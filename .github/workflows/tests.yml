@@ -22,11 +22,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -3 -m pip install robotpy
-          python -3 -m pip install coverage
-          python -3 -m robotpy sync
+          python3 -m pip install robotpy
+          pip install coverage
+          python3 -m robotpy sync
 
 
       - name:
         run: |
-          python -3 -m robotpy test
+          python3 -m robotpy test
