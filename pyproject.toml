@@ -29,5 +29,4 @@ robotpy_extras = [
 # Other pip packages to install
 requires = [
     "robotpy-commands-v2==2024.0.0b4",
-    # "robotpy-ctre==2024.0.0b4",
 ]
