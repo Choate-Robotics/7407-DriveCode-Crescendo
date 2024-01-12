@@ -1,9 +1,22 @@
+from enum import Enum
+from dataclasses import dataclass
+
+from units.SI import (
+    inches_to_meters,
+    meters,
+    meters_per_second,
+    meters_per_second_squared,
+    radians,
+)
+
 DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
 LOG_OUT_LEVEL: int = 0
 LOG_FILE_LEVEL: int = 1
+
+
 # Levels are how much information is logged
 # higher level = less information
 # level 0 will log everything
@@ -18,8 +31,15 @@ LOG_FILE_LEVEL: int = 1
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-class Type():
-        
+# LEDS
+def KRainbow():
+    return {
+        'type': 2
+    }
+
+
+class Type:
+
     def KStatic(r, g, b):
         return {
             'type': 1,
@@ -29,12 +49,7 @@ class Type():
                 'b': b
             }
         }
-    
-    def KRainbow():
-        return {
-            'type': 2
-        }
-    
+
     def KTrack(r1, g1, b1, r2, g2, b2):
         return {
             'type': 3,
@@ -47,8 +62,8 @@ class Type():
                 'b2': b2
             }
         }
-    
-    def KBlink(r,g,b):
+
+    def KBlink(r, g, b):
         return {
             'type': 4,
             'color': {
@@ -57,36 +72,63 @@ class Type():
                 'b': b
             }
         }
-        
-    def KLadder(typeA,typeB,percent,speed):
+
+    def KLadder(typeA, typeB, percent, speed):
         return {
             'type': 5,
-            'percent': percent, # 0-1
+            'percent': percent,  # 0-1
             'typeA': typeA,
             'typeB': typeB,
             'speed': speed
         }
-    
-    
-    
-class Team:
-        
-    red = 0
-    blue = 1
-    
-    
-class LimelightPipeline:
-    
-    feducial = 0.0
-    neural = 1.0
-    retroreflective = 2.0
 
-limelight_led_mode: int = {
-    'pipeline_default': 0,
+
+# TEAM
+class Team(Enum):
+    RED = 0
+    BLUE = 1
+
+
+active_team: Team = Team.BLUE
+
+
+# LIMELIGHT
+class LimelightPipeline:
+    feducial = 0.0
+    neural = 0.0
+    retroreflective = 0.0
+
+
+limelight_led_mode = {
+    'pipline_default': 0,
     'force_off': 1,
     'force_blink': 2,
     'force_on': 3
-    
 }
 
-active_team: Team = Team.blue
+# DRIVETRAIN
+front_left_move_id = 0
+front_left_turn_id = 0
+front_left_encoder_port = 0
+front_left_encoder_zeroed_pos = 0
+
+front_right_move_id = 0
+front_right_turn_id = 0
+front_right_encoder_port = 0
+front_right_encoder_zeroed_pos = 0
+
+back_left_move_id = 0
+back_left_turn_id = 0
+back_left_encoder_port = 0
+back_left_encoder_zeroed_pos = 0
+
+back_right_move_id = 0
+back_right_turn_id = 0
+back_right_encoder_port = 0
+back_right_encoder_zeroed_pos = 0
+
+driver_centric: bool = True
+drivetrain_reversed: bool = False
+
+# Gyro
+gyro_id = 0
