@@ -3,17 +3,17 @@ from dataclasses import dataclass
 
 import rev
 from wpilib import AnalogEncoder
-from ctre.sensors import CANCoder
+from phoenix6.hardware.cancoder import CANcoder
 
-from robotpy_toolkit_7407.motors.rev_motors import SparkMax, SparkMaxConfig
-from robotpy_toolkit_7407.motors.ctre_motors import TalonFX, TalonConfig
+from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
+from toolkit.motors.ctre_motors import TalonFX, TalonConfig
 
-from robotpy_toolkit_7407.sensors.gyro import PigeonIMUGyro_Wrapper
-from robotpy_toolkit_7407.subsystem_templates.drivetrain import (
+from toolkit.sensors.gyro import Pigeon2
+from toolkit.subsystem_templates.drivetrain import (
     SwerveDrivetrain,
     SwerveNode,
 )
-from robotpy_toolkit_7407.utils.units import (
+from toolkit.utils.units import (
     meters,
     meters_per_second,
     radians,
@@ -38,7 +38,7 @@ MOVE_CONFIG = TalonConfig(
 class CustomSwerveNode(SwerveNode):
     m_move: TalonFX
     m_turn: SparkMax
-    encoder: CANCoder
+    encoder: CANcoder
     absolute_encoder_zeroed_pos: float = 0
     name: str = "DefaultNode"
 
@@ -50,7 +50,7 @@ class CustomSwerveNode(SwerveNode):
     def zero(self):
         current_angle = self.get_motor_angle()
 
-        current_pos_rot = self.encoder.getAbsolutePosition() - self.absolute_encoder_zeroed_pos
+        current_pos_rot = self.encoder.get_absolute_position().value - self.absolute_encoder_zeroed_pos
 
         self.m_turn.set_sensor_position(current_pos_rot * constants.drivetrain_turn_gear_ratio)
 
@@ -77,7 +77,7 @@ class CustomSwerveNode(SwerveNode):
     def get_motor_velocity(self) -> radians_per_second:
         return (
                 self.m_move.get_sensor_velocity()
-                / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+                / constants.drivetrain_move_gear_ratio
         )
 
 
@@ -111,13 +111,13 @@ class Drivetrain(SwerveDrivetrain):
         name="n_back_right",
     )
 
-    gyro: PigeonIMUGyro_Wrapper = PigeonIMUGyro_Wrapper(config.gyro_id)
+    gyro: Pigeon2 = Pigeon2(config.gyro_id)
     axis_dx = Keymap.Drivetrain.DRIVE_X_AXIS
     axis_dy = Keymap.Drivetrain.DRIVE_Y_AXIS
     axis_rotation = Keymap.Drivetrain.DRIVE_ROTATION_AXIS
     track_width: meters = constants.track_width
     max_vel: meters_per_second = constants.drivetrain_max_vel
-    max_target_accel: meters_per_second_squared = constants.drivetrain_max_target_accel
+    max_target_accel: meters_per_second_squared = constants.drivetrain_max_accel
     max_angular_vel: radians_per_second = constants.drivetrain_max_angular_vel
     deadzone_velocity: meters_per_second = 0.02
     deadzone_angular_velocity: radians_per_second = math.radians(5)
