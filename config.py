@@ -17,3 +17,8 @@ LOG_FILE_LEVEL: int = 1
 # 4 = SETUP
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#intake
+inner_intake_id = 0
+outer_intake_front_id = 1
+outer_intake_back_id = 2
