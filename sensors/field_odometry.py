@@ -1,7 +1,7 @@
 import math
 import time
 
-from robotpy_toolkit_7407.sensors.odometry import VisionEstimator
+from toolkit.sensors.odometry import VisionEstimator
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
 
 # from subsystem import Drivetrain

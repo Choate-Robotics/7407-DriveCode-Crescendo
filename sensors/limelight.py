@@ -3,7 +3,7 @@ import ntcore, config, time
 from wpimath.geometry import Pose3d, Translation3d, Rotation3d
 from wpimath.filter import MedianFilter
 
-from robotpy_toolkit_7407.sensors.limelight.limelight import VisionEstimator
+from toolkit.sensors.odometry import VisionEstimator
 
 from wpilib import Timer
 
