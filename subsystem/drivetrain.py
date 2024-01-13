@@ -30,7 +30,7 @@ TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.018, 0.0005, 0.5, 1023 / 22365, neutral_brake=True, integral_zone=1000, max_integral_accumulator=10000
+    0.018, 0.0005, 0.5, 1023 / 22365, break_mode=True #integral_zone=1000, max_integral_accumulator=10000
 )
 
 
