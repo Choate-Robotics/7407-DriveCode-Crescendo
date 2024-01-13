@@ -1,9 +1,8 @@
 import config
 import constants
 from toolkit.subsystem import Subsystem
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
+from toolkit.motors.rev_motors import SparkMax
 from units.SI import radians
-import rev
 from math import pi
 import math
 
@@ -18,9 +17,7 @@ class Wrist(Subsystem):
     def init(self):
         self.wrist_motor.init()
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
-        self.wrist_abs_encoder = self.wrist_motor.motor.getAbsoluteEncoder(
-            rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle
-        )
+        self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
     
     def set_wrist_angle(self, pos: float):
         """
