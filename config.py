@@ -18,7 +18,9 @@ LOG_FILE_LEVEL: int = 1
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-elevator_can_id: int = 11 # TODO: PLACEHOLDER
+elevator_can_id: int = 73 # TODO: PLACEHOLDER
+elevator_gear_ratio: float = 0.7 # TODO: PLACEHOLDER
 elevator_ramp_rate: float = 1.0 # TODO: PLACEHOLDER
 elevator_max_rotation: float = 1.0 # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0 # TODO: PLACEHOLDER
+elevator_feed_forward: float = 0.65 # TODO: PLACEHOLDER

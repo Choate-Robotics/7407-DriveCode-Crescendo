@@ -23,7 +23,7 @@ class Elevator(Subsystem):
 
     def init(self) -> None:
         self.motor_extend.init()
-        self.encoder: rev.SparkAbsoluteEncoder = rev.SparkAbsoluteEncoder(self.motor_extend.motor) # TODO: Make sure params work
+        self.encoder = self.motor_extend.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
     def set_length(self, length: float) -> None:
@@ -36,19 +36,18 @@ class Elevator(Subsystem):
         
         current_length = self.get_length()
 
-        if length > .3 * config.elevator_max_rotation:
-            ff = .65 * (1 if current_length < length else -1)
-        elif length < .3 * config.elevator_max_rotation and length < current_length:
-            ff = -.75
+        if length > current_length:
+            ff = config.elevator_feed_forward
+        elif length < current_length:
+            ff = -config.elevator_feed_forward
         else: ff = 0
         
         self.motor_extend.pid_controller.setReference(length, rev.CANSparkMax.ControlType.kPosition, arbFeedforward=ff)
 
     def get_length(self) -> float:
         # Gets length and returns in meters
-        return self.motor_extend.get_sensor_position()
+        return self.motor_extend.get_sensor_position() * config.elevator_gear_ratio
     
-
     def set_motor_position(self, position: float) -> None:
         if position > 1:
             position = 1
@@ -58,8 +57,16 @@ class Elevator(Subsystem):
 
     def zero(self) -> None:
         # Reset the encoder to zero
+
+        encoder_pos: float = self.encoder.getPosition()
+
+        if encoder_pos > 0.5:
+            encoder_pos = -(1 - encoder_pos)
+
+        self.motor_extend.set_sensor_position(encoder_pos * config.elevator_gear_ratio)
+        self.motor_extend.set_target_position(0)
+
         self.set_motor_position(config.elevator_auto_position)
-        self.encoder.reset() # TODO: Sebby plz review this is for the encoder too
         self.zeroed = True
 
     def set_voltage(self, voltage: float) -> None:
