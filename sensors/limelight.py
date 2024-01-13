@@ -50,16 +50,17 @@ class Limelight():
         # self.pose_filter_roll = MedianFilter(5)
         
     def init(self):
-        campose = [
-            self.origin_offset.Y(),
-            self.origin_offset.X(),
-            self.origin_offset.Z(),
-            math.degrees(self.origin_offset.rotation().x()),
-            math.degrees(self.origin_offset.rotation().Y()),
-            math.degrees(self.origin_offset.rotation().Z())
-        ]
+        # campose = [
+        #     self.origin_offset.Y(),
+        #     self.origin_offset.X(),
+        #     self.origin_offset.Z(),
+        #     math.degrees(self.origin_offset.rotation().x()),
+        #     math.degrees(self.origin_offset.rotation().Y()),
+        #     math.degrees(self.origin_offset.rotation().Z())
+        # ]
         
-        self.table.putNumberArray('camerapose_robotspace', campose)
+        # self.table.putNumberArray('camerapose_robotspace', campose)
+        ...
         
     def enable_force_update(self):
         '''
