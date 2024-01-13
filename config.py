@@ -17,3 +17,6 @@ LOG_FILE_LEVEL: int = 1
 # 4 = SETUP
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+wrist_motor_id = 1
