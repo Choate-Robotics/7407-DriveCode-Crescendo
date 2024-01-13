@@ -71,8 +71,6 @@ class TalonFX(PIDMotor):
         if config is not None:
             self._talon_config = config
             self._talon_config._apply_settings(self._motor)
-        motion_magic_config = configs.MotionMagicConfigs()
-        motion_magic_config.motion
         
 
     def get_sensor_position(self) -> rotations:

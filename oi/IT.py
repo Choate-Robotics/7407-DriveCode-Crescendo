@@ -1,15 +1,15 @@
 
 from utils import LocalLogger
 
-log = LocalLogger("II")
+log = LocalLogger("IT")
 
-class OI:
+class IT:
     
     
     
     @staticmethod
     def init() -> None:
-        log.info("Initializing II...")
+        log.info("Initializing IT...")
 
     @staticmethod
     def map_systems():

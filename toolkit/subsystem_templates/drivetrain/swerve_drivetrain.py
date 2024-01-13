@@ -10,8 +10,9 @@ from toolkit.sensors.gyro import BaseGyro
 from toolkit.subsystem import Subsystem
 from toolkit.utils import logger
 from toolkit.utils.math import rotate_vector, bounded_angle_diff
-from toolkit.utils.units import s, m, deg, rad, hour, mile, rev, meters, meters_per_second, \
-    radians_per_second, radians
+from units.SI import meters, meters_per_second, \
+    radians_per_second, radians, miles_per_hour, miles_per_hour_to_meters_per_second, rotations_per_second, rotations_per_second__to__radians_per_second, \
+        degrees_per_second, degrees_per_second__to__radians_per_second, degrees
 
 
 class SwerveNode:
@@ -151,13 +152,13 @@ class SwerveDrivetrain(Subsystem):
     axis_dy: JoystickAxis
     axis_rotation: JoystickAxis
     track_width: meters = 1
-    max_vel: meters_per_second = (20 * mile / hour).asNumber(m / s)  # Maximum velocity
-    max_angular_vel: radians_per_second = (4 * rev / s).asNumber(rad / s)  # Maximum angular velocity
+    max_vel: meters_per_second = 20 * miles_per_hour_to_meters_per_second
+    max_angular_vel: radians_per_second = 4 * rotations_per_second__to__radians_per_second
     deadzone_velocity: meters_per_second = 0.05  # Does not run within this speed
-    deadzone_angular_velocity: radians_per_second = (5 * deg / s).asNumber(rad / s)  # Will not turn within this speed
+    deadzone_angular_velocity: radians_per_second = 5 * degrees_per_second__to__radians_per_second # Will not turn within this speed
     start_pose: Pose2d = Pose2d(0, 0, 0)  # Starting pose of the robot from wpilib Pose (x, y, rotation)
     gyro_start_angle: radians = 0
-    gyro_offset: deg = 0
+    gyro_offset: degrees = 0
 
     def __init__(self):
         super().__init__()

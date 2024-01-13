@@ -11,7 +11,7 @@ import sensors
 import subsystem
 import utils
 from oi.OI import OI
-from oi.II import II
+from oi.IT import IT
 
 
 class _Robot(wpilib.TimedRobot):
@@ -31,8 +31,8 @@ class _Robot(wpilib.TimedRobot):
         OI.init()
         OI.map_controls()
         
-        II.init()
-        II.map_systems()
+        IT.init()
+        IT.map_systems()
         period = .03
         commands2.CommandScheduler.getInstance().setPeriod(period)
 

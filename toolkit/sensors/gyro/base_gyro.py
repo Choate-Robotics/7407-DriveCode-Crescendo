@@ -1,4 +1,4 @@
-from toolkit.utils.units import radians
+from units.SI import radians
 
 
 class BaseGyro:

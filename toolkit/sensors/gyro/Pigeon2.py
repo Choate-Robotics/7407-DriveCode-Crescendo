@@ -1,7 +1,7 @@
 import phoenix6
 import math
 
-from toolkit.utils.units import radians
+from units.SI import radians
 from toolkit.sensors.gyro.base_gyro import BaseGyro
 
 

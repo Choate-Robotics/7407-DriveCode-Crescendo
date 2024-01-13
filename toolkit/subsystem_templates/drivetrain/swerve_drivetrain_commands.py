@@ -8,7 +8,7 @@ from wpimath.trajectory import TrapezoidProfileRadians, Trajectory
 from toolkit.command import SubsystemCommand
 from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
 from toolkit.utils.math import rotate_vector, bounded_angle_diff
-from toolkit.utils.units import m, s, rad
+
 
 
 class DriveSwerve(SubsystemCommand[SwerveDrivetrain]):
@@ -25,8 +25,8 @@ class DriveSwerve(SubsystemCommand[SwerveDrivetrain]):
         """
         dx, dy, d_theta = self.subsystem.axis_dx.value, self.subsystem.axis_dy.value, self.subsystem.axis_rotation.value
 
-        dx *= self.subsystem.max_vel.asUnit(m / s)
-        dy *= -self.subsystem.max_vel.asUnit(m / s)
+        dx *= self.subsystem.max_vel
+        dy *= -self.subsystem.max_vel
 
         self.subsystem.set_driver_centric((dx, dy), -d_theta * self.subsystem.max_angular_vel)
 
