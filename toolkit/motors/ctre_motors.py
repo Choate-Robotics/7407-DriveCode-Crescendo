@@ -68,8 +68,9 @@ class TalonFX(PIDMotor):
         reversed_config = configs.MotorOutputConfigs()
         reversed_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if self._inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
         self._config.apply(reversed_config)
-        self._talon_config = config
-        self._talon_config._apply_settings(self._motor)
+        if config is not None:
+            self._talon_config = config
+            self._talon_config._apply_settings(self._motor)
         motion_magic_config = configs.MotionMagicConfigs()
         motion_magic_config.motion
         
