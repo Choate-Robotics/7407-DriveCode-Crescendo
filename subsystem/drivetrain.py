@@ -41,11 +41,13 @@ class CustomSwerveNode(SwerveNode):
     encoder: CANcoder
     absolute_encoder_zeroed_pos: float = 0
     name: str = "DefaultNode"
+    counter: int = 0
 
     def init(self):
-        super().init()
+        print(f"Initializing {self.name}", self.counter)
         self.m_move.init()
         self.m_turn.init()
+        self.counter += 1
 
     def zero(self):
         current_angle = self.get_motor_angle()
@@ -64,7 +66,7 @@ class CustomSwerveNode(SwerveNode):
             (pos / (2 * math.pi)) * constants.drivetrain_turn_gear_ratio
         )
 
-    def get_motor_angle(self) -> radians:
+    def get_turn_motor_angle(self) -> radians:
         return (
                 (self.m_turn.get_sensor_position() / constants.drivetrain_turn_gear_ratio)
                 * 2
@@ -78,6 +80,14 @@ class CustomSwerveNode(SwerveNode):
         return (
                 self.m_move.get_sensor_velocity()
                 / constants.drivetrain_move_gear_ratio
+        )
+        
+    def get_drive_motor_traveled_distance(self) -> meters:
+        
+        sensor_position = self.m_move.get_sensor_position()
+        
+        return (
+            sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
 

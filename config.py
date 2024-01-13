@@ -108,22 +108,22 @@ limelight_led_mode = {
 
 # DRIVETRAIN
 front_left_move_id = 0
-front_left_turn_id = 0
+front_left_turn_id = 1
 front_left_encoder_port = 0
 front_left_encoder_zeroed_pos = 0
 
-front_right_move_id = 0
-front_right_turn_id = 0
+front_right_move_id = 2
+front_right_turn_id = 3
 front_right_encoder_port = 1
 front_right_encoder_zeroed_pos = 0
 
-back_left_move_id = 0
-back_left_turn_id = 0
+back_left_move_id = 4
+back_left_turn_id = 5
 back_left_encoder_port = 2
 back_left_encoder_zeroed_pos = 0
 
-back_right_move_id = 0
-back_right_turn_id = 0
+back_right_move_id = 6
+back_right_turn_id = 8
 back_right_encoder_port = 3
 back_right_encoder_zeroed_pos = 0
 

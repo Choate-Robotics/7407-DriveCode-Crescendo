@@ -46,15 +46,17 @@ class _Robot(wpilib.TimedRobot):
 
             for subsystem in subsystems:
                 subsystem.init()
+            
+        Robot.drivetrain.init()
 
-        try:
-            init_subsystems()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable('errors').putString('subsystem init', str(e))
+        # try:
+        #     init_subsystems()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('subsystem init', str(e))
 
-            if config.DEBUG_MODE:
-                raise e
+        #     if config.DEBUG_MODE:
+        #         raise e
 
         self.log.complete("Robot initialized")
 
@@ -88,6 +90,7 @@ class _Robot(wpilib.TimedRobot):
 
     def disabledPeriodic(self) -> None:
         pass
+    
 
 
 if __name__ == "__main__":

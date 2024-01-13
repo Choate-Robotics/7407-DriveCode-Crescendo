@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from phoenix6 import hardware, configs, signals, controls, StatusCode
+from phoenix6 import hardware, configs, signals, controls, StatusCode, StatusSignal
 import math
 
 from toolkit.motor import PIDMotor
@@ -52,29 +52,35 @@ class TalonFX(PIDMotor):
     
     _config: configs.TalonFXConfigurator
     
-    _talon_config: TalonConfig
+    _talon_config: TalonConfig = None
+    
+    _motor_pos: StatusSignal
 
     _foc: bool
 
     _inverted: bool
 
     def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None):
-        super().__init__()
-        self._motor = hardware.TalonFX(can_id)
         self._inverted = inverted
         self._foc = foc
         self._can_id = can_id
+        self._talon_config = config
+        
+            
+    def init(self):
+        print('Initializing TalonFX', self._can_id)
+        self._motor = hardware.TalonFX(self._can_id)
         self._config = self._motor.configurator
+        self._motor_pos = self._motor.get_position()
         reversed_config = configs.MotorOutputConfigs()
         reversed_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if self._inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
         self._config.apply(reversed_config)
-        if config is not None:
-            self._talon_config = config
+        if self._talon_config is not None:
             self._talon_config._apply_settings(self._motor)
-        
 
     def get_sensor_position(self) -> rotations:
-        return self._motor.get_position()
+        
+        return self._motor_pos.value
 
     def set_target_position(self, pos: radians, arbFF: float = 0.0) -> StatusCode.OK:
         return self._motor.set_control(controls.MotionMagicExpoDutyCycle(pos, self._foc, arbFF))
