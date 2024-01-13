@@ -1,4 +1,5 @@
 from enum import Enum
+from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
 
 from units.SI import (
@@ -95,8 +96,8 @@ active_team: Team = Team.BLUE
 # LIMELIGHT
 class LimelightPipeline:
     feducial = 0.0
-    neural = 0.0
-    retroreflective = 0.0
+    neural = 1.0
+    retroreflective = 2.0
 
 
 limelight_led_mode = {
@@ -105,6 +106,10 @@ limelight_led_mode = {
     'force_blink': 2,
     'force_on': 3
 }
+
+class LimelightPosition:
+    elevator_down = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+    elevator_up = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
 
 # DRIVETRAIN
 front_left_move_id = 0
@@ -132,3 +137,7 @@ drivetrain_reversed: bool = False
 
 # Gyro
 gyro_id = 0
+
+# Elevator
+
+elevator_moving = False

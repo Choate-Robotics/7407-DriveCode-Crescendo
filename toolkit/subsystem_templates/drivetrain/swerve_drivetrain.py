@@ -206,6 +206,8 @@ class SwerveDrivetrain(Subsystem):
             self.node_positions,
             self.start_pose
         )
+        
+        
 
         logger.info("initialization complete", "[swerve_drivetrain]")
 

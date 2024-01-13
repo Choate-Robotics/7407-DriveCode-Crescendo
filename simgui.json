@@ -4,7 +4,20 @@
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler"
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Odometry": {
+        "double[]##v_/Odometry/Estimated Pose": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
+    "Server": {
+      "open": true
+    },
     "visible": true
   }
 }

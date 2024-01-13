@@ -47,16 +47,32 @@ class _Robot(wpilib.TimedRobot):
             for subsystem in subsystems:
                 subsystem.init()
             
-        Robot.drivetrain.init()
 
-        # try:
-        #     init_subsystems()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('subsystem init', str(e))
+        try:
+            init_subsystems()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('subsystem init', str(e))
 
-        #     if config.DEBUG_MODE:
-        #         raise e
+            if config.DEBUG_MODE:
+                raise e
+            
+        def init_sensors():
+            sensors: list[Sensors] = list(
+                {k: v for k, v in Sensors.__dict__.items() if isinstance(v, Sensors) and hasattr(v, 'init')}.values()
+            )
+
+            for sensor in sensors:
+                sensor.init()
+                
+        try:
+            init_sensors()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('sensor init', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
 
         self.log.complete("Robot initialized")
 
@@ -72,6 +88,25 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
+            
+        try:
+            Sensors.limelight_back.update()
+            Sensors.limelight_front.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('limelight update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+        if Sensors.odometry.vision_on:
+            try:
+                Sensors.odometry.update()
+            except Exception as e:
+                self.log.error(str(e))
+                self.nt.getTable('errors').putString('odometry update', str(e))
+
+                if config.DEBUG_MODE:
+                    raise e
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
