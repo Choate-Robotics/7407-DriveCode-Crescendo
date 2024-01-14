@@ -165,7 +165,7 @@ class SwerveDrivetrain(Subsystem):
         self.kinematics: SwerveDrive4Kinematics | None = None
         self.odometry: SwerveDrive4Odometry | None = None
         self.odometry_estimator: SwerveDrive4PoseEstimator | None = None
-        self.chassis_speeds: ChassisSpeeds | None = None
+        self.chassis_speeds: ChassisSpeeds | None = ChassisSpeeds(0, 0, 0)
         self._omega: radians_per_second = 0
 
         self.node_translations: tuple[Translation2d] | None = None
