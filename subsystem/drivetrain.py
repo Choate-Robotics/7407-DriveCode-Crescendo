@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from dataclasses import dataclass
 
@@ -40,7 +42,7 @@ MOVE_CONFIG = TalonConfig(
 class CustomSwerveNode(SwerveNode):
     m_move: TalonFX
     m_turn: SparkMax
-    encoder: CANcoder
+    encoder: AnalogEncoder
     absolute_encoder_zeroed_pos: float = 0
     name: str = "DefaultNode"
     counter: int = 0
@@ -54,11 +56,14 @@ class CustomSwerveNode(SwerveNode):
     def zero(self):
         current_angle = self.get_motor_angle()
 
-        current_pos_rot = self.encoder.get_absolute_position().value - self.absolute_encoder_zeroed_pos
+        current_pos_rot = self.encoder.getAbsolutePosition() - self.absolute_encoder_zeroed_pos
 
         self.m_turn.set_sensor_position(current_pos_rot * constants.drivetrain_turn_gear_ratio)
 
         self.set_motor_angle(current_angle)
+        
+    def get_abs(self):
+        return self.encoder.getAbsolutePosition()
 
     def raw_output(self, power):
         self.m_move.set_raw_output(power)
@@ -87,6 +92,8 @@ class CustomSwerveNode(SwerveNode):
     def get_drive_motor_traveled_distance(self) -> meters:
         
         sensor_position = self.m_move.get_sensor_position()
+        
+        # print(sensor_position)
         
         return (
             sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
@@ -147,3 +154,10 @@ class Drivetrain(SwerveDrivetrain):
         self.n_front_right.set_motor_angle(math.radians(45))
         self.n_back_left.set_motor_angle(math.radians(45))
         self.n_back_right.set_motor_angle(math.radians(-45))
+        
+    def get_abs(self):
+        fl = self.n_front_left.get_abs()
+        fr = self.n_front_right.get_abs()
+        bl = self.n_back_left.get_abs()
+        br = self.n_back_right.get_abs()
+        return [fl, fr, bl, br]

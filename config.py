@@ -112,31 +112,31 @@ class LimelightPosition:
     elevator_up = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
 
 # DRIVETRAIN
-front_left_move_id = 0
-front_left_turn_id = 1
-front_left_encoder_port = 0
-front_left_encoder_zeroed_pos = 0
+front_left_move_id = 4
+front_left_turn_id = 5
+front_left_encoder_port = 1
+front_left_encoder_zeroed_pos = 0.964
 
-front_right_move_id = 2
-front_right_turn_id = 3
-front_right_encoder_port = 1
-front_right_encoder_zeroed_pos = 0
+front_right_move_id = 6
+front_right_turn_id = 7
+front_right_encoder_port = 0
+front_right_encoder_zeroed_pos = 0.684
 
-back_left_move_id = 4
-back_left_turn_id = 5
+back_left_move_id = 2
+back_left_turn_id = 3
 back_left_encoder_port = 2
-back_left_encoder_zeroed_pos = 0
+back_left_encoder_zeroed_pos = 0.509
 
-back_right_move_id = 6
-back_right_turn_id = 8
+back_right_move_id = 8
+back_right_turn_id = 9
 back_right_encoder_port = 3
-back_right_encoder_zeroed_pos = 0
+back_right_encoder_zeroed_pos = 0.261
 
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
 # Gyro
-gyro_id = 0
+gyro_id = 20
 
 # Elevator
 

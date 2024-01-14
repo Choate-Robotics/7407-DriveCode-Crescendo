@@ -7,7 +7,7 @@ from phoenix6 import hardware, configs, signals, controls, StatusCode, StatusSig
 import math
 
 from toolkit.motor import PIDMotor
-from units.SI import radians_per_second, radians, seconds, rotations
+from units.SI import radians_per_second, radians, seconds, rotations, radians_to_rotations
 import units
 
 radians_per_second_squared = float
@@ -31,6 +31,7 @@ class TalonConfig:
         self.brake_mode = brake_mode
         self.output_range = output_range
     def _apply_settings(self, motor: hardware.TalonFX):
+        print('applying settings to Talon')
         pid = configs.Slot0Configs()
         pid.k_p = self.kP
         pid.k_i = self.kI
@@ -72,11 +73,13 @@ class TalonFX(PIDMotor):
         self._motor = hardware.TalonFX(self._can_id)
         self._config = self._motor.configurator
         self._motor_pos = self._motor.get_position()
+        self._motor_vel = self._motor.get_velocity()
         reversed_config = configs.MotorOutputConfigs()
         reversed_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if self._inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
         self._config.apply(reversed_config)
         if self._talon_config is not None:
-            self._talon_config._apply_settings(self._motor)
+            ...
+            # self._talon_config._apply_settings(self._motor)
 
     def get_sensor_position(self) -> rotations:
         
@@ -89,7 +92,15 @@ class TalonFX(PIDMotor):
         return self._motor.set_position(pos)
 
     def set_target_velocity(self, vel: radians_per_second, accel: radians_per_second_squared = 0) -> StatusCode.OK:
-        return self._motor.set_control(controls.MotionMagicVelocityVoltage(vel, accel, self._foc))
+        # print('run talon vel', vel, 'rotations per second')
+        # return self._motor.set_control(controls.MotionMagicVelocityVoltage(vel, accel, self._foc))
+        # return self._motor.set_control(controls.VelocityVoltage(vel, accel, self._foc))
+        rotation = vel * radians_to_rotations
+        r_accel = accel * radians_to_rotations
+        # return self._motor.set_control(controls.VelocityVoltage(rotation, r_accel, self._foc))
+        return self._motor.set_control(controls.DutyCycleOut(.4, self._foc))
+        
+    
 
     def set_raw_output(self, x: float) -> StatusCode.OK:
         self._motor.set_control(controls.DutyCycleOut(x, self._foc))
@@ -98,7 +109,7 @@ class TalonFX(PIDMotor):
         return self._motor.set_control(controls.Follower(master._can_id, inverted))
     
     def get_sensor_velocity(self) -> radians_per_second:
-        return self._motor.get_velocity()
+        return self._motor_vel.value
     
     def get_motor_current(self) -> float:
         return self._motor.get_torque_current()

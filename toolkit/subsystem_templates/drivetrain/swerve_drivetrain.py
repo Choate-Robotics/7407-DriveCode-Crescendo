@@ -54,6 +54,12 @@ class SwerveNode:
         Get the current angle of the swerve node. Must be overridden. Must return radians.
         """
         ...
+        
+    def get_abs(self):
+        '''
+        Gets the absolute encoder value. Must be overridden.
+        '''
+        ...
 
     def set_motor_velocity(self, vel: meters_per_second):
         """
@@ -297,7 +303,7 @@ class SwerveDrivetrain(Subsystem):
 
         self.odometry.update(
             self.get_heading(),
-            *self.node_positions
+            self.node_positions
         )
 
         self.odometry_estimator.update(

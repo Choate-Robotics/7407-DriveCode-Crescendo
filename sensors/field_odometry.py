@@ -146,10 +146,21 @@ class FieldOdometry:
         # return self.drivetrain.odometry.getPose()
         est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
         
+        
         self.table.putNumberArray('Estimated Pose', [
             est_pose.translation().Y(),
             est_pose.translation().X(),
             est_pose.rotation().radians()
+        ])
+        
+        n_states = self.drivetrain.node_states
+        
+        
+        self.table.putNumberArray('Node States', [
+            n_states[0].angle.radians(), n_states[0].speed,
+            n_states[1].angle.radians(), n_states[1].speed,
+            n_states[2].angle.radians(), n_states[2].speed,
+            n_states[3].angle.radians(), n_states[3].speed
         ])
         
         self.table.putNumberArray('Velocity',[
@@ -157,6 +168,11 @@ class FieldOdometry:
             self.drivetrain.chassis_speeds.vy,
             self.drivetrain.chassis_speeds.omega
         ])
+        
+        
+        
+        self.table.putNumberArray('Abs value', 
+            self.drivetrain.get_abs())
         
         return est_pose
 

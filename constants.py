@@ -1,18 +1,24 @@
-from units.SI import rotations, rotations_per_minute, meters, inches_to_meters
+from units.SI import rotations, rotations_per_minute, meters, inches_to_meters, feet_to_meters, degrees_per_second__to__radians_per_second
 import math
 
 # DRIVETRAIN
 drivetrain_turn_gear_ratio = 1
 drivetrain_move_gear_ratio = 1
 
-track_width = 0.0
+track_width = 14 * inches_to_meters
 
-drivetrain_max_vel = 0.0
-drivetrain_max_accel = 0.0
+drivetrain_length = 25 * inches_to_meters
 
-drivetrain_max_angular_vel = 0.0
+bumper_thickness = 1.5 * inches_to_meters
 
-drivetrain_move_motor_free_speed: rotations_per_minute = 5676 # 5676 is the free speed RPM of the NEO
+drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
+
+drivetrain_max_vel = 14 * feet_to_meters
+drivetrain_max_accel = 5 * feet_to_meters
+
+drivetrain_max_angular_vel = 50 * degrees_per_second__to__radians_per_second
+
+drivetrain_move_motor_free_speed: rotations_per_minute = 6300 # 5676 is the free speed RPM of the NEO
 
 drivetrain_turn_gear_ratio: rotations = 12.8 # 12.8 is the gear ratio of the turn motor
 

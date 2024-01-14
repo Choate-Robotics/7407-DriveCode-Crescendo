@@ -1,7 +1,7 @@
 import logging
 
 import wpilib
-from robotpy_toolkit_7407 import SubsystemCommand
+from toolkit.command import SubsystemCommand
 
 import config
 from subsystem import *

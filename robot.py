@@ -20,6 +20,7 @@ class _Robot(wpilib.TimedRobot):
 
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
+        self.scheduler = commands2.CommandScheduler.getInstance()
 
     def robotInit(self):
         self.log._robot_log_setup()
@@ -34,7 +35,7 @@ class _Robot(wpilib.TimedRobot):
         IT.init()
         IT.map_systems()
         period = .03
-        commands2.CommandScheduler.getInstance().setPeriod(period)
+        self.scheduler.setPeriod(period)
 
         self.log.info(f"Scheduler period set to {period} seconds")
 
@@ -81,7 +82,7 @@ class _Robot(wpilib.TimedRobot):
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
         try:
-            commands2.CommandScheduler.getInstance().run()
+            self.scheduler.run()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('command scheduler', str(e))
@@ -111,6 +112,7 @@ class _Robot(wpilib.TimedRobot):
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
+        self.scheduler.schedule(command.DriveSwerveCustom(Robot.drivetrain))
 
     def teleopPeriodic(self):
         pass
