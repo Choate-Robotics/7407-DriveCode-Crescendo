@@ -98,15 +98,16 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
-        if Sensors.odometry.vision_on:
-            try:
-                Sensors.odometry.update()
-            except Exception as e:
-                self.log.error(str(e))
-                self.nt.getTable('errors').putString('odometry update', str(e))
+            
+        try:
+            Sensors.odometry.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
 
-                if config.DEBUG_MODE:
-                    raise e
+            if config.DEBUG_MODE:
+                raise e
+                
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
