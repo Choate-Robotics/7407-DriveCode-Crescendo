@@ -1,10 +1,11 @@
 import logging
 
 import wpilib
-from robotpy_toolkit_7407 import SubsystemCommand
+from toolkit.command import SubsystemCommand
 
 import config
 from subsystem import *
+
 
 
 def curve_abs(x):
@@ -70,7 +71,7 @@ class DrivetrainZero(SubsystemCommand[Drivetrain]):
 
     def initialize(self) -> None:
         print("ZEROING DRIVETRAIN")
-        self.subsystem.gyro.reset_angle()
+        # self.subsystem.gyro.reset_angle()
         self.subsystem.n_front_left.zero()
         self.subsystem.n_front_right.zero()
         self.subsystem.n_back_left.zero()

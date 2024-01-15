@@ -1,10 +1,11 @@
 import math
 import time
+import ntcore
 
 from toolkit.sensors.odometry import VisionEstimator
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
 
-# from subsystem import Drivetrain
+from subsystem import Drivetrain
 from units.SI import seconds
 
 
@@ -51,10 +52,10 @@ class FieldOdometry:
     """
 
     def __init__(
-        self, drivetrain: any, vision_estimator: VisionEstimator | None
+        self, drivetrain: Drivetrain, vision_estimator: VisionEstimator | None
     ):
-        self.drivetrain: any = drivetrain
-
+        self.drivetrain: Drivetrain = drivetrain
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")
         self.last_update_time: seconds | None = None
         self.min_update_wait_time: seconds = (
             0.05  # time to wait before checking for pose update
@@ -76,8 +77,9 @@ class FieldOdometry:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
+        self.table.putNumber('Robot Heading Degrees', self.drivetrain.get_heading().degrees())
         self.drivetrain.odometry.update(
-            self.drivetrain.get_heading(), *self.drivetrain.node_positions
+            self.drivetrain.get_heading(), self.drivetrain.node_positions
         )
 
         self.drivetrain.odometry_estimator.update(
@@ -142,7 +144,37 @@ class FieldOdometry:
         :rtype: Pose2d
         """
         # return self.drivetrain.odometry.getPose()
-        return self.drivetrain.odometry_estimator.getEstimatedPosition()
+        est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
+        
+        
+        self.table.putNumberArray('Estimated Pose', [
+            est_pose.translation().Y(),
+            est_pose.translation().X(),
+            est_pose.rotation().radians()
+        ])
+        
+        n_states = self.drivetrain.node_states
+        
+        
+        self.table.putNumberArray('Node States', [
+            n_states[0].angle.radians(), n_states[0].speed,
+            n_states[1].angle.radians(), n_states[1].speed,
+            n_states[2].angle.radians(), n_states[2].speed,
+            n_states[3].angle.radians(), n_states[3].speed
+        ])
+        
+        self.table.putNumberArray('Velocity',[
+            self.drivetrain.chassis_speeds.vx,
+            self.drivetrain.chassis_speeds.vy,
+            self.drivetrain.chassis_speeds.omega
+        ])
+        
+        
+        
+        self.table.putNumberArray('Abs value', 
+            self.drivetrain.get_abs())
+        
+        return est_pose
 
     def resetOdometry(self, pose: Pose2d):
         """

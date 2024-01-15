@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from builtins import type
 from dataclasses import dataclass
 from typing import Optional
@@ -18,6 +20,7 @@ from units import Unum
 # from toolkit.motors.ctre_motors import hundred_ms
 
 hundred_ms = float
+
 
 
 @dataclass
@@ -42,15 +45,6 @@ class SparkMaxConfig:
     idle_mode: Optional[CANSparkMax.IdleMode] = None
 
 
-# rev_sensor_unit = Unum.unit("rev_sensor_u", rev / 4096, "rev sensor unit")
-# rev_sensor_vel_unit = rev_sensor_unit / hundred_ms
-# rev_sensor_accel_unit = rev_sensor_vel_unit / s
-
-# k_sensor_pos_to_radians = rev.asNumber(rad)
-# k_radians_to_sensor_pos = radians.asNumber(rev)
-# k_sensor_vel_to_rad_per_sec = (rev / minute).asNumber(rad / s)
-# k_rad_per_sec_to_sensor_vel = (rad / s).asNumber(rev / minute)
-
 
 class SparkMax(PIDMotor):
     """
@@ -59,6 +53,7 @@ class SparkMax(PIDMotor):
     motor: CANSparkMax
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
+    _init_complete: bool = False
 
     def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
         """
@@ -69,7 +64,6 @@ class SparkMax(PIDMotor):
             brushless (bool, optional): Whether the motor is brushless. Defaults to True.
             config (SparkMaxConfig, None): The configuration for the motor controller. Defaults to None.
         """
-        super().__init__()
         self._can_id = can_id
         self._inverted = inverted
         self._brushless = brushless
@@ -79,6 +73,14 @@ class SparkMax(PIDMotor):
         """
         Initializes the motor controller, pid controller, and encoder
         """
+        if self._init_complete:
+            print("SparkMax already initialized")
+            return
+        
+        print("initializing SparkMax", self._can_id)
+        
+        
+        
         self.motor = CANSparkMax(
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless else CANSparkMax.MotorType.kBrushed
@@ -87,6 +89,7 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
+        self._init_complete = True
 
     def set_raw_output(self, x: float):
         """
@@ -141,6 +144,9 @@ class SparkMax(PIDMotor):
             (rotations_per_second): The sensor velocity of the motor controller in rotations per second
         """
         return self.encoder.getVelocity()
+    
+    def follow(self, master: SparkMax, inverted: bool = False) -> None:
+        self.motor.follow(master.motor, inverted)
 
     def _set_config(self, config: SparkMaxConfig):
         if config is None:

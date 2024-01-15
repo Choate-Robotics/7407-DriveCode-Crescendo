@@ -11,6 +11,7 @@ import sensors
 import subsystem
 import utils
 from oi.OI import OI
+from oi.IT import IT
 
 
 class _Robot(wpilib.TimedRobot):
@@ -19,6 +20,7 @@ class _Robot(wpilib.TimedRobot):
 
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
+        self.scheduler = commands2.CommandScheduler.getInstance()
 
     def robotInit(self):
         self.log._robot_log_setup()
@@ -29,8 +31,11 @@ class _Robot(wpilib.TimedRobot):
         # Initialize Operator Interface
         OI.init()
         OI.map_controls()
+        
+        IT.init()
+        IT.map_systems()
         period = .03
-        commands2.CommandScheduler.getInstance().setPeriod(period)
+        self.scheduler.setPeriod(period)
 
         self.log.info(f"Scheduler period set to {period} seconds")
 
@@ -42,12 +47,30 @@ class _Robot(wpilib.TimedRobot):
 
             for subsystem in subsystems:
                 subsystem.init()
+            
 
         try:
             init_subsystems()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('subsystem init', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        def init_sensors():
+            sensors: list[Sensors] = list(
+                {k: v for k, v in Sensors.__dict__.items() if isinstance(v, Sensors) and hasattr(v, 'init')}.values()
+            )
+
+            for sensor in sensors:
+                sensor.init()
+                
+        try:
+            init_sensors()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('sensor init', str(e))
 
             if config.DEBUG_MODE:
                 raise e
@@ -59,19 +82,44 @@ class _Robot(wpilib.TimedRobot):
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
         try:
-            commands2.CommandScheduler.getInstance().run()
+            self.scheduler.run()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('command scheduler', str(e))
 
             if config.DEBUG_MODE:
                 raise e
+            
+        try:
+            Sensors.limelight_back.update()
+            Sensors.limelight_front.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('limelight update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        try:
+            Sensors.odometry.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+                
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
+        self.scheduler.schedule(commands2.SequentialCommandGroup(
+            command.DrivetrainZero(Robot.drivetrain),
+            command.DriveSwerveCustom(Robot.drivetrain)
+            )
+        )
 
     def teleopPeriodic(self):
-        pass
+        print(config.front_left_encoder_port.getAbsolutePosition())
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
@@ -84,6 +132,7 @@ class _Robot(wpilib.TimedRobot):
 
     def disabledPeriodic(self) -> None:
         pass
+    
 
 
 if __name__ == "__main__":

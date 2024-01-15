@@ -1,5 +1,7 @@
 from enum import Enum
+from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
+from wpilib import AnalogEncoder
 
 from units.SI import (
     inches_to_meters,
@@ -95,8 +97,8 @@ active_team: Team = Team.BLUE
 # LIMELIGHT
 class LimelightPipeline:
     feducial = 0.0
-    neural = 0.0
-    retroreflective = 0.0
+    neural = 1.0
+    retroreflective = 2.0
 
 
 limelight_led_mode = {
@@ -106,29 +108,37 @@ limelight_led_mode = {
     'force_on': 3
 }
 
+class LimelightPosition:
+    elevator_down = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+    elevator_up = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+
 # DRIVETRAIN
-front_left_move_id = 0
-front_left_turn_id = 0
-front_left_encoder_port = 0
-front_left_encoder_zeroed_pos = 0
+front_left_move_id = 4
+front_left_turn_id = 5
+front_left_encoder_port = AnalogEncoder(0)
+front_left_encoder_zeroed_pos = 0.433
 
-front_right_move_id = 0
-front_right_turn_id = 0
-front_right_encoder_port = 0
-front_right_encoder_zeroed_pos = 0
+front_right_move_id = 6
+front_right_turn_id = 7
+front_right_encoder_port = AnalogEncoder(2)
+front_right_encoder_zeroed_pos = 0.257
 
-back_left_move_id = 0
-back_left_turn_id = 0
-back_left_encoder_port = 0
-back_left_encoder_zeroed_pos = 0
+back_left_move_id = 2
+back_left_turn_id = 3
+back_left_encoder_port = AnalogEncoder(1)
+back_left_encoder_zeroed_pos = 0.722
 
-back_right_move_id = 0
-back_right_turn_id = 0
-back_right_encoder_port = 0
-back_right_encoder_zeroed_pos = 0
+back_right_move_id = 8
+back_right_turn_id = 9
+back_right_encoder_port = AnalogEncoder(3)
+back_right_encoder_zeroed_pos = 0.011
 
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
 # Gyro
-gyro_id = 0
+gyro_id = 20
+
+# Elevator
+
+elevator_moving = False

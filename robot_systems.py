@@ -1,10 +1,11 @@
 import subsystem
 import sensors
-import wpilib
+import wpilib, config,constants
 
 
 class Robot:
-    pass
+    
+    drivetrain = subsystem.Drivetrain()
 
 
 class Pneumatics:
@@ -12,7 +13,11 @@ class Pneumatics:
 
 
 class Sensors:
-    pass
+    
+    limelight_front = sensors.Limelight(config.LimelightPosition.elevator_down, 'limelight-front')
+    limelight_back = sensors.Limelight(config.LimelightPosition.elevator_down, 'limelight-back')
+    
+    odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([limelight_front, limelight_back]))
 
 class LEDs:
     pass

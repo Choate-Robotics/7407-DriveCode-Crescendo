@@ -50,18 +50,17 @@ class Limelight():
         # self.pose_filter_roll = MedianFilter(5)
         
     def init(self):
-        pass
-        # self.feducial_filter.reset()
         # campose = [
         #     self.origin_offset.Y(),
         #     self.origin_offset.X(),
         #     self.origin_offset.Z(),
-        #     self.origin_offset.rotation().x(),
-        #     self.origin_offset.rotation().Y(),
-        #     self.origin_offset.rotation().Z()
+        #     math.degrees(self.origin_offset.rotation().x()),
+        #     math.degrees(self.origin_offset.rotation().Y()),
+        #     math.degrees(self.origin_offset.rotation().Z())
         # ]
         
         # self.table.putNumberArray('camerapose_robotspace', campose)
+        ...
         
     def enable_force_update(self):
         '''
@@ -261,7 +260,7 @@ class LimelightController(VisionEstimator):
     def get_estimated_robot_pose(self) -> list[Pose3d] | None:
         poses = []
         for limelight in self.limelights:
-            if limelight.april_tag_exists() and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial:
+            if limelight.april_tag_exists() and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial and not config.elevator_moving:
                 # print(limelight.name+' Is sending bot pose')
                 poses += [(limelight.get_bot_pose(), Timer.getFPGATimestamp())]
             else:
