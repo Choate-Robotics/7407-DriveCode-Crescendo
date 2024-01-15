@@ -7,10 +7,12 @@ from phoenix6 import hardware, configs, signals, controls, StatusCode, StatusSig
 import math
 
 from toolkit.motor import PIDMotor
-from units.SI import radians_per_second, radians, seconds, rotations, radians_to_rotations
+from units.SI import radians_per_second, radians, seconds, rotations, radians_to_rotations, rotations_per_second
 import units
 
 radians_per_second_squared = float
+
+rotations_per_second_squared = float
 
 class TalonConfig:
     
@@ -85,20 +87,15 @@ class TalonFX(PIDMotor):
         
         return self._motor_pos.value
 
-    def set_target_position(self, pos: radians, arbFF: float = 0.0) -> StatusCode.OK:
+    def set_target_position(self, pos: rotations, arbFF: float = 0.0) -> StatusCode.OK:
         return self._motor.set_control(controls.MotionMagicExpoDutyCycle(pos, self._foc, arbFF))
 
-    def set_sensor_position(self, pos: radians) -> StatusCode.OK:
+    def set_sensor_position(self, pos: rotations) -> StatusCode.OK:
         return self._motor.set_position(pos)
 
-    def set_target_velocity(self, vel: radians_per_second, accel: radians_per_second_squared = 0) -> StatusCode.OK:
-        # print('run talon vel', vel, 'rotations per second')
-        # return self._motor.set_control(controls.MotionMagicVelocityVoltage(vel, accel, self._foc))
-        # return self._motor.set_control(controls.VelocityVoltage(vel, accel, self._foc))
-        rotation = vel * radians_to_rotations
-        r_accel = accel * radians_to_rotations
-        # return self._motor.set_control(controls.VelocityVoltage(rotation, r_accel, self._foc))
-        return self._motor.set_control(controls.DutyCycleOut(.4, self._foc))
+    def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0) -> StatusCode.OK:
+        
+        return self._motor.set_control(controls.VelocityVoltage(vel, accel, self._foc))
         
     
 
@@ -108,7 +105,7 @@ class TalonFX(PIDMotor):
     def follow(self, master: TalonFX, inverted: bool = False) -> StatusCode.OK:
         return self._motor.set_control(controls.Follower(master._can_id, inverted))
     
-    def get_sensor_velocity(self) -> radians_per_second:
+    def get_sensor_velocity(self) -> rotations_per_second:
         return self._motor_vel.value
     
     def get_motor_current(self) -> float:

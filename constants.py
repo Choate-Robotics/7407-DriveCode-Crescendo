@@ -30,6 +30,6 @@ drivetrain_move_gear_ratio: rotations_per_minute = drivetrain_move_motor_free_sp
 
 #TODO: Change this
 # the below variable is the rotation the motor rotates per meter of wheel movement
-drivetrain_move_gear_ratio_as_rotations_per_meter = (1 / (drivetrain_wheel_diameter * math.pi)) * drivetrain_move_gear_ratio
+drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (drivetrain_wheel_diameter * math.pi)) * drivetrain_move_gear_ratio
 
 
