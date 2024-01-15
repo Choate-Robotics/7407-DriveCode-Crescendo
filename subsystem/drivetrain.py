@@ -100,31 +100,32 @@ class CustomSwerveNode(SwerveNode):
             sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
+foc_active = False
 
 class Drivetrain(SwerveDrivetrain):
     n_front_left = CustomSwerveNode(
-        TalonFX(config.front_left_move_id, config=MOVE_CONFIG),
+        TalonFX(config.front_left_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.front_left_turn_id, config=TURN_CONFIG),
         AnalogEncoder(config.front_left_encoder_port),
         absolute_encoder_zeroed_pos=config.front_left_encoder_zeroed_pos,
         name="n_front_left",
     )
     n_front_right = CustomSwerveNode(
-        TalonFX(config.front_right_move_id, config=MOVE_CONFIG),
+        TalonFX(config.front_right_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.front_right_turn_id, config=TURN_CONFIG),
         AnalogEncoder(config.front_right_encoder_port),
         absolute_encoder_zeroed_pos=config.front_right_encoder_zeroed_pos,
         name="n_front_right",
     )
     n_back_left = CustomSwerveNode(
-        TalonFX(config.back_left_move_id, config=MOVE_CONFIG),
+        TalonFX(config.back_left_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.back_left_turn_id, config=TURN_CONFIG),
         AnalogEncoder(config.back_left_encoder_port),
         absolute_encoder_zeroed_pos=config.back_left_encoder_zeroed_pos,
         name="n_back_left",
     )
     n_back_right = CustomSwerveNode(
-        TalonFX(config.back_right_move_id, config=MOVE_CONFIG),
+        TalonFX(config.back_right_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.back_right_turn_id, config=TURN_CONFIG),
         AnalogEncoder(config.back_right_encoder_port),
         absolute_encoder_zeroed_pos=config.back_right_encoder_zeroed_pos,

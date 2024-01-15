@@ -58,6 +58,10 @@ class TalonFX(PIDMotor):
     _talon_config: TalonConfig = None
     
     _motor_pos: StatusSignal
+    
+    _motor_vel: StatusSignal
+    
+    _motor_current: StatusSignal
 
     _foc: bool
 
@@ -72,19 +76,19 @@ class TalonFX(PIDMotor):
             
     def init(self):
         print('Initializing TalonFX', self._can_id)
-        self._motor = hardware.TalonFX(self._can_id)
+        self._motor = hardware.TalonFX(self._can_id, 'rio')
         self._config = self._motor.configurator
         self._motor_pos = self._motor.get_position()
         self._motor_vel = self._motor.get_velocity()
+        self._motor_current = self._motor.get_torque_current()
         reversed_config = configs.MotorOutputConfigs()
         reversed_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if self._inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
         self._config.apply(reversed_config)
         if self._talon_config is not None:
-            ...
-            # self._talon_config._apply_settings(self._motor)
+            self._talon_config._apply_settings(self._motor)
 
     def get_sensor_position(self) -> rotations:
-        
+        self._motor_pos.refresh()
         return self._motor_pos.value
 
     def set_target_position(self, pos: rotations, arbFF: float = 0.0) -> StatusCode.OK:
@@ -97,8 +101,6 @@ class TalonFX(PIDMotor):
         
         return self._motor.set_control(controls.VelocityVoltage(vel, accel, self._foc))
         
-    
-
     def set_raw_output(self, x: float) -> StatusCode.OK:
         self._motor.set_control(controls.DutyCycleOut(x, self._foc))
 
@@ -106,7 +108,9 @@ class TalonFX(PIDMotor):
         return self._motor.set_control(controls.Follower(master._can_id, inverted))
     
     def get_sensor_velocity(self) -> rotations_per_second:
+        self._motor_vel.refresh()
         return self._motor_vel.value
     
     def get_motor_current(self) -> float:
-        return self._motor.get_torque_current()
+        self._motor_current.refresh()
+        return self._motor_current.value
