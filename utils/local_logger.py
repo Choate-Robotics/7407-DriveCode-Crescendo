@@ -70,7 +70,7 @@ class LocalLogger():
         self.name = name
         self.dlm = DataLogManager
         if config.LOGGING:
-            self.dlm.start('logs/')
+            self.dlm.start('')
             self.log_data = self.dlm.getLog()
             self.custom_entry = StringLogEntry(self.log_data, f'messages/{self.name}')
         

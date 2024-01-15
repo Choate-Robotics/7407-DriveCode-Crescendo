@@ -52,15 +52,31 @@ class CustomSwerveNode(SwerveNode):
         self.m_move.init()
         self.m_turn.init()
         self.counter += 1
+        
+    def initial_zero(self):
+        self.m_turn.set_sensor_position(0)
+        abs_encoder_position: float = self.encoder.getAbsolutePosition()
+        print(abs_encoder_position)
+                
+        
+        encoder_difference: float = abs_encoder_position  - self.absolute_encoder_zeroed_pos
+        
+        if encoder_difference > .5:
+            encoder_difference -= 1
+        elif encoder_difference < -.5:
+            encoder_difference += 1
+            
+
+        motor_change = encoder_difference * constants.drivetrain_turn_gear_ratio
+
+        
+        print(-encoder_difference * 360, self.m_turn._can_id)
+        self.m_turn.set_sensor_position(-motor_change)
 
     def zero(self):
-        current_angle = self.get_motor_angle()
+        self.initial_zero()
 
-        current_pos_rot = self.encoder.getAbsolutePosition() - self.absolute_encoder_zeroed_pos
-
-        self.m_turn.set_sensor_position(current_pos_rot * constants.drivetrain_turn_gear_ratio)
-
-        self.set_motor_angle(current_angle)
+        self.m_turn.set_target_position(0)
         
     def get_abs(self):
         return self.encoder.getAbsolutePosition()
@@ -81,10 +97,10 @@ class CustomSwerveNode(SwerveNode):
         )
 
     def set_motor_velocity(self, vel: meters_per_second):
-        
+        # print(vel, 'meters per second')
         rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter
-        
-        self.m_move.set_target_velocity(rotations_per_second)
+        # print(rotations_per_second, 'rotations per second')
+        # self.m_move.set_target_velocity(rotations_per_second)
 
     def get_motor_velocity(self) -> meters_per_second:
         return (
@@ -106,28 +122,28 @@ class Drivetrain(SwerveDrivetrain):
     n_front_left = CustomSwerveNode(
         TalonFX(config.front_left_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.front_left_turn_id, config=TURN_CONFIG),
-        AnalogEncoder(config.front_left_encoder_port),
+        config.front_left_encoder_port,
         absolute_encoder_zeroed_pos=config.front_left_encoder_zeroed_pos,
         name="n_front_left",
     )
     n_front_right = CustomSwerveNode(
         TalonFX(config.front_right_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.front_right_turn_id, config=TURN_CONFIG),
-        AnalogEncoder(config.front_right_encoder_port),
+        config.front_right_encoder_port,
         absolute_encoder_zeroed_pos=config.front_right_encoder_zeroed_pos,
         name="n_front_right",
     )
     n_back_left = CustomSwerveNode(
         TalonFX(config.back_left_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.back_left_turn_id, config=TURN_CONFIG),
-        AnalogEncoder(config.back_left_encoder_port),
+        config.back_left_encoder_port,
         absolute_encoder_zeroed_pos=config.back_left_encoder_zeroed_pos,
         name="n_back_left",
     )
     n_back_right = CustomSwerveNode(
         TalonFX(config.back_right_move_id, foc=foc_active, config=MOVE_CONFIG),
         SparkMax(config.back_right_turn_id, config=TURN_CONFIG),
-        AnalogEncoder(config.back_right_encoder_port),
+        config.back_right_encoder_port,
         absolute_encoder_zeroed_pos=config.back_right_encoder_zeroed_pos,
         name="n_back_right",
     )

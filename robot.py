@@ -112,10 +112,14 @@ class _Robot(wpilib.TimedRobot):
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
-        self.scheduler.schedule(command.DriveSwerveCustom(Robot.drivetrain))
+        self.scheduler.schedule(commands2.SequentialCommandGroup(
+            command.DrivetrainZero(Robot.drivetrain),
+            command.DriveSwerveCustom(Robot.drivetrain)
+            )
+        )
 
     def teleopPeriodic(self):
-        pass
+        print(config.front_left_encoder_port.getAbsolutePosition())
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")

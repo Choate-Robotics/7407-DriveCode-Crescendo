@@ -7,6 +7,7 @@ import config
 from subsystem import *
 
 
+
 def curve_abs(x):
     curve = wpilib.SmartDashboard.getNumber('curve', 2)
     return x ** curve
@@ -70,7 +71,7 @@ class DrivetrainZero(SubsystemCommand[Drivetrain]):
 
     def initialize(self) -> None:
         print("ZEROING DRIVETRAIN")
-        self.subsystem.gyro.reset_angle()
+        # self.subsystem.gyro.reset_angle()
         self.subsystem.n_front_left.zero()
         self.subsystem.n_front_right.zero()
         self.subsystem.n_back_left.zero()

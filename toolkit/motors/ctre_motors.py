@@ -34,20 +34,36 @@ class TalonConfig:
         self.output_range = output_range
     def _apply_settings(self, motor: hardware.TalonFX):
         print('applying settings to Talon')
-        pid = configs.Slot0Configs()
+        talon_config = configs.TalonFXConfiguration()
+        
+        # PID
+        pid = talon_config.slot0
         pid.k_p = self.kP
         pid.k_i = self.kI
         pid.k_d = self.kD
         pid.k_s = self.kF
-        motor.configurator.apply(pid)
-        current_limits_config = configs.CurrentLimitsConfigs()
+        
+        # current limits
+        current_limits_config = talon_config.current_limits
         current_limits_config.supply_current_limit = self.current_limit
         current_limits_config.supply_current_limit_enable = True if self.current_limit > 0 else False
         current_limits_config.supply_time_threshold = 1
-        motor.configurator.apply(current_limits_config)
-        break_mode_config = configs.MotorOutputConfigs()
-        break_mode_config.neutral_mode = signals.NeutralModeValue.BRAKE if self.brake_mode else signals.NeutralModeValue.COAST
-        motor.configurator.apply(break_mode_config)
+        
+        # brake mode
+        brake_mode_config = talon_config.motor_output
+        brake_mode_config.neutral_mode = signals.NeutralModeValue.BRAKE if self.brake_mode else signals.NeutralModeValue.COAST
+        
+        # motion magic
+        magic = talon_config.motion_magic
+        magic.motion_magic_acceleration = 400
+        magic.motion_magic_jerk = 4000
+        
+        res = motor.configurator.apply(talon_config)
+        if res != StatusCode.OK:
+            print('error! config not applying')
+            raise RuntimeError
+        else:
+            print('talon configured')
 
 
 class TalonFX(PIDMotor):
@@ -62,6 +78,12 @@ class TalonFX(PIDMotor):
     _motor_vel: StatusSignal
     
     _motor_current: StatusSignal
+    
+    _mm_v_v: controls.MotionMagicVelocityVoltage
+    
+    _mm_p_v: controls.MotionMagicVoltage
+    
+    _d_o: controls.DutyCycleOut
 
     _foc: bool
 
@@ -81,28 +103,35 @@ class TalonFX(PIDMotor):
         self._motor_pos = self._motor.get_position()
         self._motor_vel = self._motor.get_velocity()
         self._motor_current = self._motor.get_torque_current()
+        self.__setup_controls()
         reversed_config = configs.MotorOutputConfigs()
         reversed_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if self._inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
         self._config.apply(reversed_config)
         if self._talon_config is not None:
             self._talon_config._apply_settings(self._motor)
+            
+    def __setup_controls(self):
+        self._mm_v_v = controls.MotionMagicVelocityVoltage(0)
+        self._mm_p_v = controls.MotionMagicVoltage(0)
+        self._d_o = controls.DutyCycleOut(0)
 
     def get_sensor_position(self) -> rotations:
         self._motor_pos.refresh()
         return self._motor_pos.value
 
     def set_target_position(self, pos: rotations, arbFF: float = 0.0) -> StatusCode.OK:
-        return self._motor.set_control(controls.MotionMagicExpoDutyCycle(pos, self._foc, arbFF))
+        return self._motor.set_control(self._mm_p_v.with_position(pos))
 
     def set_sensor_position(self, pos: rotations) -> StatusCode.OK:
         return self._motor.set_position(pos)
 
     def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0) -> StatusCode.OK:
-        
-        return self._motor.set_control(controls.VelocityVoltage(vel, accel, self._foc))
+        print('going', vel, 'rotations per second')
+        return self._motor.set_control(self._mm_v_v.with_velocity(vel))
+        # return self._motor.set_control(controls.VelocityDutyCycle(.5, enable_foc=False))
         
     def set_raw_output(self, x: float) -> StatusCode.OK:
-        self._motor.set_control(controls.DutyCycleOut(x, self._foc))
+        self._motor.set_control(self._d_o.with_output(x))
 
     def follow(self, master: TalonFX, inverted: bool = False) -> StatusCode.OK:
         return self._motor.set_control(controls.Follower(master._can_id, inverted))

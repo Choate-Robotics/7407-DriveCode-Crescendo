@@ -1,6 +1,7 @@
 from enum import Enum
 from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
+from wpilib import AnalogEncoder
 
 from units.SI import (
     inches_to_meters,
@@ -114,23 +115,23 @@ class LimelightPosition:
 # DRIVETRAIN
 front_left_move_id = 4
 front_left_turn_id = 5
-front_left_encoder_port = 1
-front_left_encoder_zeroed_pos = 0.964
+front_left_encoder_port = AnalogEncoder(0)
+front_left_encoder_zeroed_pos = 0.433
 
 front_right_move_id = 6
 front_right_turn_id = 7
-front_right_encoder_port = 0
-front_right_encoder_zeroed_pos = 0.684
+front_right_encoder_port = AnalogEncoder(2)
+front_right_encoder_zeroed_pos = 0.257
 
 back_left_move_id = 2
 back_left_turn_id = 3
-back_left_encoder_port = 2
-back_left_encoder_zeroed_pos = 0.509
+back_left_encoder_port = AnalogEncoder(1)
+back_left_encoder_zeroed_pos = 0.722
 
 back_right_move_id = 8
 back_right_turn_id = 9
-back_right_encoder_port = 3
-back_right_encoder_zeroed_pos = 0.261
+back_right_encoder_port = AnalogEncoder(3)
+back_right_encoder_zeroed_pos = 0.011
 
 driver_centric: bool = True
 drivetrain_reversed: bool = False
