@@ -1,6 +1,5 @@
 import commands2
 from toolkit.subsystem import Subsystem
-import phoenix5 as ctre
 import ntcore
 import wpilib
 import command
@@ -17,12 +16,13 @@ from oi.IT import IT
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
-
+        ...
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
         self.scheduler = commands2.CommandScheduler.getInstance()
 
     def robotInit(self):
+        ...
         self.log._robot_log_setup()
 
         if config.DEBUG_MODE:
@@ -78,6 +78,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.complete("Robot initialized")
 
     def robotPeriodic(self):
+        ...
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
@@ -111,7 +112,8 @@ class _Robot(wpilib.TimedRobot):
                 
 
     def teleopInit(self):
-        self.log.info("Teleop initialized")
+        # self.log.info("Teleop initialized")
+        ...
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain)
@@ -119,16 +121,18 @@ class _Robot(wpilib.TimedRobot):
         )
 
     def teleopPeriodic(self):
-        print(config.front_left_encoder_port.getAbsolutePosition())
+        ...
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
+        ...
 
     def autonomousPeriodic(self):
         pass
 
     def disabledInit(self) -> None:
         self.log.info("Robot disabled")
+        ...
 
     def disabledPeriodic(self) -> None:
         pass

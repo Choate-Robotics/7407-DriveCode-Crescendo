@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 import rev
 from wpilib import AnalogEncoder
-from phoenix6.hardware.cancoder import CANcoder
 
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonFX, TalonConfig
@@ -71,7 +70,7 @@ class CustomSwerveNode(SwerveNode):
 
         
         print(-encoder_difference * 360, self.m_turn._can_id)
-        self.m_turn.set_sensor_position(-motor_change)
+        self.m_turn.set_sensor_position(motor_change)
 
     def zero(self):
         self.initial_zero()
@@ -98,9 +97,9 @@ class CustomSwerveNode(SwerveNode):
 
     def set_motor_velocity(self, vel: meters_per_second):
         # print(vel, 'meters per second')
-        rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+        rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter / 2
         # print(rotations_per_second, 'rotations per second')
-        # self.m_move.set_target_velocity(rotations_per_second)
+        self.m_move.set_target_velocity(rotations_per_second)
 
     def get_motor_velocity(self) -> meters_per_second:
         return (

@@ -20,8 +20,8 @@ def curve(x):
 
 
 class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
-    driver_centric = True
-    driver_centric_reversed = False
+    driver_centric = False
+    driver_centric_reversed = True
 
     def initialize(self) -> None:
         pass

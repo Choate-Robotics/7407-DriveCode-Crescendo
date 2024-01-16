@@ -116,22 +116,22 @@ class LimelightPosition:
 front_left_move_id = 4
 front_left_turn_id = 5
 front_left_encoder_port = AnalogEncoder(0)
-front_left_encoder_zeroed_pos = 0.433
+front_left_encoder_zeroed_pos = 0.678
 
 front_right_move_id = 6
 front_right_turn_id = 7
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.257
+front_right_encoder_zeroed_pos = 0.503
 
 back_left_move_id = 2
 back_left_turn_id = 3
 back_left_encoder_port = AnalogEncoder(1)
-back_left_encoder_zeroed_pos = 0.722
+back_left_encoder_zeroed_pos = 0.964
 
 back_right_move_id = 8
 back_right_turn_id = 9
 back_right_encoder_port = AnalogEncoder(3)
-back_right_encoder_zeroed_pos = 0.011
+back_right_encoder_zeroed_pos = 0.260
 
 driver_centric: bool = True
 drivetrain_reversed: bool = False

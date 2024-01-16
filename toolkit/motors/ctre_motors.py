@@ -108,7 +108,8 @@ class TalonFX(PIDMotor):
         reversed_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if self._inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
         self._config.apply(reversed_config)
         if self._talon_config is not None:
-            self._talon_config._apply_settings(self._motor)
+            ...
+            # self._talon_config._apply_settings(self._motor)
             
     def __setup_controls(self):
         self._mm_v_v = controls.MotionMagicVelocityVoltage(0)
@@ -127,7 +128,8 @@ class TalonFX(PIDMotor):
 
     def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0) -> StatusCode.OK:
         print('going', vel, 'rotations per second')
-        return self._motor.set_control(self._mm_v_v.with_velocity(vel))
+        # return self._motor.set_control(self._mm_v_v.with_velocity(vel))
+        return self._motor.set_control(controls.VoltageOut(vel))
         # return self._motor.set_control(controls.VelocityDutyCycle(.5, enable_foc=False))
         
     def set_raw_output(self, x: float) -> StatusCode.OK:
