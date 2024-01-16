@@ -12,7 +12,7 @@ import utils
 from oi.OI import OI
 from oi.IT import IT
 from wpilib import SmartDashboard
-
+import autonomous
 
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
@@ -21,6 +21,8 @@ class _Robot(wpilib.TimedRobot):
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
         self.scheduler = commands2.CommandScheduler.getInstance()
+
+        self.auto_selection: wpilib.SendableChooser | None = None
 
     def robotInit(self):
         ...
@@ -79,6 +81,11 @@ class _Robot(wpilib.TimedRobot):
 
         self.log.complete("Robot initialized")
 
+        # Auto Selection
+        self.auto_selection = wpilib.SendableChooser()
+
+        self.auto_selection.setDefaultOption("Drive Straight", autonomous.drive_straight)
+
     def robotPeriodic(self):
         ...
         if self.isSimulation():
@@ -136,7 +143,15 @@ class _Robot(wpilib.TimedRobot):
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
-        ...
+
+        Robot.drivetrain.n_front_left.zero()
+        Robot.drivetrain.n_front_right.zero()
+        Robot.drivetrain.n_back_left.zero()
+        Robot.drivetrain.n_back_right.zero()
+
+        config.active_team = config.Team.BLUE
+
+        self.auto_selection.getSelected().run()
 
     def autonomousPeriodic(self):
         pass

@@ -10,7 +10,7 @@ from units.SI import seconds
 
 
 def weighted_pose_average(
-    robot_pose: Pose2d, vision_pose: Pose3d, robot_weight: float, vision_weight: float
+        robot_pose: Pose2d, vision_pose: Pose3d, robot_weight: float, vision_weight: float
 ) -> Pose2d:
     """
     Returns a weighted average of two poses.
@@ -31,12 +31,12 @@ def weighted_pose_average(
     return Pose2d(
         Translation2d(
             (
-                robot_pose.translation().X() * robot_weight
-                + vision_pose.translation().X() * vision_weight
+                    robot_pose.translation().X() * robot_weight
+                    + vision_pose.translation().X() * vision_weight
             ),
             (
-                robot_pose.translation().Y() * robot_weight
-                + vision_pose.translation().Y() * vision_weight
+                    robot_pose.translation().Y() * robot_weight
+                    + vision_pose.translation().Y() * vision_weight
             ),
         ),
         Rotation2d(
@@ -52,7 +52,7 @@ class FieldOdometry:
     """
 
     def __init__(
-        self, drivetrain: Drivetrain, vision_estimator: VisionEstimator | None
+            self, drivetrain: Drivetrain, vision_estimator: VisionEstimator | None
     ):
         self.drivetrain: Drivetrain = drivetrain
         self.table = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")
@@ -66,10 +66,10 @@ class FieldOdometry:
         self.robot_pose_weight: float = 1 - self.vision_estimator_pose_weight
 
         self.vision_on = True
-        
+
     def enable(self):
         self.vision_on = True
-        
+
     def disable(self):
         self.vision_on = False
 
@@ -92,7 +92,7 @@ class FieldOdometry:
         if self.vision_on:
             current_time = time.time()
             if self.last_update_time is None or (
-                current_time - self.last_update_time >= self.min_update_wait_time
+                    current_time - self.last_update_time >= self.min_update_wait_time
             ):
                 try:
                     vision_robot_pose_list = (
@@ -109,15 +109,15 @@ class FieldOdometry:
                     if vision_robot_pose[0] and vision_robot_pose[1]:
                         vision_time = vision_robot_pose[1]
                         vision_robot_pose = vision_robot_pose[0]
-                        
+
                         angle_diff = (
-                            math.degrees(
-                                vision_robot_pose.toPose2d().rotation().radians()
-                                - self.drivetrain.gyro.get_robot_heading()
-                            )
-                            % 360
+                                math.degrees(
+                                    vision_robot_pose.toPose2d().rotation().radians()
+                                    - self.drivetrain.gyro.get_robot_heading()
+                                )
+                                % 360
                         )
-                        
+
                         angle_diff_rev = 360 - angle_diff
                         if (5 > angle_diff > -5) or (5 > angle_diff_rev > -5):
                             self.drivetrain.odometry_estimator.addVisionMeasurement(
@@ -145,35 +145,31 @@ class FieldOdometry:
         """
         # return self.drivetrain.odometry.getPose()
         est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
-        
-        
+
         self.table.putNumberArray('Estimated Pose', [
             est_pose.translation().Y(),
             est_pose.translation().X(),
             est_pose.rotation().radians()
         ])
-        
+
         n_states = self.drivetrain.node_states
-        
-        
+
         self.table.putNumberArray('Node States', [
             n_states[0].angle.radians(), n_states[0].speed,
             n_states[1].angle.radians(), n_states[1].speed,
             n_states[2].angle.radians(), n_states[2].speed,
             n_states[3].angle.radians(), n_states[3].speed
         ])
-        
-        self.table.putNumberArray('Velocity',[
+
+        self.table.putNumberArray('Velocity', [
             self.drivetrain.chassis_speeds.vx,
             self.drivetrain.chassis_speeds.vy,
             self.drivetrain.chassis_speeds.omega
         ])
-        
-        
-        
-        self.table.putNumberArray('Abs value', 
-            self.drivetrain.get_abs())
-        
+
+        self.table.putNumberArray('Abs value',
+                                  self.drivetrain.get_abs())
+
         return est_pose
 
     def resetOdometry(self, pose: Pose2d):

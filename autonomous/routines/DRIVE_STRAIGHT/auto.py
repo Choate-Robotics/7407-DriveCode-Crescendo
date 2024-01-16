@@ -4,7 +4,7 @@ from robot_systems import Robot
 
 from commands2 import (
     InstantCommand,
-    SequentialCommandGroup,
+    SequentialCommandGroup
 )
 
 from autonomous.auto_routine import AutoRoutine
