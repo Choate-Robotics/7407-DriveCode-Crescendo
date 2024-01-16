@@ -14,6 +14,7 @@ from oi.IT import IT
 from wpilib import SmartDashboard
 import autonomous
 
+
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
@@ -87,7 +88,9 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.setDefaultOption("Drive Straight", autonomous.drive_straight)
 
     def robotPeriodic(self):
-        ...
+        print("front left", Robot.drivetrain.n_front_left.encoder.getAbsolutePosition())
+        print("front left", Robot.drivetrain.n_front_left.encoder.getAbsolutePosition())
+
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
@@ -130,8 +133,8 @@ class _Robot(wpilib.TimedRobot):
         )
 
     def teleopInit(self):
-        # self.log.info("Teleop initialized")
-        ...
+        self.log.info("Teleop initialized")
+
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain)

@@ -147,8 +147,8 @@ class FieldOdometry:
         est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
 
         self.table.putNumberArray('Estimated Pose', [
-            est_pose.translation().Y(),
             est_pose.translation().X(),
+            est_pose.translation().Y(),
             est_pose.rotation().radians()
         ])
 
