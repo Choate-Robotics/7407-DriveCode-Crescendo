@@ -11,6 +11,7 @@ import subsystem
 import utils
 from oi.OI import OI
 from oi.IT import IT
+from wpilib import SmartDashboard
 
 
 class _Robot(wpilib.TimedRobot):
@@ -31,7 +32,7 @@ class _Robot(wpilib.TimedRobot):
         # Initialize Operator Interface
         OI.init()
         OI.map_controls()
-        
+
         IT.init()
         IT.map_systems()
         period = .03
@@ -47,7 +48,6 @@ class _Robot(wpilib.TimedRobot):
 
             for subsystem in subsystems:
                 subsystem.init()
-            
 
         try:
             init_subsystems()
@@ -57,15 +57,17 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         def init_sensors():
             sensors: list[Sensors] = list(
                 {k: v for k, v in Sensors.__dict__.items() if isinstance(v, Sensors) and hasattr(v, 'init')}.values()
             )
 
-            for sensor in sensors:
-                sensor.init()
-                
+            # for sensor in sensors:
+            #     sensor.init()
+            Sensors.limelight.init()
+            Sensors.odometry.enable()
+
         try:
             init_sensors()
         except Exception as e:
@@ -90,17 +92,18 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         try:
-            Sensors.limelight_back.update()
-            Sensors.limelight_front.update()
+            # Sensors.limelight_back.update()
+            # Sensors.limelight_front.update()
+            Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('limelight update', str(e))
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         try:
             Sensors.odometry.update()
         except Exception as e:
@@ -109,7 +112,15 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
-                
+
+        pose = Sensors.odometry.getPose()
+        self.nt.getTable("Odometry").putNumberArray(
+            "Estimated Pose", [
+                pose.X(),
+                pose.Y(),
+                pose.rotation().radians()
+            ]
+        )
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
@@ -117,7 +128,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain)
-            )
+        )
         )
 
     def teleopPeriodic(self):
@@ -136,7 +147,6 @@ class _Robot(wpilib.TimedRobot):
 
     def disabledPeriodic(self) -> None:
         pass
-    
 
 
 if __name__ == "__main__":

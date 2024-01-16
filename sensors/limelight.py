@@ -16,7 +16,7 @@ import math
 class Limelight():
     '''
     A class for interfacing with the limelight camera.'''
-    
+
     def __init__(self, origin_offset: Pose3d, name: str = "limelight"):
         '''
         
@@ -25,7 +25,7 @@ class Limelight():
         :param name: The name of the limelight network table. This is used to differentiate between multiple limelights. 
         If you have multiple limelights, you must give them different names in order for their values to be read correctly.
         If you only have one limelight, you can leave this as the default value.'''
-        
+
         self.nt = ntcore.NetworkTableInstance.getDefault()
         self.name = name
         self.table: ntcore.NetworkTable = self.nt.getTable(name)
@@ -48,7 +48,7 @@ class Limelight():
         # self.pose_filter_pitch = MedianFilter(5)
         # self.pose_filter_yaw = MedianFilter(5)
         # self.pose_filter_roll = MedianFilter(5)
-        
+
     def init(self):
         # campose = [
         #     self.origin_offset.Y(),
@@ -58,10 +58,10 @@ class Limelight():
         #     math.degrees(self.origin_offset.rotation().Y()),
         #     math.degrees(self.origin_offset.rotation().Z())
         # ]
-        
+
         # self.table.putNumberArray('camerapose_robotspace', campose)
         ...
-        
+
     def enable_force_update(self):
         '''
         Forces the limelight to update its values. This is useful if you want to get the limelight's values multiple times in one loop.
@@ -72,7 +72,7 @@ class Limelight():
         
         When disabled, the limelight will only update its values once per loop with the update() function.'''
         self.force_update = True
-        
+
     def disable_force_update(self):
         '''
         Disables the force update. When this is disabled, the limelight will only update its values once per loop.'''
@@ -88,7 +88,7 @@ class Limelight():
         '''
         self.table.putNumber("pipeline", mode)
         self.pipeline = mode
-        
+
     def get_pipeline_mode(self) -> config.LimelightPipeline:
         '''
         Gets the pipeline mode of the limelight will be using (Feeducial, Retroreflective, Neural, etc.) as an integer.
@@ -99,7 +99,7 @@ class Limelight():
         if self.pipeline != pipeline:
             self.pipeline = pipeline
         return self.pipeline
-        
+
     def set_led_mode(self, mode: config.limelight_led_mode) -> None:
         '''
         Changes the LED mode of the limelight.
@@ -107,25 +107,25 @@ class Limelight():
         :param mode: The LED mode to set the limelight to       
         '''
         self.table.putNumber("ledMode", mode)
-        
+
     def get_led_mode(self) -> config.limelight_led_mode:
-        
+
         return self.table.getNumber("ledMode", 0)
-    
+
     def set_cam_vision(self):
         '''
         Sets the limelight to use the camera for vision processing.
         '''
         self.table.putNumber("camMode", 0)
         self.drive_cam = False
-        
+
     def set_cam_driver(self):
         '''
         Sets the limelight to use the camera for driver vision.
         '''
         self.table.putNumber("camMode", 1)
         self.drive_cam = True
-        
+
     def get_cam_mode(self):
         '''
         Gets the camera mode of the limelight (Vision or Driver)
@@ -135,7 +135,7 @@ class Limelight():
         if self.drive_cam != mode:
             self.drive_cam = mode
         return self.drive_cam
-        
+
     def get_neural_classId(self, force_update: bool = False):
         '''
         Gets the neural classId of the limelight. 
@@ -151,7 +151,7 @@ class Limelight():
             return None
         self.t_class = self.table.getString("tclass", '')
         return self.t_class
-        
+
     def update(self):
         '''
         Updates the tx, ty, and tv values of the limelight Manually. 
@@ -170,7 +170,7 @@ class Limelight():
         self.botpose_blue = self.table.getNumberArray("botpose_wpiblue", [0, 0, 0, 0, 0, 0])
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
-        
+
     def target_exists(self, force_update: bool = False):
         '''
         Checks if a target exists within the limelight's field of view.
@@ -182,7 +182,7 @@ class Limelight():
         if self.force_update or force_update:
             self.update()
         return self.tv > 0.0
-    
+
     def april_tag_exists(self, force_update: bool = False):
         '''
         Checks if an AprilTag exists within the limelight's field of view.
@@ -237,9 +237,9 @@ class Limelight():
         else:
             botpose: list = []
 
-            if team == config.Team.red or team == 0:
+            if team == config.Team.RED or team == 0:
                 botpose = self.botpose_red
-            elif team == config.Team.blue or team == 1:
+            elif team == config.Team.RED or team == 1:
                 botpose = self.botpose_blue
             else:
                 botpose = self.botpose
@@ -252,11 +252,11 @@ class Limelight():
             return pose
 
 class LimelightController(VisionEstimator):
-    
+
     def __init__(self, limelight_list: list[Limelight]):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
-        
+
     def get_estimated_robot_pose(self) -> list[Pose3d] | None:
         poses = []
         for limelight in self.limelights:
