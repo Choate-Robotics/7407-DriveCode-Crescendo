@@ -23,7 +23,7 @@ class Elevator(Subsystem):
 
     def init(self) -> None:
         self.motor_extend.init()
-        self.encoder = self.motor_extend.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
+        self.encoder = self.motor_extend.get_abs()
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
     def set_length(self, length: float) -> None:

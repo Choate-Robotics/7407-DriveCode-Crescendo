@@ -3,12 +3,12 @@ from dataclasses import dataclass
 from typing import Optional
 
 from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder
-
+import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
     
-rev = float
+
 minute = float
 rad = float
 s = float
@@ -60,6 +60,8 @@ class SparkMax(PIDMotor):
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
 
+    _is_init: bool
+
     def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
         """
 
@@ -75,10 +77,18 @@ class SparkMax(PIDMotor):
         self._brushless = brushless
         self._config = config
 
+        self._is_init = False
+
+        self._abs_encoder = None
+
     def init(self):
         """
         Initializes the motor controller, pid controller, and encoder
         """
+
+        if self._is_init:
+            return
+
         self.motor = CANSparkMax(
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless else CANSparkMax.MotorType.kBrushed
@@ -88,6 +98,8 @@ class SparkMax(PIDMotor):
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
 
+        self._is_init = True
+
     def set_raw_output(self, x: float):
         """
         Sets the raw output of the motor controller
@@ -96,6 +108,13 @@ class SparkMax(PIDMotor):
             x (float): The output of the motor controller (between -1 and 1)
         """
         self.motor.set(x)
+
+    def get_abs(self):
+        
+        if self._abs_encoder is None:
+            self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
+
+        return self._abs_encoder
 
     def set_target_position(self, pos: rotations):
         """
