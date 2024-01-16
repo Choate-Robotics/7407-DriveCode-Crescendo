@@ -4,8 +4,7 @@ import wpilib
 from toolkit.command import SubsystemCommand
 
 import config
-from subsystem import *
-
+from subsystem import Drivetrain
 
 
 def curve_abs(x):
