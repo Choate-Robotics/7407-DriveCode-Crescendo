@@ -113,15 +113,6 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
-        pose = Sensors.odometry.getPose()
-        self.nt.getTable("Odometry").putNumberArray(
-            "Estimated Pose", [
-                pose.X(),
-                pose.Y(),
-                pose.rotation().radians()
-            ]
-        )
-
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         ...

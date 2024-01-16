@@ -31,7 +31,7 @@ TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.018, 0.0005, 0.5, 1023 / 22365, brake_mode=True #integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True #integral_zone=1000, max_integral_accumulator=10000
 )
 
 
@@ -97,7 +97,7 @@ class CustomSwerveNode(SwerveNode):
 
     def set_motor_velocity(self, vel: meters_per_second):
         # print(vel, 'meters per second')
-        rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter / 2
+        rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         # print(rotations_per_second, 'rotations per second')
         self.m_move.set_target_velocity(rotations_per_second)
 
