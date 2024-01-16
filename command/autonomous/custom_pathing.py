@@ -17,7 +17,7 @@ from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
 
-from command.autonomous.custom_trajectory import CustomTrajectory
+from command.autonomous.trajectory import CustomTrajectory
 
 
 class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):

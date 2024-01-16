@@ -1,1 +1,1 @@
-from auto_routine import AutoRoutine
+from autonomous.routines.DRIVE_STRAIGHT.auto import routine as drive_straight
