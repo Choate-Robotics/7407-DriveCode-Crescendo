@@ -2,18 +2,19 @@ import math
 from autonomous.auto_routine import AutoRoutine
 from commands2 import (
     InstantCommand,
-    ParallelCommandGroup,
-    ParallelDeadlineGroup,
     SequentialCommandGroup,
-    WaitCommand,
 )
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d
 
-from coords import start_rotating, blue_team
+from autonomous.routines.DRIVE_STRAIGHT.coords import (
+    blue_team,
+    start_rotating,
+    initial,
+)
 from command.autonomous.custom_pathing import RotateInPlace
-from command.autonomous.trajectory import CustomTrajectory
+# from command.autonomous.trajectory import CustomTrajectory
 
-from robot_systems import Robot, Sensors
+from robot_systems import Robot
 from units.SI import meters_per_second, meters_per_second_squared
 
 max_vel: meters_per_second = 3
@@ -30,4 +31,4 @@ auto = SequentialCommandGroup(
     InstantCommand(lambda: print("Done")),
 )
 
-routine = AutoRoutine(Pose2d(*start_rotating.initial), auto, blue_team=blue_team)
+routine = AutoRoutine(Pose2d(*initial), auto, blue_team=blue_team)
