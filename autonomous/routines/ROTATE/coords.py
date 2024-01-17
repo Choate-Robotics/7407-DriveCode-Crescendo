@@ -1,6 +1,8 @@
 from units.SI import meters, radians
 from command.autonomous import RotateInPlace
 
+
+blue_team = True
 coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
