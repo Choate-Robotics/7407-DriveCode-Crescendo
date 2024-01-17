@@ -17,3 +17,6 @@ LOG_FILE_LEVEL: int = 1
 # 4 = SETUP
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+v0_flywheel = 15
+shooter_tol = 0.1
