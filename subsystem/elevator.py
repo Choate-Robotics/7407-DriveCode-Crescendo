@@ -36,7 +36,7 @@ class Elevator(Subsystem):
 
     def set_length(self, length: float) -> None:
         # Sets length in meters
-        self.motor_extend.pid_controller.setReference((length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumfrance, rev.CANSparkMax.ControlType.kPosition, arbFeedforward=config.elevator_feed_forward)
+        self.motor_extend.set_target_position((length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumfrance)
 
     def get_length(self) -> float:
         # Gets length and returns in meters
@@ -63,6 +63,4 @@ class Elevator(Subsystem):
 
     def stop(self) -> None:
         # Set elevator to directly where it is
-        self.set_length(self.get_length() * constants.elevator_gear_ratio)
-        # Stop all output to remove any motor movement
-        self.motor_extend.set_raw_output(0)
+        self.set_length(self.get_length())
