@@ -1,4 +1,5 @@
 from units.SI import meters, radians
+from command.autonomous import RotateInPlace
 
 coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
