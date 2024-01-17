@@ -8,7 +8,6 @@ from wpimath.geometry import Pose2d
 
 from autonomous.routines.DRIVE_STRAIGHT.coords import (
     blue_team,
-    start_rotating,
     initial,
 )
 from command.autonomous.custom_pathing import RotateInPlace
