@@ -19,6 +19,7 @@ LOG_FILE_LEVEL: int = 1
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 elevator_can_id: int = 73 # TODO: PLACEHOLDER
+elevator_can_id_2: int = 74 # TODO: PLACEHOLDER
 elevator_ramp_rate: float = 1.0 # TODO: PLACEHOLDER
 elevator_max_rotation: float = 1.0 # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0 # TODO: PLACEHOLDER

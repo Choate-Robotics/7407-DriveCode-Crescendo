@@ -16,6 +16,9 @@ class Elevator(Subsystem):
     motor_extend: SparkMax = SparkMax(
         config.elevator_can_id, config=ELEVATOR_CONFIG, inverted=False
     )
+    motor_extend_follower: SparkMax = SparkMax(
+        config.elevator_can_id_2, config=ELEVATOR_CONFIG, inverted=False
+    )
 
     def __init__(self) -> None:
         super().__init__()
@@ -24,8 +27,12 @@ class Elevator(Subsystem):
 
     def init(self) -> None:
         self.motor_extend.init()
+        self.motor_extend_follower.init()
+
         self.encoder = self.motor_extend.get_abs()
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
+
+        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=False)
 
     def set_length(self, length: float) -> None:
         # Sets length in meters
