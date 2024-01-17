@@ -143,7 +143,10 @@ class _Robot(wpilib.TimedRobot):
 
         config.active_team = config.Team.BLUE
 
-        self.auto_selection.getSelected().run()
+        self.scheduler.schedule(command.DrivetrainZero(Robot.drivetrain))
+
+        # self.auto_selection.getSelected().run()
+        autonomous.drive_straight.run()
 
     def autonomousPeriodic(self):
         pass

@@ -11,7 +11,7 @@ initial: coord = (0, 0, 0)
 drive_forward: path = (
     initial,
     [],
-    (initial[0] + 0.3, initial[1], 0),
+    (initial[0] + 0.2, initial[1], 0),
 )
 
 
