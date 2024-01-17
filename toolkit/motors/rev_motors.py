@@ -3,13 +3,15 @@ import config
 from builtins import type
 from dataclasses import dataclass
 from typing import Optional
-
-from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, REVLibError
 from utils import LocalLogger
+
+from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder, REVLibError
+import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
-import rev
+    
+
 minute = float
 rad = float
 s = float
@@ -57,6 +59,8 @@ class SparkMax(PIDMotor):
     _logger: LocalLogger
     _abs_encoder = None
 
+    _is_init: bool
+
     def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
         """
 
@@ -71,6 +75,10 @@ class SparkMax(PIDMotor):
         self._brushless = brushless
         self._config = config
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
+
+        self._is_init = False
+
+        self._abs_encoder = None
 
     def init(self):
         """
@@ -128,6 +136,13 @@ class SparkMax(PIDMotor):
             x (float): The output of the motor controller (between -1 and 1)
         """
         self.motor.set(x)
+
+    def get_abs(self):
+        
+        if self._abs_encoder is None:
+            self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
+
+        return self._abs_encoder
 
     def set_target_position(self, pos: rotations):
         """
