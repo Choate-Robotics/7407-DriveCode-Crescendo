@@ -88,9 +88,6 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.setDefaultOption("Drive Straight", autonomous.drive_straight)
 
     def robotPeriodic(self):
-        print("front left", Robot.drivetrain.n_front_left.encoder.getAbsolutePosition())
-        print("front left", Robot.drivetrain.n_front_left.encoder.getAbsolutePosition())
-
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
