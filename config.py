@@ -152,3 +152,7 @@ gyro_id = 20
 
 # Elevator
 elevator_moving = False
+
+
+v0_flywheel = 15
+shooter_tol = 0.1
