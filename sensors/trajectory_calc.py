@@ -42,10 +42,6 @@ class TrajectoryCalculator:
         )
         return result_angle
 
-    def hit_target(self, t, u):
-        # We've hit the target if the distance to target is 0.
-        return self.distance_to_target - u[0]
-
     def update(self):
         """
         Updates the trajectory calculator with current data.
@@ -57,28 +53,33 @@ class TrajectoryCalculator:
         z_1 = self.run_sim(theta_1)
         z_2 = self.run_sim(theta_2)
         z_goal_error = self.delta_z - z_2
-        z_to_angle_conversion = (theta_2 - theta_1)/(z_2 - z_1)
+        z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
         correction_angle = z_goal_error * z_to_angle_conversion
         while True:
             theta_1 = theta_2
             theta_2 = theta_1 + correction_angle
-            z_sim = self.run_sim(theta_2)
-            z_error = self.delta_z - z_sim
+            z_1 = z_2
+            z_2 = self.run_sim(theta_2)
+            z_error = self.delta_z - z_2
+            z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
             if abs(z_error) < config.shooter_tol:
                 self.shoot_angle = theta_2
-                return
+                return theta_2
             correction_angle = z_error * z_to_angle_conversion
 
-
     def run_sim(self, shooter_theta):
+        def hit_target(t, u):
+            # We've hit the target if the distance to target is 0.
+            return self.distance_to_target - u[0]
+
         u0 = 0, config.v0_flywheel * np.cos(shooter_theta), 0., config.v0_flywheel * np.sin(shooter_theta)
         t0, tf = 0, 60
         # Stop the integration when we hit the target.
-        self.hit_target.terminal = True
+        hit_target.terminal = True
         # We must be moving downwards (don't stop before we begin moving upwards!)
-        self.hit_target.direction = -1
+        hit_target.direction = -1
         sim_solution_n = solve_ivp(self.deriv, (t0, tf), u0, method='DOP853', dense_output=True,
-                                   events=self.hit_target)
+                                   events=(hit_target))
         # print(sim_solution)
         t = np.linspace(0, sim_solution_n.t_events[0][0], 100)
         sim_solution = sim_solution_n.sol(t)
@@ -97,3 +98,6 @@ class TrajectoryCalculator:
         xdotdot = -self.k / constants.m * speed * xdot
         zdotdot = -self.k / constants.m * speed * zdot - constants.g
         return xdot, xdotdot, zdot, zdotdot
+
+if __name__ == "__main__":
+    pass
