@@ -301,15 +301,15 @@ class SwerveDrivetrain(Subsystem):
         
         self._omega = angular_vel  # For simulation
 
-        self.odometry.update(
-            self.get_heading(),
-            self.node_positions
-        )
+        # self.odometry.update(
+        #     self.get_heading(),
+        #     self.node_positions
+        # )
 
-        self.odometry_estimator.update(
-            self.get_heading(),
-            self.node_positions
-        )
+        # self.odometry_estimator.update(
+        #     self.get_heading(),
+        #     self.node_positions
+        # )
         
         # self.chassis_speeds = self.kinematics.toChassisSpeeds(*self.node_states)
 

@@ -95,7 +95,6 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             # Sensors.limelight_back.update()
-            # Sensors.limelight_front.update()
             Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))

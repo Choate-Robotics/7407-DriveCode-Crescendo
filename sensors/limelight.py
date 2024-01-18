@@ -239,7 +239,7 @@ class Limelight():
 
             if team == config.Team.RED or team == 0:
                 botpose = self.botpose_red
-            elif team == config.Team.RED or team == 1:
+            elif team == config.Team.BLUE or team == 1:
                 botpose = self.botpose_blue
             else:
                 botpose = self.botpose
@@ -248,8 +248,9 @@ class Limelight():
                 Translation3d(botpose[0], botpose[1], botpose[2]),
                 Rotation3d(botpose[3], botpose[4], math.radians(botpose[5]))
             )
-            # print(pose)
-            return pose
+            timestamp = botpose[6]
+            print(pose, timestamp)
+            return pose, timestamp
 
 class LimelightController(VisionEstimator):
 
@@ -257,18 +258,13 @@ class LimelightController(VisionEstimator):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
 
-    def get_estimated_robot_pose(self) -> list[Pose3d] | None:
+    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float]] | None:
         poses = []
         for limelight in self.limelights:
             if limelight.april_tag_exists() and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial and not config.elevator_moving:
-                # print(limelight.name+' Is sending bot pose')
-                poses += [(limelight.get_bot_pose(), Timer.getFPGATimestamp())]
-            else:
-                # print(limelight.name+' Is not sending bot pose')
-                ...
+                # print(limelight.name+' Is sending bot pose'
+                poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
-            # print(poses)
             return poses
         else:
-            # print('returning none')
             return None
