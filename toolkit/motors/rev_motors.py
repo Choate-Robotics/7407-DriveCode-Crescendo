@@ -10,6 +10,7 @@ from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
 
+from wpilib import TimedRobot
 
 hundred_ms = float
 
@@ -64,7 +65,7 @@ class SparkMax(PIDMotor):
         self._config = config
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
-        self._is_init = False
+        self._init_complete = False
 
         self._abs_encoder = None
 
@@ -75,6 +76,9 @@ class SparkMax(PIDMotor):
         if self._init_complete:
             self._logger.warn("Already initialized")
             return
+        
+        if TimedRobot.isSimulation():
+            raise RuntimeError("SparkMax cannot be used in simulation")
         
         self._logger.setup("Initializing")
         

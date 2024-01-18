@@ -1,7 +1,7 @@
 import pytest
 from toolkit.motors.rev_motors import SparkMax
-from phoenix5 import TalonFX, ControlMode
 from toolkit.subsystem import Subsystem as Subsystem_C
+from rev import CANSparkMax
 
 # to test a subsystem, you need to create a mechanism
 
@@ -19,11 +19,38 @@ from toolkit.subsystem import Subsystem as Subsystem_C
 def mechanism(selected_subsystem: Subsystem_C):
     
     class MockSparkMotor(SparkMax):
+        
+        class PIDController:
+                
+                def __init__(self, motor: SparkMax):
+                    self._motor = motor
+                    
+                def setReference(self, value, control_type):
+                    if control_type == CANSparkMax.ControlType.kPosition:
+                        self._motor._position = value
+                    elif control_type == CANSparkMax.ControlType.kVelocity:
+                        self._motor._velocity = value
+                    elif control_type == CANSparkMax.ControlType.kVoltage:
+                        self._motor._output = value
+                        
+        class Motor:
+            
+            def __init__(self, motor: SparkMax):
+                self._motor = motor
+                
+            def set(self, value):
+                self._motor._output = value
+                
+            def getAppliedOutput(self):
+                return self._motor._output
+        
         def __init__(self, motor: SparkMax):
             super().__init__(motor._can_id, motor._inverted, motor._brushless, motor._config)
             self._output = 0
             self._velocity = 0
             self._position = 0
+            self.pid_controller = self.PIDController(self)
+            self.motor = self.Motor(self)
             
         def set_target_velocity(self, vel):
             self._velocity = vel
@@ -40,35 +67,6 @@ def mechanism(selected_subsystem: Subsystem_C):
         def get_sensor_position(self):
             return self._position
         
-    class MockTalonFX(TalonFX):
-        def __init__(self, talon: TalonFX):
-            super().__init__(talon.getDeviceID())
-            self._motor_output_percent = 0
-            self._selected_sensor_velocity = 0
-            self._selected_sensor_position = 0
-
-        def getMotorOutputPercent(self):
-            return self._motor_output_percent
-
-        def set(self, mode, value):
-            if mode == ControlMode.PercentOutput:
-                self._motor_output_percent = value
-            elif mode == ControlMode.Velocity:
-                self._selected_sensor_velocity = value
-            elif mode == ControlMode.Position:
-                self._selected_sensor_position = value
-
-        def getSelectedSensorVelocity(self):
-            return self._selected_sensor_velocity
-        
-        def getSelectedSensorPosition(self, pidIdx: int = 0) -> float:
-            return self._selected_sensor_position
-                
-    # add any extra motors or devices below
-    
-    # this is the class that will be returned
-    # this creates a child class of the selected subsystem
-    # Its identical to the parent, except any methods or variables that the class overrides
     class Mechanism_C(selected_subsystem):
         
         def __init__(self):
@@ -77,9 +75,8 @@ def mechanism(selected_subsystem: Subsystem_C):
         def init(self): 
             
             self.replace_parent_variables(SparkMax, MockSparkMotor)
-            self.replace_parent_variables(TalonFX, MockTalonFX)
             # replace any motors or devices here
-            
+
             super().init()
             
         def get_parent_variables_by_type(self, type):
@@ -114,7 +111,6 @@ def mechanism(selected_subsystem: Subsystem_C):
         
         def deconstruct(self):
             self.remove_parent_variables(SparkMax)
-            self.remove_parent_variables(TalonFX)
             # remove any motors or devices here
     
     return Mechanism_C()

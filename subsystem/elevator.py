@@ -8,7 +8,7 @@ from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 
 # TODO: CHANGE WHEN ROBOT IS BUILT
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, 0.000, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 class Elevator(Subsystem):
