@@ -16,6 +16,9 @@ class Elevator(Subsystem):
     motor_extend: SparkMax = SparkMax(
         config.elevator_can_id, config=ELEVATOR_CONFIG, inverted=False
     )
+    motor_extend_follower: SparkMax = SparkMax(
+        config.elevator_can_id_2, config=ELEVATOR_CONFIG, inverted=False
+    )
 
     def __init__(self) -> None:
         super().__init__()
@@ -24,12 +27,16 @@ class Elevator(Subsystem):
 
     def init(self) -> None:
         self.motor_extend.init()
+        self.motor_extend_follower.init()
+
         self.encoder = self.motor_extend.get_abs()
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
+        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=False)
+
     def set_length(self, length: float) -> None:
         # Sets length in meters
-        self.motor_extend.pid_controller.setReference((length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumfrance, rev.CANSparkMax.ControlType.kPosition, arbFeedforward=config.elevator_feed_forward)
+        self.motor_extend.set_target_position((length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumfrance)
 
     def get_length(self) -> float:
         # Gets length and returns in meters
@@ -56,6 +63,4 @@ class Elevator(Subsystem):
 
     def stop(self) -> None:
         # Set elevator to directly where it is
-        self.set_length(self.get_length() * constants.elevator_gear_ratio)
-        # Stop all output to remove any motor movement
-        self.motor_extend.set_raw_output(0)
+        self.set_length(self.get_length())
