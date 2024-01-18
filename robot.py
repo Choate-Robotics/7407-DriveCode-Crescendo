@@ -1,6 +1,5 @@
 import commands2
 from toolkit.subsystem import Subsystem
-import phoenix5 as ctre
 import ntcore
 import wpilib
 import command

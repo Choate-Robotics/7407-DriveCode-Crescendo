@@ -77,8 +77,8 @@ class SparkMax(PIDMotor):
             self._logger.warn("Already initialized")
             return
         
-        if TimedRobot.isSimulation():
-            raise RuntimeError("SparkMax cannot be used in simulation")
+        # if TimedRobot.isSimulation():
+        #     raise RuntimeError("SparkMax cannot be used in simulation")
         
         self._logger.setup("Initializing")
         
