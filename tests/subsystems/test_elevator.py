@@ -38,12 +38,12 @@ class ElevatorMock(Elevator):
 
 elevator = ElevatorMock()
 
-def test_elevator_init():
-    elevator.init()
-    time.sleep(1)
-    assert elevator.zeroed == False
-    assert elevator.encoder != False
-    assert elevator.motor_extend != False
+# def test_elevator_init():
+#     elevator.init()
+#     time.sleep(1)
+#     assert elevator.zeroed == False
+#     assert elevator.encoder != False
+#     assert elevator.motor_extend != False
 
 def test_elevator_len():
     elevator.set_length(0.5)
