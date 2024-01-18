@@ -5,7 +5,7 @@ import math
 drivetrain_turn_gear_ratio = 18.4
 drivetrain_wheel_gear_ratio = 6.12
 
-track_width = 14 * inches_to_meters
+track_width = 14 * inches_to_meters #TODO: change to 20 inches for actual robot
 
 drivetrain_length = 25 * inches_to_meters
 

@@ -131,8 +131,8 @@ class FieldOdometry:
                             )
                             self.drivetrain.odometry.resetPosition(
                                 self.drivetrain.get_heading(),
-                                weighted_pose,
-                                *self.drivetrain.node_positions
+                                self.drivetrain.node_positions,
+                                weighted_pose
                             )
                         self.last_update_time = current_time
         return self.getPose()
