@@ -1,6 +1,5 @@
 from __future__ import annotations
 import config
-from builtins import type
 from dataclasses import dataclass
 from typing import Optional
 from utils import LocalLogger
@@ -10,19 +9,9 @@ import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
-import wpilib.simulation
-
-minute = float
-rad = float
-s = float
-
-from units import Unum
 
 
 hundred_ms = float
-
-
-CANSparkMax
 
 @dataclass
 class SparkMaxConfig:
