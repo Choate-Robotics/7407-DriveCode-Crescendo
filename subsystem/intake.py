@@ -2,7 +2,9 @@ import config
 import constants
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
+from wpilib import DigitalInput
 
+# CHANGE WHEN ROBOT IS BUILT
 INNER_CONFIG = SparkMaxConfig(.5, 0, 0)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0)
 
@@ -24,6 +26,14 @@ class Intake(Subsystem):
             can_id=config.outer_intake_back_id,
             config=OUTER_CONFIG
         )
+
+        self.beam_break: DigitalInput = DigitalInput(
+            channel=config.intake_beam_break_channel
+        )
+
+        self.note_in_intake: bool = False
+
+        
     
     def init(self):
         self.inner_motor.init()
@@ -47,14 +57,58 @@ class Intake(Subsystem):
         self.outer_motor_front.set_target_velocity(vel * constants.intake_outer_gear_ratio)
         self.outer_motor_back.set_target_velocity(vel * constants.intake_outer_gear_ratio)
 
-    def roll_in(self):
-        pass
-
-    def roll_out(self):
-        pass
+    def detect_note(self) -> bool:
+        """
+        Detects if there is a note in the intake
+        Also sets class variable note_in_intake
+        Return: true if there is a note, false if there is not
+        """
+        self.note_in_intake = not self.beam_break.get()
 
     def deploy_rollers(self):
         pass
+    
+    def roll_in(self):
+        """
+        Rolls inner and outer motors in
+        Return: none
+        """
+        self.set_inner_velocity(config.intake_inner_speed)
+        self.set_outer_velocity(config.intake_outer_speed)
 
-    def load_shooter(self):
-        pass
+    def roll_out(self):
+        """
+        Rolls inner and outer motors out
+        Return: none
+        """
+        self.set_inner_velocity(-config.intake_inner_speed)
+        self.set_outer_velocity(-config.intake_outer_speed)
+
+    def rollers_idle_in(self):
+        """
+        Sets inner and outer motors to their idle speed going in
+        Return: none
+        """
+        self.set_inner_velocity(config.intake_inner_idle_speed)
+        self.set_outer_velocity(config.intake_outer_idle_speed)
+
+    def rollers_idle_out(self):
+        """
+        Sets inner and outer motors to their idle speed going out
+        Return: none
+        """
+        self.set_inner_velocity(-config.intake_inner_idle_speed)
+        self.set_outer_velocity(-config.intake_outer_idle_speed)
+
+    def get_front_current(self) -> float:
+        """
+        Return: current of front motor (float)
+        """
+        return self.outer_motor_front.motor.getOutputCurrent()
+    
+    def get_back_current(self) -> float:
+        """
+        Return: current of back motor (float)
+        """
+        return self.outer_motor_back.motor.getOutputCurrent()
+    

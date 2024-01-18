@@ -22,6 +22,9 @@ LOG_FILE_LEVEL: int = 1
 inner_intake_id = 0 #placeholder
 outer_intake_front_id = 1 #placeholder
 outer_intake_back_id = 2 #placeholder
+intake_beam_break_channel = 1 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder
+intake_inner_idle_speed = 0 #placeholder
+intake_outer_idle_speed = .25 #placeholder
