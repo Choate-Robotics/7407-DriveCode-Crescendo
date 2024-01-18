@@ -37,5 +37,7 @@ BlueNotePositionDict = {
 }
 
 RedNotePositionDict = {
-
+    "left": (2.9, 4),
+    "middle": (2.9, 2.6),
+    "right": (2.9, 1.2)
 }
