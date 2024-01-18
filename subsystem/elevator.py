@@ -3,7 +3,7 @@ import rev
 import config
 import constants
 
-from toolkit import Subsystem
+from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 
 # TODO: CHANGE WHEN ROBOT IS BUILT
