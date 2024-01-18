@@ -17,6 +17,18 @@ LOG_FILE_LEVEL: int = 1
 # 4 = SETUP
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""
+c = drag coefficient
+a = projectile area (m^2)
+m = projectile mass (kg)
+rho_air = air density (kg/m^3)
+g = acceleration due to gravity (m/s^2)
+v0 = initial velocity of shooter flywheel (m/s) config
+delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
+y = height of target (COULD BE IN ODOMETRY) (m) const
+tol = tolerance of error in distance to target (m)
+"""
+
 
 v0_flywheel = 15
 shooter_tol = 0.1
