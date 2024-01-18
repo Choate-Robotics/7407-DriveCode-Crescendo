@@ -30,13 +30,13 @@ drivetrain_move_gear_ratio: rotations_per_minute = drivetrain_move_motor_free_sp
 drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (
             drivetrain_wheel_diameter * math.pi)) * drivetrain_wheel_gear_ratio
 
-BlueNotePositionDict = {
+BlueWingNotePositionDict = {
     "left": (2.9, 7),
     "middle": (2.9, 5.5),
     "right": (2.9, 4.1)
 }
 
-RedNotePositionDict = {
+RedWingNotePositionDict = {
     "left": (2.9, 4),
     "middle": (2.9, 2.6),
     "right": (2.9, 1.2)
