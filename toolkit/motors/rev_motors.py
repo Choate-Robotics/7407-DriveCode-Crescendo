@@ -10,7 +10,7 @@ import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
-    
+import wpilib.simulation
 
 minute = float
 rad = float
@@ -20,7 +20,6 @@ from units import Unum
 
 
 hundred_ms = float
-
 
 
 CANSparkMax
