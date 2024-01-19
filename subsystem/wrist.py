@@ -17,7 +17,7 @@ class Wrist(Subsystem):
         
         self.feed_motor = SparkMax(
             can_id=constants.wrist_motor_id, inverted=True,
-            config=config.WRIST_CONFIG
+            config=config.WRIST_FEED_CONFIG
         )
 
     def init(self):
@@ -28,6 +28,7 @@ class Wrist(Subsystem):
         )
         self.feed_motor.init()
     
+    #wrist methods
     def set_wrist_angle(self, angle: radians):
         """
         Sets the wrist angle to the given position
@@ -55,8 +56,18 @@ class Wrist(Subsystem):
         """
         return abs(self.get_wrist_angle() - angle) < threshold
 
-    #from cyrus' code
-    def zero(self) -> None:
+    def zero_wrist(self) -> None: #taken from cyrus' code
         # Reset the encoder to zero
         self.wrist_motor.set_sensor_position(self.wrist_abs_encoder.getPosition() * constants.wrist_gear_ratio)
         self.zeroed = True
+
+    #feed in methods
+    def feed_in(self, angle: radians):
+        if not self.disable_rotation:
+            self.wrist_motor.set_raw_output(1) #I'm unsure what to put inside the parenthesis
+
+
+    def feed_out(self):
+        self.wrist_motor.set_raw_output(-1)
+
+    note_staged = True
