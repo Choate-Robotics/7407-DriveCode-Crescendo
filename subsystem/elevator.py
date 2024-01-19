@@ -11,9 +11,8 @@ ELEVATOR_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-class Elevator(Subsystem):
 
-    
+class Elevator(Subsystem):
 
     def __init__(self) -> None:
         super().__init__()
@@ -37,12 +36,14 @@ class Elevator(Subsystem):
 
     def set_length(self, length: float) -> None:
         # Sets length in meters
-        self.motor_extend.set_target_position((length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumfrance)
+        self.motor_extend.set_target_position(
+            (length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumference)
 
     def get_length(self) -> float:
         # Gets length and returns in meters
-        return (self.motor_extend.get_sensor_position() / constants.elevator_gear_ratio) * constants.elevator_driver_gear_circumfrance
-    
+        return (
+                    self.motor_extend.get_sensor_position() / constants.elevator_gear_ratio) * constants.elevator_driver_gear_circumference
+
     def set_motor_position(self, position: float) -> None:
         if position > 1:
             position = 1

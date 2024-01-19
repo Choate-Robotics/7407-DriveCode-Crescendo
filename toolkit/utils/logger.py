@@ -3,7 +3,7 @@ import logging.config
 import os
 
 
-from toolkit.utils.color import Color, NoColor
+from toolkit.utils.color import Color
 
 """
 Logger utility for debugging. 

@@ -18,7 +18,6 @@ LOGGING: bool = True
 LOG_OUT_LEVEL: int = 0
 LOG_FILE_LEVEL: int = 1
 
-
 # Levels are how much information is logged
 # higher level = less information
 # level 0 will log everything
@@ -35,12 +34,14 @@ LOG_FILE_LEVEL: int = 1
 
 
 # elevator
-elevator_can_id: int = 73 # TODO: PLACEHOLDER
-elevator_can_id_2: int = 74 # TODO: PLACEHOLDER
-elevator_ramp_rate: float = 1.0 # TODO: PLACEHOLDER
-elevator_max_rotation: float = 1.0 # TODO: PLACEHOLDER
-elevator_auto_position: float = 1.0 # TODO: PLACEHOLDER
-elevator_feed_forward: float = 0.65 # TODO: PLACEHOLDER
+elevator_can_id: int = 73  # TODO: PLACEHOLDER
+elevator_can_id_2: int = 74  # TODO: PLACEHOLDER
+elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
+elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
+elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
+elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
+
+
 # LEDS
 def KRainbow():
     return {
@@ -116,9 +117,11 @@ limelight_led_mode = {
     'force_on': 3
 }
 
+
 class LimelightPosition:
     elevator_down = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
     elevator_up = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+
 
 # DRIVETRAIN
 front_left_move_id = 4
@@ -148,5 +151,4 @@ drivetrain_reversed: bool = False
 gyro_id = 20
 
 # Elevator
-
 elevator_moving = False
