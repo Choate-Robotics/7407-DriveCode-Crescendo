@@ -86,18 +86,16 @@ class Intake(Subsystem):
 
     def rollers_idle_in(self):
         """
-        Sets inner and outer motors to their idle speed going in
+        Sets outer motors to their idle speed going in
         Return: none
         """
-        self.set_inner_velocity(config.intake_inner_idle_speed)
         self.set_outer_velocity(config.intake_outer_idle_speed)
 
     def rollers_idle_out(self):
         """
-        Sets inner and outer motors to their idle speed going out
+        Sets outer motors to their idle speed going out
         Return: none
         """
-        self.set_inner_velocity(-config.intake_inner_idle_speed)
         self.set_outer_velocity(-config.intake_outer_idle_speed)
 
     def get_front_current(self) -> float:
@@ -112,3 +110,14 @@ class Intake(Subsystem):
         """
         return self.outer_motor_back.motor.getOutputCurrent()
     
+    def roll_inner_in(self):
+        """
+        Rolls inner motors in
+        """
+        self.set_inner_velocity(config.intake_inner_speed)
+    
+    def stop_inner(self):
+        """
+        Stops inner rollers
+        """
+        self.set_inner_velocity(0)

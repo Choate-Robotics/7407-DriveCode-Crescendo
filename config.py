@@ -26,5 +26,4 @@ intake_beam_break_channel = 1 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder
-intake_inner_idle_speed = 0 #placeholder
 intake_outer_idle_speed = .25 #placeholder

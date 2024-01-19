@@ -78,13 +78,11 @@ def test_idle_in(intake: Intake):
     intake.rollers_idle_in()
     intake.outer_motor_back.set_target_velocity.assert_called_with(config.intake_outer_idle_speed * constants.intake_outer_gear_ratio)
     intake.outer_motor_front.set_target_velocity.assert_called_with(config.intake_outer_idle_speed * constants.intake_outer_gear_ratio)
-    intake.inner_motor.set_target_velocity.assert_called_with(config.intake_inner_idle_speed * constants.intake_inner_gear_ratio)
 
 def test_idle_out(intake: Intake):
     intake.rollers_idle_out()
     intake.outer_motor_back.set_target_velocity.assert_called_with(-config.intake_outer_idle_speed * constants.intake_outer_gear_ratio)
     intake.outer_motor_front.set_target_velocity.assert_called_with(-config.intake_outer_idle_speed * constants.intake_outer_gear_ratio)
-    intake.inner_motor.set_target_velocity.assert_called_with(-config.intake_inner_idle_speed * constants.intake_inner_gear_ratio)
 
 def test_front_current(intake: Intake):
     intake.get_front_current()
@@ -93,3 +91,11 @@ def test_front_current(intake: Intake):
 def test_back_current(intake: Intake):
     intake.get_back_current()
     intake.outer_motor_back.motor.getOutputCurrent.assert_called()
+
+def test_inner_in(intake: Intake):
+    intake.roll_inner_in()
+    intake.inner_motor.set_target_velocity.assert_called_with(config.intake_inner_speed * constants.intake_inner_gear_ratio)
+
+def test_inner_stop(intake: Intake):
+    intake.stop_inner()
+    intake.inner_motor.set_target_velocity.assert_called_with(0)
