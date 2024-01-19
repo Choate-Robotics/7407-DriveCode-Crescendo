@@ -31,3 +31,9 @@ drivetrain_move_gear_ratio: rotations_per_minute = drivetrain_move_motor_free_sp
 drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (drivetrain_wheel_diameter * math.pi)) * drivetrain_wheel_gear_ratio
 
 
+
+
+# ELEVATOR
+elevator_gear_ratio: float = 0.7 # TODO: PLACEHOLDER
+elevator_driver_gear_circumfrance: float = 0.5 # TODO: PLACEHOLDER
+elevator_length: float = 0.55 # REAL VALUE: Meters

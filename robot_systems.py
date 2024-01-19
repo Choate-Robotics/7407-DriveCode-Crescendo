@@ -4,6 +4,8 @@ import wpilib, config,constants
 
 
 class Robot:
+    elevator = subsystem.Elevator()
+
     
     drivetrain = subsystem.Drivetrain()
     ...
