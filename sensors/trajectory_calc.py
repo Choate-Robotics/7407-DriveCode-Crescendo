@@ -8,7 +8,8 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import constants
-from field_odometry import FieldOdometry
+from sensors.field_odometry import FieldOdometry
+from subsystem import Elevator
 
 
 class TrajectoryCalculator:
@@ -21,7 +22,7 @@ class TrajectoryCalculator:
     speaker_z: float = constants.speaker_z
     distance_to_target: float
 
-    def __init__(self, odometry: FieldOdometry, elevator):
+    def __init__(self, odometry: FieldOdometry, elevator: Elevator):
         self.odometry = odometry
         self.speaker = constants.speaker_location
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
@@ -55,7 +56,7 @@ class TrajectoryCalculator:
         z_goal_error = self.delta_z - z_2
         z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
         correction_angle = z_goal_error * z_to_angle_conversion
-        while True:
+        for i in range(config.max_sim_times):
             theta_1 = theta_2
             theta_2 = theta_1 + correction_angle
             z_1 = z_2
@@ -98,6 +99,3 @@ class TrajectoryCalculator:
         xdotdot = -self.k / constants.m * speed * xdot
         zdotdot = -self.k / constants.m * speed * zdot - constants.g
         return xdot, xdotdot, zdot, zdotdot
-
-if __name__ == "__main__":
-    pass

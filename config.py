@@ -29,6 +29,6 @@ y = height of target (COULD BE IN ODOMETRY) (m) const
 tol = tolerance of error in distance to target (m)
 """
 
-
 v0_flywheel = 15
 shooter_tol = 0.1
+max_sim_times = 100
