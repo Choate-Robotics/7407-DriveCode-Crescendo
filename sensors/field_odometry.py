@@ -63,8 +63,11 @@ class FieldOdometry:
         )
 
         self.vision_estimator: VisionEstimator = vision_estimator
-        self.vision_estimator_pose_weight: float = 0.7
+        self.vision_estimator_pose_weight: float = 0.4
         self.robot_pose_weight: float = 1 - self.vision_estimator_pose_weight
+        self.degree_thres = 10
+        
+        self.dist_thres = 1.0
         
 
         self.vision_on = True
@@ -85,48 +88,70 @@ class FieldOdometry:
         
         self.update_from_internal()
         
-        self.drivetrain.odometry_estimator.setVisionMeasurementStdDevs((0.0,0.0,0.0))
+        self.drivetrain.odometry_estimator.setVisionMeasurementStdDevs((0.5,0.5,math.radians(30)))
         
         vision_robot_pose_list = self.get_vision_poses()
         
         if vision_robot_pose_list == None:
             return self.getPose()
         
-        for vision_robot_pose in vision_robot_pose_list:
-            if vision_robot_pose:
-                vision_time: float
-                vision_robot_pose: Pose3d
-                vision_robot_pose, vision_time = vision_robot_pose
+        for vision_pose in vision_robot_pose_list:
+            if vision_pose == None:
+                continue
+            
+            vision_time: float
+            vision_robot_pose: Pose3d
+            vision_robot_pose, vision_time = vision_pose
+            
+            if self.within_tolerance(vision_robot_pose):
+                self.add_vision_measure(vision_robot_pose, vision_time)
+            
+            weighted_pose = weighted_pose_average(
+                self.drivetrain.odometry.getPose(),
+                vision_robot_pose,
+                self.robot_pose_weight,
+                self.vision_estimator_pose_weight,
+            )
+            
+            self.drivetrain.odometry.resetPosition(
+                self.drivetrain.get_heading(),
+                self.drivetrain.node_positions,
+                weighted_pose
+            )
+            
+            self.drivetrain.odometry_estimator.resetPosition(
+                self.drivetrain.get_heading(),
+                self.drivetrain.node_positions,
+                weighted_pose
+            )
                 
-                angle_diff = (
-                    math.degrees(
-                        vision_robot_pose.toPose2d().rotation().radians()
-                        - self.drivetrain.gyro.get_robot_heading()
-                    )
-                    % 360
-                )
-                
-                weighted_pose = weighted_pose_average(
-                    self.drivetrain.odometry.getPose(),
-                    vision_robot_pose,
-                    self.robot_pose_weight,
-                    self.vision_estimator_pose_weight,
-                )
-                
-                self.drivetrain.odometry.resetPosition(
-                    self.drivetrain.get_heading(),
-                    self.drivetrain.node_positions,
-                    weighted_pose
-                )
-                
-                self.drivetrain.odometry_estimator.resetPosition(
-                    self.drivetrain.get_heading(),
-                    self.drivetrain.node_positions,
-                    weighted_pose
-                )
-                
-                # self.last_update_time = current_time
         return self.getPose()
+    
+    def within_est_pos(self, vision: Pose3d):
+        est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
+        dist = est_pose.translation().distance(vision.toPose2d().translation())
+        if dist <= self.dist_thres:
+            return True
+        return False
+        
+    def within_est_rotation(self, vision: Pose3d):
+        angle_diff = (
+                math.degrees(
+                    vision.toPose2d().rotation().radians()
+                    - self.drivetrain.gyro.get_robot_heading()
+                )
+                % 360
+            )
+            
+        if abs(angle_diff) < self.degree_thres:
+            return True
+        return False
+    
+    def within_tolerance(self, vision: Pose3d):
+        if self.within_est_rotation(vision) and self.within_est_pos(vision):
+            return True
+        return False
+        
     
     def update_from_internal(self):
         
@@ -140,8 +165,7 @@ class FieldOdometry:
             self.drivetrain.get_heading(), self.drivetrain.node_positions
         )
         
-    def add_vision_measure(self, vision_pose, vision_time):
-        
+    def add_vision_measure(self, vision_pose: Pose3d, vision_time:float):
         self.drivetrain.odometry_estimator.addVisionMeasurement(
             vision_pose.toPose2d(), vision_time
         )

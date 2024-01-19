@@ -248,8 +248,8 @@ class Limelight():
                 Translation3d(botpose[0], botpose[1], botpose[2]),
                 Rotation3d(botpose[3], botpose[4], math.radians(botpose[5]))
             )
-            timestamp = botpose[6]
-            print(pose, timestamp)
+            timestamp = Timer.getFPGATimestamp() -  (botpose[6]/1000)
+            # print(pose, timestamp)
             return pose, timestamp
 
 class LimelightController(VisionEstimator):
