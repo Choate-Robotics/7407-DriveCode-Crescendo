@@ -74,15 +74,15 @@ class SparkMax(PIDMotor):
         self._inverted = inverted
         self._brushless = brushless
         self._config = config
-        self.is_init = False
+        self.has_init_run = False
 
     def init(self):
         """
         Initializes the motor controller, pid controller, and encoder
         """
 
-        if self.is_init:
-            return
+        if self.has_init_run:
+             return
 
         self.motor = CANSparkMax(
             self._can_id,
@@ -92,7 +92,7 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
-        self.is_init = True
+        self.has_init_run = True
 
     def set_raw_output(self, x: float):
         """
