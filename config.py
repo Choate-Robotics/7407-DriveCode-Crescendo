@@ -168,3 +168,4 @@ elevator_moving = False
 
 v0_flywheel = 15
 shooter_tol = 0.1
+max_sim_times = 100
