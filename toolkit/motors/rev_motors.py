@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from builtins import type
 import config
 from dataclasses import dataclass
 from typing import Optional
@@ -13,6 +15,7 @@ from units.SI import radians, radians_per_second, seconds, rotations_per_second,
 from wpilib import TimedRobot
 
 hundred_ms = float
+
 
 @dataclass
 class SparkMaxConfig:
