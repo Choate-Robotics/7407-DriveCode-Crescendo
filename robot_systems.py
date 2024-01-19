@@ -4,7 +4,8 @@ import wpilib
 
 
 class Robot:
-    pass
+    
+    wrist = subsystem.Wrist()
 
 
 class Pneumatics:
