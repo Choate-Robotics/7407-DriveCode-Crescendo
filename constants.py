@@ -1,7 +1,7 @@
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
 """
 c = drag coefficient
-a = projectile area (m^2)
+a = projectile sectional area (m^2)
 m = projectile mass (kg)
 rho_air = air density (kg/m^3)
 g = acceleration due to gravity (m/s^2)
