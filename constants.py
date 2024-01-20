@@ -25,7 +25,7 @@ drivetrain_wheel_diameter: meters = 4 * inches_to_meters  # 3.5 is the diameter 
 
 drivetrain_move_gear_ratio: rotations_per_minute = drivetrain_move_motor_free_speed / drivetrain_wheel_gear_ratio  # is the RPM constant multiple of the driving motor
 
-# TODO: Change this
+
 # the below variable is the rotation the motor rotates per meter of wheel movement
 drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (
             drivetrain_wheel_diameter * math.pi)) * drivetrain_wheel_gear_ratio
@@ -34,3 +34,7 @@ drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (
 elevator_gear_ratio: float = 0.7  # TODO: PLACEHOLDER
 elevator_driver_gear_circumference: float = 0.5  # TODO: PLACEHOLDER
 elevator_length: float = 0.55  # REAL VALUE: Meters
+  
+# INTAKE
+intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
+intake_outer_gear_ratio = 20 / 1 #TODO: placeholder

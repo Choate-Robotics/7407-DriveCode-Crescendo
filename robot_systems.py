@@ -4,6 +4,7 @@ import wpilib, config, constants
 
 
 class Robot:
+    intake = subsystem.Intake()
     elevator = subsystem.Elevator()
     drivetrain = subsystem.Drivetrain()
 

@@ -46,7 +46,7 @@ class SparkMax(PIDMotor):
     motor: CANSparkMax
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
-    _init_complete: bool = False
+    _has_init_run: bool = False
     _logger: LocalLogger
     _abs_encoder = None
 
@@ -65,17 +65,20 @@ class SparkMax(PIDMotor):
         self._inverted = inverted
         self._brushless = brushless
         self._config = config
+
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
-        self._init_complete = False
+        self._has_init_run = False
 
         self._abs_encoder = None
+
 
     def init(self):
         """
         Initializes the motor controller, pid controller, and encoder
         """
-        if self._init_complete:
+
+        if self._has_init_run:
             self._logger.warn("Already initialized")
             return
 
@@ -92,7 +95,8 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
-        self._init_complete = True
+
+        self._has_init_run = True
         self._logger.complete("Initialized")
 
     def error_check(self, error: REVLibError):
