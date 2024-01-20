@@ -1,3 +1,3 @@
-from robotpy_toolkit_7407.oi.buttons import DefaultButton, Button, AxisButton
-from robotpy_toolkit_7407.oi.controllermap import LogitechController, XBoxController
-from robotpy_toolkit_7407.oi.joysticks import Joysticks, JoystickAxis
+from toolkit.oi.buttons import DefaultButton, Button, AxisButton
+from toolkit.oi.controllermap import LogitechController, XBoxController
+from toolkit.oi.joysticks import Joysticks, JoystickAxis
