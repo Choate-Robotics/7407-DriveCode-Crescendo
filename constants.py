@@ -37,3 +37,4 @@ drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (drivetrain_whee
 elevator_gear_ratio: float = 0.7 # TODO: PLACEHOLDER
 elevator_driver_gear_circumfrance: float = 0.5 # TODO: PLACEHOLDER
 elevator_length: float = 0.55 # REAL VALUE: Meters
+elevator_max_velocity: float = 10.7 # TODO: PLACEHOLDER
