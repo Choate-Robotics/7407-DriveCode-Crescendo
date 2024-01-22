@@ -7,6 +7,12 @@ from toolkit.sensors.odometry import VisionEstimator
 
 from wpilib import Timer
 
+from units.SI import meters
+
+
+
+
+
 import math
 
 
@@ -41,25 +47,43 @@ class Limelight():
         self.botpose_blue: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.botpose_red: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.botpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
-        # self.pose_filter_x = MedianFilter(5)
-        # self.pose_filter_y = MedianFilter(5)
-        # self.pose_filter_z = MedianFilter(5)
-        # self.pose_filter_pitch = MedianFilter(5)
-        # self.pose_filter_yaw = MedianFilter(5)
-        # self.pose_filter_roll = MedianFilter(5)
+        self.cam_pos_moving: bool = False
+
 
     def init(self):
-        # campose = [
-        #     self.origin_offset.Y(),
-        #     self.origin_offset.X(),
-        #     self.origin_offset.Z(),
-        #     math.degrees(self.origin_offset.rotation().x()),
-        #     math.degrees(self.origin_offset.rotation().Y()),
-        #     math.degrees(self.origin_offset.rotation().Z())
-        # ]
+        self.set_cam_pose(self.origin_offset)
+        
+    def set_cam_pose(self, pose: Pose3d):
+        """
+        Sets the pose of the limelight relative to the robot's origin.
 
-        # self.table.putNumberArray('camerapose_robotspace', campose)
-        ...
+        :param pose: The pose of the limelight relative to the robot's origin
+        """
+
+        self.origin_offset = pose
+        
+        campose = [
+            self.origin_offset.Y(),
+            self.origin_offset.X(),
+            self.origin_offset.Z(),
+            math.degrees(self.origin_offset.rotation().x()),
+            math.degrees(self.origin_offset.rotation().Y()),
+            math.degrees(self.origin_offset.rotation().Z())
+        ]
+
+        self.table.putNumberArray('camerapose_robotspace_set', campose)
+
+    def set_cam_elevator_height(self, elevator_height: meters):
+        """
+        Sets the height of the limelight relative to the floor.
+
+        :param height: The height of the elevator in meters
+        """
+        x = self.origin_offset.X()
+        y = self.origin_offset.Y()
+        z = self.origin_offset.Z()
+
+        self.set_cam_pose(Pose3d(Translation3d(x, y, elevator_height + z), self.origin_offset.rotation()))
 
     def enable_force_update(self):
         """
@@ -272,10 +296,26 @@ class LimelightController(VisionEstimator):
     def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float]] | None:
         poses = []
         for limelight in self.limelights:
-            if limelight.april_tag_exists() and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial and not config.elevator_moving:
+            if limelight.april_tag_exists() and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial and not self.cam_pos_moving:
                 # print(limelight.name+' Is sending bot pose'
                 poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
             return poses
         else:
             return None
+        
+    def get_detected_objects(self) -> list[tuple[float, float, float]] | None:
+        objects = []
+        for limelight in self.limelights:
+            if limelight.target_exists() != None and limelight.get_pipeline_mode() == config.LimelightPipeline.neural:
+                objects += [limelight.get_target()]
+            else:
+                objects += [None]
+        if len(objects) > 0:
+            return objects
+        else:
+            return None
+                
+    def set_pipeline_mode(self, mode: config.LimelightPipeline) -> None:
+        for limelight in self.limelights:
+            limelight.set_pipeline_mode(mode)
