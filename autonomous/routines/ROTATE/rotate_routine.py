@@ -1,4 +1,3 @@
-import math
 from autonomous.auto_routine import AutoRoutine
 from commands2 import (
     InstantCommand,
@@ -11,7 +10,6 @@ from autonomous.routines.DRIVE_STRAIGHT.coords import (
     initial,
 )
 from command.autonomous.custom_pathing import RotateInPlace
-# from command.autonomous.trajectory import CustomTrajectory
 
 from robot_systems import Robot
 from units.SI import meters_per_second, meters_per_second_squared
