@@ -43,6 +43,8 @@ intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder
 intake_outer_idle_speed = .25 #placeholder
 
+intake_timeout = 5 #placeholder
+
 # elevator
 elevator_can_id: int = 73  # TODO: PLACEHOLDER
 elevator_can_id_2: int = 74  # TODO: PLACEHOLDER
