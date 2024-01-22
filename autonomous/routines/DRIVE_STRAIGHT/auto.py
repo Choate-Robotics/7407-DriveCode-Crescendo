@@ -22,11 +22,11 @@ path_1 = FollowPathCustom(
         start_pose=Pose2d(*drive_forward[0]),
         waypoints=[Translation2d(*coord) for coord in drive_forward[1]],
         end_pose=Pose2d(*drive_forward[2]),
-        max_velocity=0.3,
+        max_velocity=0.2,
         max_accel=0.1,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True,
     ),
     period=0.03,
 )

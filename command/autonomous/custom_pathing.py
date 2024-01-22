@@ -1,6 +1,8 @@
 import math
 import time
 
+import ntcore
+
 from toolkit.command import SubsystemCommand
 from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
 from toolkit.utils.units import radians
@@ -71,6 +73,21 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.omega = self.theta_diff / self.duration
         self.finished = False
 
+        traj_path = []
+        for i in range(len(self.trajectory.states())):
+            statepos = self.trajectory.states()[i]
+            traj_path.append(
+                statepos.pose.X(),
+            )
+            traj_path.append(
+                statepos.pose.Y()
+            )
+            traj_path.append(
+                statepos.pose.rotation().radians()
+            )
+
+        ntcore.NetworkTableInstance.getDefault().getTable('Auto').putNumberArray('trajectory', traj_path)
+
     def execute(self) -> None:
         self.t = time.perf_counter() - self.start_time
 
@@ -97,7 +114,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             speeds.vx, speeds.vy, Sensors.odometry.getPose().rotation().radians()
         )
 
-        self.subsystem.set_driver_centric((-vx, -vy), speeds.omega)
+        self.subsystem.set_driver_centric((vx, vy), speeds.omega)
 
     def isFinished(self) -> bool:
         return self.finished
