@@ -17,7 +17,7 @@ drive_forward_1: path = (
 drive_forward_2: path = (
     drive_forward_1[2],
     [],
-    (drive_forward_1[0], drive_forward_1[1]+1, 0),
+    (initial[0]+1, initial[1]+1, 0),
 )
 
 # drive_forward_3: path = (

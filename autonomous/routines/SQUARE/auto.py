@@ -8,7 +8,7 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.DRIVE_STRAIGHT.coords import (
+from autonomous.routines.SQUARE.coords import (
     blue_team,
     drive_forward_1,
     drive_forward_2,
