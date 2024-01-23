@@ -1,22 +1,15 @@
-import ntcore, config, time
+import math
 
-from wpimath.geometry import Pose3d, Translation3d, Rotation3d
-from wpimath.filter import MedianFilter
-
-from toolkit.sensors.odometry import VisionEstimator
-
+import ntcore
 from wpilib import Timer
+from wpimath.geometry import Pose3d, Rotation3d, Translation3d
 
+import config
+from toolkit.sensors.odometry import VisionEstimator
 from units.SI import meters
 
 
-
-
-
-import math
-
-
-class Limelight():
+class Limelight:
     """
     A class for interfacing with the limelight camera.
     """
@@ -27,8 +20,8 @@ class Limelight():
         :param origin_offset: The offset of the limelight from the robot's origin in meters
 
         :param name: The name of the limelight network table. This is used to differentiate between multiple limelights.
-        If you have multiple limelights, you must give them different names in order for their values to be read correctly.
-        If you only have one limelight, you can leave this as the default value.
+        If you have multiple limelights, you must give them different names in order for their values to be read
+        correctly. If you only have one limelight, you can leave this as the default value.
         """
 
         self.nt = ntcore.NetworkTableInstance.getDefault()
@@ -49,10 +42,9 @@ class Limelight():
         self.botpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.cam_pos_moving: bool = False
 
-
     def init(self):
         self.set_cam_pose(self.origin_offset)
-        
+
     def set_cam_pose(self, pose: Pose3d):
         """
         Sets the pose of the limelight relative to the robot's origin.
@@ -61,17 +53,17 @@ class Limelight():
         """
 
         self.origin_offset = pose
-        
+
         campose = [
             self.origin_offset.Y(),
             self.origin_offset.X(),
             self.origin_offset.Z(),
-            math.degrees(self.origin_offset.rotation().x()),
+            math.degrees(self.origin_offset.rotation().X()),
             math.degrees(self.origin_offset.rotation().Y()),
-            math.degrees(self.origin_offset.rotation().Z())
+            math.degrees(self.origin_offset.rotation().Z()),
         ]
 
-        self.table.putNumberArray('camerapose_robotspace_set', campose)
+        self.table.putNumberArray("camerapose_robotspace_set", campose)
 
     def set_cam_elevator_height(self, elevator_height: meters):
         """
@@ -83,7 +75,11 @@ class Limelight():
         y = self.origin_offset.Y()
         z = self.origin_offset.Z()
 
-        self.set_cam_pose(Pose3d(Translation3d(x, y, elevator_height + z), self.origin_offset.rotation()))
+        self.set_cam_pose(
+            Pose3d(
+                Translation3d(x, y, elevator_height + z), self.origin_offset.rotation()
+            )
+        )
 
     def enable_force_update(self):
         """
@@ -182,7 +178,7 @@ class Limelight():
             return False
         if self.tv == 0:
             return None
-        self.t_class = self.table.getString("tclass", '')
+        self.t_class = self.table.getString("tclass", "")
         return self.t_class
 
     def update(self):
@@ -195,13 +191,17 @@ class Limelight():
         self.ty = self.table.getNumber("ty", 0)
         self.tv = self.table.getNumber("tv", 0)
         self.ta = self.table.getNumber("ta", 0)
-        self.tid = self.table.getNumber('tid', -1)
+        self.tid = self.table.getNumber("tid", -1)
         self.get_pipeline_mode()
         self.get_neural_classId()
         # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose_red = self.table.getNumberArray("botpose_wpired", [0, 0, 0, 0, 0, 0])
+        self.botpose_red = self.table.getNumberArray(
+            "botpose_wpired", [0, 0, 0, 0, 0, 0]
+        )
         # self.botpose_blue = self.table.getEntry("botpose_wpiblue").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose_blue = self.table.getNumberArray("botpose_wpiblue", [0, 0, 0, 0, 0, 0])
+        self.botpose_blue = self.table.getNumberArray(
+            "botpose_wpiblue", [0, 0, 0, 0, 0, 0]
+        )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
 
@@ -209,7 +209,8 @@ class Limelight():
         """
         Checks if a target exists within the limelight's field of view.
 
-        :param force_update: If True, the limelight variables be updated before checking if a target exists. Defaults to False.
+        :param force_update: If True, the limelight variables be updated before checking if a target exists.
+                             Defaults to False.
 
         :return bool: True if a target exists, False if not
         """
@@ -222,7 +223,8 @@ class Limelight():
         """
         Checks if an AprilTag exists within the limelight's field of view.
 
-        :param force_update: If True, the limelight variables be updated before checking if a target exists. Defaults to False.
+        :param force_update: If True, the limelight variables be updated before checking if a target exists.
+                            Defaults to False.
 
         :return bool: True if an AprilTag exists, False if not
         """
@@ -235,7 +237,8 @@ class Limelight():
         """
         Gets the tx, ty values of a target if it exists.
 
-        :param force_update: If True, the limelight variables be updated before checking if a target exists. Defaults to False.
+        :param force_update: If True, the limelight variables be updated before checking if a target exists.
+                            Defaults to False.
 
         :return list: [tx, ty] if a target exists
 
@@ -248,12 +251,18 @@ class Limelight():
             return None
         return (self.tx, self.ty, self.ta)
 
-    def get_bot_pose(self, team: config.Team = config.active_team, round_to: int = 4, force_update: bool = False):
+    def get_bot_pose(
+        self,
+        team: config.Team = config.active_team,
+        round_to: int = 4,
+        force_update: bool = False,
+    ):
         """
         Gets the pose of the robot relative to the field using the feducial pipeline.
         This uses the botpose values from the limelight configuration, which are relative to the alliance wall.
         To call this properly, you must set the pipeline to feducial.
-        :param team: The team color of the robot. This is used to get the botpose of the robot relative to the alliance wall. can be None if you don't want to use it. 0 for red, 1 for blue.
+        :param team: The team color of the robot. This is used to get the botpose of the robot relative to the
+                        alliance wall. can be None if you don't want to use it. 0 for red, 1 for blue.
         :param round_to: The number of decimal places to round the botpose to. Defaults to 4.
         :param force_update: If True, the limelight variables be updated before getting the botpose. Defaults to False.
 
@@ -281,14 +290,13 @@ class Limelight():
             botpose = [round(i, round_to) for i in botpose]
             pose = Pose3d(
                 Translation3d(botpose[0], botpose[1], botpose[2]),
-                Rotation3d(botpose[3], botpose[4], math.radians(botpose[5]))
+                Rotation3d(botpose[3], botpose[4], math.radians(botpose[5])),
             )
             timestamp = Timer.getFPGATimestamp() - (botpose[6] / 1000)
             return pose, timestamp
 
 
 class LimelightController(VisionEstimator):
-
     def __init__(self, limelight_list: list[Limelight]):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
@@ -296,18 +304,25 @@ class LimelightController(VisionEstimator):
     def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float]] | None:
         poses = []
         for limelight in self.limelights:
-            if limelight.april_tag_exists() and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial and not self.cam_pos_moving:
+            if (
+                limelight.april_tag_exists()
+                and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
+                and not self.cam_pos_moving
+            ):
                 # print(limelight.name+' Is sending bot pose'
                 poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
             return poses
         else:
             return None
-        
+
     def get_detected_objects(self) -> list[tuple[float, float, float]] | None:
         objects = []
         for limelight in self.limelights:
-            if limelight.target_exists() != None and limelight.get_pipeline_mode() == config.LimelightPipeline.neural:
+            if (
+                limelight.target_exists() is not None
+                and limelight.get_pipeline_mode() == config.LimelightPipeline.neural
+            ):
                 objects += [limelight.get_target()]
             else:
                 objects += [None]
@@ -315,7 +330,7 @@ class LimelightController(VisionEstimator):
             return objects
         else:
             return None
-                
+
     def set_pipeline_mode(self, mode: config.LimelightPipeline) -> None:
         for limelight in self.limelights:
             limelight.set_pipeline_mode(mode)
