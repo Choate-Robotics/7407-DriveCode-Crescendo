@@ -18,7 +18,6 @@ LOGGING: bool = True
 LOG_OUT_LEVEL: int = 0
 LOG_FILE_LEVEL: int = 1
 
-
 # Levels are how much information is logged
 # higher level = less information
 # level 0 will log everything
@@ -34,13 +33,25 @@ LOG_FILE_LEVEL: int = 1
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+#intake
+inner_intake_id = 0 #placeholder
+outer_intake_front_id = 1 #placeholder
+outer_intake_back_id = 2 #placeholder
+intake_beam_break_channel = 1 #placeholder
+
+intake_inner_speed = 0.25 #placeholder
+intake_outer_speed = 0.5 #placeholder
+intake_outer_idle_speed = .25 #placeholder
+
 # elevator
-elevator_can_id: int = 73 # TODO: PLACEHOLDER
-elevator_can_id_2: int = 74 # TODO: PLACEHOLDER
-elevator_ramp_rate: float = 1.0 # TODO: PLACEHOLDER
-elevator_max_rotation: float = 1.0 # TODO: PLACEHOLDER
-elevator_auto_position: float = 1.0 # TODO: PLACEHOLDER
-elevator_feed_forward: float = 0.65 # TODO: PLACEHOLDER
+elevator_can_id: int = 73  # TODO: PLACEHOLDER
+elevator_can_id_2: int = 74  # TODO: PLACEHOLDER
+elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
+elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
+elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
+elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
+
+
 # LEDS
 def KRainbow():
     return {
@@ -116,9 +127,11 @@ limelight_led_mode = {
     'force_on': 3
 }
 
+
 class LimelightPosition:
     elevator_down = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
     elevator_up = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+
 
 # DRIVETRAIN
 front_left_move_id = 4
@@ -148,5 +161,5 @@ drivetrain_reversed: bool = False
 gyro_id = 20
 
 # Elevator
-
 elevator_moving = False
+

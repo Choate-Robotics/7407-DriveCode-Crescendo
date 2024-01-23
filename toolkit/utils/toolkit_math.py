@@ -1,7 +1,6 @@
 import math
 
 
-
 def bounded_angle_diff(theta_from: float, theta_too: float) -> float:
     """
     Finds the bounded (from -π to π) angle difference between two unbounded angles
@@ -33,6 +32,7 @@ def clamp(val: float, _min: float, _max: float):
     Returns:
         float: clamped value
     """
+
     if val < _min:
         return _min
     if val > _max:

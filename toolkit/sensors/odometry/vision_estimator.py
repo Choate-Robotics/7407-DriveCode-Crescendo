@@ -1,5 +1,4 @@
 from wpimath.geometry import Pose3d
-from wpilib import Timer
 
 
 class VisionEstimator:

@@ -9,7 +9,7 @@ from toolkit.oi.joysticks import JoystickAxis
 from toolkit.sensors.gyro import BaseGyro
 from toolkit.subsystem import Subsystem
 from toolkit.utils import logger
-from toolkit.utils.math import rotate_vector, bounded_angle_diff
+from toolkit.utils.toolkit_math import rotate_vector, bounded_angle_diff
 from units.SI import meters, meters_per_second, \
     radians_per_second, radians, miles_per_hour, miles_per_hour_to_meters_per_second, rotations_per_second, rotations_per_second__to__radians_per_second, \
         degrees_per_second, degrees_per_second__to__radians_per_second, degrees

@@ -31,10 +31,8 @@ TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True #integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True  # integral_zone=1000, max_integral_accumulator=10000
 )
-
-
 
 
 @dataclass
@@ -51,24 +49,21 @@ class CustomSwerveNode(SwerveNode):
         self.m_move.init()
         self.m_turn.init()
         self.counter += 1
-        
+
     def initial_zero(self):
         self.m_turn.set_sensor_position(0)
         abs_encoder_position: float = self.encoder.getAbsolutePosition()
         print(abs_encoder_position)
-                
-        
-        encoder_difference: float = abs_encoder_position  - self.absolute_encoder_zeroed_pos
-        
+
+        encoder_difference: float = abs_encoder_position - self.absolute_encoder_zeroed_pos
+
         if encoder_difference > .5:
             encoder_difference -= 1
         elif encoder_difference < -.5:
             encoder_difference += 1
-            
 
         motor_change = encoder_difference * constants.drivetrain_turn_gear_ratio
 
-        
         print(-encoder_difference * 360, self.m_turn._can_id)
         self.m_turn.set_sensor_position(motor_change)
 
@@ -76,7 +71,7 @@ class CustomSwerveNode(SwerveNode):
         self.initial_zero()
 
         self.m_turn.set_target_position(0)
-        
+
     def get_abs(self):
         return self.encoder.getAbsolutePosition()
 
@@ -106,16 +101,18 @@ class CustomSwerveNode(SwerveNode):
                 self.m_move.get_sensor_velocity()
                 / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
-        
+
     def get_drive_motor_traveled_distance(self) -> meters:
-        
+
         sensor_position = self.m_move.get_sensor_position()
-        
+
         return (
-            sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+                sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
+
 foc_active = False
+
 
 class Drivetrain(SwerveDrivetrain):
     n_front_left = CustomSwerveNode(
@@ -171,7 +168,7 @@ class Drivetrain(SwerveDrivetrain):
         self.n_front_right.set_motor_angle(math.radians(45))
         self.n_back_left.set_motor_angle(math.radians(45))
         self.n_back_right.set_motor_angle(math.radians(-45))
-        
+
     def get_abs(self):
         fl = self.n_front_left.get_abs()
         fr = self.n_front_right.get_abs()

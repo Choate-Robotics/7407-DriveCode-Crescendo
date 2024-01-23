@@ -1,6 +1,4 @@
-
 from units.SI import radians_per_second, radians
-
 
 
 class Motor:
