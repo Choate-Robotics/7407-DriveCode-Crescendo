@@ -11,10 +11,9 @@ ELEVATOR_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-
 class Elevator(Subsystem):
 
-    def __init__(self) -> None:
+  def __init__(self) -> None:
         super().__init__()
         # Absolute encoder
         self.motor_extend: SparkMax = SparkMax(
