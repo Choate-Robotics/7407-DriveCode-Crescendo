@@ -41,6 +41,7 @@ class SetElevator(SubsystemCommand[Elevator]):
             self.length = 0.0
 
         self.subsystem.set_length(self.length)
+        self.elevator_moving = True
 
     def execute(self):
         pass
