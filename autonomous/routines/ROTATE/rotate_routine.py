@@ -14,13 +14,15 @@ from command.autonomous.custom_pathing import RotateInPlace
 from robot_systems import Robot
 from units.SI import meters_per_second, meters_per_second_squared
 
+import math
+
 max_vel: meters_per_second = 3
 max_accel: meters_per_second_squared = 2
 
 
 path_1 = RotateInPlace(
     subsystem=Robot.drivetrain,
-    theta_f=3.14
+    theta_f=math.pi/2
 )
 
 auto = SequentialCommandGroup(

@@ -146,7 +146,8 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(command.DrivetrainZero(Robot.drivetrain))
 
         # self.auto_selection.getSelected().run()
-        autonomous.drive_straight.run()
+        # autonomous.drive_straight.run()
+        autonomous.square.run()
 
     def autonomousPeriodic(self):
         pass

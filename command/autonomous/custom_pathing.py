@@ -148,7 +148,7 @@ class RotateInPlace(SubsystemCommand[SwerveDrivetrain]):
             self,
             subsystem: SwerveDrivetrain,
             theta_f: radians,
-            threshold: float = math.radians(1),
+            threshold: float = math.radians(5),
             max_angular_vel: float | None = None,
             period: float = 0.02,
     ):
@@ -156,19 +156,26 @@ class RotateInPlace(SubsystemCommand[SwerveDrivetrain]):
 
         max_angular_vel = max_angular_vel or subsystem.max_angular_vel
 
-        self.controller = HolonomicDriveController(
-            PIDController(1, 0, 0, period),
-            PIDController(1, 0, 0, period),
-            ProfiledPIDControllerRadians(
-                4,
-                0,
-                0,
-                TrapezoidProfileRadians.Constraints(
-                    max_angular_vel, max_angular_vel / 0.001
-                ),
-                period,
-            ),
+        # self.controller = HolonomicDriveController(
+        #     PIDController(1, 0, 0, period),
+        #     PIDController(1, 0, 0, period),
+        #     ProfiledPIDControllerRadians(
+        #         0.2,
+        #         0,
+        #         0,
+        #         TrapezoidProfileRadians.Constraints(
+        #             max_angular_vel, max_angular_vel / 0.001
+        #         ),
+        #         period,
+        #     ),
+        # )
+
+        self.controller = PIDController(
+            0,0,0
         )
+
+        self.controller.setTolerance
+
         self.theta_f = theta_f
         self.threshold = threshold
 
@@ -176,22 +183,29 @@ class RotateInPlace(SubsystemCommand[SwerveDrivetrain]):
         self.theta_diff: float | None = None
 
     def initialize(self) -> None:
+        
         print("DESIRED FINAL THETA: ", math.degrees(self.theta_f))
         self.theta_i = Sensors.odometry.getPose().rotation().radians()
+        print("Initial THETA: ", math.degrees(self.theta_i))
         self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
 
     def execute(self) -> None:
         goal = Sensors.odometry.getPose()
-        speeds = self.controller.calculate(goal, goal, 0, Rotation2d(self.theta_f))
+        self.theta_diff = bounded_angle_diff(goal.rotation().radians(), self.theta_f)
+        print("Theta Diff: ", self.theta_diff)
+        speeds = self.controller.calculate(goal, goal, 0, Rotation2d(self.theta_diff))
         self.subsystem.set_driver_centric((0, 0), speeds.omega)
+        print("Current Radian: ", Sensors.odometry.getPose().rotation().radians())
 
     def end(self, interrupted: bool) -> None:
         print("ENDED ROTATE")
         self.subsystem.set_driver_centric((0, 0), 0)
 
     def isFinished(self) -> bool:
+        error = abs(Sensors.odometry.getPose().rotation().radians() - self.theta_f)
+        print("Error: ", math.degrees(error))
         return (
-                abs(Sensors.odometry.getPose().rotation().radians() - self.theta_f)
+                error
                 < self.threshold
         )
 
