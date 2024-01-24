@@ -13,16 +13,35 @@ class RunIntake(SubsystemCommand[Intake]):
         self.timer.reset()
         self.timer.start()
         self.subsystem.roll_in()
+        self.subsystem.intake_running = True
 
     def execute(self) -> None:
-        self.timeout = self.timer.get() >= config.intake_timeout
+        self.timeout = True if self.timer.get() >= config.intake_timeout else False
 
     def isFinished(self) -> bool:
         return self.subsystem.detect_note() or self.timeout
 
-    def end(self) -> None:
+    def end(self, interrupted) -> None:
         self.subsystem.rollers_idle_out()
-        if not self.timeout:
+        if not self.timeout or not interrupted:
             self.subsystem.note_in_intake = True
         self.timer.stop()
         self.timer.reset()
+        self.subsystem.intake_running = False
+
+
+class IntakeIdle(SubsystemCommand[Intake]):
+    def initialize(self) -> None:
+        if self.subsystem.note_in_intake():
+            self.subsystem.rollers_idle_out()
+        else:
+            self.subsystem.rollers_idle_in()
+
+    def execute(self) -> None:
+        pass
+
+    def isFinished(self) -> bool:
+        return False
+    
+    def end(self) -> None:
+        pass
