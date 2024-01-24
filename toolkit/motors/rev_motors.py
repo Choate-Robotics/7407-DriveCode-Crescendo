@@ -100,6 +100,8 @@ class SparkMax(PIDMotor):
         self._logger.complete("Initialized")
 
     def error_check(self, error: REVLibError):
+        if TimedRobot.isSimulation():
+            return
         if error != REVLibError.kOk:
             match error:
                 case REVLibError.kInvalid:
