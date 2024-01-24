@@ -1,11 +1,11 @@
 import subsystem
 import sensors
-import wpilib, config, constants
+import wpilib, config, constants, utils
 
 
 class Robot:
-    intake = subsystem.Intake()
-    elevator = subsystem.Elevator()
+    # intake = subsystem.Intake()
+    # elevator = subsystem.Elevator()
     drivetrain = subsystem.Drivetrain()
 
 
@@ -32,3 +32,4 @@ class PowerDistribution:
 
 class Field:
     odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([Sensors.limelight]))
+    POI = utils.POI()

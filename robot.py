@@ -65,7 +65,7 @@ class _Robot(wpilib.TimedRobot):
             #     sensor.init()
             Sensors.limelight.init()
             Field.odometry.enable()
-
+            Field.POI.init()
         try:
             init_sensors()
         except Exception as e:
