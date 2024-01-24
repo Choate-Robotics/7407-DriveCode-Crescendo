@@ -5,29 +5,31 @@ import config
 from subsystem import Intake
 
 class RunIntake(SubsystemCommand[Intake]):
-    timer = wpilib.Timer()
+    # timer = wpilib.Timer()
     timeout: bool
 
     def initialize(self) -> None:
         self.timeout = False
-        self.timer.reset()
-        self.timer.start()
+        # self.timer.reset()
+        # self.timer.start()
         self.subsystem.roll_in()
         self.subsystem.intake_running = True
 
     def execute(self) -> None:
-        self.timeout = True if self.timer.get() >= config.intake_timeout else False
+        # self.timeout = True if self.timer.get() >= config.intake_timeout else False
+        pass
 
     def isFinished(self) -> bool:
-        return self.subsystem.detect_note() or self.timeout
+        # return self.subsystem.detect_note() or self.timeout
+        return self.subsystem.detect_note()
 
     def end(self, interrupted) -> None:
         self.subsystem.rollers_idle_out()
         if not self.timeout or not interrupted:
             self.subsystem.note_in_intake = True
-        self.timer.stop()
-        self.timer.reset()
-        self.subsystem.intake_running = False
+        # self.timer.stop()
+        # self.timer.reset()
+        # self.subsystem.intake_running = False
 
 
 class IntakeIdle(SubsystemCommand[Intake]):
@@ -41,7 +43,7 @@ class IntakeIdle(SubsystemCommand[Intake]):
         pass
 
     def isFinished(self) -> bool:
-        return False
+        return True
     
-    def end(self) -> None:
+    def end(self, interrupted) -> None:
         pass
