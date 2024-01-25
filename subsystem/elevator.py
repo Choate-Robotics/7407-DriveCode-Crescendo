@@ -23,6 +23,7 @@ class Elevator(Subsystem):
             config.elevator_can_id_2, config=ELEVATOR_CONFIG, inverted=False
         )
         self.zeroed: bool = False
+        self.elevator_moving: bool = False
 
     def init(self) -> None:
         self.motor_extend.init()

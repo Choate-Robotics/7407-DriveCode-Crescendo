@@ -1,10 +1,10 @@
 from __future__ import annotations
-
 from builtins import type
 import config
 from dataclasses import dataclass
 from typing import Optional
 from utils import LocalLogger
+
 
 from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder, REVLibError
 import rev
@@ -16,6 +16,9 @@ from wpilib import TimedRobot
 
 hundred_ms = float
 
+
+
+CANSparkMax
 
 @dataclass
 class SparkMaxConfig:
@@ -37,6 +40,7 @@ class SparkMaxConfig:
     k_F: Optional[float] = None
     output_range: Optional[tuple[float, float]] = None
     idle_mode: Optional[CANSparkMax.IdleMode] = None
+
 
 
 class SparkMax(PIDMotor):
@@ -65,6 +69,7 @@ class SparkMax(PIDMotor):
         self._inverted = inverted
         self._brushless = brushless
         self._config = config
+        self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
@@ -100,6 +105,8 @@ class SparkMax(PIDMotor):
         self._logger.complete("Initialized")
 
     def error_check(self, error: REVLibError):
+        if TimedRobot.isSimulation():
+            return
         if error != REVLibError.kOk:
             match error:
                 case REVLibError.kInvalid:
@@ -189,6 +196,10 @@ class SparkMax(PIDMotor):
             (rotations_per_second): The sensor velocity of the motor controller in rotations per second
         """
         return self.encoder.getVelocity()
+    
+    def follow(self, master: SparkMax, inverted: bool = False) -> None:
+        result = self.motor.follow(master.motor, inverted)
+        self.error_check(result)
 
     def follow(self, master: SparkMax, inverted: bool = False) -> None:
         result = self.motor.follow(master.motor, inverted)
