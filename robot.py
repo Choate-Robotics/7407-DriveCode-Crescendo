@@ -14,6 +14,7 @@ from oi.IT import IT
 from wpilib import SmartDashboard
 
 
+
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
@@ -33,10 +34,9 @@ class _Robot(wpilib.TimedRobot):
 
         IT.init()
         IT.map_systems()
-        period = .03
-        self.scheduler.setPeriod(period)
+        self.scheduler.setPeriod(config.period)
 
-        self.log.info(f"Scheduler period set to {period} seconds")
+        self.log.info(f"Scheduler period set to {config.period} seconds")
 
         # Initialize subsystems and sensors
         def init_subsystems():
