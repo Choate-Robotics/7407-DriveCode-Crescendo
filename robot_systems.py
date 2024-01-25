@@ -4,9 +4,12 @@ import wpilib, config, constants, utils
 
 
 class Robot:
+    
+    wrist = subsystem.Wrist()
     # intake = subsystem.Intake()
     # elevator = subsystem.Elevator()
     drivetrain = subsystem.Drivetrain()
+
 
 
 class Pneumatics:
