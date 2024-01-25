@@ -1,5 +1,4 @@
 from units.SI import meters, radians
-from command.autonomous import RotateInPlace
 
 
 blue_team = True

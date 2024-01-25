@@ -9,8 +9,6 @@ from autonomous.routines.DRIVE_STRAIGHT.coords import (
     blue_team,
     initial,
 )
-from command.autonomous.custom_pathing import RotateInPlace
-
 from robot_systems import Robot
 from units.SI import meters_per_second, meters_per_second_squared
 
@@ -20,14 +18,14 @@ max_vel: meters_per_second = 3
 max_accel: meters_per_second_squared = 2
 
 
-path_1 = RotateInPlace(
-    subsystem=Robot.drivetrain,
-    theta_f=math.pi/2
-)
+# path_1 = RotateInPlace(
+#     subsystem=Robot.drivetrain,
+#     theta_f=math.pi/2
+# )
+#
+# auto = SequentialCommandGroup(
+#     path_1,
+#     InstantCommand(lambda: print("Done")),
+# )
 
-auto = SequentialCommandGroup(
-    path_1,
-    InstantCommand(lambda: print("Done")),
-)
-
-routine = AutoRoutine(Pose2d(*initial), auto, blue_team=blue_team)
+# routine = AutoRoutine(Pose2d(*initial), auto, blue_team=blue_team)
