@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from wpilib import AnalogEncoder, DigitalInput
 import math
 
+from toolkit.motors import SparkMaxConfig
 practice_bot: DigitalInput = DigitalInput(0) # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 from units.SI import (
@@ -35,6 +36,8 @@ LOG_FILE_LEVEL: int = 1
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+
 period: float = 0.03  # seconds
 
 
@@ -59,6 +62,14 @@ elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
 elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
+  
+# Wrist
+wrist_motor_id = 30
+WRIST_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
+feed_motor_id = 50
+FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
+feeder_velocity = 132
+
 
 # Giraffe
 elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER
