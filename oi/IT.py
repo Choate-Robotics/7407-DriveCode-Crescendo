@@ -1,10 +1,11 @@
 from utils import LocalLogger
 
-from commands2 import button, InstantCommand
+from commands2 import button, InstantCommand, PrintCommand
 
 from robot_systems import Robot, Sensors, Field
 
 from wpilib import DriverStation
+import ntcore
 
 log = LocalLogger("IT")
 
@@ -24,11 +25,21 @@ class IT:
             
         def start_limelight_pos():
             Sensors.limelight.cam_pos_moving = False
+            
+        def setFieldRed():
+            Field.POI.setRed()
+            
+        def setFieldBlue():
+            Field.POI.setBlue()
         
         # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
         #     .onTrue(InstantCommand(stop_limelight_pos))\
         #     .onFalse(InstantCommand(start_limelight_pos))
         
         button.Trigger(lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed).\
-            onTrue(InstantCommand(lambda: Field.POI.setRed())).\
-            onFalse(InstantCommand(lambda: Field.POI.setBlue()))
+            onTrue(InstantCommand(lambda: Field.POI.setRed()))
+            # onFalse(InstantCommand(setFieldRed))
+            
+        # button.Trigger(lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed).\
+        #     onTrue(PrintCommand('switching field to red')).\
+        #     onFalse(PrintCommand('switching field to blue'))

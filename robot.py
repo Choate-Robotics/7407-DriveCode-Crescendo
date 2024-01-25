@@ -76,8 +76,13 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         self.log.complete("Robot initialized")
+        # Field.POI.setRed()
+        Field.POI.setBlue()
 
     def robotPeriodic(self):
+        
+        # print('red' if Field.POI._red else 'blue')
+        
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
