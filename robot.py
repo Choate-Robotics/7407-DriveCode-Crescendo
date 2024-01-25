@@ -147,7 +147,7 @@ class _Robot(wpilib.TimedRobot):
 
         # self.auto_selection.getSelected().run()
         # autonomous.drive_straight.run()
-        autonomous.left_wing_note.run()
+        autonomous.drive_to_left_wing_note.run()
 
     def autonomousPeriodic(self):
         pass
