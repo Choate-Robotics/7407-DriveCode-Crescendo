@@ -1,7 +1,9 @@
 from enum import Enum
 from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
-from wpilib import AnalogEncoder
+from wpilib import AnalogEncoder, DigitalInput
+
+practice_bot: DigitalInput = DigitalInput(0) # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 from units.SI import (
     inches_to_meters,
@@ -32,6 +34,8 @@ LOG_FILE_LEVEL: int = 1
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+period: float = 0.03  # seconds
+
 
 #intake
 inner_intake_id = 0 #placeholder
@@ -42,6 +46,10 @@ intake_beam_break_channel = 1 #placeholder
 intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder
 intake_outer_idle_speed = .25 #placeholder
+
+intake_timeout = 5 #placeholder
+intake_roller_current_limit = 1 #placeholder
+intake_sensor_debounce = 0.2 #placeholder
 
 # elevator
 elevator_can_id: int = 73  # TODO: PLACEHOLDER
@@ -137,22 +145,22 @@ class LimelightPosition:
 front_left_move_id = 4
 front_left_turn_id = 5
 front_left_encoder_port = AnalogEncoder(0)
-front_left_encoder_zeroed_pos = 0.678
+front_left_encoder_zeroed_pos = 0.678 if not practice_bot.get() else 0.0
 
 front_right_move_id = 6
 front_right_turn_id = 7
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.503
+front_right_encoder_zeroed_pos = 0.503 if not practice_bot.get() else 0.0
 
 back_left_move_id = 2
 back_left_turn_id = 3
 back_left_encoder_port = AnalogEncoder(1)
-back_left_encoder_zeroed_pos = 0.964
+back_left_encoder_zeroed_pos = 0.964 if not practice_bot.get() else 0.0
 
 back_right_move_id = 8
 back_right_turn_id = 9
 back_right_encoder_port = AnalogEncoder(3)
-back_right_encoder_zeroed_pos = 0.260
+back_right_encoder_zeroed_pos = 0.260 if not practice_bot.get() else 0.0
 
 driver_centric: bool = True
 drivetrain_reversed: bool = False
