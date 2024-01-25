@@ -13,19 +13,19 @@ class POI:
     class Notes:
 
         class Wing:
-            kLeft: Pose2d = Pose2d(
+            kRight: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.Wing.note_x,
                     constants.FieldPos.Wing.note_init
                 ), constants.FieldPos.pose_reverse)
 
-            kRight: Pose2d = Pose2d(
+            kCenter: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.Wing.note_x,
                     constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap
                 ), constants.FieldPos.pose_reverse)
 
-            kCenter: Pose2d = Pose2d(
+            kLeft: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.Wing.note_x,
                     constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap * 2

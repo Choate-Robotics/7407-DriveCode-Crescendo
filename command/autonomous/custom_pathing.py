@@ -41,7 +41,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             period: float = 0.02,
     ):
         super().__init__(subsystem)
-        self.trajectory: Trajectory = trajectory.trajectory
+        self.trajectory: Trajectory = trajectory.generate()
         self.controller = HolonomicDriveController(
             PIDController(1, 0, 0, period),
             PIDController(1, 0, 0, period),

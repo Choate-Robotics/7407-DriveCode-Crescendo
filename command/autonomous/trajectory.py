@@ -56,3 +56,21 @@ class CustomTrajectory:
             end=self.end_pose,
             config=config,
         )
+        
+    def generate(self):
+        
+        config = TrajectoryConfig(
+            self.max_velocity,
+            self.max_accel,
+        )
+        config.setStartVelocity(self.start_velocity)
+        config.setEndVelocity(self.end_velocity)
+        config.setReversed(self.rev)
+        
+        self.trajectory = TrajectoryGenerator.generateTrajectory(
+            start=self.start_pose,
+            interiorWaypoints=self.waypoints,
+            end=self.end_pose,
+            config=config,
+        )
+        return self.trajectory
