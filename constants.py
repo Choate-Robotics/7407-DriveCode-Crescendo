@@ -103,7 +103,7 @@ class FieldPos:
 
 # ELEVATOR
 elevator_gear_ratio: float = 0.7 # TODO: PLACEHOLDER
-elevator_driver_gear_circumference: float = 0.5 # TODO: PLACEHOLDER
+elevator_driver_gear_circumference: float = 25 # REAL VALUE: 25:1 gear ratio
 elevator_length: float = 0.55 # REAL VALUE: Meters
 elevator_max_length: float = 10.7 # TODO: PLACEHOLDER
   
