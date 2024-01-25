@@ -30,15 +30,16 @@ class IT:
             Field.POI.setRed()
             
         def setFieldBlue():
-            Field.POI.setBlue()
-        
+            Field.POI.setBlue()       
         # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
         #     .onTrue(InstantCommand(stop_limelight_pos))\
         #     .onFalse(InstantCommand(start_limelight_pos))
         
             
         button.Trigger(lambda: DriverStation.getAlliance() == DriverStation.Alliance.kBlue).\
-            onTrue(PrintCommand('switching field to blue').alongWith(
-                InstantCommand(lambda: Field.POI.setBlue()))).\
-            onFalse(PrintCommand('switching field to red').alongWith(
+            onTrue(PrintCommand('switching field to blue')\
+                # .alongWith(
+                # InstantCommand(lambda: Field.POI.setBlue()))
+                )\
+            .onFalse(PrintCommand('switching field to red').alongWith(
                 InstantCommand(lambda: Field.POI.setRed())))
