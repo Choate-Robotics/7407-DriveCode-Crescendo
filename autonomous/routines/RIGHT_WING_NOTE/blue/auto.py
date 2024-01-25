@@ -8,7 +8,7 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.DRIVE_TO_LEFT_WING_NOTE.blue.coords import (
+from autonomous.routines.RIGHT_WING_NOTE.blue.coords import (
     blue_team,
     drive_to_note,
     drive_back,
