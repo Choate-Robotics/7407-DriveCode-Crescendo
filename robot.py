@@ -86,7 +86,7 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection = wpilib.SendableChooser()
 
         self.auto_selection.setDefaultOption("Drive Straight", autonomous.drive_straight)
-        self.auto_selection.addOption("Rotate In Place", autonomous.rotate_in_place)
+        # self.auto_selection.addOption("Rotate In Place", autonomous.rotate_in_place)
 
     def robotPeriodic(self):
         if self.isSimulation():

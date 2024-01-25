@@ -8,7 +8,7 @@ path = (coord, waypoints, coord)
 
 blue_team = True
 
-initial: coord = (0, 0, 0)
+initial: coord = (0, 5, 0)
 
 drive_to_note: path = (
     initial,
