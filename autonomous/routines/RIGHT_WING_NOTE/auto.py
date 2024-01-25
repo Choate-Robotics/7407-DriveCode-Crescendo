@@ -8,8 +8,7 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.RIGHT_WING_NOTE.blue.coords import (
-    blue_team,
+from autonomous.routines.RIGHT_WING_NOTE.coords import (
     drive_to_note,
     drive_back,
     initial,
@@ -53,4 +52,4 @@ auto = SequentialCommandGroup(
     InstantCommand(lambda: print("Done")),
 )
 
-routine = AutoRoutine(Pose2d(*initial), auto, blue_team=blue_team)
+routine = AutoRoutine(Pose2d(*initial), auto)

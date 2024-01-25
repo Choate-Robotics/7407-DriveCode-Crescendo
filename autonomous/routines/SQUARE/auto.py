@@ -9,7 +9,6 @@ from commands2 import (
 
 from autonomous.auto_routine import AutoRoutine
 from autonomous.routines.SQUARE.coords import (
-    blue_team,
     drive_forward,
     drive_left,
     drive_back,
@@ -87,4 +86,4 @@ auto = SequentialCommandGroup(
     InstantCommand(lambda: print("Done")),
 )
 
-routine = AutoRoutine(Pose2d(*initial), auto, blue_team=blue_team)
+routine = AutoRoutine(Pose2d(*initial), auto)
