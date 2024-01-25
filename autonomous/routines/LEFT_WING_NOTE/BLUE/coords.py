@@ -1,5 +1,5 @@
 from units.SI import meters, radians
-import constants
+import utils
 
 coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
@@ -12,7 +12,7 @@ initial: coord = (0, 7.5, 0)
 drive_to_note: path = (
     initial,
     [],
-    (constants.BlueWingNotePositionDict["left"][0], constants.BlueWingNotePositionDict["left"][1], 0)
+    (utils.POI.Notes.Wing.kRight.x, utils.POI.Notes.Wing.kRight.y, 0)
 )
 
 drive_back: path = (
