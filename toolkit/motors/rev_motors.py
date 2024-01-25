@@ -1,21 +1,18 @@
 from __future__ import annotations
-import config
 from builtins import type
+import config
 from dataclasses import dataclass
 from typing import Optional
-
-from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, REVLibError
 from utils import LocalLogger
+
+
+from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder, REVLibError
+import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
-import rev
-minute = float
-rad = float
-s = float
 
-from units import Unum
-
+from wpilib import TimedRobot
 
 hundred_ms = float
 
@@ -53,9 +50,11 @@ class SparkMax(PIDMotor):
     motor: CANSparkMax
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
-    _init_complete: bool = False
+    _has_init_run: bool = False
     _logger: LocalLogger
     _abs_encoder = None
+
+    _is_init: bool
 
     def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
         """
@@ -72,16 +71,27 @@ class SparkMax(PIDMotor):
         self._config = config
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
+        self._logger = LocalLogger(f'SparkMax: {self._can_id}')
+
+        self._has_init_run = False
+
+        self._abs_encoder = None
+
+
     def init(self):
         """
         Initializes the motor controller, pid controller, and encoder
         """
-        if self._init_complete:
+
+        if self._has_init_run:
             self._logger.warn("Already initialized")
             return
-        
+
+        # if TimedRobot.isSimulation():
+        #     raise RuntimeError("SparkMax cannot be used in simulation")
+
         self._logger.setup("Initializing")
-        
+
         self.motor = CANSparkMax(
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless else CANSparkMax.MotorType.kBrushed
@@ -90,10 +100,13 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
-        self._init_complete = True
+
+        self._has_init_run = True
         self._logger.complete("Initialized")
-        
+
     def error_check(self, error: REVLibError):
+        if TimedRobot.isSimulation():
+            return
         if error != REVLibError.kOk:
             match error:
                 case REVLibError.kInvalid:
@@ -119,7 +132,7 @@ class SparkMax(PIDMotor):
         if self._abs_encoder is None:
             self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
         return self._abs_encoder
-    
+
     def set_raw_output(self, x: float):
         """
         Sets the raw output of the motor controller
@@ -128,6 +141,13 @@ class SparkMax(PIDMotor):
             x (float): The output of the motor controller (between -1 and 1)
         """
         self.motor.set(x)
+
+    def get_abs(self):
+
+        if self._abs_encoder is None:
+            self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
+
+        return self._abs_encoder
 
     def set_target_position(self, pos: rotations):
         """
@@ -177,6 +197,10 @@ class SparkMax(PIDMotor):
         """
         return self.encoder.getVelocity()
     
+    def follow(self, master: SparkMax, inverted: bool = False) -> None:
+        result = self.motor.follow(master.motor, inverted)
+        self.error_check(result)
+
     def follow(self, master: SparkMax, inverted: bool = False) -> None:
         result = self.motor.follow(master.motor, inverted)
         self.error_check(result)

@@ -8,8 +8,6 @@ from unittest import mock
 # this function tests a single assertion
 def test_basic():
     assert True == True
-    
-
 
 
 # for multiple assertions, use a parametrized test
@@ -26,7 +24,6 @@ def test_math_multiple(test_input, expected):
     assert eval(test_input) == expected
 
 
-
 # this test is to check for instances of the correct exception error
 # use the pytest.raises context manager
 # to check that the expected exception is raised.
@@ -36,12 +33,10 @@ def test_check_exception():
         1 / 0
 
 
-
 # If you want to skip a test, use the pytest.mark.skip decorator
 @pytest.mark.skip(reason="this test is not implemented yet")
 def test_not_implemented():
     pass
-
 
 
 # If you want to mark a test as expected to fail, use the pytest.mark.xfail decorator
@@ -50,6 +45,3 @@ def test_not_implemented():
 @pytest.mark.xfail(reason="this test is expected to fail")
 def test_expected_failure():
     assert False == True
-    
-
-

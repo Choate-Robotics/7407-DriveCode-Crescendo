@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -24,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           python3 -m pip install robotpy==2024.1.1.3
           pip install coverage
-          python3 -m robotpy sync
+          python3 -m robotpy sync --user
 
 
       - name:

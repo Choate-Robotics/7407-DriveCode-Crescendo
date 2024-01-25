@@ -1,9 +1,7 @@
-
 from units.SI import radians_per_second, radians
 
 
-
-class Motor:    
+class Motor:
     def init(self): ...
 
     def set_raw_output(self, x: float): ...
