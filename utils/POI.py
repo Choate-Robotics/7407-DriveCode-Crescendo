@@ -114,6 +114,9 @@ class POI:
             
         class Obstacles:
             pass
+        
+        class Waypoints:
+            pass
             
     
     def __init__(self):
@@ -126,7 +129,11 @@ class POI:
                 {k: v for k, v in Object.__dict__.items() if isinstance(v, Pose2d)}.values()
             )
         
-        return poses
+        var_names: list[str] = list(
+                {k: v for k, v in Object.__dict__.items() if isinstance(v, Pose2d)}.keys()
+            )
+        
+        return zip(var_names, poses)
         
     def setValues(self):
         
@@ -138,20 +145,26 @@ class POI:
             theta = pose.rotation().radians()
             return [x, y, theta]
         
-        for note in self.getPoses(self.Notes.Wing):
+        for names, note in self.getPoses(self.Notes.Wing):
             POI += append(note)
             
-        for note in self.getPoses(self.Notes.MidLine):
+        for names, note in self.getPoses(self.Notes.MidLine):
             POI += append(note)
             
-        for structure in self.getPoses(self.Structures.Scoring):
+        for names, structure in self.getPoses(self.Structures.Scoring):
             POI += append(structure)
             
-        for stage in self.getPoses(self.Structures.Stage):
+        for names, stage in self.getPoses(self.Structures.Stage):
             POI += append(stage)
             
-        for pickup in self.getPoses(self.Structures.Pickup):
+        for names, pickup in self.getPoses(self.Structures.Pickup):
             POI += append(pickup)
+            
+        for names, obstacle in self.getPoses(self.Structures.Obstacles):
+            POI += append(obstacle)
+            
+        for names, waypoint in self.getPoses(self.Structures.Waypoints):
+            POI += append(waypoint)
             
         self.table.putNumberArray("POI", POI)
         
@@ -161,29 +174,39 @@ class POI:
         self.setValues()
         
     def invertY(self, pose:Pose2d):
-        invert = self.field_width - pose.translation().Y()
+        invert = constants.field_width - pose.translation().Y()
         print(invert)
-        new_pose = Pose2d(Translation2d(pose.translation().X(), invert), pose.rotation())
+        
+        new_rotation = Rotation2d(-pose.rotation().radians())
+        
+        new_pose = Pose2d(Translation2d(pose.translation().X(), invert), new_rotation)
         return new_pose
     
     def invert(self):
-        for note in self.getPoses(self.Notes.Wing):
-            note = self.invertY(note)
-        
-        for note in self.getPoses(self.Notes.MidLine):
-            note = self.invertY(note)
+        print("inverting")
+        for name, note in self.getPoses(self.Notes.Wing):
+            setattr(self.Notes.Wing, name, self.invertY(note))
             
-        for structure in self.getPoses(self.Structures.Scoring):
-            structure = self.invertY(structure)
+        for name, note in self.getPoses(self.Notes.MidLine):
+            setattr(self.Notes.MidLine, name, self.invertY(note))
             
-        for stage in self.getPoses(self.Structures.Stage):
-            stage = self.invertY(stage)
+        for name, structure in self.getPoses(self.Structures.Scoring):
+            setattr(self.Structures.Scoring, name, self.invertY(structure))
             
-        for pickup in self.getPoses(self.Structures.Pickup):
-            pickup = self.invertY(pickup)
+        for name, stage in self.getPoses(self.Structures.Stage):
+            setattr(self.Structures.Stage, name, self.invertY(stage))
             
+        for name, pickup in self.getPoses(self.Structures.Pickup):
+            setattr(self.Structures.Pickup, name, self.invertY(pickup))
+            
+        for name, obstacle in self.getPoses(self.Structures.Obstacles):
+            setattr(self.Structures.Obstacles, name, self.invertY(obstacle))
+            
+        for name, waypoint in self.getPoses(self.Structures.Waypoints):
+            setattr(self.Structures.Waypoints, name, self.invertY(waypoint))
+            
+        print('new values')
         self.setValues()
-        print(self.Notes.Wing.left.translation().Y())
         
     def setRed(self):
         print("setting red")

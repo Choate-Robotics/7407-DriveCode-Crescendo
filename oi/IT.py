@@ -36,10 +36,9 @@ class IT:
         #     .onTrue(InstantCommand(stop_limelight_pos))\
         #     .onFalse(InstantCommand(start_limelight_pos))
         
-        button.Trigger(lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed).\
-            onTrue(InstantCommand(lambda: Field.POI.setRed()))
-            # onFalse(InstantCommand(setFieldRed))
             
-        # button.Trigger(lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed).\
-        #     onTrue(PrintCommand('switching field to red')).\
-        #     onFalse(PrintCommand('switching field to blue'))
+        button.Trigger(lambda: DriverStation.getAlliance() == DriverStation.Alliance.kBlue).\
+            onTrue(PrintCommand('switching field to blue').alongWith(
+                InstantCommand(lambda: Field.POI.setBlue()))).\
+            onFalse(PrintCommand('switching field to red').alongWith(
+                InstantCommand(lambda: Field.POI.setRed())))
