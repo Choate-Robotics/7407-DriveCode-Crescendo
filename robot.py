@@ -138,7 +138,7 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        autonomous.right_wing_note.run()
+        autonomous.two_note.run()
 
     def autonomousPeriodic(self):
         pass

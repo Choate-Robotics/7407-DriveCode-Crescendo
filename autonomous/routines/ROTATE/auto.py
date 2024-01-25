@@ -6,7 +6,6 @@ from commands2 import (
 from wpimath.geometry import Pose2d
 
 from autonomous.routines.DRIVE_STRAIGHT.coords import (
-    blue_team,
     initial,
 )
 from robot_systems import Robot

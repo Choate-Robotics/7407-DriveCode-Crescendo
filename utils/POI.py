@@ -11,7 +11,6 @@ class POI:
 
     # all poses are relative to the blue field origin
     class Notes:
-
         class Wing:
             kRight: Pose2d = Pose2d(
                 Translation2d(
@@ -32,13 +31,13 @@ class POI:
                 ), constants.FieldPos.pose_reverse)
 
         class MidLine:
-            kFar_left: Pose2d = Pose2d(
+            kFar_right: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.MidLine.mid_line,
                     constants.FieldPos.MidLine.note_init
                 ), constants.FieldPos.pose_reverse)
 
-            kMid_left: Pose2d = Pose2d(
+            kMid_right: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.MidLine.mid_line,
                     constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap
@@ -50,13 +49,13 @@ class POI:
                     constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 2
                 ), constants.FieldPos.pose_reverse)
 
-            kMid_right: Pose2d = Pose2d(
+            kMid_left: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.MidLine.mid_line,
                     constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 3
                 ), constants.FieldPos.pose_reverse)
 
-            kFar_right: Pose2d = Pose2d(
+            kFar_left: Pose2d = Pose2d(
                 Translation2d(
                     constants.FieldPos.MidLine.mid_line,
                     constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 4
