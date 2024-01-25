@@ -2,6 +2,7 @@ from enum import Enum
 from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
 from wpilib import AnalogEncoder, DigitalInput
+import math
 
 practice_bot: DigitalInput = DigitalInput(0) # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
@@ -59,6 +60,9 @@ elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
 
+# Giraffe
+elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER
+wrist_rotation_limit: float = 0.74 # TODO: PLACEHOLDER
 
 # LEDS
 def KRainbow():
@@ -171,3 +175,14 @@ gyro_id = 20
 # Elevator
 elevator_moving = False
 
+# Giraffe
+class GiraffePos:
+    
+    def __init__(self, height: meters, wrist_angle: radians):
+        self.height = height
+        self.wrist_angle = wrist_angle
+
+class Giraffe:
+    
+    idle = GiraffePos(0 * meters, 0 * radians)
+    
