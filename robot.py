@@ -13,6 +13,7 @@ from oi.OI import OI
 from oi.IT import IT
 from wpilib import SmartDashboard
 import autonomous
+import math
 
 
 class _Robot(wpilib.TimedRobot):
@@ -79,14 +80,16 @@ class _Robot(wpilib.TimedRobot):
         # Field.POI.setRed()
         Field.POI.setBlue()
 
+
+
     def robotPeriodic(self):
         
         if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
             Field.POI.setBlue()
-            self.log.complete("Set to Blue")
+            # self.log.complete("Set to Blue")
         else:
             Field.POI.setRed()
-            self.log.complete("Set to Red")
+            # self.log.complete("Set to Red")
         
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
@@ -123,7 +126,9 @@ class _Robot(wpilib.TimedRobot):
         # self.log.info("Teleop initialized")
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveCustom(Robot.drivetrain)
+            command.DriveSwerveHoldRotation(subsystem=Robot.drivetrain, theta_f=math.radians(313.5)),
+            command.DriveSwerveCustom(Robot.drivetrain),
+            
         )
         )
 

@@ -9,10 +9,7 @@ from wpimath.controller import PIDController
 
 import config
 from subsystem import Drivetrain
-from robot_systems import Sensors
-
-
-
+from robot_systems import Field
 
 
 def curve_abs(x):
@@ -99,27 +96,29 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
                 subsystem: SwerveDrivetrain,
                 theta_f: radians,
                 threshold: float = math.radians(5),
-                max_angular_vel: float | None = None,
+                # max_angular_vel: float | None = None,
                 period: float = 0.02,
                 ):
         super().__init__(subsystem)
-        max_angular_vel = max_angular_vel or subsystem.max_angular_vel
         self.controller = PIDController(
-            0,0,0
+            0.1,0,0
         )
 
         self.controller.setTolerance(threshold)
 
-        self.theta_f = theta_f
-        
+        self.theta_f = theta_f % 2*math.pi
+        print("rotate init")
 
     def initialize(self) -> None:
         pass
 
     def execute(self) -> None:
-        current_theta = Sensors.odometry.getPose().rotation().radians()
+        current_theta = Field.odometry.getPose().rotation().radians()
+        print("current_theta: ",current_theta)
         error = self.controller.calculate(current_theta, self.theta_f)
         d_theta = error
+        print("error: ",error)
+        print("target: ",self.theta_f)
         
         dx, dy = (
             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
@@ -132,7 +131,7 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
 
         dx *= self.subsystem.max_vel
         dy *= -self.subsystem.max_vel
-        d_theta *= self.max_angular_vel
+        d_theta *= self.subsystem.max_angular_vel
 
         if config.driver_centric:
             self.subsystem.set_driver_centric((dy, -dx), -d_theta)
@@ -140,6 +139,7 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
             self.subsystem.set_driver_centric((-dy, dx), d_theta)
         else:
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
+        
 
     def end(self, interrupted: bool) -> None:
         self.subsystem.n_front_left.set_motor_velocity(0)
