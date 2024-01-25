@@ -62,9 +62,9 @@ elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
   
 # Wrist
-wrist_motor_id = 1
+wrist_motor_id = 30
 WRIST_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
-feed_motor_id = 2
+feed_motor_id = 50
 FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feeder_velocity = 132
 

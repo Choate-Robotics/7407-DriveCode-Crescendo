@@ -28,12 +28,7 @@ class _Robot(wpilib.TimedRobot):
         if config.DEBUG_MODE:
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
+        
         self.scheduler.setPeriod(config.period)
 
         self.log.info(f"Scheduler period set to {config.period} seconds")
@@ -78,6 +73,13 @@ class _Robot(wpilib.TimedRobot):
         self.log.complete("Robot initialized")
         # Field.POI.setRed()
         Field.POI.setBlue()
+        
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
 
     def robotPeriodic(self):
         
