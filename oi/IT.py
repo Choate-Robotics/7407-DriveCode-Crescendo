@@ -6,7 +6,10 @@ import config
 
 import command
 
-from robot_systems import Robot, Sensors
+from robot_systems import Robot, Sensors, Field
+
+from wpilib import DriverStation
+import ntcore
 
 log = LocalLogger("IT")
 
@@ -35,8 +38,18 @@ class IT:
             
         def start_limelight_pos():
             Sensors.limelight.cam_pos_moving = False
+            
+        def setFieldRed():
+            Field.POI.setRed()
+            
+        def setFieldBlue():
+            Field.POI.setBlue()       
+        # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
+        #     .onTrue(InstantCommand(stop_limelight_pos))\
+        #     .onFalse(InstantCommand(start_limelight_pos))
         
         button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
             .onTrue(InstantCommand(stop_limelight_pos))\
             .onFalse(InstantCommand(start_limelight_pos))
+
 
