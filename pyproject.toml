@@ -13,7 +13,7 @@ robotpy_version = "2024.1.1.3"
 robotpy_extras = [
     "all",
     # "apriltag"
-#     "commands2",
+    # "commands2",
     # "cscore"
     # "navx"
     "pathplannerlib",
@@ -29,4 +29,5 @@ robotpy_extras = [
 # Other pip packages to install
 requires = [
     "robotpy-commands-v2==2024.0.0b4",
+    # "numpy",
 ]

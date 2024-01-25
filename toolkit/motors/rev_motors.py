@@ -1,26 +1,20 @@
 from __future__ import annotations
 
 from builtins import type
+import config
 from dataclasses import dataclass
 from typing import Optional
+from utils import LocalLogger
 
-from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder
-
+from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder, REVLibError
+import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
-    
-rev = float
-minute = float
-rad = float
-s = float
 
-from units import Unum
-
-# from toolkit.motors.ctre_motors import hundred_ms
+from wpilib import TimedRobot
 
 hundred_ms = float
-
 
 
 @dataclass
@@ -45,7 +39,6 @@ class SparkMaxConfig:
     idle_mode: Optional[CANSparkMax.IdleMode] = None
 
 
-
 class SparkMax(PIDMotor):
     """
     Wrapper class for the SparkMax motor controller
@@ -53,7 +46,11 @@ class SparkMax(PIDMotor):
     motor: CANSparkMax
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
-    _init_complete: bool = False
+    _has_init_run: bool = False
+    _logger: LocalLogger
+    _abs_encoder = None
+
+    _is_init: bool
 
     def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
         """
@@ -69,18 +66,27 @@ class SparkMax(PIDMotor):
         self._brushless = brushless
         self._config = config
 
+        self._logger = LocalLogger(f'SparkMax: {self._can_id}')
+
+        self._has_init_run = False
+
+        self._abs_encoder = None
+
+
     def init(self):
         """
         Initializes the motor controller, pid controller, and encoder
         """
-        if self._init_complete:
-            print("SparkMax already initialized")
+
+        if self._has_init_run:
+            self._logger.warn("Already initialized")
             return
-        
-        print("initializing SparkMax", self._can_id)
-        
-        
-        
+
+        # if TimedRobot.isSimulation():
+        #     raise RuntimeError("SparkMax cannot be used in simulation")
+
+        self._logger.setup("Initializing")
+
         self.motor = CANSparkMax(
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless else CANSparkMax.MotorType.kBrushed
@@ -89,7 +95,38 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
-        self._init_complete = True
+
+        self._has_init_run = True
+        self._logger.complete("Initialized")
+
+    def error_check(self, error: REVLibError):
+        if TimedRobot.isSimulation():
+            return
+        if error != REVLibError.kOk:
+            match error:
+                case REVLibError.kInvalid:
+                    self._logger.error("Invalid")
+                case REVLibError.kCANDisconnected:
+                    self._logger.error("CAN Disconnected")
+                case REVLibError.kInvalidCANId:
+                    self._logger.error("Invalid CAN ID")
+                case REVLibError.kSetpointOutOfRange:
+                    self._logger.error("Setpoint Out of Range")
+                case REVLibError.kHALError:
+                    self._logger.error("HAL Error")
+                case REVLibError.kError:
+                    self._logger.error("General Error")
+                case REVLibError.kTimeout:
+                    self._logger.error("Timeout")
+                case _:
+                    self._logger.error(f'Uncommon Error {error}')
+            if config.DEBUG_MODE:
+                raise RuntimeError(f'SparkMax Error: {error}')
+
+    def abs_encoder(self):
+        if self._abs_encoder is None:
+            self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
+        return self._abs_encoder
 
     def set_raw_output(self, x: float):
         """
@@ -100,6 +137,13 @@ class SparkMax(PIDMotor):
         """
         self.motor.set(x)
 
+    def get_abs(self):
+
+        if self._abs_encoder is None:
+            self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
+
+        return self._abs_encoder
+
     def set_target_position(self, pos: rotations):
         """
         Sets the target position of the motor controller in rotations
@@ -107,7 +151,8 @@ class SparkMax(PIDMotor):
         Args:
             pos (float): The target position of the motor controller in rotations
         """
-        self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition)
+        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition)
+        self.error_check(result)
 
     def set_target_velocity(self, vel: rotations_per_second):  # Rotations per minute??
         """
@@ -116,7 +161,8 @@ class SparkMax(PIDMotor):
         Args:
             vel (float): The target velocity of the motor controller in rotations per second
         """
-        self.pid_controller.setReference(vel, CANSparkMax.ControlType.kVelocity)
+        result = self.pid_controller.setReference(vel, CANSparkMax.ControlType.kVelocity)
+        self.error_check(result)
 
     def get_sensor_position(self) -> rotations:
         """
@@ -134,7 +180,8 @@ class SparkMax(PIDMotor):
         Args:
             pos (rotations): The sensor position of the motor controller in rotations
         """
-        self.encoder.setPosition(pos)
+        result = self.encoder.setPosition(pos)
+        self.error_check(result)
 
     def get_sensor_velocity(self) -> rotations_per_second:
         """
@@ -144,22 +191,23 @@ class SparkMax(PIDMotor):
             (rotations_per_second): The sensor velocity of the motor controller in rotations per second
         """
         return self.encoder.getVelocity()
-    
+
     def follow(self, master: SparkMax, inverted: bool = False) -> None:
-        self.motor.follow(master.motor, inverted)
+        result = self.motor.follow(master.motor, inverted)
+        self.error_check(result)
 
     def _set_config(self, config: SparkMaxConfig):
         if config is None:
             return
         if config.k_P is not None:
-            self.pid_controller.setP(config.k_P)
+            self.error_check(self.pid_controller.setP(config.k_P))
         if config.k_I is not None:
-            self.pid_controller.setI(config.k_I)
+            self.error_check(self.pid_controller.setI(config.k_I))
         if config.k_D is not None:
-            self.pid_controller.setD(config.k_D)
+            self.error_check(self.pid_controller.setD(config.k_D))
         if config.k_F is not None:
-            self.pid_controller.setFF(config.k_F)
+            self.error_check(self.pid_controller.setFF(config.k_F))
         if config.output_range is not None:
-            self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1])
+            self.error_check(self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1]))
         if config.idle_mode is not None:
-            self.motor.setIdleMode(config.idle_mode)
+            self.error_check(self.motor.setIdleMode(config.idle_mode))

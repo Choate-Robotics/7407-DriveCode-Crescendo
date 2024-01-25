@@ -18,15 +18,11 @@ import autonomous
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
-        ...
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
         self.scheduler = commands2.CommandScheduler.getInstance()
 
-        self.auto_selection: wpilib.SendableChooser | None = None
-
     def robotInit(self):
-        ...
         self.log._robot_log_setup()
 
         if config.DEBUG_MODE:
@@ -38,10 +34,9 @@ class _Robot(wpilib.TimedRobot):
 
         IT.init()
         IT.map_systems()
-        period = .03
-        self.scheduler.setPeriod(period)
+        self.scheduler.setPeriod(config.period)
 
-        self.log.info(f"Scheduler period set to {period} seconds")
+        self.log.info(f"Scheduler period set to {config.period} seconds")
 
         # Initialize subsystems and sensors
         def init_subsystems():
@@ -69,8 +64,8 @@ class _Robot(wpilib.TimedRobot):
             # for sensor in sensors:
             #     sensor.init()
             Sensors.limelight.init()
-            Sensors.odometry.enable()
-
+            Field.odometry.enable()
+            Field.POI.init()
         try:
             init_sensors()
         except Exception as e:
@@ -81,14 +76,18 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         self.log.complete("Robot initialized")
-
-        # Auto Selection
-        self.auto_selection = wpilib.SendableChooser()
-
-        self.auto_selection.setDefaultOption("Drive Straight", autonomous.drive_straight)
-        # self.auto_selection.addOption("Rotate In Place", autonomous.rotate_in_place)
+        # Field.POI.setRed()
+        Field.POI.setBlue()
 
     def robotPeriodic(self):
+        
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+            Field.POI.setBlue()
+            self.log.complete("Set to Blue")
+        else:
+            Field.POI.setRed()
+            self.log.complete("Set to Red")
+        
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
@@ -103,7 +102,6 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             # Sensors.limelight_back.update()
-            # Sensors.limelight_front.update()
             Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
@@ -113,7 +111,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            Sensors.odometry.update()
+            Field.odometry.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
@@ -122,8 +120,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
     def teleopInit(self):
-        self.log.info("Teleop initialized")
-
+        # self.log.info("Teleop initialized")
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain)
@@ -131,7 +128,7 @@ class _Robot(wpilib.TimedRobot):
         )
 
     def teleopPeriodic(self):
-        ...
+        pass
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
@@ -141,12 +138,6 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        config.active_team = config.Team.BLUE
-
-        self.scheduler.schedule(command.DrivetrainZero(Robot.drivetrain))
-
-        # self.auto_selection.getSelected().run()
-        # autonomous.drive_straight.run()
         autonomous.drive_to_left_wing_note.run()
 
     def autonomousPeriodic(self):
@@ -154,7 +145,6 @@ class _Robot(wpilib.TimedRobot):
 
     def disabledInit(self) -> None:
         self.log.info("Robot disabled")
-        ...
 
     def disabledPeriodic(self) -> None:
         pass

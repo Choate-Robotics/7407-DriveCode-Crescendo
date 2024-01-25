@@ -1,4 +1,3 @@
-import math
 import time
 
 from wpimath.controller import HolonomicDriveController, PIDController, ProfiledPIDControllerRadians
@@ -7,8 +6,7 @@ from wpimath.trajectory import TrapezoidProfileRadians, Trajectory
 
 from toolkit.command import SubsystemCommand
 from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
-from toolkit.utils.math import rotate_vector, bounded_angle_diff
-
+from toolkit.utils.toolkit_math import rotate_vector, bounded_angle_diff
 
 
 class DriveSwerve(SubsystemCommand[SwerveDrivetrain]):
@@ -44,6 +42,7 @@ class FollowPath(SubsystemCommand[SwerveDrivetrain]):
     """
     Follow a given wpimath trajectory using a swerve drive controller.
     """
+
     def __init__(self, subsystem: SwerveDrivetrain, trajectory: Trajectory, period: float = 0.02):
         super().__init__(subsystem)
         self.trajectory = trajectory

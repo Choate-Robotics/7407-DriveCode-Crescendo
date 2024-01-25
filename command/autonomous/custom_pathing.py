@@ -6,7 +6,7 @@ import ntcore
 from toolkit.command import SubsystemCommand
 from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
 from toolkit.utils.units import radians
-from toolkit.utils.math import bounded_angle_diff, rotate_vector
+from toolkit.utils.toolkit_math import bounded_angle_diff, rotate_vector
 
 from wpimath.controller import (
     HolonomicDriveController,
@@ -14,7 +14,7 @@ from wpimath.controller import (
     ProfiledPIDControllerRadians,
 )
 
-from robot_systems import Sensors
+from robot_systems import Sensors, Field
 from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
@@ -67,7 +67,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
 
     def initialize(self) -> None:
         self.start_time = time.perf_counter()
-        self.theta_i = Sensors.odometry.getPose().rotation().radians()
+        self.theta_i = Field.odometry.getPose().rotation().radians()
         self.theta_f = self.end_pose.rotation().radians()
         self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
         self.omega = self.theta_diff / self.duration
@@ -107,11 +107,11 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         goal = self.trajectory.sample(self.t)
         goal_theta = self.theta_i + self.omega * self.t
         speeds = self.controller.calculate(
-            Sensors.odometry.getPose(), goal, Rotation2d(goal_theta)
+            Field.odometry.getPose(), goal, Rotation2d(goal_theta)
         )
 
         vx, vy = rotate_vector(
-            speeds.vx, speeds.vy, Sensors.odometry.getPose().rotation().radians()
+            speeds.vx, speeds.vy, Field.odometry.getPose().rotation().radians()
         )
 
         self.subsystem.set_driver_centric((vx, vy), speeds.omega)
@@ -123,7 +123,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.subsystem.set_driver_centric((0, 0), 0)
         SmartDashboard.putString("POSE", str(self.subsystem.odometry.getPose()))
         SmartDashboard.putString(
-            "POSD", str(Sensors.odometry.getPose().rotation().degrees())
+            "POSD", str(Field.odometry.getPose().rotation().degrees())
         )
 
     def runsWhenDisabled(self) -> bool:
