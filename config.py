@@ -73,6 +73,8 @@ feeder_velocity = 132
 
 # Giraffe
 elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER
+elevator_wrist_threshold: float = 0.75 # TODO: PLACEHOLDER
+
 wrist_rotation_limit: float = 0.74 # TODO: PLACEHOLDER
 
 # LEDS
