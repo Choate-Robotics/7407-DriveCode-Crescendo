@@ -90,6 +90,12 @@ class FieldPos:
         left_rotation = Rotation2d(math.radians(300))
         
         right_rotation = Rotation2d(math.radians(60))
+        
+    class Source:
+        
+        source_x = field_length - 86.1 * inches_to_meters / 2
+        source_y = 50.75 * inches_to_meters
+        rotation = Rotation2d(math.radians(-240))
 
 
 

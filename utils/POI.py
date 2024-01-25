@@ -3,7 +3,7 @@ import constants
 from wpimath.geometry import Pose2d, Rotation2d, Transform2d, Translation2d, Pose3d, Rotation3d, Transform3d
 from units.SI import feet_to_meters, inches_to_meters
 import ntcore, math
-
+from utils import LocalLogger
 
 class POI:
     
@@ -110,7 +110,11 @@ class POI:
             
         class Pickup:
             
-            source:Pose2d = Pose2d(Translation2d(0, 0), Rotation2d(0))
+            source:Pose2d = Pose2d(
+                Translation2d(
+                    constants.FieldPos.Source.source_x,
+                    constants.FieldPos.Source.source_y
+                    ), constants.FieldPos.Source.rotation)
             
         class Obstacles:
             pass
@@ -121,6 +125,7 @@ class POI:
     
     def __init__(self):
         self._red = False
+        self.logger = LocalLogger("POI")
         self.nt = ntcore.NetworkTableInstance.getDefault()
         self.table = self.nt.getTable("Odometry")
         
@@ -175,50 +180,52 @@ class POI:
         
     def invertY(self, pose:Pose2d):
         invert = constants.field_width - pose.translation().Y()
-        print(invert)
         
         new_rotation = Rotation2d(-pose.rotation().radians())
         
         new_pose = Pose2d(Translation2d(pose.translation().X(), invert), new_rotation)
         return new_pose
     
+    def setPOI(self, object:object, name:str, pose:Pose2d):
+        self.logger.info(f"inverting {name}")
+        setattr(object, name, self.invertY(pose))
+    
     def invert(self):
-        print("inverting")
         for name, note in self.getPoses(self.Notes.Wing):
-            setattr(self.Notes.Wing, name, self.invertY(note))
+            self.setPOI(self.Notes.Wing, name, note)
             
         for name, note in self.getPoses(self.Notes.MidLine):
-            setattr(self.Notes.MidLine, name, self.invertY(note))
+            self.setPOI(self.Notes.MidLine, name, note)
             
         for name, structure in self.getPoses(self.Structures.Scoring):
-            setattr(self.Structures.Scoring, name, self.invertY(structure))
+            self.setPOI(self.Structures.Scoring, name, structure)
             
         for name, stage in self.getPoses(self.Structures.Stage):
-            setattr(self.Structures.Stage, name, self.invertY(stage))
+            self.setPOI(self.Structures.Stage, name, stage)
             
         for name, pickup in self.getPoses(self.Structures.Pickup):
-            setattr(self.Structures.Pickup, name, self.invertY(pickup))
+            self.setPOI(self.Structures.Pickup, name, pickup)
             
         for name, obstacle in self.getPoses(self.Structures.Obstacles):
-            setattr(self.Structures.Obstacles, name, self.invertY(obstacle))
+            self.setPOI(self.Structures.Obstacles, name, obstacle)
             
         for name, waypoint in self.getPoses(self.Structures.Waypoints):
-            setattr(self.Structures.Waypoints, name, self.invertY(waypoint))
+            self.setPOI(self.Structures.Waypoints, name, waypoint)
             
-        print('new values')
+        self.logger.info("inverted")
         self.setValues()
         
     def setRed(self):
-        print("setting red")
         if self._red:
             return
+        self.logger.info("setting red")
         self.invert()
         self._red = True
         
     def setBlue(self):
-        print("setting blue")
         if not self._red:
             return
+        self.logger.info("setting blue")
         self.invert()
         self._red = False
         

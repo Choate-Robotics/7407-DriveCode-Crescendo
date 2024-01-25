@@ -81,7 +81,10 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         
-        # print('red' if Field.POI._red else 'blue')
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+            Field.POI.setBlue()
+        else:
+            Field.POI.setRed()
         
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
