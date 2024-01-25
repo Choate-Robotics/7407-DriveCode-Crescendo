@@ -13,7 +13,7 @@ ELEVATOR_CONFIG = SparkMaxConfig(
 
 class Elevator(Subsystem):
 
-  def __init__(self) -> None:
+    def __init__(self) -> None:
         super().__init__()
         # Absolute encoder
         self.motor_extend: SparkMax = SparkMax(
