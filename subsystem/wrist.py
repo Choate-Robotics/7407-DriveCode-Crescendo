@@ -15,9 +15,10 @@ class Wrist(Subsystem):
         )
         
         self.feed_motor = SparkMax(
-            can_id=constants.wrist_motor_id, inverted=True,
-            config=config.WRIST_FEED_CONFIG
+            can_id=config.feed_motor_id, inverted=True,
+            config=config.FEED_CONFIG
         )
+        self.note_staged: bool = True
 
     def init(self):
         self.wrist_motor.init()
@@ -59,12 +60,12 @@ class Wrist(Subsystem):
         self.zeroed = True
 
     #feed in methods
-    def feed_in(self, angle: radians):
+    def feed_in(self):
         if not self.disable_rotation:
-            self.wrist_motor.set_raw_output(1) #I'm unsure what to put inside the parenthesis
+            self.feed_motor.set_target_velocity(config.feeder_velocity)
 
 
     def feed_out(self):
-        self.wrist_motor.set_raw_output(-1)
+        self.feed_motor.set_target_velocity(-(config.feeder_velocity))
 
-    note_staged = True
+    
