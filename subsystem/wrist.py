@@ -73,4 +73,5 @@ class Wrist(Subsystem):
             self.feed_motor.set_target_velocity(config.feeder_velocity)
 
     def feed_out(self):
-        self.feed_motor.set_target_velocity(-(config.feeder_velocity))
+        if not self.disable_rotation:
+            self.feed_motor.set_target_velocity(-(config.feeder_velocity))

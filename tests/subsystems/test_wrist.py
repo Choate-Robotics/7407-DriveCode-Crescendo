@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+import config
 import constants
 from subsystem import Wrist
 from toolkit.motors.rev_motors import SparkMax
@@ -68,6 +69,52 @@ def test_get_wrist_angle(test_input, wrist: Wrist):
     ],
 )
 def test_is_at_angle(current_state, goal, threshold, expected, wrist: Wrist):
-    wrist.wrist_motor.get_sensor_position.return_value = current_state
+    wrist.wrist_motor.get_sensor_position.return_value = (
+        current_state * constants.wrist_gear_ratio / 2 / pi
+    )
     print(bounded_angle_diff(current_state, goal))
     assert wrist.is_at_angle(goal, threshold) == expected
+
+
+@pytest.mark.parametrize(
+    "test_input",
+    [
+        (0),
+        (0.2),
+        (0.1),
+        (0),
+    ],
+)
+def test_zero_wrist(test_input, wrist: Wrist):
+    wrist.wrist_abs_encoder.getPosition.return_value = test_input
+    wrist.zero_wrist()
+    wrist.wrist_motor.set_sensor_position.assert_called_with(
+        test_input * constants.wrist_gear_ratio
+    )
+    assert wrist.zeroed
+
+
+@pytest.mark.parametrize(
+    "test_input",
+    [True, False],
+)
+def test_feed_in(test_input, wrist: Wrist):
+    wrist.disable_rotation = test_input
+    wrist.feed_in()
+    if test_input:
+        wrist.feed_motor.set_target_velocity.assert_not_called()
+    else:
+        wrist.feed_motor.set_target_velocity.assert_called_with(config.feeder_velocity)
+
+
+@pytest.mark.parametrize(
+    "test_input",
+    [True, False],
+)
+def test_feed_out(test_input, wrist: Wrist):
+    wrist.disable_rotation = test_input
+    wrist.feed_out()
+    if test_input:
+        wrist.feed_motor.set_target_velocity.assert_not_called()
+    else:
+        wrist.feed_motor.set_target_velocity.assert_called_with(-config.feeder_velocity)
