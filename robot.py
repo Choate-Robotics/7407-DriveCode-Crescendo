@@ -121,12 +121,13 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
+            
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveHoldRotation(subsystem=Robot.drivetrain, theta_f=math.radians(313.5)),
+            # command.DriveSwerveHoldRotation(subsystem=Robot.drivetrain, theta_f=math.radians(180)), # for testing rotate command
             command.DriveSwerveCustom(Robot.drivetrain),
             
         )

@@ -91,6 +91,8 @@ class DrivetrainZero(SubsystemCommand[Drivetrain]):
         logging.info("Successfully re-zeroed swerve pods.")
         ...
 
+
+# Rotate for given radians
 class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
     def __init__(self,
                 subsystem: SwerveDrivetrain,
@@ -106,19 +108,19 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
 
         self.controller.setTolerance(threshold)
 
-        self.theta_f = theta_f % 2*math.pi
-        print("rotate init")
+        # convert any angle greater than 180 or 2pi into the smaller negative angle
+        if(theta_f>=math.pi):
+            theta_f-=2*math.pi
+
+        self.theta_f = theta_f
 
     def initialize(self) -> None:
         pass
 
     def execute(self) -> None:
         current_theta = Field.odometry.getPose().rotation().radians()
-        print("current_theta: ",current_theta)
         error = self.controller.calculate(current_theta, self.theta_f)
         d_theta = error
-        print("error: ",error)
-        print("target: ",self.theta_f)
         
         dx, dy = (
             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
