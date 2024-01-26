@@ -1,15 +1,9 @@
-# # from unittest.mock import MagicMock
 import math
 
 import pytest
 from pytest import approx
 
-#
-# # import config
-# # import constants
-from toolkit.utils.toolkit_math import bounded_angle_diff, rotate_vector
-
-#
+from toolkit.utils.toolkit_math import bounded_angle_diff, clamp, ft_to_m, rotate_vector
 
 
 @pytest.mark.parametrize(
@@ -43,20 +37,27 @@ def test_rotate_vector(x, y, theta, expected):
     assert answer == approx(expected)
 
 
-# @pytest.mark.parametrize(
-#     "val, min, max, expected",
-#     [
-#         (1, 0, 2, 1),
-#         (1, 0, 1, 1),
-#         (1, 0, 5, 1),
-#         (1, -2, 3, 1),
-#         (1, 2, 3, 2),
-#         (15, 2, 10, 10),
-#         (1, -2, -1, -1),
-#         (0, 2, -2, 0),
-#         (1, 0, 3, 1)
-#   ]
-# )
-# def test_clamp():
-#     answer = clamp(3, 0, 8)
-#     assert answer == approx(3)
+@pytest.mark.parametrize(
+    "val, min, max, expected",
+    [
+        (1, 0, 2, 1),
+        (1, 0, 1, 1),
+        (1, 0, 5, 1),
+        (1, -2, 3, 1),
+        (1, 2, 3, 2),
+        (15, 2, 10, 10),
+        (1, -2, -1, -1),
+        (0, -2, 2, 0),
+        (1, 0, 3, 1),
+    ],
+)
+def test_clamp(val, min, max, expected):
+    answer = clamp(val, min, max)
+    assert float(answer) == approx(expected)
+
+
+@pytest.mark.parametrize(
+    "val, expected", [(1, 0.3048), (0, 0), (10, 3.048), (7, 2.1336), (13, 3.9624)]
+)
+def test_ft_to_m(val, expected):
+    assert ft_to_m(val) == approx(expected)
