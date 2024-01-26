@@ -41,3 +41,22 @@ def test_bounded_angle_diff(angle_1, angle_2, expected):
 def test_rotate_vector(x, y, theta, expected):
     answer = rotate_vector(x, y, theta)
     assert answer == approx(expected)
+
+
+# @pytest.mark.parametrize(
+#     "val, min, max, expected",
+#     [
+#         (1, 0, 2, 1),
+#         (1, 0, 1, 1),
+#         (1, 0, 5, 1),
+#         (1, -2, 3, 1),
+#         (1, 2, 3, 2),
+#         (15, 2, 10, 10),
+#         (1, -2, -1, -1),
+#         (0, 2, -2, 0),
+#         (1, 0, 3, 1)
+#   ]
+# )
+# def test_clamp():
+#     answer = clamp(3, 0, 8)
+#     assert answer == approx(3)
