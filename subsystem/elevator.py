@@ -14,6 +14,8 @@ ELEVATOR_CONFIG = SparkMaxConfig(
 class Elevator(Subsystem):
     
     elevator_moving: bool
+    
+    locked_down: bool
 
     def __init__(self) -> None:
             super().__init__()
@@ -46,6 +48,12 @@ class Elevator(Subsystem):
         return (
                     self.motor_extend.get_sensor_position() / constants.elevator_gear_ratio) * constants.elevator_driver_gear_circumference
 
+    def lock(self):
+        self.locked_down = True
+        
+    def unlock(self):
+        self.locked_down = False
+    
     def set_motor_position(self, position: float) -> None:
         if position > 1:
             position = 1
