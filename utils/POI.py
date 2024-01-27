@@ -117,7 +117,12 @@ class POI:
                     ), constants.FieldPos.Source.rotation)
             
         class Obstacles:
-            pass
+            
+            stage:Pose2d = Pose2d(
+                Translation2d(
+                    constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length / 2,
+                    constants.FieldPos.Stage.stage_y
+                    ), constants.FieldPos.pose_reverse)
         
         class Waypoints:
             pass

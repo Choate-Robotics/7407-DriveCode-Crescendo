@@ -44,10 +44,12 @@ class Giraffe(commands2.Command):
         debug_commands = []
         
         if self.target.height == None or self.target.wrist_angle == None:
+            self.finished = True
             return # invalid target
         
         if type(self.target.wrist_angle) == str:
             if self.target.wrist_angle != 'aim' or self.target.wrist_angle != 'stage':
+                self.finished = True
                 return # invalid string entry, must be 'aim' or 'stage'
         
         
@@ -62,10 +64,12 @@ class Giraffe(commands2.Command):
         
         # if the desired elevator height is lower than the wrist limit threshold and the desired wrist angle is over the threshold
         if not elevator_target_over_limit() and wrist_target_over_limit():
+            self.finished = True
             return # exceeds limits of wrist and elevator constraints
         
         # if the desired elevator height is greater than 0 while the elevator is locked down
         if self.target.height > 0.1 and self.elevator.locked_down or self.target.wrist_angle < 0 and self.elevator.locked_down:
+            self.finished = True
             return # cant perform this action while elevator is locked down
             
         
@@ -136,9 +140,15 @@ class GiraffeLock(commands2.Command):
     def __init__(self, elevator: Elevator, wrist: Wrist):
         self.elevator = elevator
         self.wrist = wrist
+        self.finished = False
     
+    def finish(self):
+        self.finished = True
     
     def initialize(self):
+        self.finished = False
+        
+        self.elevator.lock()
         
         def wrist_is_over_limit():
             return self.wrist.get_wrist_angle() > config.wrist_rotation_limit
@@ -152,6 +162,10 @@ class GiraffeLock(commands2.Command):
         
         commands = []
         debug_commands = []
+        
+        if not self.elevator.get_length() > 0.1 and not wrist_is_over_limit():
+            self.finished = True
+            return # already down
             
         # if the elevator is over the limit and the wrist is over the limit
         if elevator_is_over_limit() and wrist_is_over_limit():
@@ -197,10 +211,11 @@ class GiraffeLock(commands2.Command):
         )
         
     def isFinished(self) -> bool:
-        return True
+        return self.finished
         
     def end(self, interrupted: bool):
-        pass
+        if interrupted:
+            self.finished = True
     
     
 class StageNote(commands2.Command):

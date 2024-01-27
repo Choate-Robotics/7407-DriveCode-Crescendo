@@ -80,6 +80,11 @@ elevator_wrist_threshold: float = 0.75 # TODO: PLACEHOLDER
 
 wrist_rotation_limit: float = 0.74 # TODO: PLACEHOLDER
 
+# odometry config
+
+odometry_debounce: float = 0.1 # TODO: PLACEHOLDER
+stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
+
 # LEDS
 def KRainbow():
     return {

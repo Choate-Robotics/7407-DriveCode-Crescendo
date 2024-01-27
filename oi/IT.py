@@ -47,6 +47,12 @@ class IT:
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
         )
         
+        # odom
+        button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Structures.Obstacles.stage.translation()) < config.stage_distance_threshold)\
+            .debounce(config.odometry_debounce).onTrue(
+                command.GiraffeLock(Robot.elevator, Robot.wrist)
+            ).onFalse(InstantCommand(lambda: Robot.elevator.unlock()))
+        
         
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True
