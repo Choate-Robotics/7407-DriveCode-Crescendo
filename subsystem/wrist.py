@@ -5,6 +5,7 @@ from toolkit.motors.rev_motors import SparkMax
 from units.SI import radians
 from math import pi
 import math
+from wpilib import DigitalInput
 
 class Wrist(Subsystem):
     def __init__(self):
@@ -18,10 +19,16 @@ class Wrist(Subsystem):
             can_id=config.feed_motor_id, inverted=True,
             config=config.FEED_CONFIG
         )
+        
+        self.beam_break: DigitalInput
+        
         self.note_staged: bool = True
 
     def init(self):
         self.wrist_motor.init()
+        self.beam_break: DigitalInput = DigitalInput(
+            channel=config.wrist_beam_break_channel
+        )
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()

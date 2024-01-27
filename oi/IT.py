@@ -25,14 +25,28 @@ class IT:
     def map_systems():
         log.info("Mapping systems...")
         
-
+        # intake
         button.Trigger(lambda: Robot.intake.get_back_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            ParallelRaceGroup(
-                WaitCommand(config.intake_timeout), 
-                command.RunIntake(Robot.intake)
-            ).andThen(command.IntakeIdle(Robot.intake))
+                command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
         )
+        
+        
+        # elevator and wrist
+        button.Trigger(lambda: Robot.intake.beam_break.get() and Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        .debounce(config.intake_sensor_debounce).onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage)
+        ).onFalse(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
+        )
+        
+        button.Trigger(lambda: Robot.wrist.beam_break.get() and Robot.wrist.note_staged)\
+        .debounce(config.intake_sensor_debounce).onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow)
+        ).onFalse(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
+        )
+        
         
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True
