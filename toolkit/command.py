@@ -6,7 +6,7 @@ from toolkit.subsystem import Subsystem
 T = TypeVar("T", bound=Subsystem)
 
 
-class BasicCommand(commands2.CommandBase):
+class BasicCommand(commands2.Command):
     """
     Extendable basic command
     """
