@@ -83,7 +83,6 @@ class Giraffe(commands2.Command):
             commands.append(
                 ParallelCommandGroup(
                     SetElevator(self.elevator, self.target.height),
-                    InstantCommand(lambda: self.wrist.set_wrist_angle(self.target.wrist_angle)),
                 )
             )
             debug_commands.append(
