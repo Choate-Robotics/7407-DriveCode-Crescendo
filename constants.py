@@ -34,8 +34,8 @@ drivetrain_move_gear_ratio_as_rotations_per_meter: float = (1 / (drivetrain_whee
 
 # Field
 
-field_width = 8.21
-field_length = 16.54
+field_width = 8.21 # meters
+field_length = 16.54 # meters
 class FieldPos:
     
     pose_reverse = Rotation2d(math.radians(180))
@@ -99,13 +99,11 @@ class FieldPos:
 
 
 
-
-
 # ELEVATOR
-elevator_gear_ratio: float = 0.7 # TODO: PLACEHOLDER
-elevator_driver_gear_circumference: float = 25 # REAL VALUE: 25:1 gear ratio
+elevator_gear_ratio: float = 25 # REAL VALUE: 25:1 gear ratio
+elevator_driver_gear_circumference: float = math.pi * 1 * inches_to_meters # REAL VALUE: Meters
 elevator_length: float = 0.55 # REAL VALUE: Meters
-elevator_max_length: float = 10.7 # TODO: PLACEHOLDER
+elevator_max_length: float = 21 * inches_to_meters # REAL VALUE: Meters
   
 # INTAKE
 intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
