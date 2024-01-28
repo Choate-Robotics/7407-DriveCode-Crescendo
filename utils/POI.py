@@ -44,8 +44,6 @@ class POIPose:
             self._red = False
             print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
-        else:
-            print("not inverting") if verbose else None
         return self._pose
     
     def getTranslation(self):
@@ -159,7 +157,12 @@ class POI:
                     ), constants.FieldPos.Source.rotation))
 
             class Obstacles:
-                kStage = POIPose(Pose2d(0,0,0))
+                kStage = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length / 2,
+                        constants.FieldPos.Stage.stage_y
+                    ), constants.FieldPos.pose_reverse)
+                    )
 
 
         class Waypoints:
