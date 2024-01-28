@@ -1,236 +1,193 @@
 from __future__ import annotations
 import constants
 from wpimath.geometry import Pose2d, Rotation2d, Transform2d, Translation2d, Pose3d, Rotation3d, Transform3d
-from units.SI import feet_to_meters, inches_to_meters
+from units.SI import feet_to_meters, inches_to_meters, radians
 import ntcore, math
-from utils import LocalLogger
+from wpilib import DriverStation
 
-class POI:
     
+class POIPose:
     
-    
-    _red: bool = False
-    
+    _pose: Pose2d
+    _red: bool
     # all poses are relative to the blue field origin
-    class Notes:
+    def __init__(self, pose: Pose2d, red_origin: bool = False):
+        self._pose = pose
+        self._red = red_origin
         
-        class Wing:
-            
-            kLeft:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Wing.note_x,
-                    constants.FieldPos.Wing.note_init
-                    ), constants.FieldPos.pose_reverse)
-            
-            kRight:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Wing.note_x,
-                    constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap
-                    ), constants.FieldPos.pose_reverse)
-            
-            kCenter:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Wing.note_x,
-                    constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap * 2
-                    ), constants.FieldPos.pose_reverse)
-            
-        class MidLine:
-            
-            kFar_left:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.MidLine.mid_line, 
-                    constants.FieldPos.MidLine.note_init
-                    ), constants.FieldPos.pose_reverse)
-            
-            kMid_left:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.MidLine.mid_line,
-                    constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap
-                    ), constants.FieldPos.pose_reverse)
-            
-            kCenter:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.MidLine.mid_line,
-                    constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 2
-                    ), constants.FieldPos.pose_reverse)
-            
-            kMid_right:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.MidLine.mid_line,
-                    constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 3
-                    ), constants.FieldPos.pose_reverse)
-            
-            kFar_right:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.MidLine.mid_line,
-                    constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 4
-                    ), constants.FieldPos.pose_reverse)
+    def __str__(self):
+        return str(self._pose)
     
-    class Structures:
         
-        class Scoring:
-            
-            kSpeaker:Pose2d = Pose2d(
-                Translation2d(
-                    0,
-                    constants.FieldPos.Scoring.speaker_y
-                    ), constants.FieldPos.pose_reverse)
-            
-            kAmp:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Scoring.amp_x,
-                    constants.FieldPos.Scoring.amp_y
-                    ), constants.FieldPos.Scoring.amp_rotation)
-            
-            kAmpActual:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Scoring.amp_x,
-                    constants.FieldPos.Scoring.amp_y_robot
-                    ), constants.FieldPos.Scoring.amp_rotation)
-            
-        class Stage:
-            
-            center:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Stage.stage_x,
-                    constants.FieldPos.Stage.stage_y
-                    ), constants.FieldPos.pose_reverse)
-            
-            left:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.x_deviation,
-                    constants.FieldPos.Stage.stage_y + constants.FieldPos.Stage.y_deviation
-                    ), constants.FieldPos.Stage.left_rotation)
-            
-            right:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.x_deviation,
-                    constants.FieldPos.Stage.stage_y - constants.FieldPos.Stage.y_deviation
-                    ), constants.FieldPos.Stage.right_rotation)
-            
-        class Pickup:
-            
-            source:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Source.source_x,
-                    constants.FieldPos.Source.source_y
-                    ), constants.FieldPos.Source.rotation)
-            
-        class Obstacles:
-            
-            stage:Pose2d = Pose2d(
-                Translation2d(
-                    constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length / 2,
-                    constants.FieldPos.Stage.stage_y
-                    ), constants.FieldPos.pose_reverse)
-        
-        class Waypoints:
-            pass
-            
+    def withRotation(self, radians: radians):
+        return POIPose(Pose2d(self._pose.translation(), Rotation2d(radians)))
     
-    def __init__(self):
-        self._red = False
-        self.logger = LocalLogger("POI")
-        self.nt = ntcore.NetworkTableInstance.getDefault()
-        self.table = self.nt.getTable("Odometry")
-        
-    def getPoses(self, Object: object):
-        poses: list[Pose2d] = list(
-                {k: v for k, v in Object.__dict__.items() if isinstance(v, Pose2d)}.values()
-            )
-        
-        var_names: list[str] = list(
-                {k: v for k, v in Object.__dict__.items() if isinstance(v, Pose2d)}.keys()
-            )
-        
-        return zip(var_names, poses)
-        
-    def setValues(self):
-        
-        POI = []
-        
-        def append(pose:Pose2d):
-            x = pose.translation().X()
-            y = pose.translation().Y()
-            theta = pose.rotation().radians()
-            return [x, y, theta]
-        
-        for names, note in self.getPoses(self.Notes.Wing):
-            POI += append(note)
-            
-        for names, note in self.getPoses(self.Notes.MidLine):
-            POI += append(note)
-            
-        for names, structure in self.getPoses(self.Structures.Scoring):
-            POI += append(structure)
-            
-        for names, stage in self.getPoses(self.Structures.Stage):
-            POI += append(stage)
-            
-        for names, pickup in self.getPoses(self.Structures.Pickup):
-            POI += append(pickup)
-            
-        for names, obstacle in self.getPoses(self.Structures.Obstacles):
-            POI += append(obstacle)
-            
-        for names, waypoint in self.getPoses(self.Structures.Waypoints):
-            POI += append(waypoint)
-            
-        self.table.putNumberArray("POI", POI)
-        
-        
-    def init(self):
-        
-        self.setValues()
-        
-    def invertY(self, pose:Pose2d):
+    def withOffset(self, offset: Translation2d):
+        return POIPose(Pose2d(self._pose.translation() + offset, self._pose.rotation()))
+    
+    def __invertY(self, pose: Pose2d):
         invert = constants.field_width - pose.translation().Y()
-        
+
         new_rotation = Rotation2d(-pose.rotation().radians())
-        
+
         new_pose = Pose2d(Translation2d(pose.translation().X(), invert), new_rotation)
         return new_pose
     
-    def setPOI(self, object:object, name:str, pose:Pose2d):
-        self.logger.info(f"inverting {name}")
-        setattr(object, name, self.invertY(pose))
+    def get(self, verbose: bool = True):
+        # if red is true, invert the y value
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed and not self._red\
+            or DriverStation.getAlliance() == None and not self._red:
+            self._red = True
+            print("inverting") if verbose else None
+            self._pose = self.__invertY(self._pose)
+        elif DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self._red:
+            self._red = False
+            print("inverting") if verbose else None
+            self._pose = self.__invertY(self._pose)
+        else:
+            print("not inverting") if verbose else None
+        return self._pose
     
-    def invert(self):
-        for name, note in self.getPoses(self.Notes.Wing):
-            self.setPOI(self.Notes.Wing, name, note)
-            
-        for name, note in self.getPoses(self.Notes.MidLine):
-            self.setPOI(self.Notes.MidLine, name, note)
-            
-        for name, structure in self.getPoses(self.Structures.Scoring):
-            self.setPOI(self.Structures.Scoring, name, structure)
-            
-        for name, stage in self.getPoses(self.Structures.Stage):
-            self.setPOI(self.Structures.Stage, name, stage)
-            
-        for name, pickup in self.getPoses(self.Structures.Pickup):
-            self.setPOI(self.Structures.Pickup, name, pickup)
-            
-        for name, obstacle in self.getPoses(self.Structures.Obstacles):
-            self.setPOI(self.Structures.Obstacles, name, obstacle)
-            
-        for name, waypoint in self.getPoses(self.Structures.Waypoints):
-            self.setPOI(self.Structures.Waypoints, name, waypoint)
-            
-        self.logger.info("inverted")
-        self.setValues()
+    def getTranslation(self):
+        return self.get().translation()
+
+class POI:
+    _red: bool = False
+    
+    class Coordinates:
         
-    def setRed(self):
-        if self._red:
-            return
-        self.logger.info("setting red")
-        self.invert()
-        self._red = True
+        class Notes:
+            class Wing:
+                
+                kRight = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Wing.note_x,
+                        constants.FieldPos.Wing.note_init
+                    ), constants.FieldPos.pose_reverse))
+
+                kCenter = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Wing.note_x,
+                        constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap
+                    ), constants.FieldPos.pose_reverse))
+
+                kLeft = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Wing.note_x,
+                        constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap * 2
+                    ), constants.FieldPos.pose_reverse))
+
+
+            class MidLine:
+                kFarRight = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.MidLine.mid_line,
+                        constants.FieldPos.MidLine.note_init
+                    ), constants.FieldPos.pose_reverse))
+
+                kMidRight = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.MidLine.mid_line,
+                        constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap
+                    ), constants.FieldPos.pose_reverse))
+
+                kCenter = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.MidLine.mid_line,
+                        constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 2
+                    ), constants.FieldPos.pose_reverse))
+
+                kMidLeft = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.MidLine.mid_line,
+                        constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 3
+                    ), constants.FieldPos.pose_reverse))
+
+                kFarLeft = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.MidLine.mid_line,
+                        constants.FieldPos.MidLine.note_init + constants.FieldPos.MidLine.note_gap * 4
+                    ), constants.FieldPos.pose_reverse))
+
+
+        class Structures:
+
+            class Scoring:
+                kSpeaker = POIPose(Pose2d(
+                    Translation2d(
+                        0,
+                        constants.FieldPos.Scoring.speaker_y
+                    ), constants.FieldPos.pose_reverse))
+
+                kAmp = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Scoring.amp_x,
+                        constants.FieldPos.Scoring.amp_y
+                    ), constants.FieldPos.Scoring.amp_rotation))
+
+                kAmpActual = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Scoring.amp_x,
+                        constants.FieldPos.Scoring.amp_y_robot
+                    ), constants.FieldPos.Scoring.amp_rotation))
+
+
+            class Stage:
+                kCenter = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x,
+                        constants.FieldPos.Stage.stage_y
+                    ), constants.FieldPos.pose_reverse))
+
+                kLeft = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.x_deviation,
+                        constants.FieldPos.Stage.stage_y + constants.FieldPos.Stage.y_deviation
+                    ), constants.FieldPos.Stage.left_rotation))
+
+                kRight = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.x_deviation,
+                        constants.FieldPos.Stage.stage_y - constants.FieldPos.Stage.y_deviation
+                    ), constants.FieldPos.Stage.right_rotation))
+
+            class Pickup:
+                source = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Source.source_x,
+                        constants.FieldPos.Source.source_y
+                    ), constants.FieldPos.Source.rotation))
+
+            class Obstacles:
+                kStage = POIPose(Pose2d(0,0,0))
+
+
+        class Waypoints:
+            pass
+
+    def __init__(self):
+        self.nt = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")
+        self.table = self.nt.getSubTable("POI")
+        self.setNTValues()
+
+    def setNTValues(self):
+        # set NT values for all coordinates dynamically, as a list
         
-    def setBlue(self):
-        if not self._red:
-            return
-        self.logger.info("setting blue")
-        self.invert()
-        self._red = False
+        # get all classes in Coordinates
+        classes = [cls for cls in self.Coordinates.__dict__.values() if isinstance(cls, type)]
+        # find variables in all classes that are POIPose
+        
+        for cls in classes:
+            
+            table = self.table.getSubTable(cls.__name__)
+            for classvar in cls.__dict__.values():
+                list_of_POIPoses = []
+                if isinstance(classvar, type):
+                    for var in classvar.__dict__.values():
+                        if isinstance(var, POIPose):
+                            pose = var.get(False)
+                            list_of_POIPoses += [pose.X(), pose.Y(), pose.rotation().radians()]
+                            
+                    table.putNumberArray(classvar.__name__, list_of_POIPoses)
+        
         

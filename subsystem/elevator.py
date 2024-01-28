@@ -64,7 +64,7 @@ class Elevator(Subsystem):
 
     def zero(self) -> None:
         # Reset the encoder to zero
-        self.motor_extend.set_sensor_position(self.encoder.getPosition() * constants.elevator_gear_ratio)
+        self.motor_extend.set_sensor_position(self.encoder.getPosition() * constants.elevator_max_length)
         self.zeroed = True
 
     def set_voltage(self, voltage: float) -> None:

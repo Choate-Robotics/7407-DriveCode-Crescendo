@@ -35,6 +35,9 @@ class Intake(Subsystem):
         
     
     def init(self):
+        self.beam_break: DigitalInput = DigitalInput(
+            channel=config.intake_beam_break_channel
+        )
         self.inner_motor.init()
         
         self.beam_break: DigitalInput = DigitalInput(
