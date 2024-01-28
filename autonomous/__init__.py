@@ -4,3 +4,4 @@
 # from autonomous.routines.LEFT_WING_NOTE.auto import routine as left_wing_note
 # from autonomous.routines.RIGHT_WING_NOTE.auto import routine as right_wing_note
 from autonomous.routines.TWO_NOTE.auto import routine as two_note
+from autonomous.routines.MIDLINE_NOTES.auto import routine as mid_notes
