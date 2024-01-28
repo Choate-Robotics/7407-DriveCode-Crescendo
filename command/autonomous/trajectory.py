@@ -1,6 +1,7 @@
 from wpimath.geometry import Pose2d, Translation2d
 from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
-
+from robot_systems import Field
+from utils import POIPose
 
 class CustomTrajectory:
     """
@@ -24,9 +25,9 @@ class CustomTrajectory:
 
     def __init__(
         self,
-        start_pose: Pose2d,
-        waypoints: list[Translation2d],
-        end_pose: Pose2d,
+        start_pose: Pose2d | POIPose,
+        waypoints: list[Translation2d] | list[POIPose],
+        end_pose: Pose2d | POIPose,
         max_velocity: float,
         max_accel: float,
         start_velocity: float = 0,
@@ -41,23 +42,18 @@ class CustomTrajectory:
         self.start_velocity = start_velocity
         self.end_velocity = end_velocity
         self.rev = rev
-
-        config = TrajectoryConfig(
-            self.max_velocity,
-            self.max_accel,
-        )
-        config.setStartVelocity(self.start_velocity)
-        config.setEndVelocity(self.end_velocity)
-        config.setReversed(self.rev)
-
-        self.trajectory = TrajectoryGenerator.generateTrajectory(
-            start=self.start_pose,
-            interiorWaypoints=self.waypoints,
-            end=self.end_pose,
-            config=config,
-        )
         
     def generate(self):
+        
+        if isinstance(self.start_pose, POIPose):
+            self.start_pose = self.start_pose.get()
+            
+        for i, waypoint in enumerate(self.waypoints):
+            if isinstance(waypoint, POIPose):
+                self.waypoints[i] = waypoint.getTranslation()
+
+        if isinstance(self.end_pose, POIPose):
+            self.end_pose = self.end_pose.get()
         
         config = TrajectoryConfig(
             self.max_velocity,

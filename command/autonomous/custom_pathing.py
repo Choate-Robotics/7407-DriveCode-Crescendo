@@ -1,7 +1,7 @@
 import math
 import time
 
-import ntcore
+import ntcore, config
 
 from toolkit.command import SubsystemCommand
 from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
@@ -38,10 +38,10 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             self,
             subsystem: SwerveDrivetrain,
             trajectory: CustomTrajectory,
-            period: float = 0.02,
+            period: float = config.period,
     ):
         super().__init__(subsystem)
-        self.trajectory: Trajectory = trajectory.generate()
+        self.trajectory_c: CustomTrajectory = trajectory
         self.controller = HolonomicDriveController(
             PIDController(1, 0, 0, period),
             PIDController(1, 0, 0, period),
@@ -57,15 +57,17 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         )
         self.start_time = 0
         self.t = 0
-        self.duration = self.trajectory.totalTime()
         self.theta_i: float | None = None
         self.theta_f: float | None = None
         self.theta_diff: float | None = None
         self.omega: float | None = None
-        self.end_pose: Pose2d = trajectory.end_pose
+        
         self.finished: bool = False
 
     def initialize(self) -> None:
+        self.trajectory = self.trajectory_c.generate()
+        self.duration = self.trajectory.totalTime()
+        self.end_pose: Pose2d = self.trajectory_c.end_pose
         self.start_time = time.perf_counter()
         self.theta_i = Field.odometry.getPose().rotation().radians()
         self.theta_f = self.end_pose.rotation().radians()

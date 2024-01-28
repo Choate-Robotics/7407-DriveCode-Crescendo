@@ -1,6 +1,7 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
 from robot_systems import Robot
+from utils import POIPose
 
 from commands2 import (
     InstantCommand,
@@ -20,9 +21,9 @@ from wpimath.geometry import Pose2d, Translation2d
 path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=Pose2d(*get_first_ring[0]),
+        start_pose=POIPose(Pose2d(*get_first_ring[0])),
         waypoints=[Translation2d(*coord) for coord in get_first_ring[1]],
-        end_pose=Pose2d(*get_first_ring[2]),
+        end_pose=get_first_ring[2],
         max_velocity=3,
         max_accel=0.6,
         start_velocity=0,
@@ -35,9 +36,9 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=Pose2d(*get_second_ring[0]),
+        start_pose=get_second_ring[0],
         waypoints=[Translation2d(*coord) for coord in get_second_ring[1]],
-        end_pose=Pose2d(*get_second_ring[2]),
+        end_pose=get_second_ring[2],
         max_velocity=3,
         max_accel=0.6,
         start_velocity=0,
@@ -50,9 +51,9 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=Pose2d(*leave[0]),
+        start_pose=leave[0],
         waypoints=[Translation2d(*coord) for coord in leave[1]],
-        end_pose=Pose2d(*leave[2]),
+        end_pose=leave[2],
         max_velocity=3,
         max_accel=0.6,
         start_velocity=0,

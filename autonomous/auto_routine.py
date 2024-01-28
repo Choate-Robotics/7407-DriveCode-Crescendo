@@ -5,6 +5,7 @@ from commands2 import CommandBase
 from wpimath.geometry import Pose2d
 
 from robot_systems import Robot
+from utils import POIPose
 
 
 @dataclass
@@ -27,6 +28,7 @@ class AutoRoutine:
         """
 
         Robot.drivetrain.gyro.reset_angle(self.initial_robot_pose.rotation().radians())
-        Robot.drivetrain.reset_odometry(self.initial_robot_pose)
+        Robot.drivetrain.reset_odometry(POIPose(self.initial_robot_pose).get())
 
         commands2.CommandScheduler.getInstance().schedule(self.command)
+        
