@@ -60,7 +60,6 @@ class _Robot(wpilib.TimedRobot):
             #     sensor.init()
             Sensors.limelight.init()
             Field.odometry.enable()
-            Field.POI.init()
         try:
             init_sensors()
         except Exception as e:
@@ -71,8 +70,6 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         self.log.complete("Robot initialized")
-        # Field.POI.setRed()
-        Field.POI.setBlue()
         
         # Initialize Operator Interface
         OI.init()
@@ -83,10 +80,7 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         
-        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-            Field.POI.setBlue()
-        else:
-            Field.POI.setRed()
+        Field.POI.setNTValues()
         
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
