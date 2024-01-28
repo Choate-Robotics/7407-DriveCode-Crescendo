@@ -33,7 +33,7 @@ class POIPose:
         new_pose = Pose2d(Translation2d(pose.translation().X(), invert), new_rotation)
         return new_pose
     
-    def get(self, verbose: bool = True):
+    def get(self, verbose: bool = False):
         # if red is true, invert the y value
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed and not self._red\
             or DriverStation.getAlliance() == None and not self._red:
@@ -49,7 +49,7 @@ class POIPose:
         return self._pose
     
     def getTranslation(self):
-        return self.get().translation()
+        return self.get(False).translation()
 
 class POI:
     _red: bool = False
