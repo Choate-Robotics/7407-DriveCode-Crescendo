@@ -57,6 +57,7 @@ class Giraffe(commands2.Command):
         if self.target.wrist_angle == 'aim':
             self.aiming = True
             self.target.wrist_angle = 0 # initial wrist angle
+        
         # if the target wrist angle is 'stage' then set the wrist angle to the staging angle, we will pass off the aiming command at the end
         elif self.target.wrist_angle == 'stage':
             self.staging = True

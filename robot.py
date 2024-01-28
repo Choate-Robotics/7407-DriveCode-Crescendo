@@ -71,8 +71,11 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         self.log.complete("Robot initialized")
-        # Field.POI.setRed()
-        Field.POI.setBlue()
+        
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+            Field.POI.setBlue()
+        else:
+            Field.POI.setRed()
         
         # Initialize Operator Interface
         OI.init()
