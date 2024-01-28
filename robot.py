@@ -78,8 +78,6 @@ class _Robot(wpilib.TimedRobot):
         self.log.complete("Robot initialized")
         # Field.POI.setRed()
 
-
-
     def robotPeriodic(self):
         Field.POI.setNTValues()
         
@@ -136,7 +134,7 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        autonomous.two_note.run()
+        autonomous.five_note.run()
 
     def autonomousPeriodic(self):
         pass
