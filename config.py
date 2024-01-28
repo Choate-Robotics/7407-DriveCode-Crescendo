@@ -47,7 +47,7 @@ period: float = 0.03  # seconds
 inner_intake_id = 0 #placeholder
 outer_intake_front_id = 1 #placeholder
 outer_intake_back_id = 2 #placeholder
-intake_beam_break_channel = 1 #placeholder
+intake_beam_break_channel = 7 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder

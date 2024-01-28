@@ -48,7 +48,7 @@ class IT:
         )
         
         # odom
-        button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Structures.Obstacles.stage.translation()) < config.stage_distance_threshold)\
+        button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Coordinates.Structures.Obstacles.kStage.getTranslation()) < config.stage_distance_threshold)\
             .debounce(config.odometry_debounce).onTrue(
                 command.GiraffeLock(Robot.elevator, Robot.wrist)
             ).onFalse(InstantCommand(lambda: Robot.elevator.unlock()))
@@ -59,12 +59,7 @@ class IT:
             
         def start_limelight_pos():
             Sensors.limelight.cam_pos_moving = False
-            
-        def setFieldRed():
-            Field.POI.setRed()
-            
-        def setFieldBlue():
-            Field.POI.setBlue()       
+    
         # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
         #     .onTrue(InstantCommand(stop_limelight_pos))\
         #     .onFalse(InstantCommand(start_limelight_pos))
