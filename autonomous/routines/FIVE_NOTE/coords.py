@@ -1,6 +1,6 @@
 from units.SI import meters, radians
 from robot_systems import Field
-import constants
+import constants, math
 from utils import POIPose
 from wpimath.geometry import Translation2d
 
@@ -43,5 +43,5 @@ get_fourth_note: path = (
 go_to_midline_2: path = (
     get_fourth_note[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(-2.3, 1))
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(-2.3, 1)).withRotation(math.radians(30))
 )
