@@ -47,3 +47,16 @@ class IntakeIdle(SubsystemCommand[Intake]):
     
     def end(self, interrupted) -> None:
         pass
+
+class DeployIntake(SubsystemCommand[Intake]):
+    def initialize(self) -> None:
+        self.subsystem.deploy_roller()
+
+    def execute(slef) -> None:
+        pass
+
+    def isFinished(self) -> bool:
+        return self.subsystem.get_deploy_current() > config.intake_deploy_current_limit
+    
+    def end(self, interrupted) -> None:
+        self.subsystem.deploy_motor.set_raw_output(0)

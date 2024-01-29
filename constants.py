@@ -38,3 +38,4 @@ elevator_max_length: float = 10.7 # TODO: PLACEHOLDER
 # INTAKE
 intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
 intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
+intake_deploy_gear_ratio = 20 / 1 #TODO: placeholder

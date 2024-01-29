@@ -34,9 +34,10 @@ LOG_FILE_LEVEL: int = 1
 
 
 #intake
-inner_intake_id = 0 #placeholder
-outer_intake_front_id = 1 #placeholder
-outer_intake_back_id = 2 #placeholder
+inner_intake_id = 50 #placeholder
+outer_intake_front_id = 51 #placeholder
+outer_intake_back_id = 52 #placeholder
+deploy_intake_id = 53 #placeholder
 intake_beam_break_channel = 1 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
@@ -45,6 +46,7 @@ intake_outer_idle_speed = .25 #placeholder
 
 intake_timeout = 5 #placeholder
 intake_roller_current_limit = 1 #placeholder
+intake_deploy_current_limit = 1 #placeholder
 intake_sensor_debounce = 0.2 #placeholder
 
 # elevator
