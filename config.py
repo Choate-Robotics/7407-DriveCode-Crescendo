@@ -181,3 +181,6 @@ gyro_id = 20
 # Elevator
 elevator_moving = False
 
+#Flywheel
+flywheel_id_1 = 1 #TODO: placeholder
+flywheel_id_2 = 2 #TODO: placeholder
