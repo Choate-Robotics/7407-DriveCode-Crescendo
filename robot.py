@@ -122,6 +122,7 @@ class _Robot(wpilib.TimedRobot):
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
+        self.scheduler.schedule(commands2.Command(command.DeployIntake(Robot.intake)))
 
     def autonomousPeriodic(self):
         pass
