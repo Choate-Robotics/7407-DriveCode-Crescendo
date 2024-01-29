@@ -98,9 +98,6 @@ class FieldPos:
         rotation = Rotation2d(math.radians(-240))
 
 
-
-
-
 # ELEVATOR
 elevator_gear_ratio: float = 0.7 # TODO: PLACEHOLDER
 elevator_driver_gear_circumference: float = 0.5 # TODO: PLACEHOLDER
@@ -112,6 +109,6 @@ intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
 intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
 
 # WRIST
-wrist_gear_ratio = 3
+wrist_gear_ratio = 3 
 
 wrist_time_to_max_vel = 0.3
