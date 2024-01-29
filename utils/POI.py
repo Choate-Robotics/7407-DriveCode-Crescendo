@@ -161,7 +161,29 @@ class POI:
                     ), constants.FieldPos.Source.rotation))
 
             class Obstacles:
-                kStage = POIPose(Pose2d(0,0,0))
+                kStage = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length / 2 + constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y
+                    ), constants.FieldPos.pose_reverse))
+                
+                kStageCenterPost = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length + constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y
+                    ), constants.FieldPos.pose_reverse))
+                
+                kStageLeftPost = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y + constants.FieldPos.Stage.stage_width / 2 - constants.FieldPos.Stage.post_deviation
+                    ), constants.FieldPos.pose_reverse))
+                
+                kStageRightPost = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y - constants.FieldPos.Stage.stage_width / 2 + constants.FieldPos.Stage.post_deviation
+                    ), constants.FieldPos.pose_reverse))
 
 
         class Waypoints:

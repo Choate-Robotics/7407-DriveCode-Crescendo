@@ -66,7 +66,10 @@ class FieldPos:
         amp_rotation = Rotation2d(math.radians(90))
 
     class Stage:
+        
         stage_x = 231.20 * inches_to_meters  # center stage x
+
+        post_deviation = .25
 
         stage_length = 106.19 * inches_to_meters
 
