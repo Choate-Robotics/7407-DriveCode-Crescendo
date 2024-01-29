@@ -81,6 +81,11 @@ class _Robot(wpilib.TimedRobot):
     def robotPeriodic(self):
         Field.POI.setNTValues()
         
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+            config.active_team = config.Team.BLUE
+        else:
+            config.active_team = config.Team.RED
+        
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 

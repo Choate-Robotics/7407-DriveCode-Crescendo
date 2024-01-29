@@ -22,10 +22,10 @@ class POIPose:
     
         
     def withRotation(self, radians: radians):
-        return POIPose(Pose2d(self._pose.translation(), Rotation2d(radians)))
+        return POIPose(Pose2d(self._pose.translation(), Rotation2d(radians)), self._red)
     
     def withOffset(self, offset: Translation2d):
-        return POIPose(Pose2d(self._pose.translation() + offset, self._pose.rotation()))
+        return POIPose(Pose2d(self._pose.translation() + offset, self._pose.rotation()), self._red)
     
     def __invertY(self, pose: Pose2d):
         invert = constants.field_width - pose.translation().Y()
