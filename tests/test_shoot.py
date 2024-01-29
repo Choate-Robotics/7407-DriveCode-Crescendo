@@ -30,7 +30,7 @@ def trajectory_calc():
     "distance_to_target, delta_z, expected_angle",
     [(5, 0.7, 0.25064), (5, 0.5, 0.21069), (3, 0.8, 0.32732), (3, 0.4, 0.19866)],
 )
-def test_calculate_angle_no_air(
+def test_update(
     trajectory_calc, distance_to_target, delta_z, expected_angle
 ):
     trajectory_calc.delta_z = delta_z

@@ -34,6 +34,7 @@ class TrajectoryCalculator:
         self.distance_to_target = 0
         self.delta_z = 0
         self.shoot_angle = 0
+        self.base_angle = 0
         self.elevator = elevator
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
@@ -45,7 +46,7 @@ class TrajectoryCalculator:
             0.5
             * np.arcsin(
                 np.sin(phi0)
-                * constants.g
+                + constants.g
                 * distance_to_target
                 * np.cos(phi0)
                 / (config.v0_flywheel**2)
@@ -54,9 +55,10 @@ class TrajectoryCalculator:
         )
         return result_angle
 
-    def update(self):
+    def update_shooter(self):
         """
-        Updates the trajectory calculator with current data.
+        function runs sim to calculate a final angle with air resistance considered
+        :return: target angle
         """
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker)
@@ -81,8 +83,20 @@ class TrajectoryCalculator:
                 return theta_2
             correction_angle = z_error * z_to_angle_conversion
 
-    def calculate_angle_air(self):
+    def update_base(self):
+        """
+        updates rotation of base to face target
+        :return: base target angle
+        """
         pass
+
+    def update(self):
+        """
+        updates both shooter and base
+        :return: base target angle
+        """
+        self.update_shooter()
+        self.update_base()
 
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
