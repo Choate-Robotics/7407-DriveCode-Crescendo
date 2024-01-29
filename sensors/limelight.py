@@ -205,7 +205,7 @@ class Limelight:
         )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
-        self.targetpose = self.table.getNumberArray("targetpose", [0, 0, 0, 0, 0, 0])
+        self.targetpose = self.table.getNumberArray("targetpose_robotspace", [0, 0, 0, 0, 0, 0])
 
     def target_exists(self, force_update: bool = False):
         """
