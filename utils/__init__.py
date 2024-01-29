@@ -1,2 +1,2 @@
 from utils.local_logger import LocalLogger
-from utils.POI import POI, POIPose
+from utils.POI import POI, POIPose, avoid_obstacles_between_points

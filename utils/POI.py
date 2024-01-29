@@ -269,8 +269,27 @@ class POI:
         
         
         
-def within_point_distance(poses: list[Pose2d], point: Pose2d, distance: float):
-    for pose in poses:
-        if pose.translation().distance(point.translation()) < distance:
-            return True
-    return False
+def avoid_obstacles_between_points(points: list[POIPose], obstacles: list[POIPose]) -> list[POIPose]:
+    '''
+    returns a list of waypoints that avoid obstacles
+    '''
+    
+    def line_intersection(p1: POIPose | Pose2d, p2: POIPose | Pose2d, obstacle: POIPose):
+        line_start_point_relative:Translation2d = p1.getTranslation() - p2.getTranslation()
+        obstacle_start_point_relative:Translation2d = p1.getTranslation() - obstacle.getTranslation()
+        obstacle_radius_vector:Translation2d = Translation2d(obstacle.getZ(), Rotation2d())
+    
+    # first, we find the line between each point
+    lines = []
+    for i in range(len(points) - 1):
+        print(i)
+        lines.append((points[i-1], points[i]))
+        
+    print(lines)
+    # then, we find the intersection of each line with each 3d POIPose, using the z value as the minimum distance to avoid the obstacle
+    intersections = []
+    for line in lines:
+        for obstacle in obstacles:
+            intersections += line_intersection(line[0], line[1], obstacle)
+            
+    return intersections
