@@ -27,12 +27,7 @@ class _Robot(wpilib.TimedRobot):
         if config.DEBUG_MODE:
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
+        
         period = .03
         self.scheduler.setPeriod(period)
 
@@ -74,6 +69,13 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
+
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
 
         self.log.complete("Robot initialized")
 
@@ -122,7 +124,6 @@ class _Robot(wpilib.TimedRobot):
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
-        self.scheduler.schedule(commands2.Command(command.DeployIntake(Robot.intake)))
 
     def autonomousPeriodic(self):
         pass

@@ -1,7 +1,7 @@
 from utils import LocalLogger
 
 
-from commands2 import button, ParallelDeadlineGroup, waitcommand, ParallelRaceGroup, InstantCommand
+from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand
 import config
 
 import command
@@ -25,7 +25,7 @@ class IT:
         button.Trigger(lambda: Robot.intake.get_back_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
         .debounce(config.intake_sensor_debounce).onTrue(
             ParallelRaceGroup(
-                waitcommand(3), 
+                WaitCommand(3), 
                 command.RunIntake(Robot.intake)
             ).andThen(command.IntakeIdle(Robot.intake))
         )

@@ -34,10 +34,10 @@ LOG_FILE_LEVEL: int = 1
 
 
 #intake
-inner_intake_id = 50 #placeholder
-outer_intake_front_id = 51 #placeholder
-outer_intake_back_id = 52 #placeholder
-deploy_intake_id = 53 #placeholder
+inner_intake_id = 10 #placeholder
+outer_intake_front_id = 11 #placeholder
+outer_intake_back_id = 12 #placeholder
+deploy_intake_id = 13 #placeholder
 intake_beam_break_channel = 1 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
