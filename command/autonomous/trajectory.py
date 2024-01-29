@@ -2,6 +2,7 @@ from wpimath.geometry import Pose2d, Translation2d
 from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
 from robot_systems import Field
 from utils import POIPose
+import config
 
 class CustomTrajectory:
     """
@@ -33,6 +34,7 @@ class CustomTrajectory:
         start_velocity: float = 0,
         end_velocity: float = 0,
         rev: bool = False,
+        obstacles: list[POIPose] = [Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost, Field.POI.Coordinates.Structures.Obstacles.kStageRightPost, Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost]
     ):
         self.start_pose = start_pose
         self.waypoints = waypoints

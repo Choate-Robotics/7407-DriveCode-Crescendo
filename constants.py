@@ -56,6 +56,12 @@ class FieldPos:
 
     class Scoring:
         speaker_y = 218.42 * inches_to_meters
+        
+        speaker_z_top = 82.90 * inches_to_meters
+        
+        speaker_z_bottom = 78.13 * inches_to_meters
+        
+        speaker_z = (speaker_z_top + speaker_z_bottom) / 2
 
         amp_y = field_width
 
