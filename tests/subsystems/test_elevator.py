@@ -97,7 +97,7 @@ def test_zero(test_input, elevator: Elevator):
     elevator.encoder.getPosition.return_value = test_input
     elevator.zero()
     elevator.motor_extend.set_sensor_position.assert_called_with(
-        test_input * constants.elevator_gear_ratio)
+        test_input * constants.elevator_max_length)
     assert elevator.zeroed == True
 
 

@@ -175,8 +175,7 @@ back_right_encoder_zeroed_pos = 0.260 if comp_bot.get() else 0.0
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-#pathing
-post_avoidance_distance = 0.5 * meters
+
 
 # Gyro
 gyro_id = 20

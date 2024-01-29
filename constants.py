@@ -114,3 +114,6 @@ intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
 wrist_gear_ratio = 3
 
 wrist_time_to_max_vel = 0.3
+
+#pathing
+post_avoidance_distance = 0.5 
