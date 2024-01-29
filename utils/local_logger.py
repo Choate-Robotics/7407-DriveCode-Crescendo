@@ -1,6 +1,7 @@
-from wpilib import DataLogManager, Timer, DriverStation, TimedRobot
+from wpilib import DataLogManager, DriverStation, TimedRobot, Timer
 from wpilib.deployinfo import getDeployData
 from wpiutil.log import StringLogEntry
+
 import config
 
 
@@ -8,21 +9,22 @@ class BColors:
     """
     ANSI escape codes for colors
     """
-    TEST = '\u001b[41;1m'
-    TIME = '\u001b[35;1m'
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    SETUP = '\u001b[46;1m'
+
+    TEST = "\u001b[41;1m"
+    TIME = "\u001b[35;1m"
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    SETUP = "\u001b[46;1m"
 
 
-class LocalLogger():
+class LocalLogger:
     """
     A logger that logs to the driver station and a file accessible from a USB
 
@@ -74,9 +76,9 @@ class LocalLogger():
         self.name = name
         self.dlm = DataLogManager
         if config.LOGGING:
-            self.dlm.start('')
+            self.dlm.start("")
             self.log_data = self.dlm.getLog()
-            self.custom_entry = StringLogEntry(self.log_data, f'messages/{self.name}')
+            self.custom_entry = StringLogEntry(self.log_data, f"messages/{self.name}")
 
     def _robot_log_setup(self):
         """
@@ -90,7 +92,7 @@ class LocalLogger():
         self.get_log_levels()
         self.get_deploy_info()
         self.log_driverstation(True)
-        self.setup('Robot logging initialized')
+        self.setup("Robot logging initialized")
 
     def get_deploy_info(self):
         """
@@ -101,20 +103,20 @@ class LocalLogger():
 
         if data is None:
             if TimedRobot.isSimulation():
-                self.setup('Running in simulation')
+                self.setup("Running in simulation")
                 return
-            self.setup('Deploy info not found')
+            self.setup("Deploy info not found")
             return
 
-        branch = data['git-branch']
+        branch = data["git-branch"]
 
-        date = data['deploy-date']
+        date = data["deploy-date"]
 
-        by = data['deploy-user']
+        by = data["deploy-user"]
 
-        string = f'Deploy Info\n Branch: {branch}\n Deployment Date: {date}\n Deployed By: {by}'
+        string = f"Deploy Info\n Branch: {branch}\n Deployment Date: {date}\n Deployed By: {by}"
 
-        if branch != 'master' and branch != 'main':
+        if branch != "master" and branch != "main":
             self.setup(string)
         else:
             self.setup(string)
@@ -127,11 +129,11 @@ class LocalLogger():
         """
 
         if not config.LOGGING:
-            self.setup('WARNING: Logging to file is disabled')
+            self.setup("WARNING: Logging to file is disabled")
         else:
-            self.setup('Logging to file is enabled')
-            self.setup(f'Log File Level: {config.LOG_FILE_LEVEL}')
-        self.setup(f'Log Out Level: {config.LOG_OUT_LEVEL}')
+            self.setup("Logging to file is enabled")
+            self.setup(f"Log File Level: {config.LOG_FILE_LEVEL}")
+        self.setup(f"Log Out Level: {config.LOG_OUT_LEVEL}")
 
     def log_driverstation(self, joysticks: bool):
         """
@@ -140,11 +142,12 @@ class LocalLogger():
         :param joysticks: Whether to log joystick data
         """
 
-        if not config.LOGGING: return
+        if not config.LOGGING:
+            return
         DriverStation.startDataLog(self.log_data, joysticks)
-        self.setup('DriverStation logging started')
+        self.setup("DriverStation logging started")
         if joysticks:
-            self.setup('Joystick logging started')
+            self.setup("Joystick logging started")
 
     def __pms(self, colors: bool = True):
         """
@@ -156,10 +159,10 @@ class LocalLogger():
         :type colors: bool
         """
 
-        sim_color = ''
-        header_color = ''
-        time_color = ''
-        end_color = ''
+        sim_color = ""
+        header_color = ""
+        time_color = ""
+        end_color = ""
 
         if colors:
             sim_color = BColors.TEST
@@ -167,22 +170,24 @@ class LocalLogger():
             time_color = BColors.TIME
             end_color = BColors.ENDC
 
-        mode = 'DISABLED'
-        is_sim = f'{sim_color}SIMULATION{end_color}' if TimedRobot.isSimulation() else ''
+        mode = "DISABLED"
+        is_sim = (
+            f"{sim_color}SIMULATION{end_color}" if TimedRobot.isSimulation() else ""
+        )
         if DriverStation.isEnabled():
-            mode = 'TELEOP' if DriverStation.isTeleopEnabled() else 'AUTONOMOUS'
+            mode = "TELEOP" if DriverStation.isTeleopEnabled() else "AUTONOMOUS"
 
-        mode = f'{header_color}{mode}{end_color}'
+        mode = f"{header_color}{mode}{end_color}"
 
         combined = mode + "  " + is_sim
 
         time = Timer.getFPGATimestamp()
-        time = f'{time:.3f}'
+        time = f"{time:.3f}"
         if not TimedRobot.isSimulation():
             time = Timer.getMatchTime()
-            time = f'{time:.3f}'
+            time = f"{time:.3f}"
 
-        return f'  {time}{time_color}  {combined}{end_color}'
+        return f"  {time}{time_color}  {combined}{end_color}"
 
     def __format_log_type(self, type: str):
         """
@@ -194,7 +199,7 @@ class LocalLogger():
         :type type: str
         """
 
-        return f'  |  {type}  |  '
+        return f"  |  {type}  |  "
 
     def __format_std_out(self, color: BColors, type, message):
         """
@@ -213,7 +218,7 @@ class LocalLogger():
         """
 
         type = self.__format_log_type(type)
-        return f'{self.__pms()}{color}{type}{self.name}: {message}{BColors.ENDC}'
+        return f"{self.__pms()}{color}{type}{self.name}: {message}{BColors.ENDC}"
 
     def __log(self, message, type, color, level: LogLevels, std_out: bool = True):
         """
@@ -225,7 +230,7 @@ class LocalLogger():
         if std_out and config.LOG_OUT_LEVEL <= level:
             print(self.__format_std_out(color, type, message))
         if config.LOGGING and config.LOG_FILE_LEVEL <= level:
-            self.custom_entry.append(f'{self.__pms(False)}{type}{self.name}: {message}')
+            self.custom_entry.append(f"{self.__pms(False)}{type}{self.name}: {message}")
 
     def message(self, message: str):
         """
@@ -236,7 +241,7 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, '', '', self.LogLevels.INFO, False)
+        self.__log(message, "", "", self.LogLevels.INFO, False)
 
     def info(self, message: str, std_out: bool = True):
         """
@@ -245,7 +250,7 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, 'INFO', BColors.OKBLUE, self.LogLevels.INFO, std_out)
+        self.__log(message, "INFO", BColors.OKBLUE, self.LogLevels.INFO, std_out)
 
     def debug(self, message: str, std_out: bool = True):
         """
@@ -254,7 +259,7 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, 'DEBUG', BColors.OKCYAN, self.LogLevels.DEBUG, std_out)
+        self.__log(message, "DEBUG", BColors.OKCYAN, self.LogLevels.DEBUG, std_out)
 
     def complete(self, message: str, std_out: bool = True):
         """
@@ -263,7 +268,7 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, 'DONE', BColors.OKGREEN, self.LogLevels.INFO, std_out)
+        self.__log(message, "DONE", BColors.OKGREEN, self.LogLevels.INFO, std_out)
 
     def warn(self, message: str, std_out: bool = True):
         """
@@ -272,7 +277,7 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, 'WARN', BColors.WARNING, self.LogLevels.WARNING, std_out)
+        self.__log(message, "WARN", BColors.WARNING, self.LogLevels.WARNING, std_out)
 
     def error(self, message: str, std_out: bool = True):
         """
@@ -287,7 +292,7 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, 'ERROR', BColors.FAIL, self.LogLevels.ERROR, std_out)
+        self.__log(message, "ERROR", BColors.FAIL, self.LogLevels.ERROR, std_out)
 
     def setup(self, message: str, std_out: bool = True):
         """
@@ -296,4 +301,4 @@ class LocalLogger():
         :param message: The message to log
         """
 
-        self.__log(message, 'SETUP', BColors.SETUP, self.LogLevels.SETUP, std_out)
+        self.__log(message, "SETUP", BColors.SETUP, self.LogLevels.SETUP, std_out)

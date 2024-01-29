@@ -5,33 +5,34 @@ from dataclasses import dataclass
 
 import rev
 from wpilib import AnalogEncoder
-
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
-from toolkit.motors.ctre_motors import TalonFX, TalonConfig
-
-from toolkit.sensors.gyro import Pigeon2
-from toolkit.subsystem_templates.drivetrain import (
-    SwerveDrivetrain,
-    SwerveNode,
-)
-from units.SI import (
-    meters,
-    meters_per_second,
-    radians,
-    radians_per_second,
-)
 from wpimath.geometry import Pose2d
 
 import config
 import constants
 from oi.keymap import Keymap
-from units.SI import degrees, meters_per_second_squared
+from toolkit.motors.ctre_motors import TalonConfig, TalonFX
+from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
+from toolkit.sensors.gyro import Pigeon2
+from toolkit.subsystem_templates.drivetrain import SwerveDrivetrain, SwerveNode
+from units.SI import (
+    degrees,
+    meters,
+    meters_per_second,
+    meters_per_second_squared,
+    radians,
+    radians_per_second,
+)
 
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True  # integral_zone=1000, max_integral_accumulator=10000
+    0.11,
+    0,
+    0,
+    0.25,
+    0.01,
+    brake_mode=True,  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 
@@ -55,11 +56,13 @@ class CustomSwerveNode(SwerveNode):
         abs_encoder_position: float = self.encoder.getAbsolutePosition()
         print(abs_encoder_position)
 
-        encoder_difference: float = abs_encoder_position - self.absolute_encoder_zeroed_pos
+        encoder_difference: float = (
+            abs_encoder_position - self.absolute_encoder_zeroed_pos
+        )
 
-        if encoder_difference > .5:
+        if encoder_difference > 0.5:
             encoder_difference -= 1
-        elif encoder_difference < -.5:
+        elif encoder_difference < -0.5:
             encoder_difference += 1
 
         motor_change = encoder_difference * constants.drivetrain_turn_gear_ratio
@@ -85,29 +88,31 @@ class CustomSwerveNode(SwerveNode):
 
     def get_turn_motor_angle(self) -> radians:
         return (
-                (self.m_turn.get_sensor_position() / constants.drivetrain_turn_gear_ratio)
-                * 2
-                * math.pi
+            (self.m_turn.get_sensor_position() / constants.drivetrain_turn_gear_ratio)
+            * 2
+            * math.pi
         )
 
     def set_motor_velocity(self, vel: meters_per_second):
         # print(vel, 'meters per second')
-        rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+        rotations_per_second = (
+            vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+        )
         # print(rotations_per_second, 'rotations per second')
         self.m_move.set_target_velocity(rotations_per_second)
 
     def get_motor_velocity(self) -> meters_per_second:
         return (
-                self.m_move.get_sensor_velocity()
-                / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+            self.m_move.get_sensor_velocity()
+            / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
     def get_drive_motor_traveled_distance(self) -> meters:
-
         sensor_position = self.m_move.get_sensor_position()
 
         return (
-                sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+            sensor_position
+            / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
 

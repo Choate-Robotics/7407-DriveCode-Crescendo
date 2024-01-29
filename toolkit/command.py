@@ -1,4 +1,5 @@
 from typing import Generic, TypeVar
+
 import commands2
 
 from toolkit.subsystem import Subsystem
@@ -10,6 +11,7 @@ class BasicCommand(commands2.Command):
     """
     Extendable basic command
     """
+
     ...
 
 

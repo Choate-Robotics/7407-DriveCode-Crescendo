@@ -2,6 +2,9 @@
 # Use this configuration file to control what RobotPy packages are installed
 # on your RoboRIO
 #
+[tool.isort]
+skip = ["__init__.py"]
+
 
 [tool.robotpy]
 

@@ -1,13 +1,7 @@
-import wpilib
 import commands2.button
+import wpilib
 
-from toolkit.oi import (
-    XBoxController,
-    LogitechController,
-    JoystickAxis,
-    Joysticks,
-    DefaultButton,
-)
+from toolkit.oi import JoystickAxis, Joysticks, XBoxController
 
 controllerDRIVER = XBoxController
 controllerOPERATOR = XBoxController

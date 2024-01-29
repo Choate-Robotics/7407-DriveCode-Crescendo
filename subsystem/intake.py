@@ -1,39 +1,36 @@
-import config
-import constants
-from toolkit.subsystem import Subsystem
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from wpilib import DigitalInput
 
+import config
+import constants
+from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
+from toolkit.subsystem import Subsystem
+
 # CHANGE WHEN ROBOT IS BUILT
-INNER_CONFIG = SparkMaxConfig(.5, 0, 0)
-OUTER_CONFIG = SparkMaxConfig(.5, 0, 0)
+INNER_CONFIG = SparkMaxConfig(0.5, 0, 0)
+OUTER_CONFIG = SparkMaxConfig(0.5, 0, 0)
+
 
 class Intake(Subsystem):
     def __init__(self):
         super().__init__()
 
         self.inner_motor: SparkMax = SparkMax(
-            can_id=config.inner_intake_id,
-            config=INNER_CONFIG
+            can_id=config.inner_intake_id, config=INNER_CONFIG
         )
 
         self.outer_motor_front: SparkMax = SparkMax(
-            can_id=config.outer_intake_front_id,
-            config=OUTER_CONFIG
+            can_id=config.outer_intake_front_id, config=OUTER_CONFIG
         )
 
         self.outer_motor_back: SparkMax = SparkMax(
-            can_id=config.outer_intake_back_id,
-            config=OUTER_CONFIG
+            can_id=config.outer_intake_back_id, config=OUTER_CONFIG
         )
 
-        self.beam_break: DigitalInput 
+        self.beam_break: DigitalInput
 
         self.note_in_intake: bool = False
         self.intake_running: bool = False
 
-        
-    
     def init(self):
         self.beam_break: DigitalInput = DigitalInput(
             channel=config.intake_beam_break_channel
@@ -56,8 +53,12 @@ class Intake(Subsystem):
         param vel: Speed to set motors to in rotations per second (float)
         Return: none
         """
-        self.outer_motor_front.set_target_velocity(vel * constants.intake_outer_gear_ratio)
-        self.outer_motor_back.set_target_velocity(vel * constants.intake_outer_gear_ratio)
+        self.outer_motor_front.set_target_velocity(
+            vel * constants.intake_outer_gear_ratio
+        )
+        self.outer_motor_back.set_target_velocity(
+            vel * constants.intake_outer_gear_ratio
+        )
 
     def detect_note(self) -> bool:
         """
@@ -69,7 +70,7 @@ class Intake(Subsystem):
 
     def deploy_rollers(self):
         pass
-    
+
     def roll_in(self):
         """
         Rolls inner and outer motors in
@@ -105,19 +106,19 @@ class Intake(Subsystem):
         Return: current of front motor (float)
         """
         return self.outer_motor_front.motor.getOutputCurrent()
-    
+
     def get_back_current(self) -> float:
         """
         Return: current of back motor (float)
         """
         return self.outer_motor_back.motor.getOutputCurrent()
-    
+
     def roll_inner_in(self):
         """
         Rolls inner motors in
         """
         self.set_inner_velocity(config.intake_inner_speed)
-    
+
     def stop_inner(self):
         """
         Stops inner rollers

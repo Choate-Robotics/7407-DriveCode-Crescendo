@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from phoenix6 import hardware, configs, signals, controls, StatusCode, StatusSignal
+from phoenix6 import StatusCode, StatusSignal, configs, controls, hardware, signals
 
 from toolkit.motor import PIDMotor
 from units.SI import rotations, rotations_per_second
@@ -20,8 +20,17 @@ class TalonConfig:
     break_mode: bool
     output_range: tuple[float, float]
 
-    def __init__(self, kP: float, kI: float, kD: float, kF: float, kA: float, current_limit: int = 80,
-                 brake_mode: bool = True, output_range: tuple[float, float] = (-1, 1)):
+    def __init__(
+        self,
+        kP: float,
+        kI: float,
+        kD: float,
+        kF: float,
+        kA: float,
+        current_limit: int = 80,
+        brake_mode: bool = True,
+        output_range: tuple[float, float] = (-1, 1),
+    ):
         self.kP = kP
         self.kI = kI
         self.kD = kD
@@ -32,7 +41,7 @@ class TalonConfig:
         self.output_range = output_range
 
     def _apply_settings(self, motor: hardware.TalonFX, inverted: bool = False):
-        print('applying settings to Talon')
+        print("applying settings to Talon")
         talon_config = configs.TalonFXConfiguration()
 
         # PID
@@ -46,13 +55,23 @@ class TalonConfig:
         # current limits
         current_limits_config = talon_config.current_limits
         current_limits_config.supply_current_limit = self.current_limit
-        current_limits_config.supply_current_limit_enable = True if self.current_limit > 0 else False
+        current_limits_config.supply_current_limit_enable = (
+            True if self.current_limit > 0 else False
+        )
         current_limits_config.supply_time_threshold = 1
 
         # brake mode
         brake_mode_config = talon_config.motor_output
-        brake_mode_config.neutral_mode = signals.NeutralModeValue.BRAKE if self.brake_mode else signals.NeutralModeValue.COAST
-        brake_mode_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
+        brake_mode_config.neutral_mode = (
+            signals.NeutralModeValue.BRAKE
+            if self.brake_mode
+            else signals.NeutralModeValue.COAST
+        )
+        brake_mode_config.inverted = (
+            signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+            if inverted
+            else signals.InvertedValue.CLOCKWISE_POSITIVE
+        )
 
         # motion magic
         magic = talon_config.motion_magic
@@ -61,10 +80,10 @@ class TalonConfig:
 
         res = motor.configurator.apply(talon_config)
         if res != StatusCode.OK:
-            print('error! config not applying')
+            print("error! config not applying")
             raise RuntimeError
         else:
-            print('talon configured')
+            print("talon configured")
 
 
 class TalonFX(PIDMotor):
@@ -90,15 +109,21 @@ class TalonFX(PIDMotor):
 
     _inverted: bool
 
-    def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None):
+    def __init__(
+        self,
+        can_id: int,
+        foc: bool = True,
+        inverted: bool = False,
+        config: TalonConfig = None,
+    ):
         self._inverted = inverted
         self._foc = foc
         self._can_id = can_id
         self._talon_config = config
 
     def init(self):
-        print('Initializing TalonFX', self._can_id)
-        self._motor = hardware.TalonFX(self._can_id, 'rio')
+        print("Initializing TalonFX", self._can_id)
+        self._motor = hardware.TalonFX(self._can_id, "rio")
         self._config = self._motor.configurator
         self._motor_pos = self._motor.get_position()
         self._motor_vel = self._motor.get_velocity()
@@ -123,7 +148,9 @@ class TalonFX(PIDMotor):
     def set_sensor_position(self, pos: rotations) -> StatusCode.OK:
         return self._motor.set_position(pos)
 
-    def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0) -> StatusCode.OK:
+    def set_target_velocity(
+        self, vel: rotations_per_second, accel: rotations_per_second_squared = 0
+    ) -> StatusCode.OK:
         # print('going', vel, 'rotations per second')
         return self._motor.set_control(self._mm_v_v.with_velocity(vel))
         # return self._motor.set_control(controls.VoltageOut(vel))

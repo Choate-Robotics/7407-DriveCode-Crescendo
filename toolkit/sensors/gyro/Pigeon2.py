@@ -1,8 +1,9 @@
-import phoenix6
 import math
 
-from units.SI import radians
+import phoenix6
+
 from toolkit.sensors.gyro.base_gyro import BaseGyro
+from units.SI import radians
 
 
 class Pigeon2(BaseGyro):

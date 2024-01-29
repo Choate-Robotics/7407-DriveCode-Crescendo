@@ -1,8 +1,11 @@
+import math
+
 from wpilib import AddressableLED, PowerDistribution
-import math, config
+
+import config
 
 
-class ALeds():
+class ALeds:
     """
     Addressable LEDS from PWM RIO
     """
@@ -73,15 +76,8 @@ class ALeds():
         self.brightness = brightness
 
     def getLED(self):
-        if self.active_mode == None:
-            return {
-                'type': 0,
-                'color': {
-                    'r': 0,
-                    'g': 0,
-                    'b': 0
-                }
-            }
+        if self.active_mode is None:
+            return {"type": 0, "color": {"r": 0, "g": 0, "b": 0}}
         else:
             return self.active_mode
 
@@ -91,33 +87,41 @@ class ALeds():
         self.brightness = self.last_brightness
 
     def match(self, type: config.Type):
-
         res = self.getArray()
-        match type['type']:
+        match type["type"]:
             case 1:
-                color = type['color']
-                res = self._setStatic(color['r'], color['g'], color['b'])
+                color = type["color"]
+                res = self._setStatic(color["r"], color["g"], color["b"])
             case 2:
                 res = self._setRainbow()
             case 3:
-                color = type['color']
-                res = self._setTrack(color['r1'], color['g1'], color['b1'], color['r2'], color['g2'], color['b2'])
+                color = type["color"]
+                res = self._setTrack(
+                    color["r1"],
+                    color["g1"],
+                    color["b1"],
+                    color["r2"],
+                    color["g2"],
+                    color["b2"],
+                )
             case 4:
-                color = type['color']
-                res = self._setBlink(color['r'], color['g'], color['b'])
+                color = type["color"]
+                res = self._setBlink(color["r"], color["g"], color["b"])
             case 5:
-                percent = type['percent']
-                res = self._setLadder(type['typeA'], type['typeB'], percent, type['speed'])
+                percent = type["percent"]
+                res = self._setLadder(
+                    type["typeA"], type["typeB"], percent, type["speed"]
+                )
             case _:
                 res = self._setRainbow()
 
         return res
 
     def cycle(self):
-        '''
+        """
         cycles through LED array
         this should be called periodically
-        '''
+        """
         self.array = self.match(self.active_mode)
 
         # self.m_led.setData(self.match(self.active_mode))
@@ -125,7 +129,6 @@ class ALeds():
         self.m_led.setData(self.array)
 
     def _setStatic(self, red: int, green: int, blue: int):
-
         static = self.getArray()
 
         for i in range(self.size):
@@ -170,7 +173,7 @@ class ALeds():
 
     def _setBlink(self, r, g, b):
         blink = self.getArray()
-        if self.blink_index / (2 * self.speed) <= .5:
+        if self.blink_index / (2 * self.speed) <= 0.5:
             for i in range(self.size):
                 blink[i].setRGB(r, g, b)
         else:
@@ -183,8 +186,9 @@ class ALeds():
 
         return blink
 
-    def _setLadder(self, typeA: config.Type, typeB: config.Type, percent: float, speed: int):
-
+    def _setLadder(
+        self, typeA: config.Type, typeB: config.Type, percent: float, speed: int
+    ):
         if percent < 0:
             percent = 0
         elif percent > 1:
@@ -222,7 +226,7 @@ class ALeds():
         res = b + a
 
         if len(res) > self.size:
-            del res[self.size:]
+            del res[self.size :]  # noqa: E203
         else:
             return res.copy()
 

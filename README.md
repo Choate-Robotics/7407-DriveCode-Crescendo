@@ -39,7 +39,7 @@ Check out our documentation [here](https://choate-robotics.github.io/Programming
 
 
 
-<!-- You will need to have at least python 3.10 installed on your computer. 
+<!-- You will need to have at least python 3.10 installed on your computer.
 
 
 ### Apple Silicon ARM Mac
@@ -48,7 +48,7 @@ If you have an Apple Silicon ARM mac, at some point you will be asked to intall 
 
 If you want to know if Rosetta is installed you can look at the folder ```usr/libexec/Rosetta```. If there is any files in this folder then you have Rosetta installed.
 
-You will need to intall the intel x64 version python 3.10 on your computer. 
+You will need to intall the intel x64 version python 3.10 on your computer.
 
 #### Install Homebrew
 
@@ -124,7 +124,7 @@ git clone git@github.com:Choate-Robotics/7407-DriveCode-Template.git
 
 ```
 
-curl -k https://install.python-poetry.org/ | python3 - 
+curl -k https://install.python-poetry.org/ | python3 -
 
 ```
 You might have to replace "python" at the end with "python3" depending on how python is configured in your system.

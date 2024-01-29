@@ -39,7 +39,7 @@ jobs:
 
       - run: coverage xml --omit=mechanism_setup.py
 
-      - name: Get Cover 
+      - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
             coverageFile: coverage.xml

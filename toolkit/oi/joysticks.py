@@ -9,7 +9,7 @@ OPERATOR_CONTROLLER_ID = 1
 class Joysticks:
     joysticks: list[wpilib.Joystick] = [
         wpilib.Joystick(DRIVER_CONTROLLER_ID),
-        wpilib.Joystick(OPERATOR_CONTROLLER_ID)
+        wpilib.Joystick(OPERATOR_CONTROLLER_ID),
     ]
 
 
@@ -18,6 +18,7 @@ class JoystickAxis:
     """
     Wrapper for wpilib joystick button
     """
+
     controller_id: int
     axis_id: int
 

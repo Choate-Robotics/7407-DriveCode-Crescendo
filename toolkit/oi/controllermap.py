@@ -2,6 +2,7 @@ class XBoxController:
     """
     Mappings for XBox Controller ports
     """
+
     A = 1
     B = 2
     X = 3
@@ -20,6 +21,7 @@ class LogitechController:
     """
     Mappings for Logitech Controller ports
     """
+
     A = 2
     B = 3
     X = 1

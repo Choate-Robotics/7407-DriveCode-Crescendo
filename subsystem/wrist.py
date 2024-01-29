@@ -1,22 +1,22 @@
+import math
+from math import pi
+
 import config
 import constants
-from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
+from toolkit.subsystem import Subsystem
 from units.SI import radians
-from math import pi
-import math
+
 
 class Wrist(Subsystem):
     def __init__(self):
         super().__init__()
         self.wrist_motor = SparkMax(
-            can_id=config.wrist_motor_id, inverted=True,
-            config=config.WRIST_CONFIG
+            can_id=config.wrist_motor_id, inverted=True, config=config.WRIST_CONFIG
         )
-        
+
         self.feed_motor = SparkMax(
-            can_id=config.feed_motor_id, inverted=True,
-            config=config.FEED_CONFIG
+            can_id=config.feed_motor_id, inverted=True, config=config.FEED_CONFIG
         )
         self.note_staged: bool = True
 
@@ -25,8 +25,8 @@ class Wrist(Subsystem):
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
-    
-    #wrist methods
+
+    # wrist methods
     def set_wrist_angle(self, angle: radians):
         """
         Sets the wrist angle to the given position
@@ -34,16 +34,21 @@ class Wrist(Subsystem):
         :return: None
         """
         if not self.disable_rotation:
-            self.wrist_motor.set_target_position((angle / (pi * 2)) * constants.wrist_gear_ratio)
+            self.wrist_motor.set_target_position(
+                (angle / (pi * 2)) * constants.wrist_gear_ratio
+            )
             # self.wrist_motor.set_sensor_position((pos / (pi * 2)) * constants.wrist_gear_ratio)
-
 
     def get_wrist_angle(self):
         """
         Gets the wrist rotation in radians
         :return:
         """
-        return (self.wrist_motor.get_sensor_position() / constants.wrist_gear_ratio) * pi * 2
+        return (
+            (self.wrist_motor.get_sensor_position() / constants.wrist_gear_ratio)
+            * pi
+            * 2
+        )
 
     def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """
@@ -54,18 +59,17 @@ class Wrist(Subsystem):
         """
         return abs(self.get_wrist_angle() - angle) < threshold
 
-    def zero_wrist(self) -> None: #taken from cyrus' code
+    def zero_wrist(self) -> None:  # taken from cyrus' code
         # Reset the encoder to zero
-        self.wrist_motor.set_sensor_position(self.wrist_abs_encoder.getPosition() * constants.wrist_gear_ratio)
+        self.wrist_motor.set_sensor_position(
+            self.wrist_abs_encoder.getPosition() * constants.wrist_gear_ratio
+        )
         self.zeroed = True
 
-    #feed in methods
+    # feed in methods
     def feed_in(self):
         if not self.disable_rotation:
             self.feed_motor.set_target_velocity(config.feeder_velocity)
 
-
     def feed_out(self):
         self.feed_motor.set_target_velocity(-(config.feeder_velocity))
-
-    

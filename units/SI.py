@@ -1,4 +1,3 @@
-
 """
 SI units for use in typing and conversion.
 """

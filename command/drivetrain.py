@@ -1,15 +1,15 @@
 import logging
 
 import wpilib
-from toolkit.command import SubsystemCommand
 
 import config
 from subsystem import Drivetrain
+from toolkit.command import SubsystemCommand
 
 
 def curve_abs(x):
-    curve = wpilib.SmartDashboard.getNumber('curve', 2)
-    return x ** curve
+    curve = wpilib.SmartDashboard.getNumber("curve", 2)
+    return x**curve
 
 
 def curve(x):

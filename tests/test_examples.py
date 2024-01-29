@@ -1,24 +1,27 @@
+# from unittest import mock
+
 import pytest
-
-from unittest import mock
-
 
 # these test function will be run automatically by pytest
 
+
 # this function tests a single assertion
 def test_basic():
-    assert True == True
+    assert True is True
 
 
 # for multiple assertions, use a parametrized test
 # this way, you can run the same test with different inputs
 # and expected outputs, and see which ones fail
-@pytest.mark.parametrize("test_input,expected", [
-    ("3+5", 8),
-    ("2+4", 6),
-    ("6*9", 54),
-    ("6*7", 42),
-])
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ("3+5", 8),
+        ("2+4", 6),
+        ("6*9", 54),
+        ("6*7", 42),
+    ],
+)
 # the test_input and expected variables are passed in as arguments
 def test_math_multiple(test_input, expected):
     assert eval(test_input) == expected
@@ -44,4 +47,4 @@ def test_not_implemented():
 # dont use this if you want to check for a specific exception, or if you want to skip the test
 @pytest.mark.xfail(reason="this test is expected to fail")
 def test_expected_failure():
-    assert False == True
+    assert False is True

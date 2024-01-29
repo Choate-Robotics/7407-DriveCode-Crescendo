@@ -1,8 +1,9 @@
-import wpilib
+# import wpilib
+
+# import config
+from subsystem import Intake
 from toolkit.command import SubsystemCommand
 
-import config
-from subsystem import Intake
 
 class RunIntake(SubsystemCommand[Intake]):
     # timer = wpilib.Timer()
@@ -44,6 +45,6 @@ class IntakeIdle(SubsystemCommand[Intake]):
 
     def isFinished(self) -> bool:
         return True
-    
+
     def end(self, interrupted) -> None:
         pass

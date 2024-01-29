@@ -2,15 +2,7 @@ import inspect
 import logging.config
 import os
 
-
 from toolkit.utils.color import Color
-
-"""
-Logger utility for debugging. 
-
-Example usage:
-    utils.logger.Logger.log_info("testing")
-"""
 
 
 def get_default_logging():
@@ -52,16 +44,35 @@ def get_default_logging():
             #         },
         },
         "loggers": {
-            __name__: {"level": "INFO", "handlers": ["console"], "propagate": False,},
+            __name__: {
+                "level": "INFO",
+                "handlers": ["console"],
+                "propagate": False,
+            },
             "": {"handlers": ["default"], "level": "INFO"},
-            "uvicorn.error": {"handlers": ["default"], "level": "INFO", "propagate": False},
-            "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+            "uvicorn.error": {
+                "handlers": ["default"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "uvicorn.access": {
+                "handlers": ["access"],
+                "level": "INFO",
+                "propagate": False,
+            },
             #         "uvicorn.asgi": {"handlers": ["asgi"], "level": "TRACE", "propagate": False},
         },
     }
 
 
 class Logger:
+    """
+    Logger utility for debugging.
+
+    Example usage:
+        utils.logger.Logger.log_info("testing")
+    """
+
     def __init__(self, logging_config=None):
         if logging_config is None:
             logging_config = get_default_logging()
@@ -165,7 +176,9 @@ class Logger:
         else:
             frame = inspect.currentframe().f_back
 
-        return cls()._log_function(log.warning, str(msg), header, frame, traceback_length)
+        return cls()._log_function(
+            log.warning, str(msg), header, frame, traceback_length
+        )
 
     @classmethod
     def print_function_call(cls, params=None, header="") -> str:

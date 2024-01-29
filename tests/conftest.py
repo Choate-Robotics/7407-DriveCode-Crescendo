@@ -15,12 +15,11 @@
 # # def arm():
 # #     print("arm setup")
 # #     Robot.arm.init()
-    
+
 # #     yield Robot.arm()
 # #     print("arm teardown")
-    
-    
-    
+
+
 # # # this is a fixture that will be used to mock the ctre library
 # @pytest.fixture(scope="session")
 # def ctre_mock():
@@ -45,7 +44,6 @@
 #     with mock.patch("rev"):
 #         yield rev
 #     print("rev_mock teardown")
-    
 
 
 # # this is a fixture that will be used to mock the commands2 library
@@ -59,7 +57,6 @@
 #     with mock.patch("commands2"):
 #         yield commands2
 #     print("commands2_mock teardown")
-    
 
 
 # # this is a fixture that will be used to mock the wpilib library
@@ -73,4 +70,3 @@
 #     with mock.patch("wpilib"):
 #         yield wpilib
 #     print("wpilib_mock teardown")
-    
