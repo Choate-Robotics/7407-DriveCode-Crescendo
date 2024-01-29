@@ -20,6 +20,7 @@ class Wrist(Subsystem):
             can_id=config.feed_motor_id, inverted=True, config=config.FEED_CONFIG
         )
         self.note_staged: bool = True
+        self.wrist_zeroed: bool = False
 
     def init(self):
         self.wrist_motor.init()
