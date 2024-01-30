@@ -14,6 +14,7 @@ from oi.IT import IT
 from wpilib import SmartDashboard
 
 
+
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
@@ -28,10 +29,9 @@ class _Robot(wpilib.TimedRobot):
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
         
-        period = .03
-        self.scheduler.setPeriod(period)
+        self.scheduler.setPeriod(config.period)
 
-        self.log.info(f"Scheduler period set to {period} seconds")
+        self.log.info(f"Scheduler period set to {config.period} seconds")
 
         # Initialize subsystems and sensors
         def init_subsystems():
@@ -60,7 +60,7 @@ class _Robot(wpilib.TimedRobot):
             #     sensor.init()
             Sensors.limelight.init()
             Field.odometry.enable()
-
+            Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -78,8 +78,18 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
+        
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
 
     def robotPeriodic(self):
+        
+        Field.POI.setNTValues()
+        
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
@@ -104,6 +114,15 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             Field.odometry.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        try:
+            Field.calculations.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))

@@ -33,9 +33,8 @@ class Intake(Subsystem):
             config=DEPLOY_CONFIG
         )
 
-        self.beam_break: DigitalInput = DigitalInput(
-            channel=config.intake_beam_break_channel
-        )
+        self.beam_break: DigitalInput 
+
 
         self.note_in_intake: bool = False
         self.intake_running: bool = False
@@ -43,6 +42,9 @@ class Intake(Subsystem):
         
     
     def init(self):
+        self.beam_break: DigitalInput = DigitalInput(
+            channel=config.intake_beam_break_channel
+        )
         self.inner_motor.init()
         self.outer_motor_front.init()
         self.outer_motor_back.init()
