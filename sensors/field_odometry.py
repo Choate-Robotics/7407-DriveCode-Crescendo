@@ -169,7 +169,7 @@ class FieldOdometry:
 
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: Translation2d):
         self.drivetrain.odometry_estimator.addVisionMeasurement(
-            vision_pose.toPose2d(), vision_time, (distance_to_target.X(), distance_to_target.Y(), math.degrees(50) * (distance_to_target.norm() + 1))
+            vision_pose.toPose2d(), vision_time, (distance_to_target.X(), distance_to_target.Y(), math.degrees(20) * (distance_to_target.norm() + 1))
         )
 
     def get_vision_poses(self):
