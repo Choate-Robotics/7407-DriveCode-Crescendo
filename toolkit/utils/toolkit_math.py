@@ -192,3 +192,15 @@ class NumericalIntegration:
                     break
 
         return np.array(t_values), np.array(y_values)
+
+
+def extrapolate(x, x1, y1, x2, y2):
+    # Calculate the slope (m)
+    m = (y2 - y1) / (x2 - x1)
+
+    # Calculate the y-intercept (c)
+    c = y1 - m * x1
+
+    # Use the line equation to extrapolate the y value
+    y = m * x + c
+    return y
