@@ -31,6 +31,11 @@ class IT:
                 command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
         )
         
+        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        .debounce(config.intake_sensor_debounce).onTrue(
+            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake).withTimeout(config.stage_timeout).andThen(command.IntakeIdle(Robot.intake))
+        )
+        
         
         # elevator and wrist
         button.Trigger(lambda: Robot.intake.beam_break.get() and Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
@@ -42,7 +47,7 @@ class IT:
         
         button.Trigger(lambda: Robot.wrist.beam_break.get() and Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow)
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim)
         ).onFalse(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
         )
@@ -60,12 +65,7 @@ class IT:
         def start_limelight_pos():
             Sensors.limelight.cam_pos_moving = False
     
-        # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
-        #     .onTrue(InstantCommand(stop_limelight_pos))\
-        #     .onFalse(InstantCommand(start_limelight_pos))
-        
-        # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
-        #     .onTrue(InstantCommand(stop_limelight_pos))\
-        #     .onFalse(InstantCommand(start_limelight_pos))
-
+        button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
+            .onTrue(InstantCommand(stop_limelight_pos))\
+            .onFalse(InstantCommand(start_limelight_pos))
 

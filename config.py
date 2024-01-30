@@ -72,7 +72,7 @@ feed_motor_id = 50
 FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feeder_velocity = 132
 wrist_beam_break_channel = 3 # TODO: PLACEHOLDER
-
+stage_timeout = 5 # TODO: PLACEHOLDER
 
 # Giraffe
 elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER
@@ -206,7 +206,7 @@ class Giraffe:
     
     class GiraffePos:
     
-        def __init__(self, height: meters, wrist_angle: radians | Literal['stage', 'aim']):
+        def __init__(self, height: meters | Literal['auto'], wrist_angle: radians | Literal['stage', 'aim']):
             self.height = height
             self.wrist_angle = wrist_angle
 
@@ -214,6 +214,8 @@ class Giraffe:
     kIdle = GiraffePos(0, staging_angle)
     
     kStage = GiraffePos(0, 'stage')
+    
+    kAim = GiraffePos('auto', 'aim')
     
     kAimLow = GiraffePos(0, 'aim')
     

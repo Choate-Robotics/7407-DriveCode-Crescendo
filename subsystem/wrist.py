@@ -23,6 +23,8 @@ class Wrist(Subsystem):
         self.beam_break: DigitalInput
         
         self.note_staged: bool = True
+        
+        self.ready_to_shoot: bool = False
 
     def init(self):
         self.wrist_motor.init()

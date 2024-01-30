@@ -16,6 +16,8 @@ class Elevator(Subsystem):
     elevator_moving: bool
     
     locked_down: bool
+    
+    ready_to_shoot: bool
 
     def __init__(self) -> None:
             super().__init__()
@@ -28,6 +30,7 @@ class Elevator(Subsystem):
             )
             self.zeroed: bool = False
             self.elevator_moving: bool = False
+            self.ready_to_shoot: bool = False
 
     def init(self) -> None:
         self.motor_extend.init()

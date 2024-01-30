@@ -1,5 +1,5 @@
 from subsystem import Elevator, Wrist, Intake, Drivetrain
-from sensors import FieldOdometry
+from sensors import FieldOdometry, TrajectoryCalculator
 
 import logging
 from command import DriveSwerveCustom, SetElevator, ZeroElevator
@@ -19,6 +19,7 @@ class Giraffe(commands2.Command):
         self.finished = False
         self.aiming = False
         self.staging = False
+        self.auto_height = False
     
     def finish(self):
         self.finished = True
@@ -27,6 +28,7 @@ class Giraffe(commands2.Command):
         self.finished = False
         self.aiming = False
         self.staging = False
+        self.auto_height = False
         
         def wrist_is_over_limit():
             return self.wrist.get_wrist_angle() > config.wrist_rotation_limit
@@ -62,6 +64,10 @@ class Giraffe(commands2.Command):
         elif self.target.wrist_angle == 'stage':
             self.staging = True
             self.target.wrist_angle = config.staging_angle
+        
+        if self.target.height == 'auto':
+            self.auto_height = True
+            self.target.height = self.elevator.get_length()
         
         # if the desired elevator height is lower than the wrist limit threshold and the desired wrist angle is over the threshold
         if not elevator_target_over_limit() and wrist_target_over_limit():
@@ -120,6 +126,7 @@ class Giraffe(commands2.Command):
             SequentialCommandGroup(
                 *commands,
                 InstantCommand(self.finish),
+                PrintCommand("Start auto height here with command") if self.auto_height else PrintCommand("Not auto height"),
                 PrintCommand("Start aiming here with command") if self.aiming else PrintCommand("Not aiming"),
                 PrintCommand("Start staging here with command") if self.staging else PrintCommand("Not staging"),
             ),
@@ -219,40 +226,25 @@ class GiraffeLock(commands2.Command):
             self.finished = True
     
     
-class StageNote(commands2.Command):
+class StageNote(SequentialCommandGroup):
     
-    def __init__(self, wrist: Wrist, elevator: Elevator, intake: Intake):
-        self.wrist = wrist
-        self.intake = intake
-        
-    def initialize(self):
-        self.wrist.feed_in()
-        self.intake.roll_inner_in()
-        
-    def isFinished(self) -> bool:
-        return (not self.intake.note_in_intake )
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
+        super().__init__(
+            Giraffe(elevator, wrist, config.Giraffe.kStage),
+            InstantCommand(lambda: intake.roll_inner_in()),
+            WaitUntilCommand(lambda: intake.detect_note() == False and wrist.note_staged),
+            Giraffe(elevator, wrist, config.Giraffe.kIdle),
+        )
     
-class Shoot(commands2.Command):
+class ShootSpeaker(SequentialCommandGroup):
     
-    def __init__(self, drivetrain: Drivetrain, calculations, odometry: FieldOdometry, elevator: Elevator, wrist: Wrist, target, atPose: Pose2d | None = None):
-        self.drivetrain = drivetrain
-        self.elevator = elevator
-        self.wrist = wrist
-        self.odometry = odometry
-        self.target = target
-        self.atPose = atPose
-        self.wrist_at_angle:bool = False
-        self.flywheel_at_speed:bool = False
-        self.drivetrain_aimed:bool = False
-        
-    def initialize(self):
-        pass
-    
-    def execute(self):
-        pass
-    
-    def isFinished(self) -> bool:
-        return True
-    
-    def end(self, interrupted: bool):
-        pass
+    def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, odometry: FieldOdometry, elevator: Elevator, wrist: Wrist, atPose: Pose2d | None = None):
+        super().__init__(
+            ParallelCommandGroup(
+                PrintCommand('Speed up flywheel'),
+                Giraffe(elevator, wrist, config.Giraffe.kAim),
+                PrintCommand('Aim Drivetrain')
+            ),
+            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot), # and drivetrain.ready_to_shoot
+            PrintCommand('Shoot (run wrist feeder)')
+        )
