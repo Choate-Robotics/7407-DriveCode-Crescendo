@@ -43,8 +43,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
         self.controller = HolonomicDriveController(
-            PIDController(1, 0, 0, period),
-            PIDController(1, 0, 0, period),
+            PIDController(3, 0, 0, period),
+            PIDController(2, 0, 0, period),
             ProfiledPIDControllerRadians(
                 0.55,
                 0,
@@ -98,8 +98,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         )
 
         if (
-                abs(relative.x) < 0.02
-                and abs(relative.y) < 0.02
+                abs(relative.x) < 0.01
+                and abs(relative.y) < 0.01
                 and abs(relative.rotation().degrees()) < 2
                 or self.t > self.duration
         ):
