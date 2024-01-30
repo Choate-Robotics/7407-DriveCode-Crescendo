@@ -15,7 +15,7 @@ class Pneumatics:
 
 class Sensors:
     # limelight_front = sensors.Limelight(config.LimelightPosition.elevator_down, 'limelight-front')
-    # limelight_back = sensors.Limelight(config.LimelightPosition.elevator_down, 'limelight-back')
+    limelight_back = sensors.Limelight(config.LimelightPosition.elevator_down, 'limelight-b')
 
     # odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([limelight_front, limelight_back]))
 
@@ -31,5 +31,5 @@ class PowerDistribution:
 
 
 class Field:
-    odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([Sensors.limelight]))
+    odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([Sensors.limelight, Sensors.limelight_back]))
     POI = utils.POI()

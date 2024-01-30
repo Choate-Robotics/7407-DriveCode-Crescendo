@@ -65,6 +65,7 @@ class _Robot(wpilib.TimedRobot):
             # for sensor in sensors:
             #     sensor.init()
             Sensors.limelight.init()
+            Sensors.limelight_back.init()
             Field.odometry.enable()
         try:
             init_sensors()
@@ -80,7 +81,6 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         Field.POI.setNTValues()
-        Field.odometry.disable()
         if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
             config.active_team = config.Team.BLUE
         else:
@@ -99,7 +99,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            # Sensors.limelight_back.update()
+            Sensors.limelight_back.update()
             Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
