@@ -190,6 +190,8 @@ back_right_encoder_zeroed_pos = 0.260 if comp_bot.get() else 0.0
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
+
+
 # Gyro
 gyro_id = 20
 
@@ -225,3 +227,18 @@ class Giraffe:
     
     kAmp = GiraffePos(constants.elevator_max_length, -45 * degrees_to_radians)
     
+"""
+c = drag coefficient
+a = projectile area (m^2)
+m = projectile mass (kg)
+rho_air = air density (kg/m^3)
+g = acceleration due to gravity (m/s^2)
+v0 = initial velocity of shooter flywheel (m/s) config
+delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
+y = height of target (COULD BE IN ODOMETRY) (m) const
+tol = tolerance of error in distance to target (m)
+"""
+v0_flywheel = 15
+shooter_tol = 0.1
+max_sim_times = 100
+
