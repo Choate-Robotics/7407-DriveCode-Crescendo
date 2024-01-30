@@ -47,6 +47,7 @@ intake_outer_idle_speed = .25 #placeholder
 intake_timeout = 5 #placeholder
 intake_roller_current_limit = 1 #placeholder
 intake_deploy_current_limit = 1 #placeholder
+tenting_deploy_current_limit = 1 #placeholder
 intake_sensor_debounce = 0.2 #placeholder
 
 # elevator

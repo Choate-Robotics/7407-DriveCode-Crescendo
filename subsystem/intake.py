@@ -78,6 +78,13 @@ class Intake(Subsystem):
         Return: none
         """
         self.deploy_motor.set_raw_output(0.5)
+
+    def deploy_tenting(self):
+        """
+        Rotate deploy motor to deploy tenting mechanism
+        Return: none
+        """
+        self.deploy_motor.set_raw_output(-0.5)
     
     def roll_in(self):
         """
