@@ -129,6 +129,8 @@ elevator_max_length: float = 21 * inches_to_meters # REAL VALUE: Meters
 # INTAKE
 intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
 intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
+intake_deploy_gear_ratio = 20 / 1 #TODO: placeholder
+
 
 # WRIST
 wrist_gear_ratio = 3
@@ -139,3 +141,4 @@ shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be teste
 
 #pathing
 post_avoidance_distance = 0.5 
+

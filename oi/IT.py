@@ -1,7 +1,9 @@
 from utils import LocalLogger
 
 
-from commands2 import button, WaitCommand, ParallelRaceGroup, InstantCommand
+
+from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand
+
 import config
 
 import command
