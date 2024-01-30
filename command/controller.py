@@ -245,6 +245,6 @@ class ShootSpeaker(SequentialCommandGroup):
                 Giraffe(elevator, wrist, config.Giraffe.kAim),
                 PrintCommand('Aim Drivetrain')
             ),
-            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot), # and drivetrain.ready_to_shoot
+            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot),
             PrintCommand('Shoot (run wrist feeder)')
         )

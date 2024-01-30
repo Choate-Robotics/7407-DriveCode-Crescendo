@@ -46,7 +46,14 @@ class TrajectoryCalculator:
         Calculates the angle of the trajectory without air resistance.
         """
         
-        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
+        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else np.pi / 2
+        
+        vx = self.odometry.drivetrain.chassis_speeds.vx
+        vy = self.odometry.drivetrain.chassis_speeds.vy
+        x_pose = self.odometry.getPose().translation().X()
+        
+        initial_velocity = config.v0_flywheel # - (vx / (x_pose / distance_to_target)) + (vy / np.cos(np.radians(90) - (x_pose / distance_to_target)))
+        
         result_angle = (
             0.5
             * np.arcsin(
@@ -54,7 +61,7 @@ class TrajectoryCalculator:
                 + constants.g
                 * distance_to_target
                 * np.cos(phi0)
-                / (config.v0_flywheel**2)
+                / (initial_velocity**2)
             )
             + 0.5 * phi0
         )
@@ -69,6 +76,7 @@ class TrajectoryCalculator:
             self.odometry.getPose().translation().distance(self.speaker)
         )
         self.delta_z = self.speaker_z - self.elevator.get_length() + constants.shooter_height
+        initial_v = config.v0_flywheel
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         theta_2 = theta_1 + np.radians(1)
         z_1 = self.run_sim(theta_1)
