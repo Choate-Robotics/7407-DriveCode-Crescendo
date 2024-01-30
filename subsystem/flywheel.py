@@ -1,11 +1,15 @@
 import math
 import rev
 import config
+import constants
+
+from wpimath.controller import LinearQuadraticRegulator_1_1
+from wpimath.estimator import KalmanFilter_1_1_1
+from wpimath.system import LinearSystemLoop_1_1_1
+from wpimath.system.plant import LinearSystemId, DCMotor
 
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
-from wpimath.controller import LinearPlantInversionFeedforward_1_1
-from wpimath.system.plant import LinearSystemId, DCMotor
 
 FLYWHEEL_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
@@ -24,6 +28,39 @@ class Flywheel(Subsystem):
             can_id=config.flywheel_id_2,
             config=FLYWHEEL_CONFIG
         )
+
+        self.flywheel_MOI = constants.flywheel_mass * (constants.flywheel_radius_outer ** 2 - constants.flywheel_radius_inner ** 2) / 2
+
+        self.flywheel_plant = LinearSystemId().flywheelSystem(
+            DCMotor.NEO(1), self.flywheel_MOI, constants.flywheel_gear_ratio
+        )
+        self.flywheel_observer = KalmanFilter_1_1_1(
+            self.flywheel_plant,
+            [3.0],
+            [0.01],
+            constants.flywheel_period
+        )
+        self.flywheel_controller = LinearQuadraticRegulator_1_1(
+            self.flywheel_plant,
+            [12.0],
+            [0.1],
+        )
+        self.flywheel_controller.latencyCompensate(self.flywheel_plant, constants.flywheel_period, 0.025)
+        self.top_flywheel_state = LinearSystemLoop_1_1_1(
+            self.flywheel_plant,
+            self.flywheel_controller,
+            self.flywheel_observer,
+            12.0,
+            constants.flywheel_period
+        )
+        self.bottom_flywheel_state = LinearSystemLoop_1_1_1(
+            self.flywheel_plant,
+            self.flywheel_controller,
+            self.flywheel_observer,
+            12.0,
+            constants.flywheel_period
+        )
+
 
         self.initialized: bool = False
 
