@@ -28,7 +28,7 @@ path_1 = FollowPathCustom(
         start_pose=POIPose(Pose2d(*get_first_ring[0])),
         waypoints=[Translation2d(*coord) for coord in get_first_ring[1]],
         end_pose=get_first_ring[2],
-        max_velocity=10,
+        max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
@@ -43,7 +43,7 @@ path_2 = FollowPathCustom(
         start_pose=come_back_to_shoot_first_ring[0],
         waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_first_ring[1]],
         end_pose=come_back_to_shoot_first_ring[2],
-        max_velocity=10,
+        max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
@@ -58,7 +58,7 @@ path_3 = FollowPathCustom(
         start_pose=get_second_ring[0],
         waypoints=[Translation2d(*coord) for coord in get_second_ring[1]],
         end_pose=get_second_ring[2],
-        max_velocity=10,
+        max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
@@ -73,7 +73,7 @@ path_4 = FollowPathCustom(
         start_pose=come_back_to_shoot_second_ring[0],
         waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_second_ring[1]],
         end_pose=come_back_to_shoot_second_ring[2],
-        max_velocity=10,
+        max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
@@ -88,7 +88,7 @@ path_5 = FollowPathCustom(
         start_pose=get_third_ring[0],
         waypoints=[Translation2d(*coord) for coord in get_third_ring[1]],
         end_pose=get_third_ring[2],
-        max_velocity=10,
+        max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
@@ -103,7 +103,7 @@ path_6 = FollowPathCustom(
         start_pose=come_back_to_shoot_third_ring[0],
         waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_third_ring[1]],
         end_pose=come_back_to_shoot_third_ring[2],
-        max_velocity=10,
+        max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
@@ -114,19 +114,19 @@ path_6 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
-    WaitCommand(1),
+    WaitCommand(1), # shoot
     path_1,
-    WaitCommand(.75),
+    WaitCommand(.75), # intake
     path_2,
-    WaitCommand(1),
+    WaitCommand(1), # shoot
     path_3,
-    WaitCommand(.75),
+    WaitCommand(.75), # intake
     path_4,
-    WaitCommand(1),
+    WaitCommand(1), # shoot
     path_5,
-    WaitCommand(.75),
+    WaitCommand(.75), # intake
     path_6,
-    WaitCommand(1),
+    WaitCommand(1), # shoot
     InstantCommand(lambda: print("Done")),
 )
 
