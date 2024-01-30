@@ -98,9 +98,9 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         )
 
         if (
-                abs(relative.x) < 0.03
-                and abs(relative.y) < 0.03
-                and abs(relative.rotation().degrees()) < 3
+                abs(relative.x) < 0.02
+                and abs(relative.y) < 0.02
+                and abs(relative.rotation().degrees()) < 2
                 or self.t > self.duration
         ):
             self.t = self.duration

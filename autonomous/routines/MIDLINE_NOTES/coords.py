@@ -9,7 +9,7 @@ coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
 
-initial: coord = (1.9, 2.3, 0)
+initial: coord = (1.9, .78, 0)
 
 get_first_ring: path = (
     initial,
@@ -20,8 +20,7 @@ get_first_ring: path = (
 come_back_to_shoot_first_ring: path = (
     get_first_ring[2],
     [],
-    # ()
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,1))
+    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,1)),
 )
 
 get_second_ring: path = (
@@ -33,7 +32,7 @@ get_second_ring: path = (
 come_back_to_shoot_second_ring: path = (
     get_second_ring[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,1))
+    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,1)),
 )
 
 get_third_ring: path = (
@@ -45,5 +44,5 @@ get_third_ring: path = (
 come_back_to_shoot_third_ring: path = (
     get_third_ring[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(-3, 1))
+    Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(-4, 1.2)),
 )
