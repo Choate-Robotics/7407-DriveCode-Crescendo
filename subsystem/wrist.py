@@ -21,6 +21,8 @@ class Wrist(Subsystem):
         )
         self.note_staged: bool = True
         self.wrist_zeroed: bool = False
+        self.rotation_disabled: bool = False
+        self.feed_disabled: bool = False
 
     def init(self):
         self.wrist_motor.init()
@@ -70,9 +72,16 @@ class Wrist(Subsystem):
 
     # feed in methods
     def feed_in(self):
-        if not self.disable_rotation:
+        if not self.feed_disabled:
             self.feed_motor.set_target_velocity(config.feeder_velocity)
 
     def feed_out(self):
-        if not self.disable_rotation:
+        if not self.feed_disabled:
             self.feed_motor.set_target_velocity(-(config.feeder_velocity))
+    
+    def stop_feed(self):
+        self.feed_motor.set_target_velocity(0)
+
+    def feed_note(self):
+        if not self.feed_disabled:
+            self.feed_motor.set_target_velocity(config.feeder_pass_velocity)
