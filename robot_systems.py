@@ -5,10 +5,10 @@ import wpilib, config, constants, utils
 
 class Robot:
     
-    wrist = subsystem.Wrist()
-    # intake = subsystem.Intake()
-    # elevator = subsystem.Elevator()
-    drivetrain = subsystem.Drivetrain()
+    wrist: subsystem.Wrist = subsystem.Wrist()
+    intake: subsystem.Intake = subsystem.Intake()
+    elevator:subsystem.Elevator = subsystem.Elevator()
+    drivetrain: subsystem.Drivetrain = subsystem.Drivetrain()
 
 
 
@@ -35,4 +35,5 @@ class PowerDistribution:
 
 class Field:
     odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([Sensors.limelight]))
+    calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator)
     POI = utils.POI()
