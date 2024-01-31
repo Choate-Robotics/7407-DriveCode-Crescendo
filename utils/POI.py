@@ -309,6 +309,7 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose]):
         if obstacle[0].translation().distance(start.get(False).translation()) < obstacle[1] or obstacle[0].translation().distance(end.get(False).translation()) < obstacle[1]:
             # raise ValueError("start or end is within the obstacle distance")
             print("start or end is within the obstacle distance")
+            # TODO: add code to move the start and/or end away from the obstacle
         else:
             print("start and end are not within the obstacle distance")
     # next, check if the line between the start and end intersects with any of the obstacles
