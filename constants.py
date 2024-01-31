@@ -115,6 +115,5 @@ wrist_time_to_max_vel = 0.3
 # FLYWHEEL
 flywheel_mass = 0.5 # TODO: placeholder
 flywheel_radius_outer = 2 * 0.0254 # TODO: placeholder
-flywheel_radius_inner = 1.9 * 0.0254 # TODO: placeholder
 flywheel_gear_ratio = 1 / 2 # TODO: placeholder
 flywheel_period = .03

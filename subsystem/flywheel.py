@@ -29,10 +29,10 @@ class Flywheel(Subsystem):
             config=FLYWHEEL_CONFIG
         )
 
-        self.flywheel_MOI = constants.flywheel_mass * (constants.flywheel_radius_outer ** 2 - constants.flywheel_radius_inner ** 2) / 2
+        self.flywheel_MOI = (constants.flywheel_mass / 2 ) * (constants.flywheel_radius_outer ** 2)
 
         self.flywheel_plant = LinearSystemId().flywheelSystem(
-            DCMotor.NEO(1), self.flywheel_MOI, constants.flywheel_gear_ratio
+            DCMotor.NEO(config.flywheel_motor_count), self.flywheel_MOI, constants.flywheel_gear_ratio
         )
         self.flywheel_observer = KalmanFilter_1_1_1(
             self.flywheel_plant,
@@ -82,7 +82,7 @@ class Flywheel(Subsystem):
 
         self.initialized = True
 
-    def set(self, angular_velocity: float, motor=0) -> None:
+    def set_velocity(self, angular_velocity: float, motor=0) -> None:
         if motor == 1:
             self.motor_1.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
         elif motor == 2:
@@ -91,7 +91,7 @@ class Flywheel(Subsystem):
             self.motor_1.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
             self.motor_2.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
 
-    def get(self, motor=0) -> float:
+    def get_velocity(self, motor=0) -> float:
         if motor == 1:
             return self.rpm_to_angular_velocity(self.motor_1.get_sensor_velocity())
         elif motor == 2:
@@ -100,4 +100,24 @@ class Flywheel(Subsystem):
             return (
                 self.rpm_to_angular_velocity(self.motor_1.get_sensor_velocity()),
                 self.rpm_to_angular_velocity(self.motor_2.get_sensor_velocity())
+            )
+        
+    def set_voltage(self, voltage: float, motor=0) -> None:
+        if motor == 1:
+            self.motor_1.pid_controller.setReference(voltage, rev.CANSparkMax.ControlType.kVoltage)
+        elif motor == 2:
+            self.motor_2.pid_controller.setReference(voltage, rev.CANSparkMax.ControlType.kVoltage)
+        else:
+            self.motor_1.pid_controller.setReference(voltage, rev.CANSparkMax.ControlType.kVoltage)
+            self.motor_2.pid_controller.setReference(voltage, rev.CANSparkMax.ControlType.kVoltage)
+    
+    def get_voltage(self, motor=0) -> float:
+        if motor == 1:
+            return self.motor_1.motor.getAppliedOutput()
+        elif motor == 2:
+            return self.motor_2.motor.getAppliedOutput()
+        else:
+            return (
+                self.motor_1.motor.getAppliedOutput(),
+                self.motor_2.motor.getAppliedOutput()
             )

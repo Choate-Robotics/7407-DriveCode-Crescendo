@@ -184,3 +184,4 @@ elevator_moving = False
 #Flywheel
 flywheel_id_1 = 1 #TODO: placeholder
 flywheel_id_2 = 2 #TODO: placeholder
+flywheel_motor_count = 2 #TODO: placeholder
