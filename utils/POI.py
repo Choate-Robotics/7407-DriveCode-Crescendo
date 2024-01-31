@@ -1,11 +1,11 @@
 from __future__ import annotations
 import constants, config
-from wpimath.geometry import Pose2d, Rotation2d, Transform2d, Translation2d, Pose3d, Rotation3d, Transform3d, Translation3d
+from wpimath.geometry import Pose2d, Rotation2d, Transform2d, Translation2d, Pose3d, Rotation3d, Transform3d, Translation3d, Twist2d
 from units.SI import feet_to_meters, inches_to_meters, radians
 import ntcore, math
 from utils import LocalLogger
 from wpilib import DriverStation
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, Literal
 
     
 class POIPose:
@@ -36,6 +36,19 @@ class POIPose:
             if isinstance(rotation, float) or isinstance(rotation, int):
                 rotation = Rotation2d(math.radians(rotation))
             return POIPose(Pose2d(self._pose.translation(), rotation), self._red)
+        
+    def withRotationOffset(self, rotation: Rotation2d | Rotation3d | int | float):
+        '''
+        sets new rotation for the pose (float and int are interpreted as degrees)
+        '''
+        if isinstance(self._pose, Pose3d):
+            if isinstance(rotation, float) or isinstance(rotation, int):
+                rotation = Rotation3d(0,0,math.radians(rotation))
+            return POIPose(Pose3d(self._pose.translation(), self._pose.rotation() + rotation), self._red)
+        else:
+            if isinstance(rotation, float) or isinstance(rotation, int):
+                rotation = Rotation2d(math.radians(rotation))
+            return POIPose(Pose2d(self._pose.translation(), self._pose.rotation() + rotation), self._red)
     
     def withOffset(self, offset: Translation2d | Translation3d):
         if isinstance(self._pose, Pose3d):
@@ -68,7 +81,7 @@ class POIPose:
         else:
             print("not inverting") if verbose else None
     
-    def get(self, verbose: bool = True):
+    def get(self, verbose: bool = False):
         '''
         returns the pose2d, inverted if red is true
         '''
@@ -269,8 +282,84 @@ class POI:
         
         
         
-def within_point_distance(poses: list[Pose2d], point: Pose2d, distance: float):
-    for pose in poses:
-        if pose.translation().distance(point.translation()) < distance:
-            return True
-    return False
+def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose]):
+    '''
+    returns a list of Transform2d that avoid obstacles. This should be used in the waypoints list
+    '''
+    
+    obstacles:list[tuple[Pose2d, float]] = [(obstacles.get(False), obstacles.getZ()) for obstacles in obstacles]
+    print(obstacles)
+    # first, check if the start and end are within the general area of the obstacles
+    # if not, remove from the list
+    
+    def between(a: float, b: float, c: float):
+        return b - 1 <= a <= c + 1 or c - 1 <= a <= b + 1
+    
+    print('checking if start and end are within the general area of the obstacles')
+    
+    for obstacle in obstacles:
+        if not between(obstacle[0].X(), start.get(False).X(), end.get(False).X()) or not between(obstacle[0].Y(), start.get().Y(), end.get().Y()):
+            obstacles.remove(obstacle)
+            print("removed obstacle", obstacle)
+    
+    
+    print('checked if start and end are within the general area of the obstacles')
+    # next, check if the start and end are within the obstacles distance
+    for obstacle in obstacles:
+        if obstacle[0].translation().distance(start.get(False).translation()) < obstacle[1] or obstacle[0].translation().distance(end.get(False).translation()) < obstacle[1]:
+            # raise ValueError("start or end is within the obstacle distance")
+            print("start or end is within the obstacle distance")
+        else:
+            print("start and end are not within the obstacle distance")
+    # next, check if the line between the start and end intersects with any of the obstacles
+    
+    def line_intersection(line1: tuple[Translation2d, Translation2d], line2: tuple[Translation2d, Translation2d]):
+        '''
+        returns true if the lines intersect
+        '''
+        def ccw(A: Translation2d, B: Translation2d, C: Translation2d):
+            return (C.Y() - A.Y()) * (B.X() - A.X()) > (B.Y() - A.Y()) * (C.X() - A.X())
+        
+        A, B = line1
+        C, D = line2
+        return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+    
+    def get_deltas(line: tuple[Translation2d, Translation2d], point: Translation2d):
+        # check if point is above or below the line using standard form
+        
+        # get the standard form of the line
+        A, B = line
+        a = A.Y() - B.Y()
+        b = B.X() - A.X()
+        c = A.X() * B.Y() - B.X() * A.Y()
+        
+        # plug in the point to the standard form
+        ans = a * point.X() + b * point.Y() + c
+        
+        # if ans is positive, the point is above the line
+        # if ans is negative, the point is below the line
+        
+        if ans > 0:
+            return (A.X() - B.X(), A.Y() - B.Y())
+        else:
+            return (B.X() - A.X(), B.Y() - A.Y())
+        
+    def get_reciporical_translation(point: Translation2d, deltas: tuple[float, float], magnitude: float):
+        '''
+        returns the translation of the point that is on the line of the deltas and slope
+        '''
+        angle = math.atan2(deltas[0], deltas[1])
+        ans = point + Translation2d(math.cos(angle) * magnitude, math.sin(angle) * magnitude)
+        print(point.distance(ans), magnitude)
+        return ans
+    
+    waypoints = []
+    print('checking if the line between the start and end intersects with any of the obstacles')
+    for obstacle in obstacles:
+        deltas = get_deltas((start.getTranslation(), end.getTranslation()), obstacle[0].translation())
+        tangent_point = get_reciporical_translation(obstacle[0].translation(), deltas, obstacle[1])
+        if line_intersection((start.getTranslation(), end.getTranslation()), (obstacle[0], tangent_point)):
+            print("intersection", 'new point', tangent_point)
+            waypoints.append(tangent_point)
+            
+    return waypoints

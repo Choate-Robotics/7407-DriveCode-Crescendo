@@ -67,7 +67,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     def initialize(self) -> None:
         self.trajectory = self.trajectory_c.generate()
         self.duration = self.trajectory.totalTime()
-        self.end_pose: Pose2d = self.trajectory_c.end_pose
+        self.end_pose: Pose2d = self.trajectory_c.end_pose if isinstance(self.trajectory_c.end_pose, Pose2d) else self.trajectory_c.end_pose.get()
         self.start_time = time.perf_counter()
         self.theta_i = Field.odometry.getPose().rotation().radians()
         self.theta_f = self.end_pose.rotation().radians()
@@ -101,7 +101,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
                 abs(relative.x) < 0.03
                 and abs(relative.y) < 0.03
                 # and abs(relative.rotation().degrees()) < 2
-                and self.t > self.duration
+                or self.t > self.duration
         ):
             self.t = self.duration
             self.finished = True
