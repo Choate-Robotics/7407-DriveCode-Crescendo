@@ -70,6 +70,7 @@ WRIST_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feed_motor_id = 50
 FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feeder_velocity = 132
+feeder_pass_velocity = 5
 
 
 
