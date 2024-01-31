@@ -43,8 +43,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
         self.controller = HolonomicDriveController(
-            PIDController(8, 0, 0, period),
-            PIDController(8, 0, 0, period),
+            PIDController(2, 0, 0, period),
+            PIDController(2, 0, 0, period),
             ProfiledPIDControllerRadians(
                 0.55,
                 0,
@@ -67,12 +67,12 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     def initialize(self) -> None:
         self.trajectory = self.trajectory_c.generate()
         self.duration = self.trajectory.totalTime()
-        self.end_pose: Pose2d = self.trajectory_c.end_pose if isinstance(self.trajectory_c.end_pose, Pose2d) else self.trajectory_c.end_pose.get()
+        self.end_pose: Pose2d = self.trajectory.states()[-1].pose
         self.start_time = time.perf_counter()
         self.theta_i = Field.odometry.getPose().rotation().radians()
         self.theta_f = self.end_pose.rotation().radians()
         self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
-        self.omega = self.theta_diff / self.duration
+        # self.omega = self.theta_diff / self.duration
         self.finished = False
 
         traj_path = []
@@ -100,16 +100,16 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         if (
                 abs(relative.x) < 0.03
                 and abs(relative.y) < 0.03
-                # and abs(relative.rotation().degrees()) < 2
-                or self.t > self.duration
+                and abs(relative.rotation().degrees()) < 2
+                and self.t > self.duration
         ):
             self.t = self.duration
             self.finished = True
 
         goal = self.trajectory.sample(self.t)
-        goal_theta = self.theta_i + self.omega * self.t
+        # goal_theta = self.theta_i + self.omega * self.t
         speeds = self.controller.calculate(
-            Field.odometry.getPose(), goal, Rotation2d(goal_theta)
+            Field.odometry.getPose(), goal, goal.pose.rotation()
         )
 
         vx, vy = rotate_vector(
