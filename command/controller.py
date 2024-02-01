@@ -2,7 +2,7 @@ from subsystem import Elevator, Wrist, Intake, Drivetrain
 from sensors import FieldOdometry, TrajectoryCalculator
 
 import logging
-from command import DriveSwerveCustom, SetElevator, ZeroElevator
+from command import DriveSwerveCustom, SetElevator, ZeroElevator, FeedIn, FeedOut, PassNote, SetWrist
 import wpilib, config, constants
 import commands2
 from wpimath.geometry import Pose2d, Rotation2d
@@ -30,17 +30,6 @@ class Giraffe(commands2.Command):
         self.staging = False
         self.auto_height = False
         
-        def wrist_is_over_limit():
-            return self.wrist.get_wrist_angle() > config.wrist_rotation_limit
-        
-        def wrist_target_over_limit():
-            return self.target.wrist_angle > config.wrist_rotation_limit
-        
-        def elevator_is_over_limit():
-            return self.elevator.get_length() > config.elevator_wrist_limit
-        
-        def elevator_target_over_limit():
-            return self.target.height > config.elevator_wrist_limit
         
         commands = []
         debug_commands = []
@@ -54,81 +43,75 @@ class Giraffe(commands2.Command):
                 self.finished = True
                 return # invalid string entry, must be 'aim' or 'stage'
         
+        if type(self.target.height) == str:
+            if self.target.height != 'auto':
+                self.finished = True
+                return # invalid string entry, must be 'auto'
+            
+        
+        
+        debug_commands.append(
+            PrintCommand("Running both elevator and wrist normally")
+        )
+        
+        continuous_commands = []
+        
         
         # if the target wrist angle is 'aim' then set the wrist angle to the calculated angle, we will pass off the aiming command at the end
         if self.target.wrist_angle == 'aim':
+            continuous_commands.append(
+                PrintCommand("Aiming wrist")
+            )
             self.aiming = True
-            self.target.wrist_angle = 0 # initial wrist angle
+            self.target.wrist_angle = self.wrist.get_wrist_angle()
+            debug_commands.append(
+                PrintCommand("Aiming wrist")
+            )
         
-        # if the target wrist angle is 'stage' then set the wrist angle to the staging angle, we will pass off the aiming command at the end
+        # if the target wrist angle is 'stage' then set the wrist angle to the staging angle, we will pass off the staging command at the end
         elif self.target.wrist_angle == 'stage':
             self.staging = True
             self.target.wrist_angle = config.staging_angle
+            continuous_commands.append(
+                FeedIn(self.wrist)
+            )
+            debug_commands.append(
+                PrintCommand("Staging note to wrist")
+            )
         
         if self.target.height == 'auto':
             self.auto_height = True
             self.target.height = self.elevator.get_length()
+            continuous_commands.append(
+                PrintCommand("Auto height")
+            )
+            debug_commands.append(
+                PrintCommand("Auto height")
+            )
         
-        # if the desired elevator height is lower than the wrist limit threshold and the desired wrist angle is over the threshold
-        if not elevator_target_over_limit() and wrist_target_over_limit():
-            self.finished = True
-            return # exceeds limits of wrist and elevator constraints
         
-        # if the desired elevator height is greater than 0 while the elevator is locked down
-        if self.target.height > 0.1 and self.elevator.locked_down or self.target.wrist_angle < 0 and self.elevator.locked_down:
+         # if the desired elevator height is greater than 0 while the elevator is locked down
+        if self.target.height > config.elevator_stage_max and self.elevator.locked_down or self.target.wrist_angle < config.wrist_stage_max and self.elevator.locked_down:
             self.finished = True
             return # cant perform this action while elevator is locked down
             
         
-        # if the desired elevator height is lower than the wrist limit threshold and the wrist is over the threshold
-        if not elevator_target_over_limit() and wrist_is_over_limit():
-            # move wrist out of the way
-            commands.append(
-                RunCommand(lambda: self.wrist.set_wrist_angle(self.target.wrist_angle)))\
-                    .until(lambda: self.wrist.get_wrist_angle() > config.wrist_rotation_limit)\
-                    .andThen(ParallelCommandGroup(
-                        SetElevator(self.elevator, self.target.height),
-                        InstantCommand(lambda: self.wrist.set_wrist_angle(self.target.wrist_angle)),
-                    )
+        
+        commands.append(
+            ParallelCommandGroup(
+                SetElevator(self.elevator, self.target.height),
+                SetWrist(self.wrist, self.target.wrist_angle),
+                InstantCommand(self.finish),
             )
-                    
-            debug_commands.append(
-                PrintCommand("Wrist over limit, moving wrist out of the way before running elevator")
-            )
-        elif wrist_target_over_limit() and not elevator_is_over_limit():
-            # move elevator up before running wrist
-            commands.append(
-                SetElevator(self.elevator, self.target.height)\
-                    .until(elevator_is_over_limit)\
-                    .andThen(ParallelCommandGroup(
-                        SetElevator(self.elevator, self.target.height),
-                        InstantCommand(lambda: self.wrist.set_wrist_angle(self.target.wrist_angle)),
-                    )
-                )
-            )
-            
-            debug_commands.append(
-                PrintCommand("Elevator under limit, moving elevator up before running wrist")
-            )
-            
-        else:
-            # run both at the same time
-            commands.append(
-                ParallelCommandGroup(
-                    SetElevator(self.elevator, self.target.height),
-                )
-            )
-            debug_commands.append(
-                PrintCommand("Running both elevator and wrist normally")
-            )
+        )
+        
+        
+        commands += continuous_commands
+        
         
         commands2.CommandScheduler.schedule(ParallelCommandGroup(
             SequentialCommandGroup(
                 *commands,
-                InstantCommand(self.finish),
-                PrintCommand("Start auto height here with command") if self.auto_height else PrintCommand("Not auto height"),
-                PrintCommand("Start aiming here with command") if self.aiming else PrintCommand("Not aiming"),
-                PrintCommand("Start staging here with command") if self.staging else PrintCommand("Not staging"),
             ),
             SequentialCommandGroup(
                 *debug_commands
