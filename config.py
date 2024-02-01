@@ -44,10 +44,11 @@ period: float = 0.03  # seconds
 
 
 #intake
-inner_intake_id = 0 #placeholder
-outer_intake_front_id = 1 #placeholder
-outer_intake_back_id = 2 #placeholder
-intake_beam_break_channel = 7 #placeholder
+inner_intake_id = 10 #placeholder
+outer_intake_front_id = 11 #placeholder
+outer_intake_back_id = 12 #placeholder
+deploy_intake_id = 13 #placeholder
+intake_beam_break_channel = 1 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder
@@ -55,6 +56,8 @@ intake_outer_idle_speed = .25 #placeholder
 
 intake_timeout = 5 #placeholder
 intake_roller_current_limit = 1 #placeholder
+intake_deploy_current_limit = 1 #placeholder
+tenting_deploy_current_limit = 1 #placeholder
 intake_sensor_debounce = 0.2 #placeholder
 
 # elevator
@@ -73,6 +76,7 @@ FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feeder_velocity = 132
 wrist_beam_break_channel = 3 # TODO: PLACEHOLDER
 stage_timeout = 5 # TODO: PLACEHOLDER
+feeder_pass_velocity = 5
 
 # Giraffe
 elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER

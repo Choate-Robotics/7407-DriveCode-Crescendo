@@ -7,6 +7,7 @@ from wpilib import DigitalInput
 # CHANGE WHEN ROBOT IS BUILT
 INNER_CONFIG = SparkMaxConfig(.5, 0, 0)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0)
+DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0)
 
 class Intake(Subsystem):
     def __init__(self):
@@ -27,7 +28,13 @@ class Intake(Subsystem):
             config=OUTER_CONFIG
         )
 
+        self.deploy_motor: SparkMax = SparkMax(
+            can_id=config.deploy_intake_id,
+            config=DEPLOY_CONFIG
+        )
+
         self.beam_break: DigitalInput 
+
 
         self.note_in_intake: bool = False
         self.intake_running: bool = False
@@ -69,8 +76,19 @@ class Intake(Subsystem):
         """
         self.note_in_intake = not self.beam_break.get()
 
-    def deploy_rollers(self):
-        pass
+    def deploy_roller(self):
+        """
+        Rotate deploy motor to deploy outer intake
+        Return: none
+        """
+        self.deploy_motor.set_raw_output(0.5)
+
+    def deploy_tenting(self):
+        """
+        Rotate deploy motor to deploy tenting mechanism
+        Return: none
+        """
+        self.deploy_motor.set_raw_output(-0.5)
     
     def roll_in(self):
         """
@@ -113,6 +131,12 @@ class Intake(Subsystem):
         Return: current of back motor (float)
         """
         return self.outer_motor_back.motor.getOutputCurrent()
+    
+    def get_deploy_current(self) -> float:
+        """
+        Return: current of deploy motor (float)
+        """
+        return self.deploy_motor.motor.getOutputCurrent()
     
     def roll_inner_in(self):
         """
