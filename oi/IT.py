@@ -59,7 +59,8 @@ class IT:
         )
         
         # odom
-        button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Coordinates.Structures.Obstacles.kStage.getTranslation()) < config.stage_distance_threshold)\
+        button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Coordinates.Structures.Obstacles.kStage.getTranslation()) < config.stage_distance_threshold\
+            and (Robot.elevator.get_length() > config.elevator_stage_max or Robot.wrist.get_wrist_angle() < config.wrist_stage_max))\
             .debounce(config.odometry_debounce).onTrue(
                 command.GiraffeLock(Robot.elevator, Robot.wrist)
             ).onFalse(InstantCommand(lambda: Robot.elevator.unlock()))

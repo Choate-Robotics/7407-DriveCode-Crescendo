@@ -88,7 +88,7 @@ class FeedOut(SubsystemCommand[Wrist]):
         utils.LocalLogger.debug("Fed-in")
 
 class PassNote(SubsystemCommand[Wrist]):
-    def __init__(self, subsystem: Wrist, length:float):
+    def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
 
     def initialize(self):

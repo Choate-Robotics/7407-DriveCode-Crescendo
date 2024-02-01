@@ -2,7 +2,7 @@ from subsystem import Elevator, Wrist, Intake, Drivetrain
 from sensors import FieldOdometry, TrajectoryCalculator
 
 import logging
-from command import DriveSwerveCustom, SetElevator, ZeroElevator, FeedIn, FeedOut, PassNote, SetWrist
+from command import DriveSwerveCustom, SetElevator, ZeroElevator, ZeroWrist, FeedIn, FeedOut, PassNote, SetWrist
 import wpilib, config, constants
 import commands2
 from wpimath.geometry import Pose2d, Rotation2d
@@ -142,59 +142,41 @@ class GiraffeLock(commands2.Command):
         self.elevator.lock()
         
         def wrist_is_over_limit():
-            return self.wrist.get_wrist_angle() > config.wrist_rotation_limit
-        
-        def wrist_under_lock_limit():
-            return self.wrist.get_wrist_angle() > -0.1
+            return self.wrist.get_wrist_angle() > config.wrist_stage_max
         
         def elevator_is_over_limit():
-            return self.elevator.get_length() > config.elevator_wrist_limit
+            return self.elevator.get_length() > config.elevator_stage_max
         
         
         commands = []
         debug_commands = []
         
-        if not self.elevator.get_length() > 0.1 and not wrist_is_over_limit():
+        if not elevator_is_over_limit and not wrist_is_over_limit():
             self.finished = True
             return # already down
             
-        # if the elevator is over the limit and the wrist is over the limit
-        if elevator_is_over_limit() and wrist_is_over_limit():
-            # move wrist out of the way
+        if wrist_is_over_limit():
             commands.append(
-                RunCommand(lambda: self.wrist.set_wrist_angle(0)))\
-                    .until(lambda: self.wrist.get_wrist_angle() > config.wrist_rotation_limit)\
-                    .andThen(ParallelCommandGroup( # move elevator down
-                        SetElevator(self.elevator, 0),
-                        InstantCommand(lambda: self.wrist.set_wrist_angle(0)),
-                    )
-            )
-                    
-            debug_commands.append(
-                PrintCommand("Wrist over limit, moving wrist out of the way before running elevator")
-            )
-        elif not wrist_under_lock_limit() and not elevator_is_over_limit():
-            # move wrist down
-            commands.append(
-                InstantCommand(lambda: self.wrist.set_wrist_angle(0))
+                SetWrist(self.wrist, config.wrist_stage_max)
             )
             debug_commands.append(
-                PrintCommand("Wrist above locking limit, moving wrist down")
-            )
-        else:
-            # run both at the same time
-            commands.append(
-                    SetElevator(self.elevator, 0),
+                PrintCommand("Setting wrist to stage limit")
             )
             
-            debug_commands.append(
-                PrintCommand("moving elevator down")
+        if elevator_is_over_limit():
+            commands.append(
+                SetElevator(self.elevator, config.elevator_stage_max)
             )
+            debug_commands.append(
+                PrintCommand("Setting elevator to stage limit")
+            )
+            
+        commands.append(
+            InstantCommand(self.finish)
+        )
         
         commands2.CommandScheduler.schedule(ParallelCommandGroup(
-            SequentialCommandGroup(
-                *commands
-            ),
+                *commands,
             SequentialCommandGroup(
                 *debug_commands
             )
@@ -214,14 +196,13 @@ class StageNote(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kStage),
-            InstantCommand(lambda: intake.roll_inner_in()),
             WaitUntilCommand(lambda: intake.detect_note() == False and wrist.note_staged),
             Giraffe(elevator, wrist, config.Giraffe.kIdle),
         )
     
 class ShootSpeaker(SequentialCommandGroup):
     
-    def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, odometry: FieldOdometry, elevator: Elevator, wrist: Wrist, atPose: Pose2d | None = None):
+    def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, atPose: Pose2d | None = None):
         super().__init__(
             ParallelCommandGroup(
                 PrintCommand('Speed up flywheel'),
@@ -229,5 +210,18 @@ class ShootSpeaker(SequentialCommandGroup):
                 PrintCommand('Aim Drivetrain')
             ),
             WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot),
-            PrintCommand('Shoot (run wrist feeder)')
+            PassNote(wrist),
+        )
+        
+class ShootAmp(SequentialCommandGroup):
+    
+    def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist):
+        super().__init__(
+            ParallelCommandGroup(
+                PrintCommand('Speed up flywheel'),
+                Giraffe(elevator, wrist, config.Giraffe.kAmp),
+                PrintCommand('Lock Drivetrain with amp')
+            ),
+            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot),
+            PassNote(self.wrist),
         )
