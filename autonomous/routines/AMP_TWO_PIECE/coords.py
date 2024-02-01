@@ -10,40 +10,35 @@ coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
 
-initial: coord = (1.9, .78, math.pi)
+initial: coord = (1.9, 7.5, math.pi/2)
 
-get_first_ring: path = ( 
+amp_1: path = ( 
     initial,
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight,
+    Field.POI.Coordinates.Structures.Scoring.kAmp.withRotation(math.pi/2),
 )
 
-come_back_to_shoot_first_ring: path = (
-    get_first_ring[2],
+get_first_note: path = (
+    amp_1[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,1)),
+    Field.POI.Coordinates.Notes.Wing.kLeft.withRotation(math.pi),
 )
 
-get_second_ring: path = (
-    come_back_to_shoot_first_ring[2],
+amp_2: path = (
+    get_first_note[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kMidRight,
+    Field.POI.Coordinates.Structures.Scoring.kAmp.withRotation(math.pi/2),
 )
 
-come_back_to_shoot_second_ring: path = (
-    get_second_ring[2],
+get_second_note: path = (
+    amp_2[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,1)),
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(math.pi),
 )
 
-get_third_ring: path = (
-    come_back_to_shoot_second_ring[2],
+shoot_second_note: path = (
+    get_second_note[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kCenter,
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(-4, -1)),
 )
 
-come_back_to_shoot_third_ring: path = (
-    get_third_ring[2],
-    [(FieldPos.Stage.stage_x, FieldPos.Stage.stage_y)],
-    Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(-4.5, 1.2)),
-)
