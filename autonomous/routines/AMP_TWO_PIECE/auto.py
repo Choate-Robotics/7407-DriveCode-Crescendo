@@ -10,14 +10,13 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.MIDLINE_NOTES.coords import (
+from autonomous.routines.AMP_TWO_PIECE.coords import (
     initial,
-    get_first_ring,
-    come_back_to_shoot_first_ring,
-    get_second_ring,
-    come_back_to_shoot_second_ring,
-    get_third_ring,
-    come_back_to_shoot_third_ring,
+    amp_1,
+    get_first_note,
+    amp_2,
+    get_second_note,
+    shoot_second_note,
 )
 
 from wpimath.geometry import Pose2d, Translation2d
@@ -25,9 +24,9 @@ from wpimath.geometry import Pose2d, Translation2d
 path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=POIPose(Pose2d(*get_first_ring[0])),
-        waypoints=[Translation2d(*coord) for coord in get_first_ring[1]],
-        end_pose=get_first_ring[2],
+        start_pose=POIPose(Pose2d(*amp_1[0])),
+        waypoints=[Translation2d(*coord) for coord in amp_1[1]],
+        end_pose=amp_1[2],
         max_velocity=12,
         max_accel=3,
         start_velocity=0,
@@ -40,9 +39,9 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=come_back_to_shoot_first_ring[0],
-        waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_first_ring[1]],
-        end_pose=come_back_to_shoot_first_ring[2],
+        start_pose=get_first_note[0],
+        waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
+        end_pose=get_first_note[2],
         max_velocity=12,
         max_accel=3,
         start_velocity=0,
@@ -55,9 +54,9 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_second_ring[0],
-        waypoints=[Translation2d(*coord) for coord in get_second_ring[1]],
-        end_pose=get_second_ring[2],
+        start_pose=amp_2[0],
+        waypoints=[Translation2d(*coord) for coord in amp_2[1]],
+        end_pose=amp_2[2],
         max_velocity=12,
         max_accel=3,
         start_velocity=0,
@@ -70,9 +69,9 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=come_back_to_shoot_second_ring[0],
-        waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_second_ring[1]],
-        end_pose=come_back_to_shoot_second_ring[2],
+        start_pose=get_first_note[0],
+        waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
+        end_pose=get_first_note[2],
         max_velocity=12,
         max_accel=3,
         start_velocity=0,
@@ -85,9 +84,9 @@ path_4 = FollowPathCustom(
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_third_ring[0],
-        waypoints=[Translation2d(*coord) for coord in get_third_ring[1]],
-        end_pose=get_third_ring[2],
+        start_pose=shoot_second_note[0],
+        waypoints=[Translation2d(*coord) for coord in shoot_second_note[1]],
+        end_pose=shoot_second_note[2],
         max_velocity=12,
         max_accel=3,
         start_velocity=0,
@@ -97,35 +96,18 @@ path_5 = FollowPathCustom(
     period=0.03,
 )
 
-path_6 = FollowPathCustom(
-    subsystem=Robot.drivetrain,
-    trajectory=CustomTrajectory(
-        start_pose=come_back_to_shoot_third_ring[0],
-        waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_third_ring[1]],
-        end_pose=come_back_to_shoot_third_ring[2],
-        max_velocity=12,
-        max_accel=3,
-        start_velocity=0,
-        end_velocity=0,
-        rev=False,
-    ),
-    period=0.03,
-)
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
-    WaitCommand(1), # shoot
     path_1,
-    WaitCommand(.75), # intake
+    WaitCommand(1), # shoot
     path_2,
-    WaitCommand(1), # shoot
+    WaitCommand(.75), # intake
     path_3,
-    WaitCommand(.75), # intake
-    path_4,
     WaitCommand(1), # shoot
-    path_5,
+    path_4,
     WaitCommand(.75), # intake
-    path_6,
+    path_5,
     WaitCommand(1), # shoot
     InstantCommand(lambda: print("Done")),
 )
