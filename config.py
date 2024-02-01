@@ -3,7 +3,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
 from wpilib import AnalogEncoder, DigitalInput
 from toolkit.motors import SparkMaxConfig
-practice_bot: DigitalInput = DigitalInput(0) # if true, we are using the practice bot (we will put a jumper on the DIO port)
+comp_bot: DigitalInput = DigitalInput(0) # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 from units.SI import (
     inches_to_meters,
@@ -40,9 +40,10 @@ period: float = 0.03  # seconds
 
 
 #intake
-inner_intake_id = 0 #placeholder
-outer_intake_front_id = 1 #placeholder
-outer_intake_back_id = 2 #placeholder
+inner_intake_id = 10 #placeholder
+outer_intake_front_id = 11 #placeholder
+outer_intake_back_id = 12 #placeholder
+deploy_intake_id = 13 #placeholder
 intake_beam_break_channel = 1 #placeholder
 
 intake_inner_speed = 0.25 #placeholder
@@ -51,6 +52,8 @@ intake_outer_idle_speed = .25 #placeholder
 
 intake_timeout = 5 #placeholder
 intake_roller_current_limit = 1 #placeholder
+intake_deploy_current_limit = 1 #placeholder
+tenting_deploy_current_limit = 1 #placeholder
 intake_sensor_debounce = 0.2 #placeholder
 
 # elevator
@@ -67,6 +70,8 @@ WRIST_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feed_motor_id = 50
 FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feeder_velocity = 132
+feeder_pass_velocity = 5
+wrist_stage_max:radians = 0 #TODO: PLACEHOLDER
 
 
 
@@ -155,31 +160,49 @@ class LimelightPosition:
 front_left_move_id = 4
 front_left_turn_id = 5
 front_left_encoder_port = AnalogEncoder(0)
-front_left_encoder_zeroed_pos = 0.678 if not practice_bot.get() else 0.0
+front_left_encoder_zeroed_pos = 0.678 if comp_bot.get() else 0.0
 
 front_right_move_id = 6
 front_right_turn_id = 7
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.503 if not practice_bot.get() else 0.0
+front_right_encoder_zeroed_pos = 0.503 if comp_bot.get() else 0.0
 
 back_left_move_id = 2
 back_left_turn_id = 3
 back_left_encoder_port = AnalogEncoder(1)
-back_left_encoder_zeroed_pos = 0.964 if not practice_bot.get() else 0.0
+back_left_encoder_zeroed_pos = 0.964 if comp_bot.get() else 0.0
 
 back_right_move_id = 8
 back_right_turn_id = 9
 back_right_encoder_port = AnalogEncoder(3)
-back_right_encoder_zeroed_pos = 0.260 if not practice_bot.get() else 0.0
+back_right_encoder_zeroed_pos = 0.260 if comp_bot.get() else 0.0
 
 driver_centric: bool = True
 drivetrain_reversed: bool = False
+
+
 
 # Gyro
 gyro_id = 20
 
 # Elevator
 elevator_moving = False
+elevator_stage_max:meters = 0.1 #meters
+
+"""
+c = drag coefficient
+a = projectile area (m^2)
+m = projectile mass (kg)
+rho_air = air density (kg/m^3)
+g = acceleration due to gravity (m/s^2)
+v0 = initial velocity of shooter flywheel (m/s) config
+delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
+y = height of target (COULD BE IN ODOMETRY) (m) const
+tol = tolerance of error in distance to target (m)
+"""
+v0_flywheel = 15
+shooter_tol = 0.1
+max_sim_times = 100
 
 #Flywheel
 flywheel_id_1 = 1 #TODO: placeholder
