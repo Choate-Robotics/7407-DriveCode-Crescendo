@@ -204,3 +204,7 @@ v0_flywheel = 15
 shooter_tol = 0.1
 max_sim_times = 100
 
+#Flywheel
+flywheel_id_1 = 1 #TODO: placeholder
+flywheel_id_2 = 2 #TODO: placeholder
+flywheel_motor_count = 2 #TODO: placeholder
