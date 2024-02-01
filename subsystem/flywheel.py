@@ -121,3 +121,8 @@ class Flywheel(Subsystem):
                 self.motor_1.motor.getAppliedOutput(),
                 self.motor_2.motor.getAppliedOutput()
             )
+        
+    def periodic(self):
+        # self.top_flywheel_state.
+        # self.bottom_flywheel_state
+        ...
