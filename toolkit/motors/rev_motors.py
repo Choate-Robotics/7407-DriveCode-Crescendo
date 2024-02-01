@@ -97,6 +97,7 @@ class SparkMax(PIDMotor):
             CANSparkMax.MotorType.kBrushless if self._brushless else CANSparkMax.MotorType.kBrushed
         )
         self.motor.setInverted(self._inverted)
+        self.motor.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus5, 15)
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
