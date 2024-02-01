@@ -3,9 +3,10 @@ import constants
 import wpilib
 import config
 from oi.keymap import Controllers
-from toolkit.command import SubsystemCommand, radians
+from toolkit.command import SubsystemCommand
 from subsystem import Wrist
 from commands2 import SequentialCommandGroup
+from units.SI import radians
 import math
 
 class ZeroWrist(SubsystemCommand[Wrist]):

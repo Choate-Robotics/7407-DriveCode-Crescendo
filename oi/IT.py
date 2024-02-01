@@ -4,7 +4,7 @@ from utils import LocalLogger
 
 
 from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand
-
+import command
 import config
 
 

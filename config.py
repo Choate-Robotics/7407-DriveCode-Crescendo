@@ -71,6 +71,7 @@ feed_motor_id = 50
 FEED_CONFIG = SparkMaxConfig(.1, 0, 0.003, 0.00015, (-.5, .5))
 feeder_velocity = 132
 feeder_pass_velocity = 5
+wrist_stage_max:radians = 0 #TODO: PLACEHOLDER
 
 
 
@@ -186,6 +187,7 @@ gyro_id = 20
 
 # Elevator
 elevator_moving = False
+elevator_stage_max:meters = 0.1 #meters
 
 """
 c = drag coefficient
