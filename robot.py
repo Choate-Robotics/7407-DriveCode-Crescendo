@@ -80,6 +80,7 @@ class _Robot(wpilib.TimedRobot):
         # Field.POI.setRed()
 
     def robotPeriodic(self):
+        Field.odometry.disable()
         Field.POI.setNTValues()
         if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
             config.active_team = config.Team.BLUE
@@ -141,7 +142,7 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        autonomous.mid_notes.run()
+        autonomous.four_note.run()
 
     def autonomousPeriodic(self):
         pass

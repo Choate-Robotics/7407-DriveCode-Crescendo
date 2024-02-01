@@ -48,19 +48,19 @@ class CustomTrajectory:
         
     def generate(self):
         
-        self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
+        # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
         
         temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
         
         if isinstance(self.start_pose, POIPose):
-            temp_start_pose = self.start_pose.get()
+            self.start_pose = self.start_pose.get()
             
-        # for i, waypoint in enumerate(self.waypoints):
-        #     if isinstance(waypoint, POIPose):
-        #         self.waypoints[i] = waypoint.getTranslation()
+        for i, waypoint in enumerate(self.waypoints):
+            if isinstance(waypoint, POIPose):
+                self.waypoints[i] = waypoint.getTranslation()
 
         if isinstance(self.end_pose, POIPose):
-            temp_end_pose = self.end_pose.get()
+            self.end_pose = self.end_pose.get()
         
         config = TrajectoryConfig(
             self.max_velocity,
@@ -71,9 +71,9 @@ class CustomTrajectory:
         config.setReversed(self.rev)
         
         self.trajectory = TrajectoryGenerator.generateTrajectory(
-            start=temp_start_pose,
+            start=self.start_pose,
             interiorWaypoints=self.waypoints,
-            end=temp_end_pose,
+            end=self.end_pose,
             config=config,
         )
         return self.trajectory
