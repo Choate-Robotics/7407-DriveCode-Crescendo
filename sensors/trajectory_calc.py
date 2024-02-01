@@ -69,7 +69,7 @@ class TrajectoryCalculator:
         :return: target angle
         """
         self.distance_to_target = (
-            self.odometry.getPose().translation().distance(self.speaker.translation())
+            self.odometry.getPose().translation().distance(self.speaker)
         )
         # print("distance_to_target", self.distance_to_target)
 

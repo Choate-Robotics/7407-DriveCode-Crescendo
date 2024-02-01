@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from pytest import MonkeyPatch
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Translation2d
 
 import config
 import constants
@@ -90,6 +90,7 @@ def test_update_shooter(
     monkeypatch.setattr(constants, "shooter_height", 0.0)
     monkeypatch.setattr(trajectory_calc.elevator, "get_length", mock_get_length)
     monkeypatch.setattr(trajectory_calc.odometry, "getPose", mock_pose)
+    monkeypatch.setattr(trajectory_calc, "speaker", Translation2d(0, 0))
     monkeypatch.setattr(constants, "g", 9.8)
     monkeypatch.setattr(constants, "c", 0.47)
     monkeypatch.setattr(constants, "rho_air", 1.28)
