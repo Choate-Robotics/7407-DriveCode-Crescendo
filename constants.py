@@ -144,13 +144,28 @@ elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
 
 # INTAKE
-intake_inner_gear_ratio = 15 / 1  # TODO: placeholder
-intake_outer_gear_ratio = 20 / 1  # TODO: placeholder
+
+intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
+intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
+intake_deploy_gear_ratio = 20 / 1 #TODO: placeholder
+
+
 
 # WRIST
-wrist_gear_ratio = 3
-
+wrist_gear_ratio = 3 
 wrist_time_to_max_vel = 0.3
 
-# pathing
-post_avoidance_distance = 0.5  # meters
+
+
+# FLYWHEEL
+flywheel_mass = 0.5 # TODO: placeholder
+flywheel_radius_outer = 2 * 0.0254 # TODO: placeholder
+flywheel_gear_ratio = 1 / 2 # TODO: placeholder
+flywheel_period = .03
+
+shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
+
+#pathing
+post_avoidance_distance = 0.5 
+
+

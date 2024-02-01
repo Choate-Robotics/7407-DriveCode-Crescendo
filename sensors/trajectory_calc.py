@@ -10,6 +10,8 @@ import constants
 from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
+from utils import POI
+
 
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
@@ -25,25 +27,32 @@ class TrajectoryCalculator:
     """
 
     delta_z: float
-    speaker_z: float = constants.speaker_z
+    speaker_z: float
     distance_to_target: float
 
     def __init__(self, odometry: FieldOdometry, elevator: Elevator):
         self.odometry = odometry
-        self.speaker = constants.speaker_location
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
         self.delta_z = 0
         self.shoot_angle = 0
         self.base_angle = 0
         self.elevator = elevator
+
         self.numerical_integration = NumericalIntegration()
+
+        
+    def init(self):
+        self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
+
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
         """
         Calculates the angle of the trajectory without air resistance.
         """
-        phi0 = np.arctan(delta_z / distance_to_target)
+        
+        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
         result_angle = (
             0.5
             * np.arcsin(
@@ -66,8 +75,8 @@ class TrajectoryCalculator:
             self.odometry.getPose().translation().distance(self.speaker.translation())
         )
 
-        self.delta_z = self.speaker_z - self.elevator.get_length()
-        print("in program:" + str(self.delta_z))
+        self.delta_z = self.speaker_z - self.elevator.get_length() + constants.shooter_height
+
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         theta_2 = theta_1 + np.radians(1)
         z_1 = self.run_sim(theta_1)

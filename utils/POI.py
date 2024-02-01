@@ -1,8 +1,8 @@
 from __future__ import annotations
-
-import math
-
-import ntcore
+import constants, config
+from wpimath.geometry import Pose2d, Rotation2d, Transform2d, Translation2d, Pose3d, Rotation3d, Transform3d, Translation3d
+from units.SI import feet_to_meters, inches_to_meters, radians
+import ntcore, math
 from wpilib import DriverStation
 from wpimath.geometry import (
     Pose2d,
@@ -32,7 +32,6 @@ class POIPose:
         if not isinstance(self._pose, Pose2d) and not isinstance(self._pose, Pose3d):
             raise TypeError("pose must be Pose2d or Pose3d")
         self._red = red_origin
-        # self.logger = LocalLogger("POI")
 
     def __str__(self):
         return str(self._pose)
@@ -299,8 +298,37 @@ class POI:
                 )
 
             class Obstacles:
-                # Obstacles are usually in Pose3d, with the z acting as the
-                # recommended minimum distance to avoid the obstacle
+
+                
+                # Obstacles are usually in Pose3d, with the z acting as the recommended minimum distance to avoid the obstacle
+                
+                kStage = POIPose(Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length / 2 + constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y
+                    ), constants.FieldPos.pose_reverse))
+                
+                kStageCenterPost = POIPose(Pose3d(
+                    Translation3d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.stage_length + constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y,
+                        constants.post_avoidance_distance,
+                    ), Rotation3d(0, 0, constants.FieldPos.pose_reverse.radians())))
+                
+                kStageLeftPost = POIPose(Pose3d(
+                    Translation3d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y + constants.FieldPos.Stage.stage_width / 2 - constants.FieldPos.Stage.post_deviation,
+                        constants.post_avoidance_distance,
+                    ), Rotation3d(0, 0, constants.FieldPos.pose_reverse.radians())))
+                
+                kStageRightPost = POIPose(Pose3d(
+                    Translation3d(
+                        constants.FieldPos.Stage.stage_x - constants.FieldPos.Stage.post_deviation,
+                        constants.FieldPos.Stage.stage_y - constants.FieldPos.Stage.stage_width / 2 + constants.FieldPos.Stage.post_deviation,
+                        constants.post_avoidance_distance,
+                    ), Rotation3d(0, 0, constants.FieldPos.pose_reverse.radians())))
+
 
                 kStage = POIPose(
                     Pose2d(

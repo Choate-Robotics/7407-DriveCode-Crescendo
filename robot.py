@@ -60,6 +60,7 @@ class _Robot(wpilib.TimedRobot):
             #     sensor.init()
             Sensors.limelight.init()
             Field.odometry.enable()
+            Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -68,6 +69,13 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
+
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
 
         self.log.complete("Robot initialized")
         
@@ -106,6 +114,15 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             Field.odometry.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        try:
+            Field.calculations.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))

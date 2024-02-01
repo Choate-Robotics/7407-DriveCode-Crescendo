@@ -31,7 +31,12 @@ class Keymap:
         RESET_GYRO = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
         )
-
         X_MODE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
         )
+    class Elevator:
+        pass
+    class Intake:
+        pass
+    class Shooter:
+        pass
