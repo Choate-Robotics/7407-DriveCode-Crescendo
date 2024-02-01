@@ -99,8 +99,8 @@ def test_update_shooter(
     constants.rho_air = 1.28
     constants.a = 14 * 0.0254 * 2 * 0.0254
     constants.m = 0.235301
-    constants.speaker_z = y_distance
-    trajectory_calc.speaker_z = y_distance
+    constants.speaker_z = y_distance - constants.shooter_height
+    trajectory_calc.speaker_z = y_distance - constants.shooter_height
     trajectory_calc.distance_to_target = x_distance
     trajectory_calc.delta_z = y_distance
     # print(trajectory_calc.delta_z)

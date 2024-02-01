@@ -43,13 +43,12 @@ LOG_FILE_LEVEL: int = 1
 period: float = 0.03  # seconds
 
 
-
-#intake
-inner_intake_id = 10 #placeholder
-outer_intake_front_id = 11 #placeholder
-outer_intake_back_id = 12 #placeholder
-deploy_intake_id = 13 #placeholder
-intake_beam_break_channel = 1 #placeholder
+# intake
+inner_intake_id = 10  # placeholder
+outer_intake_front_id = 11  # placeholder
+outer_intake_back_id = 12  # placeholder
+deploy_intake_id = 13  # placeholder
+intake_beam_break_channel = 1  # placeholder
 
 
 intake_inner_speed = 0.25  # placeholder
@@ -57,11 +56,11 @@ intake_outer_speed = 0.5  # placeholder
 intake_outer_idle_speed = 0.25  # placeholder
 
 
-intake_timeout = 5 #placeholder
-intake_roller_current_limit = 1 #placeholder
-intake_deploy_current_limit = 1 #placeholder
-tenting_deploy_current_limit = 1 #placeholder
-intake_sensor_debounce = 0.2 #placeholder
+intake_timeout = 5  # placeholder
+intake_roller_current_limit = 1  # placeholder
+intake_deploy_current_limit = 1  # placeholder
+tenting_deploy_current_limit = 1  # placeholder
+intake_sensor_debounce = 0.2  # placeholder
 
 
 # elevator
@@ -79,7 +78,7 @@ feed_motor_id = 50
 FEED_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))
 feeder_velocity = 132
 feeder_pass_velocity = 5
-wrist_stage_max:radians = 0 #TODO: PLACEHOLDER
+wrist_stage_max = 0  # TODO: PLACEHOLDER radians
 
 
 # LEDS
@@ -164,13 +163,12 @@ driver_centric: bool = True
 drivetrain_reversed: bool = False
 
 
-
 # Gyro
 gyro_id = 20
 
 # Elevator
 elevator_moving = False
-elevator_stage_max:meters = 0.1 #meters
+elevator_stage_max = 0.1  # meters
 
 
 # c = drag coefficient
@@ -184,12 +182,10 @@ elevator_stage_max:meters = 0.1 #meters
 # tol = tolerance of error in distance to target (m)
 
 
-
-
-#Flywheel
-flywheel_id_1 = 1 #TODO: placeholder
-flywheel_id_2 = 2 #TODO: placeholder
-flywheel_motor_count = 2 #TODO: placeholder
-v0_flywheel = 15 #TODO: placeholder
-shooter_tol = 0.001 # For aim of shooter
-max_sim_times = 100 # To make sure that we don't have infinite while loop
+# Flywheel
+flywheel_id_1 = 1  # TODO: placeholder
+flywheel_id_2 = 2  # TODO: placeholder
+flywheel_motor_count = 2  # TODO: placeholder
+v0_flywheel = 15  # TODO: placeholder
+shooter_tol = 0.001  # For aim of shooter
+max_sim_times = 100  # To make sure that we don't have infinite while loop
