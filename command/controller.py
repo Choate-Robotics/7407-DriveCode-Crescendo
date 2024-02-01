@@ -2,7 +2,7 @@ from subsystem import Elevator, Wrist, Intake, Drivetrain
 from sensors import FieldOdometry, TrajectoryCalculator
 
 import logging
-from command import DriveSwerveCustom, SetElevator, ZeroElevator, ZeroWrist, FeedIn, FeedOut, PassNote, SetWrist
+from command import DriveSwerveCustom, SetElevator, ZeroElevator, ZeroWrist, FeedIn, FeedOut, PassNote, SetWrist, DeployIntake, DeployTenting
 import wpilib, config, constants
 import commands2
 from wpimath.geometry import Pose2d, Rotation2d
@@ -224,4 +224,11 @@ class ShootAmp(SequentialCommandGroup):
             ),
             WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot),
             PassNote(self.wrist),
+        )
+        
+class EnableClimb(SequentialCommandGroup):
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
+        super().__init__(
+            Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
+            DeployTenting(intake),
         )
