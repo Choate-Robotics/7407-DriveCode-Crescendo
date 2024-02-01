@@ -226,9 +226,13 @@ class ShootAmp(SequentialCommandGroup):
             PassNote(self.wrist),
         )
         
-class EnableClimb(SequentialCommandGroup):
+class EnableClimb(ParallelCommandGroup):
+    
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
-            DeployTenting(intake),
+            SequentialCommandGroup(
+                WaitUntilCommand(lambda: wrist.get_wrist_angle() < 0.1),
+                DeployTenting(intake)
+            )
         )
