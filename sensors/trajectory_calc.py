@@ -11,6 +11,7 @@ from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
+from wpimath.geometry import Rotation2d
 
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
@@ -35,7 +36,7 @@ class TrajectoryCalculator:
         self.distance_to_target = 0
         self.delta_z = 0
         self.shoot_angle = 0
-        self.base_angle = 0
+        self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
 
         self.numerical_integration = NumericalIntegration()
@@ -104,7 +105,11 @@ class TrajectoryCalculator:
         updates rotation of base to face target
         :return: base target angle
         """
-        pass
+        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        robot_pose_2d = self.odometry.getPose()
+        robot_to_speaker = speaker_translation - robot_pose_2d.translation()
+        self.base_rotation2d = robot_to_speaker.angle()
+        return self.base_rotation2d
 
     def update(self):
         """
