@@ -116,7 +116,9 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
-            
+
+        Field.odometry.disable()    
+        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
