@@ -1,5 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
+from command import DrivetrainZero
 from robot_systems import Robot
 from utils import POIPose
 
@@ -31,7 +32,7 @@ path_1 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False,
     ),
     period=0.03,
 )
@@ -46,7 +47,7 @@ path_2 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True,
     ),
     period=0.03,
 )
@@ -61,7 +62,7 @@ path_3 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False,
     ),
     period=0.03,
 )
@@ -69,14 +70,14 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_first_note[0],
-        waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
-        end_pose=get_first_note[2],
+        start_pose=get_second_note[0],
+        waypoints=[Translation2d(*coord) for coord in get_second_note[1]],
+        end_pose=get_second_note[2],
         max_velocity=12,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True,
     ),
     period=0.03,
 )
@@ -91,7 +92,7 @@ path_5 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False,
     ),
     period=0.03,
 )
@@ -99,6 +100,7 @@ path_5 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
+    DrivetrainZero(Robot.drivetrain),
     path_1,
     WaitCommand(1), # shoot
     path_2,

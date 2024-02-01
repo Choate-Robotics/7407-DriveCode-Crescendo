@@ -1,5 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
+from command import DrivetrainZero
 from robot_systems import Robot
 from utils import POIPose
 
@@ -114,6 +115,7 @@ path_6 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
+    DrivetrainZero(Robot.drivetrain),
     WaitCommand(1), # shoot
     path_1,
     WaitCommand(.75), # intake

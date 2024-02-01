@@ -101,7 +101,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
                 abs(relative.x) < 0.03
                 and abs(relative.y) < 0.03
                 and abs(relative.rotation().degrees()) < 2
-                and self.t > self.duration
+                or self.t > self.duration
         ):
             self.t = self.duration
             self.finished = True
@@ -112,11 +112,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             Field.odometry.getPose(), goal, goal.pose.rotation()
         )
 
-        vx, vy = rotate_vector(
-            speeds.vx, speeds.vy, Field.odometry.getPose().rotation().radians()
-        )
 
-        self.subsystem.set_driver_centric((vx, vy), speeds.omega)
+        self.subsystem.set_driver_centric((speeds.vx, speeds.vy), speeds.omega)
 
     def isFinished(self) -> bool:
         return self.finished
