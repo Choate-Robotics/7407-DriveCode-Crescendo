@@ -2,6 +2,7 @@ from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
 from robot_systems import Robot
 from utils import POIPose
+from command import DrivetrainZero
 
 from commands2 import (
     InstantCommand,
@@ -25,8 +26,8 @@ path_1 = FollowPathCustom(
         start_pose=POIPose(Pose2d(*get_first_note[0])),
         waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
         end_pose=get_first_note[2],
-        max_velocity=1,
-        max_accel=0.5,
+        max_velocity=5,
+        max_accel=2,
         start_velocity=0,
         end_velocity=0,
         rev=True
@@ -37,13 +38,13 @@ path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=get_second_note[0],
-        waypoints=[Translation2d(*coord) for coord in get_second_note[1]],
+        waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=5,
-        max_accel=0.5,
+        max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=False
     )
 )
 
@@ -51,17 +52,18 @@ path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=get_third_note[0],
-        waypoints=[Translation2d(*coord) for coord in get_third_note[1]],
+        waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
-        max_velocity=1,
-        max_accel=0.5,
+        max_velocity=5,
+        max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=False
     )
 )
 
 auto = SequentialCommandGroup(
+    # DrivetrainZero(Robot.drivetrain),
     path_1,
     WaitCommand(1),
 

@@ -70,6 +70,7 @@ class CustomTrajectory:
         config.setEndVelocity(self.end_velocity)
         config.setReversed(self.rev)
         
+        
         self.trajectory = TrajectoryGenerator.generateTrajectory(
             start=self.start_pose,
             interiorWaypoints=self.waypoints,

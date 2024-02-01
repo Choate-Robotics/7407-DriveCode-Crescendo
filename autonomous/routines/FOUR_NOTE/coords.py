@@ -8,22 +8,22 @@ coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
 
-initial: coord = (0, constants.field_width/2, math.radians(180))
+initial: coord = (1.9, constants.field_width/2, math.radians(180))
 
 get_first_note: path = (
     initial,
     [],
-    Field.POI.Coordinates.Notes.Wing.kRight
+    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length/2, 0))
 )
 
 get_second_note: path = (
     get_first_note[2],
-    [],
-    Field.POI.Coordinates.Notes.Wing.kCenter
+    [Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length, 4*constants.FieldPos.Wing.note_gap/5))],
+    Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length/2, 0))
 )
 
 get_third_note: path = (
     get_second_note[2],
-    [],
-    Field.POI.Coordinates.Notes.Wing.kLeft
+    [Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length, 4*constants.FieldPos.Wing.note_gap/5))],
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-constants.drivetrain_length/2, 0))
 )
