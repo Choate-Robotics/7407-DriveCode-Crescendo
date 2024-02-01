@@ -12,7 +12,6 @@ from subsystem import Elevator
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
 
-
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
 
@@ -41,17 +40,15 @@ class TrajectoryCalculator:
 
         self.numerical_integration = NumericalIntegration()
 
-        
     def init(self):
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
-
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
         """
         Calculates the angle of the trajectory without air resistance.
         """
-        
+
         phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
         result_angle = (
             0.5
@@ -74,9 +71,14 @@ class TrajectoryCalculator:
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker.translation())
         )
+        # print("distance_to_target", self.distance_to_target)
 
-        self.delta_z = self.speaker_z - self.elevator.get_length() + constants.shooter_height
-
+        self.delta_z = (
+            self.speaker_z - self.elevator.get_length() + constants.shooter_height
+        )
+        # print("delta_z", self.delta_z)
+        # print("constant.shooter_height", constants.shooter_height)
+        # print("elevator.get_length()", self.elevator.get_length())
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         theta_2 = theta_1 + np.radians(1)
         z_1 = self.run_sim(theta_1)
@@ -91,7 +93,7 @@ class TrajectoryCalculator:
             z_2 = self.run_sim(theta_2)
             z_goal_error = self.delta_z - z_2
             z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-            print(z_goal_error, theta_2, self.delta_z)
+            # print(z_goal_error, theta_2, self.delta_z)
             if abs(z_goal_error) < config.shooter_tol:
                 self.shoot_angle = theta_2
                 return theta_2
