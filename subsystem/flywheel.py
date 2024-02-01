@@ -46,6 +46,7 @@ class Flywheel(Subsystem):
             [0.1],
         )
         self.flywheel_controller.latencyCompensate(self.flywheel_plant, constants.flywheel_period, 0.025)
+        
         self.top_flywheel_state = LinearSystemLoop_1_1_1(
             self.flywheel_plant,
             self.flywheel_controller,
@@ -125,4 +126,18 @@ class Flywheel(Subsystem):
     def periodic(self):
         # self.top_flywheel_state.
         # self.bottom_flywheel_state
-        ...
+        self.top_flywheel_state.correct([self.get_velocity(1)])
+        self.bottom_flywheel_state.correct([self.get_velocity(2)])
+        
+        self.top_flywheel_state.predict(constants.flywheel_period)
+        
+        self.bottom_flywheel_state.predict(constants.flywheel_period)
+        
+        voltage_top = self.top_flywheel_state.U(0)
+        
+        voltage_bottom = self.bottom_flywheel_state.U(0)
+        
+        self.set_voltage(voltage_top, 1)
+        
+        self.set_voltage(voltage_bottom, 2)
+        
