@@ -1,6 +1,7 @@
 import math
 from unittest.mock import MagicMock
 
+import POI
 import pytest
 from pytest import MonkeyPatch
 from wpimath.geometry import Pose2d, Translation2d
@@ -102,3 +103,14 @@ def test_update_shooter(
     # print(trajectory_calc.delta_z)
     angle = trajectory_calc.update_shooter()
     assert angle == pytest.approx(expected_answer, math.radians(2))
+
+
+def test_update_base(trajectory_calc, monkeypatch: MonkeyPatch):
+    monkeypatch.setattr(
+        POI.Coordinates.Structures.Scoring.kSpeaker,
+        "getTranslation",
+        Translation2d(2, 3),
+    )
+    monkeypatch.setattr(TrajectoryCalculator.odometry, "getPose", Pose2d(4, 5, 0))
+    trajectory_calc.init()
+    assert trajectory_calc.update_base() == pytest.approx(math.radians(-135))
