@@ -1,13 +1,13 @@
 import math
 from unittest.mock import MagicMock
 
-import POI
 import pytest
 from pytest import MonkeyPatch
 from wpimath.geometry import Pose2d, Translation2d
 
 import config
 import constants
+import utils.POI
 from sensors.trajectory_calc import TrajectoryCalculator
 
 
@@ -105,12 +105,34 @@ def test_update_shooter(
     assert angle == pytest.approx(expected_answer, math.radians(2))
 
 
-def test_update_base(trajectory_calc, monkeypatch: MonkeyPatch):
+@pytest.mark.parametrize(
+    "x_speaker, y_speaker, x_robot, y_robot, expected_angle",
+    [
+        (2, 3, 4, 5, -135),
+        (0, 4.8, 2, 5.1, -171.46923),
+        (0, 4.8, 4, 2.5, 150.1011),
+        (0, 4.8, 1, 8, -107.35402),
+        (0, 4.8, 6, 3, 163.30076),
+    ],
+)
+def test_update_base(
+    trajectory_calc,
+    x_speaker,
+    y_speaker,
+    x_robot,
+    y_robot,
+    expected_angle,
+    monkeypatch: MonkeyPatch,
+):
     monkeypatch.setattr(
-        POI.Coordinates.Structures.Scoring.kSpeaker,
+        utils.POI.Coordinates.Structures.Scoring.kSpeaker,
         "getTranslation",
-        Translation2d(2, 3),
+        lambda: Translation2d(x_speaker, y_speaker),
     )
-    monkeypatch.setattr(TrajectoryCalculator.odometry, "getPose", Pose2d(4, 5, 0))
+    monkeypatch.setattr(
+        trajectory_calc.odometry, "getPose", lambda: Pose2d(x_robot, y_robot, 0)
+    )
     trajectory_calc.init()
-    assert trajectory_calc.update_base() == pytest.approx(math.radians(-135))
+    assert trajectory_calc.update_base().radians() == pytest.approx(
+        math.radians(expected_angle)
+    )
