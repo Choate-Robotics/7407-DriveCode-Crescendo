@@ -1,12 +1,13 @@
+from unittest.mock import MagicMock
+
 import pytest
 import rev
 from pytest import MonkeyPatch
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 
 import config
 import constants
 from subsystem import Elevator
-from unittest.mock import MagicMock
+from toolkit.motors.rev_motors import SparkMax
 
 
 @pytest.fixture()
@@ -28,9 +29,9 @@ def test_elevator_dunder_init(elevator: Elevator):
 
     # elevator.encoder = MagicMock()
     # elevator.motor_extend = MagicMock()
-    assert elevator.zeroed == False
+    assert elevator.zeroed is False
     # assert elevator.encoder != False
-    assert elevator.motor_extend != False
+    assert elevator.motor_extend is not False
     elevator.motor_extend.init.assert_called()
     elevator.motor_extend.get_abs.assert_called()
     elevator.motor_extend.motor.setClosedLoopRampRate.assert_called()
@@ -68,9 +69,9 @@ def test_get_length(test_input, elevator: Elevator):
     # elevator.motor_extend.get_sensor_position.assert_called()
     elevator.motor_extend.get_sensor_position.return_value = test_input
     assert (
-            elevator.get_length()
-            == (test_input / constants.elevator_gear_ratio)
-            * constants.elevator_driver_gear_circumference
+        elevator.get_length()
+        == (test_input / constants.elevator_gear_ratio)
+        * constants.elevator_driver_gear_circumference
     )
 
 
@@ -97,8 +98,10 @@ def test_zero(test_input, elevator: Elevator):
     elevator.encoder.getPosition.return_value = test_input
     elevator.zero()
     elevator.motor_extend.set_sensor_position.assert_called_with(
-        test_input * constants.elevator_max_length)
-    assert elevator.zeroed == True
+        test_input * constants.elevator_max_length
+    )
+    assert elevator.zeroed is True
+
 
 
 @pytest.mark.parametrize(
@@ -141,4 +144,5 @@ def test_stop(test_input, elevator: Elevator, monkeypatch: MonkeyPatch):
     elevator.stop()
     elevator.motor_extend.set_target_position.assert_called_with(
         (test_input * constants.elevator_gear_ratio)
-        / constants.elevator_driver_gear_circumference)
+        / constants.elevator_driver_gear_circumference
+    )
