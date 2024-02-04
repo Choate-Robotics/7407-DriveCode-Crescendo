@@ -91,6 +91,9 @@ class POIPose:
             return self._pose.toPose2d()
         return self._pose
     
+    def __str__(self):
+        return str(self.get())
+    
     def get3d(self, verbose: bool = True):
         '''
         returns the pose3d, inverted if red is true
@@ -282,36 +285,56 @@ class POI:
         
         
         
-def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose]):
+def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | list[tuple[POIPose, float]], level: int = 0):
     '''
     returns a list of Transform2d that avoid obstacles. This should be used in the waypoints list
     '''
+    if level == 0:
+        print('starting obstacle avoidance algorithm')
     
-    obstacles:list[tuple[Pose2d, float]] = [(obstacles.get(False), obstacles.getZ()) for obstacles in obstacles]
-    print(obstacles)
+    if isinstance(obstacles[0], POIPose):
+        obstacles:list[tuple[Pose2d, float]] = [(obstacles.get(False), obstacles.getZ()) for obstacles in obstacles]
+    if level == 0:
+        print('obstacles', obstacles)
+    all_obstacles = obstacles.copy()
     # first, check if the start and end are within the general area of the obstacles
     # if not, remove from the list
     
     def between(a: float, b: float, c: float):
-        return b - 1 <= a <= c + 1 or c - 1 <= a <= b + 1
+        return b - .5 <= a <= c + .5 or c - .5 <= a <= b + .5
     
-    print('checking if start and end are within the general area of the obstacles')
+    # print('checking if start and end are within the general area of the obstacles')
     
-    for obstacle in obstacles:
-        if not between(obstacle[0].X(), start.get(False).X(), end.get(False).X()) or not between(obstacle[0].Y(), start.get().Y(), end.get().Y()):
-            obstacles.remove(obstacle)
-            print("removed obstacle", obstacle)
+    def get_obstacles_in_range(obstacles: list[tuple[Pose2d, float]], start: POIPose, end: POIPose):
+        potential_obstacles = []
+        for obstacle in obstacles:
+            if between(obstacle[0].X(), start.get(False).X(), end.get(False).X()) or between(obstacle[0].Y(), start.get().Y(), end.get().Y()):
+                potential_obstacles.append(obstacle)
+            else:    
+                print("removed obstacle", obstacle)
+                
+        return potential_obstacles
     
+    obstacles = get_obstacles_in_range(obstacles, start, end)
     
-    print('checked if start and end are within the general area of the obstacles')
+    if obstacles == []:
+        return []
+    
+    # print('checked if start and end are within the general area of the obstacles')
     # next, check if the start and end are within the obstacles distance
+    
+    
+    
+    tally = 0
     for obstacle in obstacles:
         if obstacle[0].translation().distance(start.get(False).translation()) < obstacle[1] or obstacle[0].translation().distance(end.get(False).translation()) < obstacle[1]:
             # raise ValueError("start or end is within the obstacle distance")
-            print("start or end is within the obstacle distance")
+            tally +=1
             # TODO: add code to move the start and/or end away from the obstacle
-        else:
-            print("start and end are not within the obstacle distance")
+    
+    if tally > 1:
+        print('WARNING: start and end are within the obstacle distance')
+    
     # next, check if the line between the start and end intersects with any of the obstacles
     
     def line_intersection(line1: tuple[Translation2d, Translation2d], line2: tuple[Translation2d, Translation2d]):
@@ -323,7 +346,10 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose]):
         
         A, B = line1
         C, D = line2
-        return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+        ans = ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+        if ans:
+            print('intersection', C, D)
+        return ans
     
     def get_deltas(line: tuple[Translation2d, Translation2d], point: Translation2d):
         # check if point is above or below the line using standard form
@@ -337,30 +363,57 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose]):
         # plug in the point to the standard form
         ans = a * point.X() + b * point.Y() + c
         
-        # if ans is positive, the point is above the line
-        # if ans is negative, the point is below the line
-        
+        # check if the point is above or below the line
         if ans > 0:
-            return (A.X() - B.X(), A.Y() - B.Y())
+            # print('point is above the line')
+            return (A.X() - B.X(), A.Y() - B.Y()), ans
         else:
-            return (B.X() - A.X(), B.Y() - A.Y())
+            # print('point is below the line')
+            return (B.X() - A.X(), B.Y() - A.Y()), ans
         
-    def get_reciporical_translation(point: Translation2d, deltas: tuple[float, float], magnitude: float):
+    def get_reciporical_translation(point: Translation2d, deltas: tuple[float, float], ans: float, magnitude: float):
         '''
         returns the translation of the point that is on the line of the deltas and slope
         '''
-        angle = math.atan2(deltas[0], deltas[1])
+        angle = math.pi -math.atan2(deltas[0], deltas[1]) 
+        # print(math.degrees(angle))
         ans = point + Translation2d(math.cos(angle) * magnitude, math.sin(angle) * magnitude)
-        print(point.distance(ans), magnitude)
+        # print(point.distance(ans), magnitude)
         return ans
     
-    waypoints = []
-    print('checking if the line between the start and end intersects with any of the obstacles')
-    for obstacle in obstacles:
-        deltas = get_deltas((start.getTranslation(), end.getTranslation()), obstacle[0].translation())
-        tangent_point = get_reciporical_translation(obstacle[0].translation(), deltas, obstacle[1])
-        if line_intersection((start.getTranslation(), end.getTranslation()), (obstacle[0], tangent_point)):
+    def recursive_check(start: POIPose, end: POIPose, new_waypoint: Translation2d, remove_obs: tuple[Pose2d, float]):
+        point = POIPose(Pose2d(new_waypoint, Rotation2d(0)))
+        new_obs = all_obstacles.copy()
+        new_obs.remove(remove_obs)
+        print('new obstacle list', new_obs)
+        if new_obs == []:
+            return [new_waypoint]
+        first_waypoints = avoid_obstacles(start, point, new_obs, level + 1)
+        second_waypoints = avoid_obstacles(point, end, new_obs, level + 1)
+        ans = first_waypoints + [new_waypoint] + second_waypoints
+        print(ans, 'level recursive', level)
+        return ans
+    
+    def get_obstacle_avoid_waypoints(start: POIPose, end: POIPose, obstacle: tuple[Pose2d, float]):
+        '''
+        returns a list of waypoints that avoid the obstacle
+        '''
+        waypoints = []
+        # print('checking if the line segments intersects with the obstacle')
+        deltas, ans = get_deltas((start.getTranslation(), end.getTranslation()), obstacle[0].translation())
+        tangent_point = get_reciporical_translation(obstacle[0].translation(), deltas, ans, obstacle[1])
+        if line_intersection((start.getTranslation(), end.getTranslation()), (obstacle[0].translation(), tangent_point)):
             print("intersection", 'new point', tangent_point)
-            waypoints.append(tangent_point)
+            waypoints += recursive_check(start, end, tangent_point, obstacle)
             
-    return waypoints
+            print(waypoints, 'level', level)
+        return waypoints
+    
+    fin_waypoints = []
+    for obstacle in obstacles:
+        fin_waypoints += get_obstacle_avoid_waypoints(start, end, obstacle)
+    
+    if level == 0:
+        print('final waypoints', fin_waypoints)
+        
+    return fin_waypoints

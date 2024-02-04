@@ -48,9 +48,9 @@ class CustomTrajectory:
         
     def generate(self):
         
-        self.waypoints = avoid_obstacles_between_points([self.start_pose, *self.waypoints, self.end_pose], self.obstacles)
+        # self.waypoints = avoid_obstacles_between_points([self.start_pose, *self.waypoints, self.end_pose], self.obstacles)
         
-        # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
+        self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
         
         temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
         
