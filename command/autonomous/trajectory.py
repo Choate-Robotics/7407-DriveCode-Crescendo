@@ -1,7 +1,7 @@
 from wpimath.geometry import Pose2d, Translation2d
 from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
 from robot_systems import Field
-from utils import POIPose, avoid_obstacles_between_points
+from utils import POIPose, avoid_obstacles
 import config
 
 class CustomTrajectory:
@@ -50,6 +50,9 @@ class CustomTrajectory:
         
         self.waypoints = avoid_obstacles_between_points([self.start_pose, *self.waypoints, self.end_pose], self.obstacles)
         
+        # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
+        
+        temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
         
         if isinstance(self.start_pose, POIPose):
             self.start_pose = self.start_pose.get()
@@ -71,6 +74,7 @@ class CustomTrajectory:
         config.setStartVelocity(self.start_velocity)
         config.setEndVelocity(self.end_velocity)
         config.setReversed(self.rev)
+        
         
         self.trajectory = TrajectoryGenerator.generateTrajectory(
             start=self.start_pose,
