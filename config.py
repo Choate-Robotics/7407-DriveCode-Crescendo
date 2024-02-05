@@ -166,7 +166,7 @@ driver_centric: bool = True
 drivetrain_reversed: bool = False
 
 #pathing
-post_avoidance_distance = 25 * inches_to_meters
+post_avoidance_distance = 30 * inches_to_meters
 
 # Gyro
 gyro_id = 20

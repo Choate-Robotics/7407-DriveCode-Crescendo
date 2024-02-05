@@ -289,7 +289,9 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
     '''
     returns a list of Transform2d that avoid obstacles. This should be used in the waypoints list
     '''
+    table = ntcore.NetworkTableInstance.getDefault().getTable("Auto")
     if level == 0:
+        table.putNumberArray('active obstacles', [])
         print('starting obstacle avoidance algorithm')
     
     if isinstance(obstacles[0], POIPose):
@@ -301,7 +303,7 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
     # if not, remove from the list
     
     def between(a: float, b: float, c: float):
-        return b - .5 <= a <= c + .5 or c - .5 <= a <= b + .5
+        return b - .25 <= a <= c + .25 or c - .25 <= a <= b + .25
     
     # print('checking if start and end are within the general area of the obstacles')
     
@@ -318,6 +320,7 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
     obstacles = get_obstacles_in_range(obstacles, start, end)
     
     if obstacles == []:
+        print('no obstacles in range')
         return []
     
     # print('checked if start and end are within the general area of the obstacles')
@@ -341,6 +344,30 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
         '''
         returns true if the lines intersect
         '''
+        
+        # def ccw(A, B, C):
+        #     return (C.Y() - A.Y()) * (B.X() - A.X()) > (B.Y() - A.Y()) * (C.X() - A.X())
+
+        # def on_segment(A, B, C):
+        #     return (
+        #         (B.X() <= max(A.X(), C.X()) <= A.X() or B.X() <= min(A.X(), C.X()) <= A.X())
+        #         and (B.Y() <= max(A.Y(), C.Y()) <= A.Y() or B.Y() <= min(A.Y(), C.Y()) <= A.Y())
+        #     )
+
+        # A, B = line1
+        # C, D = line2
+
+        # intersect = (
+        #     ccw(A, C, D) != ccw(B, C, D)
+        #     and ccw(A, B, C) != ccw(A, B, D)
+        #     or (ccw(A, C, D) == 0 and on_segment(A, C, D))
+        #     or (ccw(B, C, D) == 0 and on_segment(B, C, D))
+        #     or (ccw(A, B, C) == 0 and on_segment(A, B, C))
+        #     or (ccw(A, B, D) == 0 and on_segment(A, B, D))
+        # )
+
+        # return intersect
+        
         def ccw(A: Translation2d, B: Translation2d, C: Translation2d):
             return (C.Y() - A.Y()) * (B.X() - A.X()) > (B.Y() - A.Y()) * (C.X() - A.X())
         
@@ -350,6 +377,8 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
         if ans:
             print('intersection', C, D)
         return ans
+    
+    
     
     def get_deltas(line: tuple[Translation2d, Translation2d], point: Translation2d):
         # check if point is above or below the line using standard form
@@ -405,15 +434,18 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
         if line_intersection((start.getTranslation(), end.getTranslation()), (obstacle[0].translation(), tangent_point)):
             print("intersection", 'new point', tangent_point)
             waypoints += recursive_check(start, end, tangent_point, obstacle)
-            
+            table.putNumberArray('active obstacles', table.getNumberArray('active obstacles', []) + [obstacle[0].X(), obstacle[0].Y(), 0])
             print(waypoints, 'level', level)
         return waypoints
     
-    fin_waypoints = []
-    for obstacle in obstacles:
+    fin_waypoints:list[Translation2d] = []
+    for obstacle in all_obstacles:
         fin_waypoints += get_obstacle_avoid_waypoints(start, end, obstacle)
     
     if level == 0:
         print('final waypoints', fin_waypoints)
-        
+        nt_points = []
+        for point in fin_waypoints:
+            nt_points += [point.X(), point.Y(), 0]
+        table.putNumberArray("waypoints", nt_points)
     return fin_waypoints

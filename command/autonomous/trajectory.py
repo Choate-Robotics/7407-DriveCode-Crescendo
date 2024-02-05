@@ -55,7 +55,8 @@ class CustomTrajectory:
         temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
         
         if isinstance(self.start_pose, POIPose):
-            self.start_pose = self.start_pose.get()
+            # self.start_pose = self.start_pose.get()
+            temp_start_pose = self.start_pose.get()
             
         # for i, waypoint in enumerate(self.waypoints):
         #     if isinstance(waypoint, POIPose):
@@ -63,7 +64,8 @@ class CustomTrajectory:
         
 
         if isinstance(self.end_pose, POIPose):
-            self.end_pose = self.end_pose.get()
+            # self.end_pose = self.end_pose.get()
+            temp_end_pose = self.end_pose.get()
             
         
         
@@ -77,9 +79,9 @@ class CustomTrajectory:
         
         
         self.trajectory = TrajectoryGenerator.generateTrajectory(
-            start=self.start_pose,
+            start=temp_start_pose,
             interiorWaypoints=self.waypoints,
-            end=self.end_pose,
+            end=temp_end_pose,
             config=config,
         )
         return self.trajectory
