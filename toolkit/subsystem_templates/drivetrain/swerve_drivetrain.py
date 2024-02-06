@@ -278,10 +278,8 @@ class SwerveDrivetrain(Subsystem):
 
         new_states = self.kinematics.toSwerveModuleStates(self.chassis_speeds)
         normalized_states = self.kinematics.desaturateWheelSpeeds(new_states, self.max_vel)
-
         # normalized_states = new_states
         fl, fr, bl, br = normalized_states
-
         self.n_front_left.set(fl.speed, fl.angle.radians())
         self.n_front_right.set(fr.speed, fr.angle.radians())
         self.n_back_left.set(bl.speed, bl.angle.radians())

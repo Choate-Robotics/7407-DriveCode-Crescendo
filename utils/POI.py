@@ -340,78 +340,75 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
     
     # next, check if the line between the start and end intersects with any of the obstacles
     
-    def line_intersection(line1: tuple[Translation2d, Translation2d], line2: tuple[Translation2d, Translation2d]):
-        '''
-        returns true if the lines intersect
-        '''
+    def segment_intersects_circle(line: tuple[Translation2d, Translation2d], circle: tuple[Translation2d, float]):
         
-        # def ccw(A, B, C):
-        #     return (C.Y() - A.Y()) * (B.X() - A.X()) > (B.Y() - A.Y()) * (C.X() - A.X())
-
-        # def on_segment(A, B, C):
-        #     return (
-        #         (B.X() <= max(A.X(), C.X()) <= A.X() or B.X() <= min(A.X(), C.X()) <= A.X())
-        #         and (B.Y() <= max(A.Y(), C.Y()) <= A.Y() or B.Y() <= min(A.Y(), C.Y()) <= A.Y())
-        #     )
-
-        # A, B = line1
-        # C, D = line2
-
-        # intersect = (
-        #     ccw(A, C, D) != ccw(B, C, D)
-        #     and ccw(A, B, C) != ccw(A, B, D)
-        #     or (ccw(A, C, D) == 0 and on_segment(A, C, D))
-        #     or (ccw(B, C, D) == 0 and on_segment(B, C, D))
-        #     or (ccw(A, B, C) == 0 and on_segment(A, B, C))
-        #     or (ccw(A, B, D) == 0 and on_segment(A, B, D))
-        # )
-
-        # return intersect
+        AC:Translation2d = circle[0] - line[0]
+        AB:Translation2d = line[1] - line[0]
+        # print(AB, AC, circle[1])
+        def dot(v1: Translation2d, v2: Translation2d):
+            return v1.X() * v2.X() + v1.Y() * v2.Y()
         
-        def ccw(A: Translation2d, B: Translation2d, C: Translation2d):
-            return (C.Y() - A.Y()) * (B.X() - A.X()) > (B.Y() - A.Y()) * (C.X() - A.X())
+        # check if the circle is within the line segment
+        if dot(AC, AB) <= 0:
+            # print('circle is within the line segment')
+            if circle[0].distance(line[0]) <= circle[1]:
+                print('circle is within the line segment')
+                return line[0]
+            
         
-        A, B = line1
-        C, D = line2
-        ans = ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
-        if ans:
-            print('intersection', C, D)
-        return ans
+        
+        # get D by projecting AC onto AB and adding the start point
+        d_proj = dot(AC, AB) / dot(AB, AB)
+        D:Translation2d = line[0] + AB * d_proj
+        # print(D)
+        AD = D - line[0]
+        
+        # check if line segment is greater
+        
+        
+        # print(AD)
+        k = AD.X() / AB.X() if abs(AB.X()) > abs(AB.Y()) else AD.Y() / AB.Y()
+        
+        # get the point of the distance along AD
+        
+        dist:float = circle[0].distance(D)
+        if k >= 1:
+            dist = circle[0].distance(line[1])
+        elif k <= 0:
+            dist = circle[0].distance(line[0])
+            
+        # print(dist, circle[1])
+            
+        if dist <= circle[1]:
+            print('segment intersects circle', dist, circle[1])
+            # get the translation of the point of the distance of circle[0] that intersects the line
+            
+            # get the angle between AB and AC
+            angle = math.atan2(AB.Y(), AB.X()) - math.atan2(AC.Y(), AC.X())
+            if AB.X() == 0:
+                return get_reciporical_translation(circle[0], (AB.X(), AB.Y()), angle, circle[1])
+            else:
+                return get_reciporical_translation(circle[0], (AB.X(), AB.Y()), angle, circle[1])
+        return None
+            
+            
+        
     
     
-    
-    def get_deltas(line: tuple[Translation2d, Translation2d], point: Translation2d):
-        # check if point is above or below the line using standard form
-        
-        # get the standard form of the line
-        A, B = line
-        a = A.Y() - B.Y()
-        b = B.X() - A.X()
-        c = A.X() * B.Y() - B.X() * A.Y()
-        
-        # plug in the point to the standard form
-        ans = a * point.X() + b * point.Y() + c
-        
-        # check if the point is above or below the line
-        if ans > 0:
-            # print('point is above the line')
-            return (A.X() - B.X(), A.Y() - B.Y()), ans
-        else:
-            # print('point is below the line')
-            return (B.X() - A.X(), B.Y() - A.Y()), ans
-        
     def get_reciporical_translation(point: Translation2d, deltas: tuple[float, float], ans: float, magnitude: float):
         '''
         returns the translation of the point that is on the line of the deltas and slope
         '''
-        angle = math.pi -math.atan2(deltas[0], deltas[1]) 
-        # print(math.degrees(angle))
+
+        angle = math.pi - math.atan2(deltas[0], deltas[1]) if start._red else -math.atan2(deltas[0], deltas[1])
+        print(math.degrees(angle))
+        print('ans', ans)
         ans = point + Translation2d(math.cos(angle) * magnitude, math.sin(angle) * magnitude)
         # print(point.distance(ans), magnitude)
         return ans
     
     def recursive_check(start: POIPose, end: POIPose, new_waypoint: Translation2d, remove_obs: tuple[Pose2d, float]):
-        point = POIPose(Pose2d(new_waypoint, Rotation2d(0)))
+        point = POIPose(Pose2d(new_waypoint, Rotation2d(0)), start._red)
         new_obs = all_obstacles.copy()
         new_obs.remove(remove_obs)
         print('new obstacle list', new_obs)
@@ -428,12 +425,10 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
         returns a list of waypoints that avoid the obstacle
         '''
         waypoints = []
-        # print('checking if the line segments intersects with the obstacle')
-        deltas, ans = get_deltas((start.getTranslation(), end.getTranslation()), obstacle[0].translation())
-        tangent_point = get_reciporical_translation(obstacle[0].translation(), deltas, ans, obstacle[1])
-        if line_intersection((start.getTranslation(), end.getTranslation()), (obstacle[0].translation(), tangent_point)):
-            print("intersection", 'new point', tangent_point)
-            waypoints += recursive_check(start, end, tangent_point, obstacle)
+        res = segment_intersects_circle((start.getTranslation(), end.getTranslation()), (obstacle[0].translation(), obstacle[1]))
+        if not res is None:
+            print("intersection", 'new point', res)
+            waypoints += recursive_check(start, end, res, obstacle)
             table.putNumberArray('active obstacles', table.getNumberArray('active obstacles', []) + [obstacle[0].X(), obstacle[0].Y(), 0])
             print(waypoints, 'level', level)
         return waypoints
