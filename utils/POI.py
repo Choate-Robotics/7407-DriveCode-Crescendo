@@ -390,10 +390,6 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
             else:
                 return get_reciporical_translation(circle[0], (AB.X(), AB.Y()), angle, circle[1])
         return None
-            
-            
-        
-    
     
     def get_reciporical_translation(point: Translation2d, deltas: tuple[float, float], ans: float, magnitude: float):
         '''
@@ -407,10 +403,11 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
         # print(point.distance(ans), magnitude)
         return ans
     
-    def recursive_check(start: POIPose, end: POIPose, new_waypoint: Translation2d, remove_obs: tuple[Pose2d, float]):
+    def recursive_check(start: POIPose, end: POIPose, new_waypoint: Translation2d, remove_obs: list[tuple[Pose2d, float]]):
         point = POIPose(Pose2d(new_waypoint, Rotation2d(0)), start._red)
         new_obs = all_obstacles.copy()
-        new_obs.remove(remove_obs)
+        for obs in remove_obs:
+            new_obs.remove(obs)
         print('new obstacle list', new_obs)
         if new_obs == []:
             return [new_waypoint]
@@ -428,15 +425,32 @@ def avoid_obstacles(start: POIPose, end: POIPose, obstacles: list[POIPose] | lis
         res = segment_intersects_circle((start.getTranslation(), end.getTranslation()), (obstacle[0].translation(), obstacle[1]))
         if not res is None:
             print("intersection", 'new point', res)
-            waypoints += recursive_check(start, end, res, obstacle)
+            # waypoints += recursive_check(start, end, res, [obstacle])
+            waypoints += [res]
             table.putNumberArray('active obstacles', table.getNumberArray('active obstacles', []) + [obstacle[0].X(), obstacle[0].Y(), 0])
             print(waypoints, 'level', level)
         return waypoints
     
-    fin_waypoints:list[Translation2d] = []
-    for obstacle in all_obstacles:
-        fin_waypoints += get_obstacle_avoid_waypoints(start, end, obstacle)
     
+        
+    def get_waypoints():
+        fin_waypoints:list[Translation2d] = []
+        first_order_waypoints = []
+        used_obstacles = []
+        for obstacle in all_obstacles:
+            res = get_obstacle_avoid_waypoints(start, end, obstacle)
+            if res != []:
+                first_order_waypoints += res
+                used_obstacles.append(obstacle)
+            # overlaping obstacles need to be removed before trying new ones
+            
+        for waypoint in first_order_waypoints:
+            fin_waypoints += recursive_check(start, end, waypoint, used_obstacles)
+        
+        return fin_waypoints
+        
+    fin_waypoints = get_waypoints()
+        
     if level == 0:
         print('final waypoints', fin_waypoints)
         nt_points = []

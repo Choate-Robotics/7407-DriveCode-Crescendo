@@ -48,7 +48,7 @@ path_2 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True,
     ),
     period=0.03,
 )

@@ -9,3 +9,4 @@ from autonomous.routines.FIVE_NOTE.auto import routine as five_note
 from autonomous.routines.FOUR_NOTE.auto import routine as four_note
 from autonomous.routines.AMP_TWO_PIECE.auto import routine as amp_auto
 from autonomous.routines.AVOID_TEST.auto import routine as avoid_test
+from autonomous.routines.AVOID_TEST_CRAZY.auto import routine as avoid_test_crazy

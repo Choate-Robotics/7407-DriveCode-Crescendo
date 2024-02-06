@@ -21,19 +21,20 @@ get_first_ring: path = (
 come_back_to_shoot_first_ring: path = (
     get_first_ring[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(2.3,1)),
+    # Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(2.3,1)),
+    Field.POI.Coordinates.Notes.MidLine.kFarRight,
 )
 
 get_second_ring: path = (
     come_back_to_shoot_first_ring[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kMidRight,
+    Field.POI.Coordinates.Notes.Wing.kLeft,
 )
 
 come_back_to_shoot_second_ring: path = (
     get_second_ring[2],
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(2.3,1)),
+    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(-2.3,-1)),
 )
 
 get_third_ring: path = (
