@@ -45,6 +45,6 @@ get_third_ring: path = (
 
 come_back_to_shoot_third_ring: path = (
     get_third_ring[2],
-    [(FieldPos.Stage.stage_x, FieldPos.Stage.stage_y)],
+    [],
     Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(-4.5, 1.2)),
 )

@@ -50,7 +50,7 @@ class CustomTrajectory:
         
         # self.waypoints = avoid_obstacles_between_points([self.start_pose, *self.waypoints, self.end_pose], self.obstacles)
         
-        self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
+        temp_waypoints = avoid_obstacles(self.start_pose, self.waypoints, self.end_pose, self.obstacles)
         
         temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
         
@@ -80,7 +80,7 @@ class CustomTrajectory:
         
         self.trajectory = TrajectoryGenerator.generateTrajectory(
             start=temp_start_pose,
-            interiorWaypoints=self.waypoints,
+            interiorWaypoints=temp_waypoints,
             end=temp_end_pose,
             config=config,
         )

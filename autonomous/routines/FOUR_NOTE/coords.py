@@ -18,12 +18,12 @@ get_first_note: path = (
 
 get_second_note: path = (
     get_first_note[2],
-    [Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length, 4*constants.FieldPos.Wing.note_gap/5))],
+    [Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length, -4*constants.FieldPos.Wing.note_gap/5))],
     Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length/2, 0))
 )
 
 get_third_note: path = (
     get_second_note[2],
-    [Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length, 4*constants.FieldPos.Wing.note_gap/5))],
+    [Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length, -4*constants.FieldPos.Wing.note_gap/5))],
     Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-constants.drivetrain_length/2, 0))
 )
