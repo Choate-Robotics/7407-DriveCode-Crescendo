@@ -37,6 +37,11 @@ class Wrist(Subsystem):
         :param pos: The position to set the wrist to(float)
         :return: None
         """
+        if angle <= constants.wrist_min_rotation:
+            angle = constants.wrist_min_rotation
+        elif angle >= constants.wrist_max_rotation:
+            angle = constants.wrist_max_rotation
+        
         if not self.disable_rotation:
             self.wrist_motor.set_target_position(
                 (angle / (pi * 2)) * constants.wrist_gear_ratio
