@@ -142,8 +142,7 @@ class SparkMax(PIDMotor):
         """
         self.motor.set(x)
 
-    def get_abs(self):
-
+    def get_absolute_encoder(self):
         if self._abs_encoder is None:
             self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
 

@@ -18,7 +18,7 @@ def elevator() -> Elevator:
     my_elevator.motor_extend: SparkMax = MagicMock()
     my_elevator.motor_extend.motor = MagicMock()
     my_elevator.motor_extend_follower: SparkMax = MagicMock()
-    my_elevator.encoder = MagicMock()
+    my_elevator.motor_extend_encoder = MagicMock()
     my_elevator.motor_extend.pid_controller = MagicMock()
     # my_elevator.init()
     return my_elevator
@@ -79,7 +79,7 @@ def test_get_length(test_input, elevator: Elevator):
     "test_input,actual", [(0.2, 0.2), (3, 1), (1, 1), (0, 0), (-0.2, 0)]
 )
 def test_set_motor_position(test_input, actual, elevator: Elevator):
-    elevator.set_motor_position(test_input)
+    elevator.set_motor_extend_position(test_input)
     elevator.motor_extend.set_sensor_position.assert_called_with(
         actual * config.elevator_max_rotation
     )
@@ -95,7 +95,7 @@ def test_set_motor_position(test_input, actual, elevator: Elevator):
     ],
 )
 def test_zero(test_input, elevator: Elevator):
-    elevator.encoder.getPosition.return_value = test_input
+    elevator.motor_extend_encoder.getPosition.return_value = test_input
     elevator.zero()
     elevator.motor_extend.set_sensor_position.assert_called_with(
         test_input * constants.elevator_max_length
