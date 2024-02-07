@@ -18,10 +18,10 @@ class Intake(Subsystem):
             config=INNER_CONFIG
         )
 
-        self.outer_motor_front: SparkMax = SparkMax(
-            can_id=config.outer_intake_front_id,
-            config=OUTER_CONFIG
-        )
+        # self.outer_motor_front: SparkMax = SparkMax(
+        #     can_id=config.outer_intake_front_id,
+        #     config=OUTER_CONFIG
+        # )
 
         self.outer_motor_back: SparkMax = SparkMax(
             can_id=config.outer_intake_back_id,
@@ -43,7 +43,7 @@ class Intake(Subsystem):
     
     def init(self):
         self.inner_motor.init()
-        self.outer_motor_front.init()
+        # self.outer_motor_front.init()
         self.outer_motor_back.init()
         self.distance_sensor = self.inner_motor.motor.getAnalog()
 
@@ -61,7 +61,7 @@ class Intake(Subsystem):
         param vel: Speed to set motors to in rotations per second (float)
         Return: none
         """
-        self.outer_motor_front.set_target_velocity(vel * constants.intake_outer_gear_ratio)
+        # self.outer_motor_front.set_target_velocity(vel * constants.intake_outer_gear_ratio)
         self.outer_motor_back.set_target_velocity(vel * constants.intake_outer_gear_ratio)
 
     def detect_note(self) -> bool:
@@ -117,11 +117,11 @@ class Intake(Subsystem):
         """
         self.set_outer_velocity(-config.intake_outer_idle_speed)
 
-    def get_front_current(self) -> float:
-        """
-        Return: current of front motor (float)
-        """
-        return self.outer_motor_front.motor.getOutputCurrent()
+    # def get_front_current(self) -> float:
+    #     """
+    #     Return: current of front motor (float)
+    #     """
+    #     return self.outer_motor_front.motor.getOutputCurrent()
     
     def get_back_current(self) -> float:
         """
