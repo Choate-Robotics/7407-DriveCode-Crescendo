@@ -2,7 +2,7 @@ import config
 import constants
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
-from wpilib import DigitalInput
+from rev import AnalogInput
 
 # CHANGE WHEN ROBOT IS BUILT
 INNER_CONFIG = SparkMaxConfig(.5, 0, 0)
@@ -33,7 +33,7 @@ class Intake(Subsystem):
             config=DEPLOY_CONFIG
         )
 
-        self.beam_break: DigitalInput 
+        self.distance_sensor: AnalogInput = None
 
 
         self.note_in_intake: bool = False
@@ -42,12 +42,10 @@ class Intake(Subsystem):
         
     
     def init(self):
-        self.beam_break: DigitalInput = DigitalInput(
-            channel=config.intake_beam_break_channel
-        )
         self.inner_motor.init()
         self.outer_motor_front.init()
         self.outer_motor_back.init()
+        self.distance_sensor = self.inner_motor.motor.getAnalog()
 
     def set_inner_velocity(self, vel: float):
         """
@@ -72,7 +70,8 @@ class Intake(Subsystem):
         Also sets class variable note_in_intake
         Return: true if there is a note, false if there is not
         """
-        self.note_in_intake = not self.beam_break.get()
+        self.note_in_intake = self.distance_sensor.getVoltage() > config.intake_distance_sensor_threshold
+        return self.note_in_intake
 
     def deploy_roller(self):
         """

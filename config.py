@@ -55,6 +55,7 @@ intake_roller_current_limit = 1 #placeholder
 intake_deploy_current_limit = 1 #placeholder
 tenting_deploy_current_limit = 1 #placeholder
 intake_sensor_debounce = 0.2 #placeholder
+intake_distance_sensor_threshold = 0.5 #placeholder
 
 # elevator
 elevator_can_id: int = 73  # TODO: PLACEHOLDER
