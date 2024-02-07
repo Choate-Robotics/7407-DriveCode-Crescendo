@@ -48,7 +48,7 @@ path_2 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False,
     ),
     period=0.03,
 )
@@ -63,7 +63,7 @@ path_3 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False,
     ),
     period=0.03,
 )
