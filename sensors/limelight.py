@@ -205,7 +205,7 @@ class Limelight:
         )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
-        self.targetpose = self.table.getNumberArray("targetpose_cameraspace", [0, 0, 0, 0, 0, 0])
+        self.targetpose = self.table.getNumberArray("botpose_targetspace", [0, 0, 0, 0, 0, 0])
 
     def target_exists(self, force_update: bool = False):
         """
@@ -321,7 +321,7 @@ class LimelightController(VisionEstimator):
             if (
                 limelight.april_tag_exists()
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
-                
+                and limelight.get_target_pose()
             ):
                 # print(limelight.name+' Is sending bot pose'
                 poses += [(limelight.get_bot_pose(), limelight.get_target_pose())]

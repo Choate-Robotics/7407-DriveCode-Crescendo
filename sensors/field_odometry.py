@@ -3,7 +3,7 @@ import time
 import ntcore
 
 from toolkit.sensors.odometry import VisionEstimator
-from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
+from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
 
 from subsystem import Drivetrain
 from units.SI import seconds
@@ -100,7 +100,7 @@ class FieldOdometry:
             vision_time: float
             vision_robot_pose: Pose3d
             pose_data: tuple[Pose3d, float]
-            pose_data, target_pose =  vision_pose
+            pose_data, target_pose = vision_pose
             vision_robot_pose, vision_time = pose_data
             distance_to_target = target_pose.translation()
 
@@ -167,9 +167,11 @@ class FieldOdometry:
             self.drivetrain.get_heading(), self.drivetrain.node_positions
         )
 
-    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: Translation2d):
+    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: Translation3d):
+        dist_calculations =  (abs(distance_to_target.norm() **2) / 2.5, abs(distance_to_target.norm() ** 2) / 2.5, abs(math.radians(40)))
+        # print(dist_calculations)
         self.drivetrain.odometry_estimator.addVisionMeasurement(
-            vision_pose.toPose2d(), vision_time, (distance_to_target.X(), distance_to_target.Y(), math.degrees(20) * (distance_to_target.norm() + 1))
+            vision_pose.toPose2d(), vision_time, dist_calculations
         )
 
     def get_vision_poses(self):
