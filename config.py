@@ -77,7 +77,7 @@ feeder_velocity = 132
 wrist_beam_break_channel = 3 # TODO: PLACEHOLDER
 stage_timeout = 5 # TODO: PLACEHOLDER
 feeder_pass_velocity = 5
-wrist_stage_max:radians = 0 #TODO: PLACEHOLDER
+wrist_stage_max:radians = math.radians(30) #TODO: PLACEHOLDER
 
 # Giraffe
 elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER
