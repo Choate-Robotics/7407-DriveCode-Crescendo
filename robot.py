@@ -37,6 +37,13 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
         self.scheduler.setPeriod(config.period)
 
+        self.auto_selection = wpilib.SendableChooser()
+        self.auto_selection.setDefaultOption("Two Notes", autonomous.two_note)
+        self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
+        self.auto_selection.addOption("Four Notes", autonomous.four_note)
+        self.auto_selection.addOption("Five Notes", autonomous.five_note)
+        self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
+
         self.log.info(f"Scheduler period set to {config.period} seconds")
 
         # Initialize subsystems and sensors
@@ -142,7 +149,8 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        autonomous.four_note.run()
+        # autonomous.four_note.run()
+        self.auto_selection.getSelected().run()
 
     def autonomousPeriodic(self):
         pass
