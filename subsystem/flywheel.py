@@ -121,4 +121,7 @@ class Flywheel(Subsystem):
     def periodic(self):
         # self.top_flywheel_state.
         # self.bottom_flywheel_state
-        ...
+        self.top_flywheel_state.correct(self.get_velocity(1))
+        self.bottom_flywheel_state.correct(self.get_velocity(2))
+
+        self.set_voltage(self.top_flywheel_state.predict(), 1)

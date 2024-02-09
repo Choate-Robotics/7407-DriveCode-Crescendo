@@ -69,7 +69,7 @@ class Wrist(Subsystem):
         self.wrist_motor.set_sensor_position(
             self.wrist_abs_encoder.getPosition() * constants.wrist_gear_ratio
         )
-        self.zeroed = True
+        self.wrist_zeroed = True
         
     # feed in methods
     def feed_in(self):
