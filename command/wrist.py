@@ -58,6 +58,7 @@ class SetWrist(SubsystemCommand[Wrist]):
 class FeedIn(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
+        self.subsystem = subsystem
 
     def initialize(self):
         self.subsystem.feed_in()
@@ -78,6 +79,7 @@ class FeedIn(SubsystemCommand[Wrist]):
 class FeedOut(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
+        self.subsystem = subsystem
 
     def initialize(self):
         self.subsystem.feed_out()
@@ -98,6 +100,7 @@ class FeedOut(SubsystemCommand[Wrist]):
 class PassNote(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
+        self.subsystem = subsystem
 
     def initialize(self):
         self.subsystem.feed_note()
