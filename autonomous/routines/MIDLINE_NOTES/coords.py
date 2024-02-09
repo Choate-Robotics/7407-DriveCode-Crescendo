@@ -5,10 +5,11 @@ from wpimath.geometry import Translation2d
 # from constants.FieldPos import MidLine
 from constants import field_length, FieldPos
 import math
+from typing import Tuple
 
-coord = (meters, meters, radians)
-waypoints = [(meters, meters)]
-path = (coord, waypoints, coord)
+coord = Tuple[meters, meters, radians]
+waypoints = Tuple[meters, meters]
+path = Tuple[coord, waypoints, coord]
 
 initial: coord = (1.9, .78, math.pi)
 
