@@ -124,7 +124,7 @@ class FieldPos:
 # Elevator
 elevator_gear_ratio: float = 25  # REAL VALUE: 25:1 gear ratio
 elevator_driver_gear_circumference: float = (
-    math.pi * 1 * inches_to_meters
+    math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
 elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
