@@ -9,11 +9,7 @@ from wpimath.system import LinearSystemLoop_1_1_1
 from wpimath.system.plant import LinearSystemId, DCMotor
 
 from toolkit.subsystem import Subsystem
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
-
-FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
-)
+from toolkit.motors.rev_motors import SparkMax
 
 class Flywheel(Subsystem):
 
@@ -22,11 +18,11 @@ class Flywheel(Subsystem):
 
         self.motor_1: SparkMax = SparkMax(
             can_id=config.flywheel_id_1,
-            config=FLYWHEEL_CONFIG
+            config=config.FLYWHEEL_CONFIG
         )
         self.motor_2: SparkMax = SparkMax(
             can_id=config.flywheel_id_2,
-            config=FLYWHEEL_CONFIG
+            config=config.FLYWHEEL_CONFIG
         )
 
         self.flywheel_MOI = (constants.flywheel_mass / 2 ) * (constants.flywheel_radius_outer ** 2)

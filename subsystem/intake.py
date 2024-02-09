@@ -4,35 +4,31 @@ from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from wpilib import DigitalInput
 
-# CHANGE WHEN ROBOT IS BUILT
-INNER_CONFIG = SparkMaxConfig(.5, 0, 0)
-OUTER_CONFIG = SparkMaxConfig(.5, 0, 0)
-DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0)
-
 
 class Intake(Subsystem):
+    
     def __init__(self):
         super().__init__()
 
         self.beam_break = None
         self.inner_motor: SparkMax = SparkMax(
             can_id=config.inner_intake_id,
-            config=INNER_CONFIG
+            config=config.INNER_CONFIG
         )
 
         self.outer_motor_front: SparkMax = SparkMax(
             can_id=config.outer_intake_front_id,
-            config=OUTER_CONFIG
+            config=config.OUTER_CONFIG
         )
 
         self.outer_motor_back: SparkMax = SparkMax(
             can_id=config.outer_intake_back_id,
-            config=OUTER_CONFIG
+            config=config.OUTER_CONFIG
         )
 
         self.deploy_motor: SparkMax = SparkMax(
             can_id=config.deploy_intake_id,
-            config=DEPLOY_CONFIG
+            config=config.DEPLOY_CONFIG
         )
 
         self.beam_break: DigitalInput

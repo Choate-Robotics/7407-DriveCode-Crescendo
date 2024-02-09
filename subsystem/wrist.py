@@ -24,6 +24,8 @@ class Wrist(Subsystem):
         self.rotation_disabled: bool = False
         self.feed_disabled: bool = False
 
+        self.disable_rotation: bool = False
+
     def init(self):
         self.wrist_motor.init()
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
@@ -41,7 +43,6 @@ class Wrist(Subsystem):
             self.wrist_motor.set_target_position(
                 (angle / (pi * 2)) * constants.wrist_gear_ratio
             )
-            # self.wrist_motor.set_sensor_position((pos / (pi * 2)) * constants.wrist_gear_ratio)
 
     def get_wrist_angle(self):
         """
@@ -69,7 +70,7 @@ class Wrist(Subsystem):
             self.wrist_abs_encoder.getPosition() * constants.wrist_gear_ratio
         )
         self.zeroed = True
-
+        
     # feed in methods
     def feed_in(self):
         if not self.feed_disabled:

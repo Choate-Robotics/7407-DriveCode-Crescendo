@@ -1,18 +1,11 @@
 import rev
-
 import config
 import constants
 
+from units.SI import meters
+
 from toolkit.subsystem import Subsystem
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
-
-from units.SI import meters, radians
-
-# TODO: CHANGE WHEN ROBOT IS BUILT
-ELEVATOR_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
-)
-
+from toolkit.motors.rev_motors import SparkMax
 
 class Elevator(Subsystem):
 
@@ -20,12 +13,12 @@ class Elevator(Subsystem):
         super().__init__()
         # Absolute encoder
         self.motor_extend: SparkMax = SparkMax(
-            config.elevator_can_id, config=ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id, config=config.ELEVATOR_CONFIG, inverted=False
         )
         self.motor_extend_encoder = None
 
         self.motor_extend_follower: SparkMax = SparkMax(
-            config.elevator_can_id_2, config=ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id_2, config=config.ELEVATOR_CONFIG, inverted=False
         )
 
         self.zeroed: bool = False
@@ -38,10 +31,11 @@ class Elevator(Subsystem):
         # Set the motor_extend encoder to the motor's absolute encoder
         self.motor_extend_encoder = self.motor_extend.get_absolute_encoder()
 
-        # Set the motor's ramp rate
+        # Limits motor acceleration
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
-        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=False)
+        # Inverted b/c motors r parallel facing out.
+        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
 
     def set_length(self, length: meters) -> None:
         """
