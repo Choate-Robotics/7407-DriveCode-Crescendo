@@ -1,6 +1,12 @@
 import math
 
-from wpimath.geometry import Rotation2d, Translation2d
+from wpimath.geometry import (
+    Pose3d,
+    Rotation2d,
+    Rotation3d,
+    Translation2d,
+    Translation3d,
+)
 
 from units.SI import (
     degrees_per_second__to__radians_per_second,
@@ -98,6 +104,8 @@ class FieldPos:
 
         speaker_z = (speaker_z_top + speaker_z_bottom) / 2
 
+        speaker_x = 18.11 / 2 * inches_to_meters
+
         amp_y = field_width
 
         amp_y_robot = amp_y - drivetrain_length_with_bumpers / 2
@@ -145,27 +153,33 @@ elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
 
 # INTAKE
 
-intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
-intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
-intake_deploy_gear_ratio = 20 / 1 #TODO: placeholder
-
+intake_inner_gear_ratio = 15 / 1  # TODO: placeholder
+intake_outer_gear_ratio = 20 / 1  # TODO: placeholder
+intake_deploy_gear_ratio = 20 / 1  # TODO: placeholder
 
 
 # WRIST
-wrist_gear_ratio = 3 
+wrist_gear_ratio = 3
 wrist_time_to_max_vel = 0.3
 
 
-
 # FLYWHEEL
-flywheel_mass = 0.5 # TODO: placeholder
-flywheel_radius_outer = 2 * 0.0254 # TODO: placeholder
-flywheel_gear_ratio = 1 / 2 # TODO: placeholder
-flywheel_period = .03
+flywheel_mass = 0.5  # TODO: placeholder
+flywheel_radius_outer = 2 * 0.0254  # TODO: placeholder
+flywheel_gear_ratio = 1 / 2  # TODO: placeholder
+flywheel_period = 0.03
 
-shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
+shooter_height = 23 * inches_to_meters  # TODO: looks good, but needs to be tested
 
-#pathing
-post_avoidance_distance = 0.5 
+# pathing
+post_avoidance_distance = 0.5
 
-
+# Targets
+speaker_target_pose = Pose3d(
+    Translation3d(
+        FieldPos.Scoring.speaker_x,
+        FieldPos.Scoring.speaker_y,
+        FieldPos.Scoring.speaker_z,
+    ),
+    Rotation3d(0, 0, 0),
+)

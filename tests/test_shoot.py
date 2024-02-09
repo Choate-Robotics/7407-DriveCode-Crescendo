@@ -3,12 +3,12 @@ from unittest.mock import MagicMock
 
 import pytest
 from pytest import MonkeyPatch
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Pose3d, Rotation3d, Translation2d, Translation3d
 
 import config
 import constants
 import utils.POI
-from sensors.trajectory_calc import TrajectoryCalculator
+from sensors.trajectory_calc import Target, TargetVariable, TrajectoryCalculator
 
 
 @pytest.fixture
@@ -29,21 +29,116 @@ def trajectory_calc():
 
 
 @pytest.mark.parametrize(
-    "distance_to_target, delta_z, expected_angle",
-    [(5, 0.7, 0.25064), (5, 0.5, 0.21069), (3, 0.8, 0.32732), (3, 0.4, 0.19866)],
+    "target, expected_angle",
+    [
+        (
+            Target(
+                Pose3d(Translation3d(0, 5, 0.7), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5,
+                lambda x, y: False,
+            ),
+            0.25064,
+        ),
+        (
+            Target(
+                Pose3d(Translation3d(5, 0, 0.5), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5,
+                lambda x, y: False,
+            ),
+            0.21069,
+        ),
+        (
+            Target(
+                Pose3d(Translation3d(3, 0, 0.8), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5,
+                lambda x, y: False,
+            ),
+            0.32732,
+        ),
+        (
+            Target(
+                Pose3d(Translation3d(0, 3, 0.4), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5,
+                lambda x, y: False,
+            ),
+            0.19866,
+        ),
+    ],
 )
-def test_update(trajectory_calc, distance_to_target, delta_z, expected_angle):
-    trajectory_calc.delta_z = delta_z
-    trajectory_calc.distance_to_target = distance_to_target
-    assert trajectory_calc.calculate_angle_no_air(
-        distance_to_target, delta_z
-    ) == pytest.approx(expected_angle, 0.0001)
+def test_update_no_air(trajectory_calc, target, expected_angle):
+    # trajectory_calc.delta_z = delta_z
+    # trajectory_calc.distance_to_target = distance_to_target
+    assert trajectory_calc.calculate_angle_no_air(target) == pytest.approx(
+        expected_angle, 0.0001
+    )
 
 
 @pytest.mark.parametrize(
-    "angle, x_distance, expected_answer",
+    "angle, target, expected_answer",
     [
-        (0.3, 5.88, 0.9114040891170673),
+        (
+            0.3,
+            Target(
+                Pose3d(Translation3d(0, 0, 1.3), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5.88,
+                lambda x, y: y[0] > 5.88,
+            ),
+            0.9114040891170673,
+        ),
+        (
+            0.56,
+            Target(
+                Pose3d(Translation3d(0, 0, 1.3), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                6.53,
+                lambda x, y: y[0] > 6.53,
+            ),
+            0.9114040891170673,
+        ),
+        (
+            0.9,
+            Target(
+                Pose3d(Translation3d(0, 0.3, 1.3), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5.88,
+                lambda x, y: y[0] > 5.88,
+            ),
+            0.9114040891170673,
+        ),
+        (
+            0.52,
+            Target(
+                Pose3d(Translation3d(0, 0.3, 1.3), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5.88,
+                lambda x, y: y[0] > 5.88,
+            ),
+            0.9114040891170673,
+        ),
+        (
+            1.0031,
+            Target(
+                Pose3d(Translation3d(0, 0.3, 1.3), Rotation3d(0, 0, 0)),
+                15,
+                TargetVariable.X,
+                5.88,
+                lambda x, y: y[0] > 5.88,
+            ),
+            0.9114040891170673,
+        ),
         (0.56, 6.53, 2.6401846942215146),
         (0.9, 7.8, 5.730080943722868),
         (0.52, 2.1, 1.0700338538709877),
@@ -51,7 +146,7 @@ def test_update(trajectory_calc, distance_to_target, delta_z, expected_angle):
     ],
 )
 def test_run_sim(
-    trajectory_calc, angle, x_distance, expected_answer, monkeypatch: MonkeyPatch
+    trajectory_calc, angle, target, expected_answer, monkeypatch: MonkeyPatch
 ):
     monkeypatch.setattr(config, "v0_flywheel", 15)
     monkeypatch.setattr(constants, "g", 9.8)
@@ -62,7 +157,7 @@ def test_run_sim(
     monkeypatch.setattr(constants, "speaker_z", 1.7)
     monkeypatch.setattr(constants, "shooter_height", 0.0)
 
-    trajectory_calc.distance_to_target = x_distance
+    # trajectory_calc.distance_to_target = x_distance
     # trajectory_calc.print_constants()
     ans = trajectory_calc.run_sim(angle)
     assert ans == pytest.approx(expected_answer, 0.01)
