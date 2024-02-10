@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import math
 import config
 import constants
 
-from __future__ import annotations
 from dataclasses import dataclass
 from wpilib import AnalogEncoder
 from wpimath.geometry import Pose2d
