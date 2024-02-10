@@ -157,7 +157,7 @@ drivetrain_reversed: bool = False
 # Flywheel
 flywheel_id_1 = 1  # TODO: placeholder
 flywheel_id_2 = 2  # TODO: placeholder
-flywheel_motor_count = 2  # TODO: placeholder
+flywheel_motor_count = 1  # REAL
 v0_flywheel = 15  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
