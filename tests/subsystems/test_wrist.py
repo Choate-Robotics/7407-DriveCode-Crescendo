@@ -91,7 +91,7 @@ def test_zero_wrist(test_input, wrist: Wrist):
     wrist.wrist_motor.set_sensor_position.assert_called_with(
         test_input * constants.wrist_gear_ratio
     )
-    assert wrist.zeroed
+    assert wrist.wrist_zeroed
 
 
 @pytest.mark.parametrize(
