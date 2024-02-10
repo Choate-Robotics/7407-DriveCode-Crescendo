@@ -125,6 +125,7 @@ elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
 elevator_moving = False
 elevator_stage_max = 0.1  # meters
+elevator_zeroed_pos = 0.0  # TODO: PLACEHOLDER: meters
 
 # Wrist
 wrist_motor_id = 30
