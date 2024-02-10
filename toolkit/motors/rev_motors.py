@@ -100,7 +100,7 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController()
         self.encoder = self.motor.getEncoder()
         self._set_config(self._config)
-
+        self.motor.burnFlash()
         self._has_init_run = True
         self._logger.complete("Initialized")
 
