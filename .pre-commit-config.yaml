@@ -21,6 +21,7 @@ repos:
   - id: isort
     args: ["--profile", "black"]
     name: isort
+    args: ['--profile', 'black', '--skip','*/__init__.py' ]
     stages: [commit]
     language: system
     entry: isort

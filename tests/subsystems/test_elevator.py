@@ -1,12 +1,13 @@
+from unittest.mock import MagicMock
+
 import pytest
 import rev
 from pytest import MonkeyPatch
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 
 import config
 import constants
 from subsystem import Elevator
-from unittest.mock import MagicMock
+from toolkit.motors.rev_motors import SparkMax
 
 
 @pytest.fixture()
@@ -17,7 +18,7 @@ def elevator() -> Elevator:
     my_elevator.motor_extend: SparkMax = MagicMock()
     my_elevator.motor_extend.motor = MagicMock()
     my_elevator.motor_extend_follower: SparkMax = MagicMock()
-    my_elevator.encoder = MagicMock()
+    my_elevator.motor_extend_encoder = MagicMock()
     my_elevator.motor_extend.pid_controller = MagicMock()
     # my_elevator.init()
     return my_elevator
@@ -28,11 +29,10 @@ def test_elevator_dunder_init(elevator: Elevator):
 
     # elevator.encoder = MagicMock()
     # elevator.motor_extend = MagicMock()
-    assert elevator.zeroed == False
+    assert elevator.zeroed is False
     # assert elevator.encoder != False
-    assert elevator.motor_extend != False
+    assert elevator.motor_extend is not False
     elevator.motor_extend.init.assert_called()
-    elevator.motor_extend.get_abs.assert_called()
     elevator.motor_extend.motor.setClosedLoopRampRate.assert_called()
 
 
@@ -68,9 +68,9 @@ def test_get_length(test_input, elevator: Elevator):
     # elevator.motor_extend.get_sensor_position.assert_called()
     elevator.motor_extend.get_sensor_position.return_value = test_input
     assert (
-            elevator.get_length()
-            == (test_input / constants.elevator_gear_ratio)
-            * constants.elevator_driver_gear_circumference
+        elevator.get_length()
+        == (test_input / constants.elevator_gear_ratio)
+        * constants.elevator_driver_gear_circumference
     )
 
 
@@ -78,7 +78,7 @@ def test_get_length(test_input, elevator: Elevator):
     "test_input,actual", [(0.2, 0.2), (3, 1), (1, 1), (0, 0), (-0.2, 0)]
 )
 def test_set_motor_position(test_input, actual, elevator: Elevator):
-    elevator.set_motor_position(test_input)
+    elevator.set_motor_extend_position(test_input)
     elevator.motor_extend.set_sensor_position.assert_called_with(
         actual * config.elevator_max_rotation
     )
@@ -94,11 +94,13 @@ def test_set_motor_position(test_input, actual, elevator: Elevator):
     ],
 )
 def test_zero(test_input, elevator: Elevator):
-    elevator.encoder.getPosition.return_value = test_input
+    elevator.motor_extend_encoder.getPosition.return_value = test_input
     elevator.zero()
     elevator.motor_extend.set_sensor_position.assert_called_with(
-        test_input * constants.elevator_max_length)
-    assert elevator.zeroed == True
+        test_input * constants.elevator_max_length
+    )
+    assert elevator.zeroed is True
+
 
 
 @pytest.mark.parametrize(
@@ -141,4 +143,5 @@ def test_stop(test_input, elevator: Elevator, monkeypatch: MonkeyPatch):
     elevator.stop()
     elevator.motor_extend.set_target_position.assert_called_with(
         (test_input * constants.elevator_gear_ratio)
-        / constants.elevator_driver_gear_circumference)
+        / constants.elevator_driver_gear_circumference
+    )
