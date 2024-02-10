@@ -189,3 +189,4 @@ flywheel_motor_count = 2  # TODO: placeholder
 v0_flywheel = 15  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
+FLYWHEEL_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))

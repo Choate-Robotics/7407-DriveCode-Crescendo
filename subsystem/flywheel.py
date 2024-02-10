@@ -73,6 +73,18 @@ class Flywheel(Subsystem):
         # Convert radians per second to RPM
         rpm = (angular_velocity * 60) / (2 * math.pi)
         return rpm
+    
+    @staticmethod
+    def linear_velocity_to_angular_velocity(linear_velocity):
+        # Convert radians per second to RPM
+        vel = linear_velocity / constants.flywheel_radius_outer
+        return vel
+    
+    @staticmethod
+    def angular_velocity_to_linear_velocity(angular_velocity):
+        # Convert radians per second to RPM
+        vel = angular_velocity * constants.flywheel_radius_outer
+        return vel
 
     def init(self) -> None:
         self.motor_1.init()
@@ -167,13 +179,13 @@ class Flywheel(Subsystem):
     def periodic(self):
         
         # Correct the state estimate with the encoder and voltage
-        self.top_flywheel_state.correct(self.get_velocity(1))
-        self.bottom_flywheel_state.correct(self.get_velocity(2))
+        self.top_flywheel_state.correct([self.get_velocity(1)])
+        self.bottom_flywheel_state.correct([self.get_velocity(2)])
 
         # Update our LQR to generate new voltage commands and use the voltage
         self.top_flywheel_state.predict(config.period)
         self.bottom_flywheel_state.predict(config.period)
 
         # Set the next setpoint for the flywheel
-        self.set_voltage(self.top_flywheel_state.U[0], 1)
-        self.set_voltage(self.bottom_flywheel_state.U[0], 2)
+        self.set_voltage(self.top_flywheel_state.U(0), 1)
+        self.set_voltage(self.bottom_flywheel_state.U(0), 2)
