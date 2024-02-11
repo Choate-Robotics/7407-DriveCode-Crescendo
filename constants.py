@@ -18,6 +18,7 @@ from units.SI import (
     inches_to_meters,
     meters,
     rotations_per_minute,
+    degrees_to_radians
 )
 
 # Main
