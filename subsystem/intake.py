@@ -5,8 +5,8 @@ from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
 
 
-
 class Intake(Subsystem):
+    
     def __init__(self):
         super().__init__()
 
@@ -15,6 +15,7 @@ class Intake(Subsystem):
             can_id=config.inner_intake_id,
             config=config.INNER_CONFIG
         )
+
 
         self.outer_motor: SparkMax = SparkMax(
             can_id=config.outer_intake_back_id,

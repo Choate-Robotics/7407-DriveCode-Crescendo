@@ -10,6 +10,7 @@ from wpimath.system.plant import LinearSystemId, DCMotor
 
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
+
 from units.SI import radians_per_second, meters_per_second, radians
 
 class Flywheel(Subsystem):
