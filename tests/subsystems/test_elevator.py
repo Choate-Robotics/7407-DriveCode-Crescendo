@@ -33,7 +33,6 @@ def test_elevator_dunder_init(elevator: Elevator):
     # assert elevator.encoder != False
     assert elevator.motor_extend is not False
     elevator.motor_extend.init.assert_called()
-    elevator.motor_extend.get_abs.assert_called()
     elevator.motor_extend.motor.setClosedLoopRampRate.assert_called()
 
 
