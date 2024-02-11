@@ -14,9 +14,8 @@ import config
 import constants
 from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
-from toolkit.utils.toolkit_math import NumericalIntegration
-
-# from units.SI import radians
+from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
+from units.SI import radians
 
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
@@ -40,20 +39,22 @@ class TargetCriteria:
     def __init__(
         self,
         target_variable: TargetVariable,
-        goal_value: float,
+        criteria_variable: TargetVariable = None,
+        criteria_value: float = None,
         end_condition: Callable[[float, List[float]], bool] = None,
     ):
         self.target_variable = target_variable
-        self.goal_value = goal_value
+        self.criteria_variable = criteria_variable
+        self.criteria_value = criteria_value
         self.end_condition_function = end_condition
 
-    def set_goal_value(self, goal_value: float):
-        self.goal_value = goal_value
+    def set_criteria_value(self, criteria_value: float):
+        self.criteria_value = criteria_value
 
     def end_condition(self, t: float, y: List[float]) -> bool:
         if self.end_condition_function:
             return self.end_condition_function(t, y)
-        return y[self.target_variable] > self.goal_value
+        return y[self.criteria_variable] > self.criteria_value
 
 
 class Target:
@@ -87,7 +88,7 @@ speaker_target_pose = Pose3d(
     ),
     Rotation3d(0, 0, 0),
 )
-target_criteria = TargetCriteria(TargetVariable.X, 5.0)
+target_criteria = TargetCriteria(TargetVariable.Z, TargetVariable.X, 5.0)
 speaker_target = Target(speaker_target_pose, constants.vzero, target_criteria)
 
 
@@ -159,11 +160,13 @@ class TrajectoryCalculator:
         @return: the angle of the trajectory without air resistance
         """
         # update the distances
-        delta_x, delta_z = self.calculate_distance_to_target(
-            self.odometry.getPose(),
-            self.target.pose,
-            self.elevator.get_length() + constants.shooter_height,
-        )
+        # delta_x, delta_z = self.calculate_distance_to_target(
+        #     self.odometry.getPose(),
+        #     self.target.pose,
+        #     self.elevator.get_length() + constants.shooter_height,
+        # )
+        delta_x = self.target_horizontal_distance()
+        delta_z = self.target_vertical_distance()
         print(f"odometryPose: {self.odometry.getPose()}")
         print(f"targetPose: {self.target.get_pose2d()}")
         print(f"delta_x: {delta_x}, delta_z: {delta_z}")
@@ -226,8 +229,6 @@ class TrajectoryCalculator:
         """
         updates rotation of base to face target
 
-        :param target: target to shoot at
-
         :return: base target angle
         """
         # target_translation = self.target.get_pose2d().getTranslation()
@@ -242,45 +243,52 @@ class TrajectoryCalculator:
         updates both shooter and base
         :return: base target angle
         """
-        pass
 
-    #     self.update_shooter()
-    #     self.update_base()
-    #
-    # def run_sim(self, shooter_theta: radians) -> float:
-    #     # def hit_target(t, u):
-    #     #     return u[0] > self.distance_to_target
-    #
-    #     # u0 = (
-    #     #     0,
-    #     #     config.v0_flywheel * np.cos(shooter_theta),
-    #     #     0.0,
-    #     #     config.v0_flywheel * np.sin(shooter_theta),
-    #     # )
-    #     u0 = (
-    #         0,
-    #         self.target.velocity * np.cos(shooter_theta),
-    #         0.0,
-    #         self.target.velocity * np.sin(shooter_theta),
-    #     )
-    #
-    #     t0, tf = 0, 60
-    #     # Stop the integration when we hit the target.
-    #     t, y = self.numerical_integration.adaptive_rk4(
-    #         self.deriv, u0, t0, tf, 0.001, 1e-9, self.target.end_condition
-    #     )
-    #
-    #     # y[-2][0] is the penultimate x value
-    #     # y[-2][2] is the penultimate z value
-    #     # y[-1][0] is the final x value
-    #     # y[-1][2] is the final z value
-    #
-    #     goal_variable = int(self.target.goal_variable)
-    #     goal_value = self.target.goal_value
-    #     return extrapolate(
-    #         goal_value, y[-2][0], y[-2][goal_variable], y[-1][0], y[-1][goal_variable]
-    #     )
-    #
+        #     self.update_shooter()
+        self.update_base()
+
+    def run_sim(self, shooter_theta: radians) -> float:
+        # def hit_target(t, u):
+        #     return u[0] > self.distance_to_target
+
+        # u0 = (
+        #     0,
+        #     config.v0_flywheel * np.cos(shooter_theta),
+        #     0.0,
+        #     config.v0_flywheel * np.sin(shooter_theta),
+        # )
+        delta_x = self.target_horizontal_distance()
+        print(f"delta_x: {delta_x}")
+        self.target.criteria.set_criteria_value(delta_x)
+        # Set the initial conditions
+        u0 = (
+            0,
+            self.target.velocity * np.cos(shooter_theta),
+            0.0,
+            self.target.velocity * np.sin(shooter_theta),
+        )
+        # One minute should be plenty of time.
+        t0, tf = 0, 60
+        # Stop the integration when we hit the target.
+        t, y = self.numerical_integration.adaptive_rk4(
+            self.deriv, u0, t0, tf, 0.001, 1e-9, self.target.criteria.end_condition
+        )
+
+        # y[-2][0] is the penultimate x value
+        # y[-2][2] is the penultimate z value
+        # y[-1][0] is the final x value
+        # y[-1][2] is the final z value
+        target_variable = int(self.target.criteria.target_variable)
+        criteria_variable = int(self.target.criteria.criteria_variable)
+        criteria_value = self.target.criteria.criteria_value
+        return extrapolate(
+            criteria_value,
+            y[-2][criteria_variable],
+            y[-2][target_variable],
+            y[-1][criteria_variable],
+            y[-1][target_variable],
+        )
+
     # def get_theta(self) -> float:
     #     """
     #     Returns the angle of the trajectory.
