@@ -190,34 +190,26 @@ def test_update_no_air(
 #     assert angle == pytest.approx(expected_answer, math.radians(2))
 #
 #
-# @pytest.mark.parametrize(
-#     "x_speaker, y_speaker, x_robot, y_robot, expected_angle",
-#     [
-#         (2, 3, 4, 5, -135),
-#         (0, 4.8, 2, 5.1, -171.46923),
-#         (0, 4.8, 4, 2.5, 150.1011),
-#         (0, 4.8, 1, 8, -107.35402),
-#         (0, 4.8, 6, 3, 163.30076),
-#     ],
-# )
-# def test_update_base(
-#     trajectory_calc,
-#     x_speaker,
-#     y_speaker,
-#     x_robot,
-#     y_robot,
-#     expected_angle,
-#     monkeypatch: MonkeyPatch,
-# ):
-#     monkeypatch.setattr(
-#         utils.POI.Coordinates.Structures.Scoring.kSpeaker,
-#         "getTranslation",
-#         lambda: Translation2d(x_speaker, y_speaker),
-#     )
-#     monkeypatch.setattr(
-#         trajectory_calc.odometry, "getPose", lambda: Pose2d(x_robot, y_robot, 0)
-#     )
-#     trajectory_calc.init()
-#     assert trajectory_calc.update_base().radians() == pytest.approx(
-#         math.radians(expected_angle)
-#     )
+
+
+@pytest.mark.parametrize(
+    "odometry, expected_angle",
+    [
+        (Pose2d(2, 3, Rotation2d(0)), 2.17795669397),
+        (Pose2d(1, 6.8, Rotation2d(0)), -2.12213750822),
+        (Pose2d(2, 5.1, Rotation2d(0)), 2.89376365937),
+        (Pose2d(6, 2.8, Rotation2d(0)), 2.69713889916),
+        (Pose2d(7, 4, Rotation2d(0)), 2.91682031799),
+    ],
+)
+def test_update_base(
+    odometry,
+    expected_angle,
+    trajectory_calc,
+    monkeypatch: MonkeyPatch,
+):
+    monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
+    trajectory_calc.init()
+    assert trajectory_calc.update_base().radians() == pytest.approx(
+        expected_angle, abs=math.radians(1)
+    )

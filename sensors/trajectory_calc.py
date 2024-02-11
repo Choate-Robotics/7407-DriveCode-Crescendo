@@ -8,7 +8,7 @@ from typing import Callable, List, Tuple
 import numpy as np
 
 # from utils import POI
-from wpimath.geometry import Pose2d, Pose3d, Rotation3d, Translation3d
+from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Rotation3d, Translation3d
 
 import config
 import constants
@@ -222,19 +222,21 @@ class TrajectoryCalculator:
     #             return theta_2
     #         correction_angle = z_goal_error * z_to_angle_conversion
     #
-    # def update_base(self) -> float:
-    #     """
-    #     updates rotation of base to face target
-    #
-    #     :param target: target to shoot at
-    #
-    #     :return: base target angle
-    #     """
-    #     # target_translation = self.target.get_pose2d().getTranslation()
-    #     robot_pose_2d = self.odometry.getPose()
-    #     robot_to_speaker = self.target_translation - robot_pose_2d.translation()
-    #     return robot_to_speaker.angle()
-    #
+    def update_base(self) -> Rotation2d:
+        """
+        updates rotation of base to face target
+
+        :param target: target to shoot at
+
+        :return: base target angle
+        """
+        # target_translation = self.target.get_pose2d().getTranslation()
+        robot_pose_2d = self.odometry.getPose()
+        robot_to_speaker = (
+            self.target.get_pose2d().translation() - robot_pose_2d.translation()
+        )
+        return robot_to_speaker.angle()
+
     def update(self):
         """
         updates both shooter and base
