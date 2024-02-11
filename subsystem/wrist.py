@@ -29,6 +29,14 @@ class Wrist(Subsystem):
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
+        
+    @staticmethod
+    def limit_angle(angle: radians) -> radians:
+        if angle <= constants.wrist_min_rotation:
+            return constants.wrist_min_rotation
+        elif angle >= constants.wrist_max_rotation:
+            return constants.wrist_max_rotation
+        return angle
 
     # wrist methods
     def set_wrist_angle(self, angle: radians):
@@ -37,7 +45,9 @@ class Wrist(Subsystem):
         :param pos: The position to set the wrist to(float)
         :return: None
         """
-        if not self.disable_rotation:
+        angle = self.limit_angle(angle)
+        
+        if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
                 (angle / (pi * 2)) * constants.wrist_gear_ratio
             )
@@ -66,7 +76,7 @@ class Wrist(Subsystem):
     def zero_wrist(self) -> None:  # taken from cyrus' code
         # Reset the encoder to zero
         self.wrist_motor.set_sensor_position(
-            self.wrist_abs_encoder.getPosition() * constants.wrist_gear_ratio
+            (self.wrist_abs_encoder.getPosition() - config.wrist_zeroed_pos) * constants.wrist_gear_ratio
         )
         self.zeroed = True
 

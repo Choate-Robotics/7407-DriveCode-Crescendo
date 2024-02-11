@@ -165,6 +165,10 @@ flywheel_period = .03
 
 shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
 
+wrist_max_rotation = 60 * degrees_to_radians
+wrist_min_rotation = -40 * degrees_to_radians
+
+
 #pathing
 post_avoidance_distance = 0.5 
 

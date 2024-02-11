@@ -72,6 +72,7 @@ elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
 
 # Wrist
+wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))
 feed_motor_id = 3
