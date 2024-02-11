@@ -154,8 +154,10 @@ intake_deploy_gear_ratio = 20 / 1  # TODO: placeholder
 
 
 # WRIST
-wrist_gear_ratio = 3
-wrist_time_to_max_vel = 0.3
+
+wrist_gear_ratio: float = 48 # REAL VALUE: 48:1 gear ratio muahhaha
+wrist_time_to_max_vel = 0.3 #TODO: placeholder
+
 
 
 # FLYWHEEL
