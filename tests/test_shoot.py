@@ -1,5 +1,4 @@
 import math
-import sys
 from unittest.mock import MagicMock
 
 import pytest
@@ -8,30 +7,15 @@ from wpimath.geometry import Pose2d, Rotation2d
 
 import config
 import constants
-
-# import utils.POI
-# from sensors.field_odometry import FieldOdometry
-from sensors.trajectory_calc import (  # Target,; TargetCriteria,; TargetVariable,
-    TrajectoryCalculator,
-    speaker_target,
-)
+from sensors.trajectory_calc import TrajectoryCalculator, speaker_target
 from units.SI import radians
 
 
 @pytest.fixture
 def trajectory_calc():
     odometry = MagicMock()
-    # drivetrain = MagicMock()
     elevator = MagicMock()
     trajectory_calc = TrajectoryCalculator(odometry, elevator, speaker_target)
-    # trajectory_calc.odometry = MagicMock()
-
-    # distance to speaker (m)
-    # trajectory_calc.odometry.getPose.return_value.translation.return_value.distance.return_value = (
-    #    5
-    # )
-    # current height of elevator (m)
-    # trajectory_calc.elevator.get_height.return_value = 0.5
     return trajectory_calc
 
 
@@ -65,9 +49,7 @@ def test_update_no_air(
 ):
     monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
     monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
-    # trajectory_calc.delta_z = delta_z
-    # trajectory_calc.distance_to_target = distance_to_target
-    print(f"target: {odometry}", sys.stdout)
+    # print(f"target: {odometry}", sys.stdout)
     assert trajectory_calc.calculate_angle_no_air() == pytest.approx(
         expected_angle, abs=math.radians(1)
     )
