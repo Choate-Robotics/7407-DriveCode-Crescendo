@@ -34,7 +34,7 @@ def wrist() -> Wrist:
 )
 def test_wrist_set_wrist_angle(test_input, disabled, wrist: Wrist):
     # wrist.init()
-    wrist.disable_rotation = disabled
+    wrist.rotation_disabled = disabled
     wrist.set_wrist_angle(test_input)
     if disabled:
         wrist.wrist_motor.set_target_position.assert_not_called()
@@ -99,7 +99,7 @@ def test_zero_wrist(test_input, wrist: Wrist):
     [True, False],
 )
 def test_feed_in(test_input, wrist: Wrist):
-    wrist.disable_rotation = test_input
+    wrist.feed_disabled = test_input
     wrist.feed_in()
     if test_input:
         wrist.feed_motor.set_target_velocity.assert_not_called()
@@ -112,7 +112,7 @@ def test_feed_in(test_input, wrist: Wrist):
     [True, False],
 )
 def test_feed_out(test_input, wrist: Wrist):
-    wrist.disable_rotation = test_input
+    wrist.feed_disabled = test_input
     wrist.feed_out()
     if test_input:
         wrist.feed_motor.set_target_velocity.assert_not_called()

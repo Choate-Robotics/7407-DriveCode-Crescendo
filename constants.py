@@ -19,7 +19,7 @@ g = 9.8 # acceleration due to gravity (m/s^2)
 speaker_z = 1.7 # height of target (m) CHANGE THIS
 speaker_location = Translation2d(0, 0)
 from units.SI import rotations, rotations_per_minute, meters, inches_to_meters, feet_to_meters, \
-    degrees_per_second__to__radians_per_second
+    degrees_per_second__to__radians_per_second, degrees_to_radians
 import math
 from wpimath.geometry import Pose2d, Rotation2d
 
@@ -139,8 +139,8 @@ wrist_time_to_max_vel = 0.3
 
 shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
 
-wrist_max_rotation = 60
-wrist_min_rotation = -40
+wrist_max_rotation = 60 * degrees_to_radians
+wrist_min_rotation = -40 * degrees_to_radians
 
 
 #pathing
