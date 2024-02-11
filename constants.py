@@ -145,10 +145,10 @@ elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
 
 # INTAKE
+intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
+intake_outer_gear_ratio = 58 / 12 #REAL VALUE: 58:12 gear ratio
+intake_deploy_gear_ratio = 20 * (32 / 14) #REAL VALUE: 20:1 * 32:14 gear ratio
 
-intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
-intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
-intake_deploy_gear_ratio = 20 / 1 #TODO: placeholder
 
 
 

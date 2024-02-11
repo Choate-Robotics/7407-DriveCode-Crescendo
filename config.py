@@ -5,6 +5,7 @@ from wpilib import AnalogEncoder, DigitalInput
 from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
+from rev import CANSparkMax
 
 comp_bot: DigitalInput = DigitalInput(
     9
@@ -51,16 +52,20 @@ deploy_intake_id = 12
 intake_beam_break_channel = 1  # placeholder
 
 
-intake_inner_speed = 0.25  # placeholder
-intake_outer_speed = 0.5  # placeholder
-intake_outer_idle_speed = 0.25  # placeholder
+INNER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=CANSparkMax.IdleMode.kBrake) #placeholder
+OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=CANSparkMax.IdleMode.kBrake) #placeholder
+DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=CANSparkMax.IdleMode.kCoast) #placeholder
 
+intake_inner_speed = 0.25 #placeholder
+intake_outer_speed = 0.5 #placeholder
+intake_outer_idle_speed = .25 #placeholder
 
-intake_timeout = 5  # placeholder
-intake_roller_current_limit = 1  # placeholder
-intake_deploy_current_limit = 1  # placeholder
-tenting_deploy_current_limit = 1  # placeholder
-intake_sensor_debounce = 0.2  # placeholder
+intake_timeout = 5 #placeholder
+intake_roller_current_limit = 1 #placeholder
+intake_deploy_current_limit = 1 #placeholder
+tenting_deploy_current_limit = 1 #placeholder
+intake_sensor_debounce = 0.2 #placeholder
+intake_distance_sensor_threshold: float = 0.5 #placeholder
 
 
 # elevator

@@ -32,7 +32,7 @@ class IT:
 
         
 
-        button.Trigger(lambda: Robot.intake.get_back_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
+        button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
         .debounce(config.intake_sensor_debounce).onTrue(
             ParallelRaceGroup(
                 WaitCommand(config.intake_timeout), 
