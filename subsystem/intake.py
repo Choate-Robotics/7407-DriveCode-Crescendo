@@ -36,7 +36,7 @@ class Intake(Subsystem):
     def init(self):
         self.inner_motor.init()
         self.outer_motor.init()
-        self.distance_sensor = self.inner_motor.motor.getAnalog()
+        self.distance_sensor = self.inner_motor.get_analog()
 
     def set_inner_velocity(self, vel: float):
         """
@@ -52,7 +52,7 @@ class Intake(Subsystem):
         :param vel: Speed to set motors to in rotations per second (float)
         """
 
-        self.outer_motor.set_target_velocity(vel * constants.intake_outer_gear_ratio)
+        self.outer_motor.set_raw_output(vel * constants.intake_outer_gear_ratio)
 
     def detect_note(self) -> bool:
         """
