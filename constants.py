@@ -1,3 +1,4 @@
+
 # c = drag coefficient
 # a = projectile sectional area (m^2)
 # m = projectile mass (kg)
@@ -129,14 +130,18 @@ elevator_driver_gear_circumference: float = (
 elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
 
-# Intake
-intake_inner_gear_ratio = 15 / 1 #TODO: placeholder
-intake_outer_gear_ratio = 20 / 1 #TODO: placeholder
-intake_deploy_gear_ratio = 20 / 1 #TODO: placeholder
+# INTAKE
+intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
+intake_outer_gear_ratio = 58 / 12 #REAL VALUE: 58:12 gear ratio
+intake_deploy_gear_ratio = 20 * (32 / 14) #REAL VALUE: 20:1 * 32:14 gear ratio
 
-# Wrist
-wrist_gear_ratio = 3 
-wrist_time_to_max_vel = 0.3
+
+
+
+# WRIST
+wrist_gear_ratio: float = 48 # REAL VALUE: 48:1 gear ratio muahhaha
+wrist_time_to_max_vel = 0.3 #TODO: placeholder
+
 
 # Flywheel
 flywheel_mass = 0.5 # TODO: placeholder
@@ -145,5 +150,12 @@ flywheel_gear_ratio = 1 / 2 # TODO: placeholder
 flywheel_period = .03
 shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
 
-# Pathing
+
+wrist_max_rotation = 60 * degrees_to_radians
+wrist_min_rotation = -40 * degrees_to_radians
+
+
+#pathing
 post_avoidance_distance = 0.5 
+
+

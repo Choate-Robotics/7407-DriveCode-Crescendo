@@ -1,3 +1,41 @@
+
+# from dataclasses import dataclass
+from enum import Enum
+
+from wpilib import AnalogEncoder, DigitalInput
+from wpimath.geometry import Pose3d, Rotation3d
+
+from toolkit.motors import SparkMaxConfig
+from rev import CANSparkMax
+import rev
+from enum import Enum
+
+from wpilib import AnalogEncoder, DigitalInput
+from wpimath.geometry import Pose3d, Rotation3d
+
+from toolkit.motors import SparkMaxConfig
+from toolkit.motors.ctre_motors import TalonConfig
+
+
+comp_bot: DigitalInput = DigitalInput(
+    9
+)  # if true, we are using the practice bot (we will put a jumper on the DIO port)
+
+# from units.SI import (
+#     inches_to_meters,
+#     meters,
+#     meters_per_second,
+#     meters_per_second_squared,
+#     radians,
+# )
+
+DEBUG_MODE: bool = True
+# MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+LOGGING: bool = True
+LOG_OUT_LEVEL: int = 0
+LOG_FILE_LEVEL: int = 1
+
 # Levels are how much information is logged
 # higher level = less information
 # level 0 will log everything
@@ -12,42 +50,13 @@
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-# c = drag coefficient
-# a = projectile area (m^2)
-# m = projectile mass (kg)
-# rho_air = air density (kg/m^3)
-# g = acceleration due to gravity (m/s^2)
-# v0 = initial velocity of shooter flywheel (m/s) config
-# delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
-# y = height of target (COULD BE IN ODOMETRY) (m) const
-# tol = tolerance of error in distance to target (m)
-
-# Imports
-import rev
-from enum import Enum
-
-from wpilib import AnalogEncoder, DigitalInput
-from wpimath.geometry import Pose3d, Rotation3d
-
-from toolkit.motors import SparkMaxConfig
-from toolkit.motors.ctre_motors import TalonConfig
+period: float = 0.03  # seconds
 
 
-# Main
-comp_bot: DigitalInput = DigitalInput(
-    0
-) 
 
-DEBUG_MODE: bool = True
-# MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-LOGGING: bool = True
-LOG_OUT_LEVEL: int = 0
-LOG_FILE_LEVEL: int = 1
+ 
 
-# Gyro
-gyro_id = 20
 
 # Leds
 def KRainbow():
@@ -102,23 +111,27 @@ class LimelightPosition:
 period: float = 0.03  # seconds
 
 # Intake
-inner_intake_id = 10  # placeholder
-outer_intake_front_id = 11  # placeholder
+inner_intake_id = 13
+outer_intake_front_id = 17
 outer_intake_back_id = 12  # placeholder
-deploy_intake_id = 13  # placeholder
+deploy_intake_id = 12
 intake_beam_break_channel = 1  # placeholder
-intake_inner_speed = 0.25  # placeholder
-intake_outer_speed = 0.5  # placeholder
-intake_outer_idle_speed = 0.25  # placeholder
-intake_timeout = 5  # placeholder
-intake_roller_current_limit = 1  # placeholder
-intake_deploy_current_limit = 1  # placeholder
-tenting_deploy_current_limit = 1  # placeholder
-intake_sensor_debounce = 0.2  # placeholder
+
+intake_inner_speed = 0.25 #placeholder
+intake_outer_speed = 0.5 #placeholder
+intake_outer_idle_speed = .25 #placeholder
+
+intake_timeout = 5 #placeholder
+intake_roller_current_limit = 1 #placeholder
+intake_deploy_current_limit = 1 #placeholder
+tenting_deploy_current_limit = 1 #placeholder
+intake_sensor_debounce = 0.2 #placeholder
+intake_distance_sensor_threshold: float = 0.5 #placeholder
 
 # Elevator
-elevator_can_id: int = 73  # TODO: PLACEHOLDER
-elevator_can_id_2: int = 74  # TODO: PLACEHOLDER
+
+elevator_can_id: int = 10
+elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
 elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
@@ -128,37 +141,40 @@ elevator_stage_max = 0.1  # meters
 elevator_zeroed_pos = 0.0  # TODO: PLACEHOLDER: meters
 
 # Wrist
-wrist_motor_id = 30
-feed_motor_id = 50
+wrist_zeroed_pos = 0.0
+wrist_motor_id = 2
+feed_motor_id = 3
 feeder_velocity = 132
 feeder_pass_velocity = 5
 wrist_stage_max = 0  # TODO: PLACEHOLDER radians
 
-
-# Drivetrain
-front_left_move_id = 4
-front_left_turn_id = 5
-front_left_encoder_port = AnalogEncoder(0)
+# DRIVETRAIN
+front_left_move_id = 7
+front_left_turn_id = 8
+front_left_encoder_port = AnalogEncoder(3)
 front_left_encoder_zeroed_pos = 0.678 if comp_bot.get() else 0.0
-front_right_move_id = 6
-front_right_turn_id = 7
+
+front_right_move_id = 5
+front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
 front_right_encoder_zeroed_pos = 0.503 if comp_bot.get() else 0.0
-back_left_move_id = 2
-back_left_turn_id = 3
+
+back_left_move_id = 11
+back_left_turn_id = 14
 back_left_encoder_port = AnalogEncoder(1)
 back_left_encoder_zeroed_pos = 0.964 if comp_bot.get() else 0.0
-back_right_move_id = 8
-back_right_turn_id = 9
-back_right_encoder_port = AnalogEncoder(3)
+
+back_right_move_id = 19
+back_right_turn_id = 16
+back_right_encoder_port = AnalogEncoder(0)
 back_right_encoder_zeroed_pos = 0.260 if comp_bot.get() else 0.0
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
 # Flywheel
-flywheel_id_1 = 1  # TODO: placeholder
-flywheel_id_2 = 2  # TODO: placeholder
-flywheel_motor_count = 1  # REAL
+flywheel_id_1 = 0
+flywheel_id_2 = 19
+flywheel_motor_count = 2
 v0_flywheel = 15  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
@@ -184,3 +200,9 @@ TURN_CONFIG = SparkMaxConfig(
 MOVE_CONFIG = TalonConfig(
     0.11, 0, 0, 0.25, 0.01, brake_mode=True  # integral_zone=1000, max_integral_accumulator=10000
 )
+
+
+#Gyro
+gyro_id = 29
+ 
+

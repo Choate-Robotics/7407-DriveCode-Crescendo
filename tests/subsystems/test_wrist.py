@@ -34,7 +34,7 @@ def wrist() -> Wrist:
 )
 def test_wrist_set_wrist_angle(test_input, disabled, wrist: Wrist):
     # wrist.init()
-    wrist.disable_rotation = disabled
+    wrist.rotation_disabled = disabled
     wrist.set_wrist_angle(test_input)
     if disabled:
         wrist.wrist_motor.set_target_position.assert_not_called()
