@@ -118,44 +118,30 @@ def test_run_sim(
     assert ans == pytest.approx(expected_answer, abs=0.01)
 
 
-#
-# @pytest.mark.parametrize(
-#     "x_distance, y_distance, expected_answer",
-#     [
-#         (1.15, 1.35, 0.8918247212271702),
-#         (5.27, 1.63, 0.4323481479683407),
-#         (6.11, 1.67, 0.4234831594121902),
-#         (4.86, 1.71, 0.45967112158043777),
-#     ],
-# )
-# def test_update_shooter(
-#     trajectory_calc, x_distance, y_distance, expected_answer, monkeypatch: MonkeyPatch
-# ):
-#     def mock_get_length():
-#         return 0
-#
-#     def mock_pose():
-#         return Pose2d(x_distance, 0, 0)
-#
-#     trajectory_calc.speaker = Pose2d(0, 0, 0)
-#     monkeypatch.setattr(config, "v0_flywheel", 15)
-#     monkeypatch.setattr(constants, "shooter_height", 0.0)
-#     monkeypatch.setattr(trajectory_calc.elevator, "get_length", mock_get_length)
-#     monkeypatch.setattr(trajectory_calc.odometry, "getPose", mock_pose)
-#     monkeypatch.setattr(trajectory_calc, "speaker", Translation2d(0, 0))
-#     monkeypatch.setattr(constants, "g", 9.8)
-#     monkeypatch.setattr(constants, "c", 0.47)
-#     monkeypatch.setattr(constants, "rho_air", 1.28)
-#     monkeypatch.setattr(constants, "a", 14 * 0.0254 * 2 * 0.0254)
-#     monkeypatch.setattr(constants, "m", 0.235301)
-#     trajectory_calc.speaker_z = y_distance
-#     trajectory_calc.distance_to_target = x_distance
-#     trajectory_calc.delta_z = y_distance
-#     # print(trajectory_calc.delta_z)
-#     angle = trajectory_calc.update_shooter()
-#     assert angle == pytest.approx(expected_answer, math.radians(2))
-#
-#
+@pytest.mark.parametrize(
+    "odometry, expected_answer",
+    [
+        (Pose2d(2, 3, Rotation2d(0)), 0.514656225342555),
+        (Pose2d(1, 6.8, Rotation2d(0)), 0.8168519268236714),
+        (Pose2d(2, 5.1, Rotation2d(0)), 0.717954626335556),
+        (Pose2d(0.7, 5.54, Rotation2d(0)), 1.2705172634003417),
+        (Pose2d(7, 4, Rotation2d(0)), 0.38871749175127635),
+        (Pose2d(4, 2, Rotation2d(0)), 0.3880263622269912),
+    ],
+)
+def test_update_shooter(
+    trajectory_calc, odometry, expected_answer, monkeypatch: MonkeyPatch
+):
+    monkeypatch.setattr(config, "v0_flywheel", 15)
+    monkeypatch.setattr(constants, "g", 9.8)
+    monkeypatch.setattr(constants, "c", 0.47)
+    monkeypatch.setattr(constants, "rho_air", 1.28)
+    monkeypatch.setattr(constants, "a", 14 * 0.0254 * 2 * 0.0254)
+    monkeypatch.setattr(constants, "m", 0.235301)
+    monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
+    monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
+    angle = trajectory_calc.update_shooter()
+    assert angle == pytest.approx(expected_answer, abs=math.radians(2))
 
 
 @pytest.mark.parametrize(

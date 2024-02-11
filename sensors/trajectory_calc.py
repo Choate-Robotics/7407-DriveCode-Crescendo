@@ -181,50 +181,53 @@ class TrajectoryCalculator:
         )
         return result_angle
 
-    # def update_shooter(self) -> float:
-    #     """
-    #     function runs sim to calculate a final angle with air resistance considered
-    #
-    #     :param target: target to shoot at
-    #
-    #     :return: target angle
-    #     """
-    #     delta_x, delta_z = self.calculate_distance_to_target(
-    #         self.odometry.getPose(),
-    #         self.target.get_pose2d(),
-    #         self.elevator.get_length() + constants.shooter_height,
-    #     )
-    #     # self.distance_to_target = (
-    #     #     self.odometry.getPose().translation().distance(self.speaker)
-    #     # )
-    #     # print("distance_to_target", self.distance_to_target)
-    #
-    #     # self.delta_z = (
-    #     #     self.speaker_z - (self.elevator.get_length() + constants.shooter_height)
-    #     # )
-    #     # print("delta_z", self.delta_z)
-    #     # print("constant.shooter_height", constants.shooter_height)
-    #     # print("elevator.get_length()", self.elevator.get_length())
-    #     theta_1 = self.calculate_angle_no_air()
-    #     theta_2 = theta_1 + np.radians(1)
-    #     z_1 = self.run_sim(theta_1)
-    #     z_2 = self.run_sim(theta_2)
-    #     z_goal_error = delta_z - z_2
-    #     z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-    #     correction_angle = z_goal_error * z_to_angle_conversion
-    #     for i in range(config.max_sim_times):
-    #         theta_1 = theta_2
-    #         theta_2 = theta_2 + correction_angle
-    #         z_1 = z_2
-    #         z_2 = self.run_sim(theta_2)
-    #         z_goal_error = delta_z - z_2
-    #         z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-    #         # print(z_goal_error, theta_2, self.delta_z)
-    #         if abs(z_goal_error) < config.shooter_tol:
-    #             self.shoot_angle = theta_2
-    #             return theta_2
-    #         correction_angle = z_goal_error * z_to_angle_conversion
-    #
+    def update_shooter(self) -> float:
+        """
+        function runs sim to calculate a final angle with air resistance considered
+
+        :param target: target to shoot at
+
+        :return: target angle
+        """
+        delta_x = self.target_horizontal_distance()
+        delta_z = self.target_vertical_distance()
+        self.target.criteria.set_criteria_value(delta_x)
+        # delta_x, delta_z = self.calculate_distance_to_target(
+        #     self.odometry.getPose(),
+        #     self.target.get_pose2d(),
+        #     self.elevator.get_length() + constants.shooter_height,
+        # )
+        # self.distance_to_target = (
+        #     self.odometry.getPose().translation().distance(self.speaker)
+        # )
+        # print("distance_to_target", self.distance_to_target)
+
+        # self.delta_z = (
+        #     self.speaker_z - (self.elevator.get_length() + constants.shooter_height)
+        # )
+        # print("delta_z", self.delta_z)
+        # print("constant.shooter_height", constants.shooter_height)
+        # print("elevator.get_length()", self.elevator.get_length())
+        theta_1 = self.calculate_angle_no_air()
+        theta_2 = theta_1 + np.radians(1)
+        z_1 = self.run_sim(theta_1)
+        z_2 = self.run_sim(theta_2)
+        z_goal_error = delta_z - z_2
+        z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
+        correction_angle = z_goal_error * z_to_angle_conversion
+        for i in range(config.max_sim_times):
+            theta_1 = theta_2
+            theta_2 = theta_2 + correction_angle
+            z_1 = z_2
+            z_2 = self.run_sim(theta_2)
+            z_goal_error = delta_z - z_2
+            z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
+            # print(z_goal_error, theta_2, self.delta_z)
+            if abs(z_goal_error) < config.shooter_tol:
+                self.shoot_angle = theta_2
+                return theta_2
+            correction_angle = z_goal_error * z_to_angle_conversion
+
     def update_base(self) -> Rotation2d:
         """
         updates rotation of base to face target
@@ -289,11 +292,11 @@ class TrajectoryCalculator:
             y[-1][target_variable],
         )
 
-    # def get_theta(self) -> float:
-    #     """
-    #     Returns the angle of the trajectory.
-    #     """
-    #     return self.shoot_angle
+    def get_theta(self) -> float:
+        """
+        Returns the angle of the trajectory.
+        """
+        return self.shoot_angle
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u
