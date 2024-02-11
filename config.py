@@ -7,7 +7,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 from toolkit.motors import SparkMaxConfig
 
 comp_bot: DigitalInput = DigitalInput(
-    0
+    9
 )  # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 # from units.SI import (
@@ -44,10 +44,10 @@ period: float = 0.03  # seconds
 
 
 # intake
-inner_intake_id = 10  # placeholder
-outer_intake_front_id = 11  # placeholder
+inner_intake_id = 13
+outer_intake_front_id = 17
 outer_intake_back_id = 12  # placeholder
-deploy_intake_id = 13  # placeholder
+deploy_intake_id = 12
 intake_beam_break_channel = 1  # placeholder
 
 
@@ -64,17 +64,17 @@ intake_sensor_debounce = 0.2  # placeholder
 
 
 # elevator
-elevator_can_id: int = 73  # TODO: PLACEHOLDER
-elevator_can_id_2: int = 74  # TODO: PLACEHOLDER
+elevator_can_id: int = 10
+elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
 elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
 
 # Wrist
-wrist_motor_id = 30
+wrist_motor_id = 2
 WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))
-feed_motor_id = 50
+feed_motor_id = 3
 FEED_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))
 feeder_velocity = 132
 feeder_pass_velocity = 5
@@ -139,24 +139,24 @@ class LimelightPosition:
 
 
 # DRIVETRAIN
-front_left_move_id = 4
-front_left_turn_id = 5
-front_left_encoder_port = AnalogEncoder(0)
+front_left_move_id = 7
+front_left_turn_id = 8
+front_left_encoder_port = AnalogEncoder(3)
 front_left_encoder_zeroed_pos = 0.678 if comp_bot.get() else 0.0
 
-front_right_move_id = 6
-front_right_turn_id = 7
+front_right_move_id = 5
+front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
 front_right_encoder_zeroed_pos = 0.503 if comp_bot.get() else 0.0
 
-back_left_move_id = 2
-back_left_turn_id = 3
+back_left_move_id = 11
+back_left_turn_id = 14
 back_left_encoder_port = AnalogEncoder(1)
 back_left_encoder_zeroed_pos = 0.964 if comp_bot.get() else 0.0
 
-back_right_move_id = 8
-back_right_turn_id = 9
-back_right_encoder_port = AnalogEncoder(3)
+back_right_move_id = 19
+back_right_turn_id = 16
+back_right_encoder_port = AnalogEncoder(0)
 back_right_encoder_zeroed_pos = 0.260 if comp_bot.get() else 0.0
 
 driver_centric: bool = True
@@ -164,7 +164,7 @@ drivetrain_reversed: bool = False
 
 
 # Gyro
-gyro_id = 20
+gyro_id = 29
 
 # Elevator
 elevator_moving = False
@@ -183,9 +183,9 @@ elevator_stage_max = 0.1  # meters
 
 
 # Flywheel
-flywheel_id_1 = 1  # TODO: placeholder
-flywheel_id_2 = 2  # TODO: placeholder
-flywheel_motor_count = 2  # TODO: placeholder
+flywheel_id_1 = 0
+flywheel_id_2 = 1
+flywheel_motor_count = 2
 v0_flywheel = 15  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
