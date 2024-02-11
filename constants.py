@@ -1,12 +1,6 @@
 import math
 
-from wpimath.geometry import (
-    Pose3d,
-    Rotation2d,
-    Rotation3d,
-    Translation2d,
-    Translation3d,
-)
+from wpimath.geometry import Rotation2d
 
 from units.SI import (
     degrees_per_second__to__radians_per_second,
@@ -32,8 +26,9 @@ a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
 m = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
 g = 9.8  # acceleration due to gravity (m/s^2)
-speaker_z = 1.7  # height of target (m) CHANGE THIS
-speaker_location = Translation2d(0, 0)
+vzero = 15  # initial velocity of shooter flywheel (m/s) config
+# speaker_z = 1.7  # height of target (m) CHANGE THIS
+# speaker_location = Translation2d(0, 0)
 
 # DRIVETRAIN
 drivetrain_turn_gear_ratio = 18.4
@@ -173,13 +168,3 @@ shooter_height = 23 * inches_to_meters  # TODO: looks good, but needs to be test
 
 # pathing
 post_avoidance_distance = 0.5
-
-# Targets
-speaker_target_pose = Pose3d(
-    Translation3d(
-        FieldPos.Scoring.speaker_x,
-        FieldPos.Scoring.speaker_y,
-        FieldPos.Scoring.speaker_z,
-    ),
-    Rotation3d(0, 0, 0),
-)
