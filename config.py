@@ -3,6 +3,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 from dataclasses import dataclass
 from wpilib import AnalogEncoder, DigitalInput
 from toolkit.motors import SparkMaxConfig
+from rev import CANSparkMax
 comp_bot: DigitalInput = DigitalInput(0) # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 from units.SI import (
@@ -45,6 +46,10 @@ outer_intake_front_id = 11 #placeholder
 outer_intake_back_id = 12 #placeholder
 deploy_intake_id = 13 #placeholder
 intake_beam_break_channel = 1 #placeholder
+
+INNER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=CANSparkMax.IdleMode.kBrake) #placeholder
+OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=CANSparkMax.IdleMode.kBrake) #placeholder
+DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=CANSparkMax.IdleMode.kCoast) #placeholder
 
 intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 0.5 #placeholder
