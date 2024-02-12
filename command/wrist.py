@@ -22,12 +22,14 @@ class ZeroWrist(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return True
+        return self.subsystem.wrist_zeroed
     
     def end(self, interrupted: bool):
         if not interrupted:
             self.subsystem.wrist_zeroed = True
             utils.LocalLogger.debug("Wrist zeroed")
+        else:
+            utils.LocalLogger.debug("Wrist zeroing interrupted")
 
 class SetWrist(SubsystemCommand[Wrist]):
 
@@ -47,15 +49,16 @@ class SetWrist(SubsystemCommand[Wrist]):
 
     def end(self, interrupted:bool):
         if interrupted:
-            self.subsystem.set_wrist_angle(self.subsystem.get_wrist_angle()) #stopping motor where it is
-            utils.LocalLogger.debug("Interrupted, Wrist position " + str(self.target) + " acheived")
+            wrist_angle = self.subsystem.get_wrist_angle()
+            self.subsystem.set_wrist_angle(wrist_angle) #stopping motor where it is
+            utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         else:
-            utils.LocalLogger.debug("Wrist position " + str(self.target) + " acheived")
+            utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
        
-
 class FeedIn(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
+        self.subsystem = subsystem
 
     def initialize(self):
         self.subsystem.feed_in()
@@ -68,11 +71,15 @@ class FeedIn(SubsystemCommand[Wrist]):
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        utils.LocalLogger.debug("Fed-in")
+        if interrupted:
+            utils.LocalLogger.debug("Feed in interrupted")
+        else:
+            utils.LocalLogger.debug("Fed-in")
 
 class FeedOut(SubsystemCommand[Wrist]):
-    def __init__(self, subsystem: Wrist, length:float):
+    def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
+        self.subsystem = subsystem
 
     def initialize(self):
         self.subsystem.feed_out()
@@ -81,15 +88,19 @@ class FeedOut(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return False
+        return not self.subsystem.note_staged
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        utils.LocalLogger.debug("Fed-in")
+        if interrupted:
+            utils.LocalLogger.debug("Feed out interrupted")
+        else:
+            utils.LocalLogger.debug("Fed-out")
 
 class PassNote(SubsystemCommand[Wrist]):
-    def __init__(self, subsystem: Wrist, length:float):
+    def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
+        self.subsystem = subsystem
 
     def initialize(self):
         self.subsystem.feed_note()

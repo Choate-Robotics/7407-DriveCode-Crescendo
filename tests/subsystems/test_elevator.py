@@ -80,7 +80,7 @@ def test_get_length(test_input, elevator: Elevator):
 def test_set_motor_position(test_input, actual, elevator: Elevator):
     elevator.set_motor_extend_position(test_input)
     elevator.motor_extend.set_sensor_position.assert_called_with(
-        actual * config.elevator_max_rotation
+        elevator.length_to_rotations(elevator.limit_length(test_input))
     )
 
 
@@ -97,7 +97,7 @@ def test_zero(test_input, elevator: Elevator):
     elevator.motor_extend_encoder.getPosition.return_value = test_input
     elevator.zero()
     elevator.motor_extend.set_sensor_position.assert_called_with(
-        test_input * constants.elevator_max_length
+        elevator.length_to_rotations(elevator.limit_length(test_input))
     )
     assert elevator.zeroed is True
 
@@ -142,6 +142,5 @@ def test_stop(test_input, elevator: Elevator, monkeypatch: MonkeyPatch):
     monkeypatch.setattr(Elevator, "get_length", mock_get_length)
     elevator.stop()
     elevator.motor_extend.set_target_position.assert_called_with(
-        (test_input * constants.elevator_gear_ratio)
-        / constants.elevator_driver_gear_circumference
+        elevator.length_to_rotations(elevator.limit_length(test_input))
     )

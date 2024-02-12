@@ -8,6 +8,7 @@ class Robot:
     # intake: subsystem.Intake = subsystem.Intake()
     # elevator:subsystem.Elevator = subsystem.Elevator()
     drivetrain: subsystem.Drivetrain = subsystem.Drivetrain()
+    flywheel: subsystem.Flywheel = subsystem.Flywheel()
 
 
 class Pneumatics:
