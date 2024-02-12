@@ -32,13 +32,13 @@ class IT:
 
         
 
-        button.Trigger(lambda: Robot.intake.get_back_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            ParallelRaceGroup(
-                WaitCommand(config.intake_timeout), 
-                command.RunIntake(Robot.intake)
-            ).andThen(command.IntakeIdle(Robot.intake))
-        )
+        # button.Trigger(lambda: Robot.intake.get_back_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     ParallelRaceGroup(
+        #         WaitCommand(config.intake_timeout),
+        #         command.RunIntake(Robot.intake)
+        #     ).andThen(command.IntakeIdle(Robot.intake))
+        # )
         
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True

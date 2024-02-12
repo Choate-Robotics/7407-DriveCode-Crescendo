@@ -14,7 +14,6 @@ from oi.IT import IT
 from wpilib import SmartDashboard
 
 
-
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
@@ -28,7 +27,6 @@ class _Robot(wpilib.TimedRobot):
         if config.DEBUG_MODE:
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
-        
         self.scheduler.setPeriod(config.period)
 
         self.log.info(f"Scheduler period set to {config.period} seconds")
@@ -58,9 +56,10 @@ class _Robot(wpilib.TimedRobot):
 
             # for sensor in sensors:
             #     sensor.init()
-            Sensors.limelight.init()
-            Field.odometry.enable()
-            Field.calculations.init()
+            # Sensors.limelight.init()
+            # Field.odometry.enable()
+            # Field.calculations.init()
+
         try:
             init_sensors()
         except Exception as e:
@@ -78,18 +77,11 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
-        
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
 
     def robotPeriodic(self):
-        
+
         Field.POI.setNTValues()
-        
+
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
@@ -102,33 +94,63 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
-        try:
+        SmartDashboard.putNumber("Front right current abs position", Robot.drivetrain.n_front_right.get_abs())
+        SmartDashboard.putNumber("Front left current abs position", Robot.drivetrain.n_front_left.get_abs())
+        SmartDashboard.putNumber("Back right current abs position", Robot.drivetrain.n_back_right.get_abs())
+        SmartDashboard.putNumber("Back left current abs position", Robot.drivetrain.n_back_left.get_abs())
+
+        SmartDashboard.putNumber("Front right abs position", config.front_right_encoder_zeroed_pos)
+        SmartDashboard.putNumber("Front left abs position", config.front_left_encoder_zeroed_pos)
+        SmartDashboard.putNumber("Back right abs position", config.back_right_encoder_zeroed_pos)
+        SmartDashboard.putNumber("Back left abs position", config.back_left_encoder_zeroed_pos)
+
+        # Turn motor angle
+        SmartDashboard.putNumber("Front right angle", Robot.drivetrain.n_front_right.get_turn_motor_angle())
+        SmartDashboard.putNumber("Front left angle", Robot.drivetrain.n_front_left.get_turn_motor_angle())
+        SmartDashboard.putNumber("Back right angle", Robot.drivetrain.n_back_right.get_turn_motor_angle())
+        SmartDashboard.putNumber("Back left angle", Robot.drivetrain.n_back_left.get_turn_motor_angle())
+
+        # Motor rotation position
+        SmartDashboard.putNumber("Front right sensor position",
+                                 Robot.drivetrain.n_front_right.m_turn.get_sensor_position())
+        SmartDashboard.putNumber("Front left sensor position",
+                                 Robot.drivetrain.n_front_left.m_turn.get_sensor_position())
+        SmartDashboard.putNumber("Back right sensor position",
+                                 Robot.drivetrain.n_back_right.m_turn.get_sensor_position())
+        SmartDashboard.putNumber("Back left sensor position",
+                                 Robot.drivetrain.n_back_left.m_turn.get_sensor_position())
+        # Gyro angle
+        SmartDashboard.putNumber("Gyro Angle", Robot.drivetrain.get_heading().degrees())
+
+
+        # try:
+
             # Sensors.limelight_back.update()
-            Sensors.limelight.update()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable('errors').putString('limelight update', str(e))
+            # Sensors.limelight.update()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('limelight update', str(e))
+        #
+        #     if config.DEBUG_MODE:
+        #         raise e
 
-            if config.DEBUG_MODE:
-                raise e
+        # try:
+        #     Field.odometry.update()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('odometry update', str(e))
+        #
+        #     if config.DEBUG_MODE:
+        #         raise e
 
-        try:
-            Field.odometry.update()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable('errors').putString('odometry update', str(e))
-
-            if config.DEBUG_MODE:
-                raise e
-            
-        try:
-            Field.calculations.update()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable('errors').putString('odometry update', str(e))
-
-            if config.DEBUG_MODE:
-                raise e
+        # try:
+        #     Field.calculations.update()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('odometry update', str(e))
+        #
+        #     if config.DEBUG_MODE:
+        #         raise e
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
