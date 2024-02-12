@@ -24,7 +24,7 @@ class Dashboard(QMainWindow):
         self.show()
         
     def update(self):
-        ...
+        pass
     
     def closeEvent(self, event):
         self.nt.stopClient()
