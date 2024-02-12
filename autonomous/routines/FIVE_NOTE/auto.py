@@ -1,3 +1,4 @@
+import command
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
 from robot_systems import Robot
@@ -106,11 +107,13 @@ path_6 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
+    command.ZeroElevator(Robot.elevator),
     WaitCommand(1),
     InstantCommand(lambda: print("Shot first note")),
 
     path_1,
-    WaitCommand(0.75),
+
+    command.RunIntake(Robot.intake),
     InstantCommand(lambda: print("Intaked second note")),
     WaitCommand(1),
     InstantCommand(lambda: print("Shot second note")),
