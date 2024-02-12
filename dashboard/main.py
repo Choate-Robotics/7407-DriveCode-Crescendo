@@ -1,6 +1,9 @@
-import ntcore
-from wpilib import SmartDashboard
+from ntcore import NetworkTableInstance
 from PyQt6.QtWidgets import QApplication, QMainWindow, QGridLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+import site
+
+print(site.getsitepackages())
+
 
 class Dashboard(QMainWindow):
     def __init__(self):
@@ -11,7 +14,7 @@ class Dashboard(QMainWindow):
         self.central_widget = QWidget()
         self.central_widget.setLayout(self.layout)
         self.setCentralWidget(self.central_widget)
-        self.nt = ntcore.NetworkTableInstance.getDefault()
+        self.nt = NetworkTableInstance.getDefault()
         self.nt.startClient4('dashboard')
         self.nt.startClient3('dashboard')
         self.ds = self.nt.startDSClient()
