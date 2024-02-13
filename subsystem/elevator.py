@@ -18,7 +18,7 @@ class Elevator(Subsystem):
         self.motor_extend_encoder = None
 
         self.motor_extend_follower: SparkMax = SparkMax(
-            config.elevator_can_id_2, config=config.ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id_2, config=config.ELEVATOR_CONFIG, inverted=True
         )
 
         self.zeroed: bool = False

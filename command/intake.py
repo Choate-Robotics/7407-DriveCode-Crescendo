@@ -7,26 +7,21 @@ from subsystem import Intake
 class RunIntake(SubsystemCommand[Intake]):
 
     def initialize(self) -> None:
-        # self.timer.reset()
-        # self.timer.start()
         self.subsystem.roll_in()
         self.subsystem.intake_running = True
         self.note_detected = False
 
     def execute(self) -> None:
-        # self.timeout = True if self.timer.get() >= config.intake_timeout else False
         pass
 
     def isFinished(self) -> bool:
-        # return self.subsystem.detect_note() or self.timeout
         self.note_detected = self.subsystem.detect_note()
         return self.note_detected
 
     def end(self, interrupted) -> None:
+        self.subsystem.stop_inner()
         if not interrupted and self.note_detected:
             self.subsystem.note_in_intake = True
-        # self.timer.stop()
-        # self.timer.reset()
         self.subsystem.intake_running = False
 
 

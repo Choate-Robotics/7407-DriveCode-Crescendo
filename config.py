@@ -116,17 +116,16 @@ period: float = 0.03  # seconds
 inner_intake_id = 13
 outer_intake_back_id = 17
 deploy_intake_id = 12
-intake_beam_break_channel = 1  # placeholder
 
-intake_inner_speed = 0.25 #placeholder
-intake_outer_speed = 1 #placeholder
-intake_outer_idle_speed = .15 #placeholder
+intake_inner_speed = 0.25 
+intake_outer_speed = 1 
+intake_outer_idle_speed = .15
 
 deploy_intake_timeout = .1 
 deploy_tenting_timeout = .1
 
 intake_timeout = 5
-intake_roller_current_limit = 15 #placeholder
+intake_roller_current_limit = 15
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.2

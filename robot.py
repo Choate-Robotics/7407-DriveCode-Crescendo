@@ -143,7 +143,6 @@ class _Robot(wpilib.TimedRobot):
             
             # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
             # command.IntakeIdle(Robot.intake),
-            # command.SetFlywheelLinearVelocity(Robot.flywheel, 20)
             # command.DeployTenting(Robot.intake)
         )
         )
