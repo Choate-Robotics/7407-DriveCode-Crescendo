@@ -149,8 +149,7 @@ class _Robot(wpilib.TimedRobot):
         )
 
     def teleopPeriodic(self):
-        # pass
-        print(Robot.intake.get_outer_current())
+        pass
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")

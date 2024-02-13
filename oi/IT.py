@@ -32,8 +32,7 @@ class IT:
         .debounce(config.intake_sensor_debounce).onTrue(
             command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
         ).onFalse(
-            PrintCommand('idle').alongWith(
-            command.IntakeIdle(Robot.intake))
+            command.IntakeIdle(Robot.intake)
         )
         
         def stop_limelight_pos():
