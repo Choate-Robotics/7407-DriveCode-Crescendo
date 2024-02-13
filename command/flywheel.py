@@ -16,13 +16,13 @@ class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
             self.subsystem.set_velocity_linear(self.velocity)
     
         def execute(self):
-            pass
+            print(self.subsystem.get_velocity_linear(), 'Current velocity')
     
         def isFinished(self):
-            return False
+            return self.subsystem.within_velocity_linear(self.velocity, .05)
         
         def end(self, interrupted: bool):
-            pass
+            print(self.subsystem.get_velocity_linear(), 'Final velocity')
                 
 class SetFlywheelVelocityIndependent(SubsystemCommand[Flywheel]):
         

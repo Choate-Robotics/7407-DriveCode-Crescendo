@@ -59,7 +59,6 @@ class _Robot(wpilib.TimedRobot):
             # Sensors.limelight.init()
             # Field.odometry.enable()
             # Field.calculations.init()
-
         try:
             init_sensors()
         except Exception as e:
@@ -94,69 +93,48 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
-        SmartDashboard.putNumber("Front right current abs position", Robot.drivetrain.n_front_right.get_abs())
-        SmartDashboard.putNumber("Front left current abs position", Robot.drivetrain.n_front_left.get_abs())
-        SmartDashboard.putNumber("Back right current abs position", Robot.drivetrain.n_back_right.get_abs())
-        SmartDashboard.putNumber("Back left current abs position", Robot.drivetrain.n_back_left.get_abs())
-
-        SmartDashboard.putNumber("Front right abs position", config.front_right_encoder_zeroed_pos)
-        SmartDashboard.putNumber("Front left abs position", config.front_left_encoder_zeroed_pos)
-        SmartDashboard.putNumber("Back right abs position", config.back_right_encoder_zeroed_pos)
-        SmartDashboard.putNumber("Back left abs position", config.back_left_encoder_zeroed_pos)
-
-        # Turn motor angle
-        SmartDashboard.putNumber("Front right angle", Robot.drivetrain.n_front_right.get_turn_motor_angle())
-        SmartDashboard.putNumber("Front left angle", Robot.drivetrain.n_front_left.get_turn_motor_angle())
-        SmartDashboard.putNumber("Back right angle", Robot.drivetrain.n_back_right.get_turn_motor_angle())
-        SmartDashboard.putNumber("Back left angle", Robot.drivetrain.n_back_left.get_turn_motor_angle())
-
-        # Motor rotation position
-        SmartDashboard.putNumber("Front right sensor position",
-                                 Robot.drivetrain.n_front_right.m_turn.get_sensor_position())
-        SmartDashboard.putNumber("Front left sensor position",
-                                 Robot.drivetrain.n_front_left.m_turn.get_sensor_position())
-        SmartDashboard.putNumber("Back right sensor position",
-                                 Robot.drivetrain.n_back_right.m_turn.get_sensor_position())
-        SmartDashboard.putNumber("Back left sensor position",
-                                 Robot.drivetrain.n_back_left.m_turn.get_sensor_position())
-        # Gyro angle
-        SmartDashboard.putNumber("Gyro Angle", Robot.drivetrain.get_heading().degrees())
-
-
-        # try:
-
+        try:
+            ...
             # Sensors.limelight_back.update()
             # Sensors.limelight.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('limelight update', str(e))
-        #
-        #     if config.DEBUG_MODE:
-        #         raise e
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('limelight update', str(e))
 
-        # try:
-        #     Field.odometry.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-        #
-        #     if config.DEBUG_MODE:
-        #         raise e
+            if config.DEBUG_MODE:
+                raise e
 
-        # try:
-        #     Field.calculations.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-        #
-        #     if config.DEBUG_MODE:
-        #         raise e
+        try:
+            # Field.odometry.update()
+            ...
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        try:
+            # Field.calculations.update()
+            ...
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         self.scheduler.schedule(commands2.SequentialCommandGroup(
-            command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveCustom(Robot.drivetrain)
+            # command.DrivetrainZero(Robot.drivetrain),
+            # command.DriveSwerveCustom(Robot.drivetrain)
+            # command.IntakeIdle(Robot.intake)
+            # command.DeployIntake(Robot.intake),
+            
+            # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
+            # command.IntakeIdle(Robot.intake),
+            # command.DeployTenting(Robot.intake)
         )
         )
 

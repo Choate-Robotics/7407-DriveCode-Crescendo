@@ -18,7 +18,7 @@ from units.SI import (
     inches_to_meters,
     meters,
     rotations_per_minute,
-    degrees_to_radians
+    degrees_to_radians,
 )
 
 # Main
@@ -136,8 +136,10 @@ intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
 intake_outer_gear_ratio = 58 / 12 #REAL VALUE: 58:12 gear ratio
 intake_deploy_gear_ratio = 20 * (32 / 14) #REAL VALUE: 20:1 * 32:14 gear ratio
 
-
-
+# LIMELIGHT
+limelight_height = 23 * inches_to_meters
+limelight_elevator_angle = 25 * degrees_to_radians
+limelight_back_yaw = 180 * degrees_to_radians
 
 # WRIST
 wrist_gear_ratio: float = 48 # REAL VALUE: 48:1 gear ratio muahhaha
@@ -145,11 +147,11 @@ wrist_time_to_max_vel = 0.3 #TODO: placeholder
 
 
 # Flywheel
-flywheel_mass = 0.5 # TODO: placeholder
-flywheel_radius_outer = 2 * 0.0254 # TODO: placeholder
-flywheel_gear_ratio = 1 / 2 # TODO: placeholder
+flywheel_mass = 1.3 #kilograms
+flywheel_radius_outer = 2 * 0.0254
+flywheel_gear_ratio = 1
 flywheel_period = .03
-shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
+shooter_height = 23 * inches_to_meters
 
 
 wrist_max_rotation = 60 * degrees_to_radians

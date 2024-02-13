@@ -13,19 +13,20 @@ class Intake(Subsystem):
         self.beam_break = None
         self.inner_motor: SparkMax = SparkMax(
             can_id=config.inner_intake_id,
-            config=config.INNER_CONFIG
+            config=config.INNER_CONFIG,
+            inverted=True
         )
 
 
         self.outer_motor: SparkMax = SparkMax(
             can_id=config.outer_intake_back_id,
             config=config.OUTER_CONFIG,
-            brushless=False
+            brushless=False,
         )
-
         self.deploy_motor: SparkMax = SparkMax(
             can_id=config.deploy_intake_id,
-            config=config.DEPLOY_CONFIG
+            config=config.DEPLOY_CONFIG,
+            inverted=True
         )
 
 
@@ -33,11 +34,13 @@ class Intake(Subsystem):
 
         self.note_in_intake: bool = False
         self.intake_running: bool = False
+        self.intake_deployed: bool = False
 
     def init(self):
         self.inner_motor.init()
         self.outer_motor.init()
-        self.distance_sensor = self.inner_motor.get_analog()
+        self.deploy_motor.init()
+        self.distance_sensor = self.outer_motor.get_analog()
 
     def set_inner_velocity(self, vel: float):
         """
@@ -45,7 +48,8 @@ class Intake(Subsystem):
         :param vel: Speed to set motor to in rotations per second (float)
         """
 
-        self.inner_motor.set_target_velocity(vel * constants.intake_inner_gear_ratio)
+        # self.inner_motor.set_target_velocity(vel * constants.intake_inner_gear_ratio)
+        self.inner_motor.set_raw_output(vel * constants.intake_inner_gear_ratio)
 
     def set_outer_velocity(self, vel: float):
         """
@@ -69,8 +73,8 @@ class Intake(Subsystem):
         """
         Rotate deploy motor to deploy outer intake
         """
-
-        self.deploy_motor.set_raw_output(0.5)
+        
+        self.deploy_motor.set_raw_output(0.70)
 
     def deploy_tenting(self):
         """
@@ -99,12 +103,14 @@ class Intake(Subsystem):
         Sets outer motors to their idle speed going in
         """
         self.set_outer_velocity(config.intake_outer_idle_speed)
+        self.set_inner_velocity(0)
 
     def rollers_idle_out(self):
         """
         Sets outer motors to their idle speed going out
         """
         self.set_outer_velocity(-config.intake_outer_idle_speed)
+        self.set_inner_velocity(0)
 
     
     def get_outer_current(self) -> float:
