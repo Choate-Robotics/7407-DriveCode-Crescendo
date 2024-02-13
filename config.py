@@ -120,6 +120,9 @@ intake_inner_speed = 0.25 #placeholder
 intake_outer_speed = 1 #placeholder
 intake_outer_idle_speed = .15 #placeholder
 
+deploy_intake_timeout = .1 
+deploy_tenting_timeout = .1
+
 intake_timeout = 5
 intake_roller_current_limit = 15 #placeholder
 intake_deploy_current_limit = 30

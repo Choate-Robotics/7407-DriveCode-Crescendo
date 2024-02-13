@@ -59,11 +59,13 @@ class DeployIntake(SubsystemCommand[Intake]):
         return (
             self.subsystem.get_deploy_current() > config.intake_deploy_current_limit
             and
-            self.timer.get() > .1
+            self.timer.get() > config.deploy_intake_timeout
         )
     
     def end(self, interrupted) -> None:
         self.subsystem.deploy_motor.set_raw_output(0)
+        if not interrupted:
+            self.subsystem.intake_deployed = True
 
 class DeployTenting(SubsystemCommand[Intake]):
     def initialize(self) -> None:
@@ -78,7 +80,7 @@ class DeployTenting(SubsystemCommand[Intake]):
         return (
             self.subsystem.get_deploy_current() > config.tenting_deploy_current_limit
             and
-            self.timer.get() > .1)
+            self.timer.get() > config.deploy_tenting_timeout)
     
     def end(self, interrupted) -> None:
         self.subsystem.deploy_motor.set_raw_output(0)

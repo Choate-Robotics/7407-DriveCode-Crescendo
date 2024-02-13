@@ -18,7 +18,7 @@ from units.SI import (
     inches_to_meters,
     meters,
     rotations_per_minute,
-    degrees_to_radians
+    degrees_to_radians,
 )
 
 # Main
@@ -145,11 +145,11 @@ wrist_time_to_max_vel = 0.3 #TODO: placeholder
 
 
 # Flywheel
-flywheel_mass = 1.3
-flywheel_radius_outer = 2 * 0.0254 # TODO: placeholder
-flywheel_gear_ratio = 1 / 2 # TODO: placeholder
+flywheel_mass = 1.3 #kilograms
+flywheel_radius_outer = 2 * 0.0254
+flywheel_gear_ratio = 1
 flywheel_period = .03
-shooter_height = 23 * inches_to_meters # TODO: looks good, but needs to be tested
+shooter_height = 23 * inches_to_meters
 
 
 wrist_max_rotation = 60 * degrees_to_radians

@@ -34,6 +34,7 @@ class Intake(Subsystem):
 
         self.note_in_intake: bool = False
         self.intake_running: bool = False
+        self.intake_deployed: bool = False
 
     def init(self):
         self.inner_motor.init()
