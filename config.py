@@ -9,6 +9,7 @@ from toolkit.motors import SparkMaxConfig
 from rev import CANSparkMax
 import rev
 from enum import Enum
+import constants
 
 from wpilib import AnalogEncoder, DigitalInput
 from wpimath.geometry import Pose3d, Rotation3d
@@ -105,8 +106,9 @@ limelight_led_mode = {
 }
 
 class LimelightPosition:
-    elevator_down = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
-    elevator_up = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+    init_elevator_front = Pose3d(0, 0, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, 0))
+    init_elevator_back = Pose3d(0, 0, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
+    fixed_intake = Pose3d(0,0,0, Rotation3d(0,0,0))
 
 period: float = 0.03  # seconds
 

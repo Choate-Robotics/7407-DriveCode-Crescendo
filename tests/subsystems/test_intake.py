@@ -11,6 +11,7 @@ def intake()->Intake:
     intake = Intake()
     intake.inner_motor = MagicMock()
     intake.outer_motor = MagicMock()
+    intake.deploy_motor = MagicMock()
     intake.outer_motor.motor = MagicMock()
     intake.distance_sensor = MagicMock()
     return intake
@@ -20,10 +21,12 @@ def intake()->Intake:
 #     assert intake.note_in_intake == False
 
 def test_intake_init(intake: Intake):
+    
     intake.init()
 
     intake.inner_motor.init.assert_called()
     intake.outer_motor.init.assert_called()
+    intake.deploy_motor.init.assert_called()
     # intake.outer_motor_front.init.assert_called()
 
 @pytest.mark.parametrize(

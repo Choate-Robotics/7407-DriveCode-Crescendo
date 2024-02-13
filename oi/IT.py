@@ -35,6 +35,13 @@ class IT:
             command.IntakeIdle(Robot.intake)
         )
         
+        # button.Trigger(lambda: Robot.intake.note_in_intake)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
+        # ).onFalse(
+        #     command.IntakeIdle(Robot.intake)
+        # )
+        
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True
 

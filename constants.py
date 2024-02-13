@@ -136,8 +136,10 @@ intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
 intake_outer_gear_ratio = 58 / 12 #REAL VALUE: 58:12 gear ratio
 intake_deploy_gear_ratio = 20 * (32 / 14) #REAL VALUE: 20:1 * 32:14 gear ratio
 
-
-
+# LIMELIGHT
+limelight_height = 23 * inches_to_meters
+limelight_elevator_angle = 25 * degrees_to_radians
+limelight_back_yaw = 180 * degrees_to_radians
 
 # WRIST
 wrist_gear_ratio: float = 48 # REAL VALUE: 48:1 gear ratio muahhaha
