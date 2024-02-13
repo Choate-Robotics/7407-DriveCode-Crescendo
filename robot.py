@@ -139,11 +139,11 @@ class _Robot(wpilib.TimedRobot):
             # command.DrivetrainZero(Robot.drivetrain),
             # command.DriveSwerveCustom(Robot.drivetrain)
             # command.IntakeIdle(Robot.intake)
-            command.DeployIntake(Robot.intake),
+            # command.DeployIntake(Robot.intake),
             
             # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
-            command.IntakeIdle(Robot.intake)
-            
+            # command.IntakeIdle(Robot.intake),
+            # command.SetFlywheelLinearVelocity(Robot.flywheel, 20)
             # command.DeployTenting(Robot.intake)
         )
         )

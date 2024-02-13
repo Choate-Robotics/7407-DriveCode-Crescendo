@@ -19,7 +19,7 @@ class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
             pass
     
         def isFinished(self):
-            return False
+            return self.subsystem.within_velocity_linear(self.velocity, .5)
         
         def end(self, interrupted: bool):
             pass

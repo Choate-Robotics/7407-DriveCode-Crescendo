@@ -77,7 +77,7 @@ class Flywheel(Subsystem):
     
     @staticmethod
     def linear_velocity_to_angular_velocity(linear_velocity):
-        # Convert radians per second to RPM
+        # convert linear to angular velocity
         vel = linear_velocity / constants.flywheel_radius_outer
         return vel
     
@@ -86,6 +86,7 @@ class Flywheel(Subsystem):
         # Convert radians per second to RPM
         vel = angular_velocity * constants.flywheel_radius_outer
         return vel
+    
 
     def init(self) -> None:
         self.motor_1.init()

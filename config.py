@@ -121,7 +121,7 @@ intake_outer_speed = 1 #placeholder
 intake_outer_idle_speed = .15 #placeholder
 
 intake_timeout = 5
-intake_roller_current_limit = 20 #placeholder
+intake_roller_current_limit = 15 #placeholder
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.2
@@ -172,9 +172,9 @@ driver_centric: bool = True
 drivetrain_reversed: bool = False
 
 # Flywheel
-flywheel_id_1 = 0
-flywheel_id_2 = 19
-flywheel_motor_count = 2
+flywheel_id_1 = 19
+flywheel_id_2 = 1
+flywheel_motor_count = 1
 v0_flywheel = 15  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
