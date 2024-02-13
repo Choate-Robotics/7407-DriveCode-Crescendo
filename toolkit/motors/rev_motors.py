@@ -56,7 +56,7 @@ class SparkMax(PIDMotor):
     _get_analog = None
     _is_init: bool
 
-    def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
+    def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None):
         """
 
         Args:
@@ -98,11 +98,14 @@ class SparkMax(PIDMotor):
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless or TimedRobot.isSimulation() else CANSparkMax.MotorType.kBrushed
         ) # TODO: FIX TECH DEBT HERE
-        self.motor.setInverted(self._inverted)
+        
         self.pid_controller = self.motor.getPIDController() if self._brushless else None
         self.encoder = self.motor.getEncoder() if self._brushless else None
         self._set_config(self._config) if self._brushless else None
+        
+        self.motor.setInverted(self._inverted)
         self.motor.burnFlash()
+            
         self._has_init_run = True
         self._logger.complete("Initialized")
 
@@ -156,14 +159,14 @@ class SparkMax(PIDMotor):
 
         return self._abs_encoder
 
-    def set_target_position(self, pos: rotations):
+    def set_target_position(self, pos: rotations, arbff: float = 0):
         """
         Sets the target position of the motor controller in rotations
 
         Args:
             pos (float): The target position of the motor controller in rotations
         """
-        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition)
+        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff)
         self.error_check(result)
 
     def set_target_velocity(self, vel: rotations_per_second):  # Rotations per minute??
@@ -227,3 +230,4 @@ class SparkMax(PIDMotor):
             self.error_check(self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1]))
         if config.idle_mode is not None:
             self.error_check(self.motor.setIdleMode(config.idle_mode))
+        

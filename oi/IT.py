@@ -3,15 +3,11 @@ from utils import LocalLogger
 
 
 
-from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand
+from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
 import command
 import config
 
-
-# import command
-# import config
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
-from robot_systems import Field, Sensors
 from utils import LocalLogger
 
 
@@ -34,10 +30,10 @@ class IT:
 
         button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            ParallelRaceGroup(
-                WaitCommand(config.intake_timeout), 
-                command.RunIntake(Robot.intake)
-            ).andThen(command.IntakeIdle(Robot.intake))
+            command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
+        ).onFalse(
+            PrintCommand('idle').alongWith(
+            command.IntakeIdle(Robot.intake))
         )
         
         def stop_limelight_pos():

@@ -58,9 +58,9 @@ class _Robot(wpilib.TimedRobot):
 
             # for sensor in sensors:
             #     sensor.init()
-            Sensors.limelight.init()
-            Field.odometry.enable()
-            Field.calculations.init()
+            # Sensors.limelight.init()
+            # Field.odometry.enable()
+            # Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -103,8 +103,9 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
+            ...
             # Sensors.limelight_back.update()
-            Sensors.limelight.update()
+            # Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('limelight update', str(e))
@@ -113,7 +114,8 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            Field.odometry.update()
+            # Field.odometry.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
@@ -122,7 +124,8 @@ class _Robot(wpilib.TimedRobot):
                 raise e
             
         try:
-            Field.calculations.update()
+            # Field.calculations.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
@@ -133,13 +136,21 @@ class _Robot(wpilib.TimedRobot):
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         self.scheduler.schedule(commands2.SequentialCommandGroup(
-            command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveCustom(Robot.drivetrain)
+            # command.DrivetrainZero(Robot.drivetrain),
+            # command.DriveSwerveCustom(Robot.drivetrain)
+            # command.IntakeIdle(Robot.intake)
+            command.DeployIntake(Robot.intake),
+            
+            # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
+            command.IntakeIdle(Robot.intake)
+            
+            # command.DeployTenting(Robot.intake)
         )
         )
 
     def teleopPeriodic(self):
-        pass
+        # pass
+        print(Robot.intake.get_outer_current())
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")

@@ -112,21 +112,20 @@ period: float = 0.03  # seconds
 
 # Intake
 inner_intake_id = 13
-outer_intake_front_id = 17
-outer_intake_back_id = 12  # placeholder
+outer_intake_back_id = 17
 deploy_intake_id = 12
 intake_beam_break_channel = 1  # placeholder
 
 intake_inner_speed = 0.25 #placeholder
-intake_outer_speed = 0.5 #placeholder
-intake_outer_idle_speed = .25 #placeholder
+intake_outer_speed = 1 #placeholder
+intake_outer_idle_speed = .15 #placeholder
 
-intake_timeout = 5 #placeholder
-intake_roller_current_limit = 1 #placeholder
-intake_deploy_current_limit = 1 #placeholder
-tenting_deploy_current_limit = 1 #placeholder
-intake_sensor_debounce = 0.2 #placeholder
-intake_distance_sensor_threshold: float = 0.5 #placeholder
+intake_timeout = 5
+intake_roller_current_limit = 20 #placeholder
+intake_deploy_current_limit = 30
+tenting_deploy_current_limit = 30
+intake_sensor_debounce = 0.2
+intake_distance_sensor_threshold: float = 0.55
 
 # Elevator
 
@@ -144,6 +143,7 @@ elevator_zeroed_pos = 0.0  # TODO: PLACEHOLDER: meters
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
+wrist_flat_ff = 0 # TODO: FIND
 feeder_velocity = 132
 feeder_pass_velocity = 5
 wrist_stage_max = 0  # TODO: PLACEHOLDER radians
@@ -185,11 +185,11 @@ flywheel_feed_forward = 0.65  # TODO: placeholder
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))
-FEED_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5))
-INNER_CONFIG = SparkMaxConfig(.5, 0, 0)
-OUTER_CONFIG = SparkMaxConfig(.5, 0, 0)
-DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0)
+WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+FEED_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FLYWHEEL_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, flywheel_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )

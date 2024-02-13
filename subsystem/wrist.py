@@ -49,9 +49,12 @@ class Wrist(Subsystem):
         """
         angle = self.limit_angle(angle)
         
+        ff = config.wrist_flat_ff * math.cos(angle)
+        
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
-                (angle / (pi * 2)) * constants.wrist_gear_ratio
+                (angle / (pi * 2)) * constants.wrist_gear_ratio,
+                ff
             )
 
     def get_wrist_angle(self):
