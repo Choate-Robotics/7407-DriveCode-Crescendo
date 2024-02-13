@@ -22,6 +22,22 @@ class RunIntake(SubsystemCommand[Intake]):
         self.subsystem.stop_inner()
         if not interrupted and self.note_detected:
             self.subsystem.note_in_intake = True
+            self.subsystem.rollers_idle_out()
+        self.subsystem.intake_running = False
+        
+class EjectIntake(SubsystemCommand[Intake]):
+    def initialize(self) -> None:
+        self.subsystem.roll_out()
+        self.subsystem.intake_running = True
+
+    def execute(self) -> None:
+        pass
+
+    def isFinished(self) -> bool:
+        return False
+
+    def end(self, interrupted) -> None:
+        self.subsystem.stop_inner()
         self.subsystem.intake_running = False
 
 

@@ -35,6 +35,13 @@ class IT:
             command.IntakeIdle(Robot.intake)
         )
         
+        # if note in intake and wrist, after certain time, eject TODO: add wrist to this
+        # button.Trigger(lambda: Robot.intake.note_in_intake)\
+        #     .debounce(config.double_note_timeout).onTrue(
+        #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
+        #     )
+        
+        # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
         # button.Trigger(lambda: Robot.intake.note_in_intake)\
         # .debounce(config.intake_sensor_debounce).onTrue(
         #     # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))

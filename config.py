@@ -131,6 +131,8 @@ tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.2
 intake_distance_sensor_threshold: float = 0.55
 
+double_note_timeout = 2
+
 # Elevator
 
 elevator_can_id: int = 10
