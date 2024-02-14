@@ -51,9 +51,9 @@ class SetWrist(SubsystemCommand[Wrist]):
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
             self.subsystem.set_wrist_angle(wrist_angle) #stopping motor where it is
-            utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
-        else:
-            utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
+            # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
+        # else:
+        #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
        
 class FeedIn(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
@@ -67,14 +67,16 @@ class FeedIn(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return self.subsystem.note_staged
+        return self.subsystem.note_detected()
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
         if interrupted:
-            utils.LocalLogger.debug("Feed in interrupted")
+            ...
+            # utils.LocalLogger.debug("Feed in interrupted")
         else:
-            utils.LocalLogger.debug("Fed-in")
+            self.subsystem.note_staged = True
+            # utils.LocalLogger.debug("Fed-in")
 
 class FeedOut(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
@@ -92,10 +94,10 @@ class FeedOut(SubsystemCommand[Wrist]):
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        if interrupted:
-            utils.LocalLogger.debug("Feed out interrupted")
-        else:
-            utils.LocalLogger.debug("Fed-out")
+        # if interrupted:
+        #     # utils.LocalLogger.debug("Feed out interrupted")
+        # else:
+        #     # utils.LocalLogger.debug("Fed-out")
 
 class PassNote(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
@@ -114,7 +116,7 @@ class PassNote(SubsystemCommand[Wrist]):
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        if interrupted:
-            utils.LocalLogger.debug("Note transfer interrupted")
-        else:
-            utils.LocalLogger.debug("Note transferred")
+        # if interrupted:
+        #     # utils.LocalLogger.debug("Note transfer interrupted")
+        # else:
+        #     utils.LocalLogger.debug("Note transferred")

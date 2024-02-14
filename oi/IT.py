@@ -5,7 +5,7 @@ from utils import LocalLogger
 
 from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
 import command
-import config
+import config, math
 
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
 from utils import LocalLogger
@@ -42,12 +42,21 @@ class IT:
         #     )
         
         # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
-        # button.Trigger(lambda: Robot.intake.note_in_intake)\
-        # .debounce(config.intake_sensor_debounce).onTrue(
-        #     # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
-        # ).onFalse(
-        #     command.IntakeIdle(Robot.intake)
-        # )
+        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        .debounce(config.intake_sensor_debounce).onTrue(
+            command.PassIntakeNote(Robot.intake).alongWith(command.FeedIn(Robot.wrist)).andThen(command.IntakeIdle(Robot.intake))
+        ).onFalse(
+            command.IntakeIdle(Robot.intake)
+        )
+        
+        # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
+        button.Trigger(lambda: Robot.wrist.note_staged)\
+        .debounce(config.intake_sensor_debounce).onTrue(
+            command.SetWrist(Robot.wrist, math.radians(20))\
+                .andThen(command.PassNote(Robot.wrist))
+        ).onFalse(
+            command.SetWrist(Robot.wrist, math.radians(40))
+        )
         
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True

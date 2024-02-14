@@ -149,10 +149,11 @@ elevator_zeroed_pos = 0.0  # TODO: PLACEHOLDER: meters
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
-wrist_flat_ff = 0 # TODO: FIND
-feeder_velocity = 132
-feeder_pass_velocity = 5
+wrist_flat_ff = -0.6 # TODO: FIND
+feeder_velocity = .8
+feeder_pass_velocity = 1
 wrist_stage_max = 0  # TODO: PLACEHOLDER radians
+feeder_sensor_threshold = .4
 
 # DRIVETRAIN
 front_left_move_id = 7
@@ -192,7 +193,7 @@ ELEVATOR_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
-FEED_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+FEED_CONFIG = SparkMaxConfig(0.0005, 0, 0.0004, 0.00017, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)

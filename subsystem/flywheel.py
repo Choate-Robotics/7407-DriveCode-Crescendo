@@ -35,13 +35,13 @@ class Flywheel(Subsystem):
         self.flywheel_observer = KalmanFilter_1_1_1(
             self.flywheel_plant,
             [3.0], # how accurate we think our model is
-            [0.01], # how accurate we think our encoder data is
+            [0.05], # how accurate we think our encoder data is
             config.period
         )
         self.flywheel_controller = LinearQuadraticRegulator_1_1(
             self.flywheel_plant,
-            [8.0], # velocity error tolerance
-            [12.0], # control effort tolerance
+            [4.0], # velocity error tolerance
+            [8.0], # control effort tolerance
             config.period
         )
         self.flywheel_controller.latencyCompensate(self.flywheel_plant, config.period, 0.025)
@@ -120,7 +120,10 @@ class Flywheel(Subsystem):
             )
             
     def get_velocity_linear(self, motor=0) -> meters_per_second:
-        return self.get_velocity(motor) * constants.flywheel_radius_outer
+        if motor == 0:
+            return (self.get_velocity(1) + self.get_velocity(2))/2 * constants.flywheel_radius_outer
+        else:
+            return self.get_velocity(motor) * constants.flywheel_radius_outer
         
     def set_voltage(self, voltage: float, motor=0) -> None:
         if motor == 1:

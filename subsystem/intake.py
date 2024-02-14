@@ -65,8 +65,17 @@ class Intake(Subsystem):
         Also sets class variable note_in_intake
         :return: if there is a note
         """
-        self.note_in_intake = self.distance_sensor.getVoltage() > config.intake_distance_sensor_threshold
-        return self.note_in_intake
+        note_in_intake = self.distance_sensor.getVoltage() > config.intake_distance_sensor_threshold
+        return note_in_intake
+    
+    def detect_note_leaving(self) -> bool:
+        """
+        Detects if there is a note in the intake
+        Also sets class variable note_in_intake
+        :return: if there is a note
+        """
+        note_in_intake = self.distance_sensor.getVoltage() < .2
+        return note_in_intake
 
 
     def deploy_roller(self):

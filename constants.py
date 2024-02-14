@@ -147,14 +147,14 @@ wrist_time_to_max_vel = 0.3 #TODO: placeholder
 
 
 # Flywheel
-flywheel_mass = 1.3 #kilograms
+flywheel_mass = 1.3 + .127 #kilograms
 flywheel_radius_outer = 2 * 0.0254
 flywheel_gear_ratio = 1
 flywheel_period = .03
 shooter_height = 23 * inches_to_meters
 
 
-wrist_max_rotation = 60 * degrees_to_radians
+wrist_max_rotation = 54 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
 
 

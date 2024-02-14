@@ -29,13 +29,15 @@ class Elevator(Subsystem):
         self.motor_extend_follower.init()
 
         # Set the motor_extend encoder to the motor's absolute encoder
-        self.motor_extend_encoder = self.motor_extend.get_absolute_encoder()
+        self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
+
+        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+
 
         # Limits motor acceleration
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
         # Inverted b/c motors r parallel facing out.
-        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
         
         # self.zero()
 
