@@ -1,7 +1,7 @@
 import commands2
 
 
-class Subsystem(commands2.SubsystemBase):
+class Subsystem(commands2.Subsystem):
     """
     Extendable subsystem class. Needs to be extended by every subsystem.
     """

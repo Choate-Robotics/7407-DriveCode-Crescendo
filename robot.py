@@ -12,6 +12,7 @@ import utils
 from oi.OI import OI
 from oi.IT import IT
 from wpilib import SmartDashboard
+from math import degrees, radians
 
 
 
@@ -58,9 +59,9 @@ class _Robot(wpilib.TimedRobot):
 
             # for sensor in sensors:
             #     sensor.init()
-            Sensors.limelight.init()
-            Field.odometry.enable()
-            Field.calculations.init()
+            # Sensors.limelight.init()
+            # Field.odometry.enable()
+            # Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -103,8 +104,9 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
+            ...
             # Sensors.limelight_back.update()
-            Sensors.limelight.update()
+            # Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('limelight update', str(e))
@@ -113,7 +115,8 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            Field.odometry.update()
+            # Field.odometry.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
@@ -122,24 +125,45 @@ class _Robot(wpilib.TimedRobot):
                 raise e
             
         try:
-            Field.calculations.update()
+            # Field.calculations.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
 
             if config.DEBUG_MODE:
                 raise e
+            
+        self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
+        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
+        Robot.wrist.zero_wrist()
+        Robot.elevator.zero()
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain)
+            # # command.IntakeIdle(Robot.intake)
+            # command.DeployIntake(Robot.intake),
+            # command.SetWrist(Robot.wrist, radians(20)),
+            # command.SetWrist(Robot.wrist, radians(20)),
+            # # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
+            # command.IntakeIdle(Robot.intake),
+            # # command.DeployTenting(Robot.intake)
+            # command.SetFlywheelLinearVelocity(Robot.flywheel, 30),
+            # # command.FeedIn(Robot.wrist)
+            # command.SetElevator(Robot.elevator, .51)
         )
         )
 
     def teleopPeriodic(self):
-        pass
+        ...
+        # print(Robot.elevator.get_length_total_height())
+        # print(degrees(Robot.wrist.get_wrist_abs_angle() ))
+        # print(degrees(Robot.wrist.get_wrist_angle()))
+        # print(Robot.wrist.wrist_motor.get_sensor_position())
+        print(Robot.flywheel.get_velocity_linear())
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")

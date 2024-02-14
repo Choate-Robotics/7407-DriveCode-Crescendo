@@ -31,7 +31,6 @@ class Keymap:
         RESET_GYRO = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
         )
-
         X_MODE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
         )
@@ -41,3 +40,9 @@ class Keymap:
         SHOOT = commands2.button.Trigger(
             lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
         )
+    class Elevator:
+        pass
+    class Intake:
+        pass
+    class Shooter:
+        pass
