@@ -140,10 +140,10 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
 elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
-elevator_feed_forward: float = 0.65  # TODO: PLACEHOLDER
+elevator_feed_forward: float = 0.0  # TODO: PLACEHOLDER
 elevator_moving = False
 elevator_stage_max = 0.1  # meters
-elevator_zeroed_pos = 0.0  # TODO: PLACEHOLDER: meters
+elevator_zeroed_pos = 0.023  # TODO: PLACEHOLDER: meters
 
 # Wrist
 wrist_zeroed_pos = 0.0
@@ -159,22 +159,22 @@ feeder_sensor_threshold = .4
 front_left_move_id = 7
 front_left_turn_id = 8
 front_left_encoder_port = AnalogEncoder(3)
-front_left_encoder_zeroed_pos = 0.678 if comp_bot.get() else 0.0
+front_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.860
 
 front_right_move_id = 5
 front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.503 if comp_bot.get() else 0.0
+front_right_encoder_zeroed_pos = 0.536 if comp_bot.get() else 0.536
 
 back_left_move_id = 11
 back_left_turn_id = 14
-back_left_encoder_port = AnalogEncoder(1)
-back_left_encoder_zeroed_pos = 0.964 if comp_bot.get() else 0.0
+back_left_encoder_port = AnalogEncoder(0)
+back_left_encoder_zeroed_pos = 0.458 if comp_bot.get() else 0.458
 
-back_right_move_id = 19
+back_right_move_id = 18
 back_right_turn_id = 16
-back_right_encoder_port = AnalogEncoder(0)
-back_right_encoder_zeroed_pos = 0.260 if comp_bot.get() else 0.0
+back_right_encoder_port = AnalogEncoder(1)
+back_right_encoder_zeroed_pos = 0.984 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 

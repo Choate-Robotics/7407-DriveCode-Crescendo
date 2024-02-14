@@ -65,6 +65,9 @@ class Elevator(Subsystem):
         """
         length = self.limit_length(length)
         
+        print(length)
+        print(self.length_to_rotations(length), 'elevator rotation')
+        
         self.motor_extend.set_target_position(
             self.length_to_rotations(length)
         )
@@ -75,6 +78,10 @@ class Elevator(Subsystem):
         :return: Length of the elevator in meters
         """
         return self.rotations_to_length(self.motor_extend.get_sensor_position())
+    
+    def get_length_total_height(self) -> meters:
+        
+        return self.get_length() + constants.elevator_bottom_total_height
 
     def set_motor_extend_position(self, length: meters) -> None:
         """
@@ -87,13 +94,24 @@ class Elevator(Subsystem):
         self.motor_extend.set_sensor_position(
             self.length_to_rotations(length)
         )
+        
+    def get_elevator_abs(self) -> meters:
+        
+        length = (self.motor_extend_encoder.getPosition() - config.elevator_zeroed_pos) * constants.elevator_max_length
+        print(length, 'abs length')
+        return length
+        
 
     def zero(self) -> None:
         """
         Zero the elevator
 
-        """
-        length = (self.motor_extend_encoder.getPosition() - config.elevator_zeroed_pos) * constants.elevator_max_length
+        """  
+        
+        
+        length = self.limit_length(self.get_elevator_abs())
+    
+        print(length, 'elevator length (m)')
         # Reset the encoder to zero
         self.set_motor_extend_position(length)
 

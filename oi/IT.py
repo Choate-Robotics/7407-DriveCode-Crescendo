@@ -28,35 +28,35 @@ class IT:
 
         
 
-        button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
-        ).onFalse(
-            command.IntakeIdle(Robot.intake)
-        )
+        # button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
+        # ).onFalse(
+        #     command.IntakeIdle(Robot.intake)
+        # )
         
-        # if note in intake and wrist, after certain time, eject TODO: add wrist to this
-        # button.Trigger(lambda: Robot.intake.note_in_intake)\
-        #     .debounce(config.double_note_timeout).onTrue(
-        #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
-        #     )
+        # # if note in intake and wrist, after certain time, eject TODO: add wrist to this
+        # # button.Trigger(lambda: Robot.intake.note_in_intake)\
+        # #     .debounce(config.double_note_timeout).onTrue(
+        # #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
+        # #     )
         
-        # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
-        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            command.PassIntakeNote(Robot.intake).alongWith(command.FeedIn(Robot.wrist)).andThen(command.IntakeIdle(Robot.intake))
-        ).onFalse(
-            command.IntakeIdle(Robot.intake)
-        )
+        # # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
+        # button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     command.PassIntakeNote(Robot.intake).alongWith(command.FeedIn(Robot.wrist)).andThen(command.IntakeIdle(Robot.intake))
+        # ).onFalse(
+        #     command.IntakeIdle(Robot.intake)
+        # )
         
-        # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
-        button.Trigger(lambda: Robot.wrist.note_staged)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            command.SetWrist(Robot.wrist, math.radians(20))\
-                .andThen(command.PassNote(Robot.wrist))
-        ).onFalse(
-            command.SetWrist(Robot.wrist, math.radians(40))
-        )
+        # # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
+        # button.Trigger(lambda: Robot.wrist.note_staged)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     command.SetWrist(Robot.wrist, math.radians(20))\
+        #         .andThen(command.PassNote(Robot.wrist))
+        # ).onFalse(
+        #     command.SetWrist(Robot.wrist, math.radians(40))
+        # )
         
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True
