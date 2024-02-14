@@ -41,13 +41,7 @@ class IT:
         # #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
         # #     )
         
-        # # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
-        # button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
-        # .debounce(config.intake_sensor_debounce).onTrue(
-        #     command.PassIntakeNote(Robot.intake).alongWith(command.FeedIn(Robot.wrist)).andThen(command.IntakeIdle(Robot.intake))
-        # ).onFalse(
-        #     command.IntakeIdle(Robot.intake)
-        # )
+        # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
         
         # # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
         # button.Trigger(lambda: Robot.wrist.note_staged)\
@@ -65,14 +59,14 @@ class IT:
         
         
         # elevator and wrist
-        button.Trigger(lambda: Robot.intake.beam_break.get() and Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage)
         ).onFalse(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
         )
         
-        button.Trigger(lambda: Robot.wrist.beam_break.get() and Robot.wrist.note_staged)\
+        button.Trigger(lambda: Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim)
         ).onFalse(

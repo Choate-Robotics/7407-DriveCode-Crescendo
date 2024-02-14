@@ -59,9 +59,9 @@ class _Robot(wpilib.TimedRobot):
 
             # for sensor in sensors:
             #     sensor.init()
-            # Sensors.limelight.init()
-            # Field.odometry.enable()
-            # Field.calculations.init()
+            Sensors.limelight.init()
+            Field.odometry.enable()
+            Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -106,7 +106,7 @@ class _Robot(wpilib.TimedRobot):
         try:
             ...
             # Sensors.limelight_back.update()
-            # Sensors.limelight.update()
+            Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('limelight update', str(e))
@@ -115,7 +115,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            # Field.odometry.update()
+            Field.odometry.update()
             ...
         except Exception as e:
             self.log.error(str(e))
@@ -125,7 +125,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
             
         try:
-            # Field.calculations.update()
+            Field.calculations.update()
             ...
         except Exception as e:
             self.log.error(str(e))

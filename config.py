@@ -7,7 +7,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from rev import CANSparkMax
-import rev
+import rev, math
 from enum import Enum
 import constants
 
@@ -16,8 +16,8 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonConfig
-
-
+from units.SI import degrees_to_radians, meters, radians
+from typing import Literal
 comp_bot: DigitalInput = DigitalInput(
     9
 )  # if true, we are using the practice bot (we will put a jumper on the DIO port)
@@ -159,9 +159,10 @@ feed_motor_id = 3
 wrist_flat_ff = -0.6 # TODO: FIND
 feeder_velocity = .8
 feeder_pass_velocity = 1
-wrist_stage_max = 0  # TODO: PLACEHOLDER radians
+wrist_stage_max = 22 * degrees_to_radians  # radians
 feeder_sensor_threshold = .4
-
+stage_timeout = 5
+wrist_tent_limit = 20 * degrees_to_radians
 # DRIVETRAIN
 front_left_move_id = 7
 front_left_turn_id = 8
@@ -189,6 +190,7 @@ drivetrain_reversed: bool = False
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
+flywheel_amp_speed:meters = 5
 v0_flywheel = 15  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop

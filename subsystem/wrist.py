@@ -121,3 +121,9 @@ class Wrist(Subsystem):
     def feed_note(self):
         if not self.feed_disabled:
             self.feed_motor.set_target_velocity(config.feeder_pass_velocity)
+            
+    def set_note_staged(self):
+        self.note_staged = True
+        
+    def set_note_not_staged(self):
+        self.note_staged = False

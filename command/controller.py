@@ -1,8 +1,8 @@
-from subsystem import Elevator, Wrist, Intake, Drivetrain
+from subsystem import Elevator, Wrist, Intake, Drivetrain, Flywheel
 from sensors import FieldOdometry, TrajectoryCalculator
 
 import logging
-from command import DriveSwerveCustom, SetElevator, ZeroElevator, ZeroWrist, FeedIn, FeedOut, PassNote, SetWrist, DeployIntake, DeployTenting
+from command import *
 import wpilib, config, constants
 import commands2
 from wpimath.geometry import Pose2d, Rotation2d
@@ -196,16 +196,17 @@ class StageNote(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kStage),
-            WaitUntilCommand(lambda: intake.detect_note() == False and wrist.note_staged),
+            PassIntakeNote(intake),
+            WaitUntilCommand(wrist.note_detected),
             Giraffe(elevator, wrist, config.Giraffe.kIdle),
         )
     
 class ShootSpeaker(SequentialCommandGroup):
     
-    def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, atPose: Pose2d | None = None):
+    def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, flywheel: Flywheel, atPose: Pose2d | None = None):
         super().__init__(
             ParallelCommandGroup(
-                PrintCommand('Speed up flywheel'),
+                SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 Giraffe(elevator, wrist, config.Giraffe.kAim),
                 PrintCommand('Aim Drivetrain')
             ),
@@ -215,10 +216,10 @@ class ShootSpeaker(SequentialCommandGroup):
         
 class ShootAmp(SequentialCommandGroup):
     
-    def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist):
+    def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
             ParallelCommandGroup(
-                PrintCommand('Speed up flywheel'),
+                SetFlywheelLinearVelocity(flywheel, config.flywheel_amp_speed),
                 Giraffe(elevator, wrist, config.Giraffe.kAmp),
                 PrintCommand('Lock Drivetrain with amp')
             ),
@@ -232,7 +233,8 @@ class EnableClimb(ParallelCommandGroup):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
             SequentialCommandGroup(
-                WaitUntilCommand(lambda: wrist.get_wrist_angle() < 0.1),
+                WaitUntilCommand(lambda: wrist.get_wrist_angle() < config.wrist_tent_limit),
                 DeployTenting(intake)
             )
         )
+        

@@ -75,7 +75,7 @@ class TrajectoryCalculator:
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
-            self.speaker_z - self.elevator.get_length() + constants.shooter_height
+            self.speaker_z - self.elevator.get_length() + constants.elevator_bottom_total_height
         )
         # print("delta_z", self.delta_z)
         # print("constant.shooter_height", constants.shooter_height)
@@ -105,7 +105,7 @@ class TrajectoryCalculator:
         updates rotation of base to face target
         :return: base target angle
         """
-        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.get(False).translation()
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         self.base_rotation2d = robot_to_speaker.angle()

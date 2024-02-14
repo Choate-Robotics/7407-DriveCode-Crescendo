@@ -24,7 +24,7 @@ class Sensors:
 
     # odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([limelight_front, limelight_back]))
 
-    # limelight = sensors.Limelight(config.LimelightPosition.elevator_down)
+    limelight = sensors.Limelight(config.LimelightPosition.init_elevator_front)
 
 
 class LEDs:
@@ -36,6 +36,6 @@ class PowerDistribution:
 
 
 class Field:
-    # odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([Sensors.limelight]))
-    # calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator)
+    odometry = sensors.FieldOdometry(Robot.drivetrain, sensors.LimelightController([Sensors.limelight]))
+    calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator)
     POI = utils.POI()
