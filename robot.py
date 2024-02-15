@@ -1,3 +1,5 @@
+# from math import degrees, radians
+
 import commands2
 import ntcore
 import wpilib
@@ -11,7 +13,7 @@ import config
 import utils
 from oi.IT import IT
 from oi.OI import OI
-from robot_systems import Field, Robot, Sensors
+from robot_systems import Field, Robot
 from toolkit.subsystem import Subsystem
 
 # from wpilib import SmartDashboard
@@ -44,8 +46,8 @@ class _Robot(wpilib.TimedRobot):
                 }.values()
             )
 
-            for subsystem in subsystems:
-                subsystem.init()
+            for my_subsystem in subsystems:
+                my_subsystem.init()
 
         try:
             init_subsystems()
@@ -56,23 +58,24 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
-        def init_sensors():
-            sensors: list[Sensors] = list(
-                {
-                    k: v
-                    for k, v in Sensors.__dict__.items()
-                    if isinstance(v, Sensors) and hasattr(v, "init")
-                }.values()
-            )
+        # def init_sensors():
+        #     my_sensors: list[Sensors] = list(
+        #         {
+        #             k: v
+        #             for k, v in Sensors.__dict__.items()
+        #             if isinstance(v, Sensors) and hasattr(v, "init")
+        #         }.values()
+        #     )
 
-            for sensor in sensors:
-                sensor.init()
-            Sensors.limelight.init()
-            Field.odometry.enable()
-            Field.speaker_calculations.init()
+        # for sensor in sensors:
+        #     sensor.init()
+        # Sensors.limelight.init()
+        # Field.odometry.enable()
+        # Field.calculations.init()
 
         try:
-            init_sensors()
+            ...
+            # init_sensors()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString("sensor init", str(e))
@@ -112,8 +115,9 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
+            ...
             # Sensors.limelight_back.update()
-            Sensors.limelight.update()
+            # Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString("limelight update", str(e))
@@ -122,7 +126,8 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            Field.odometry.update()
+            # Field.odometry.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString("odometry update", str(e))
@@ -131,7 +136,8 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            Field.speaker_calculations.update()
+            # Field.calculations.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString("odometry update", str(e))
@@ -139,17 +145,38 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
+        self.nt.getTable("swerve").putNumberArray(
+            "abs encoders", Robot.drivetrain.get_abs()
+        )
+
     def teleopInit(self):
         # self.log.info("Teleop initialized")
+        Robot.wrist.zero_wrist()
+        Robot.elevator.zero()
         self.scheduler.schedule(
             commands2.SequentialCommandGroup(
                 command.DrivetrainZero(Robot.drivetrain),
-                command.DriveSwerveCustom(Robot.drivetrain),
+                command.DriveSwerveCustom(Robot.drivetrain)
+                # # command.IntakeIdle(Robot.intake)
+                # command.DeployIntake(Robot.intake),
+                # command.SetWrist(Robot.wrist, radians(20)),
+                # command.SetWrist(Robot.wrist, radians(20)),
+                # # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
+                # command.IntakeIdle(Robot.intake),
+                # # command.DeployTenting(Robot.intake)
+                # command.SetFlywheelLinearVelocity(Robot.flywheel, 30),
+                # # command.FeedIn(Robot.wrist)
+                # command.SetElevator(Robot.elevator, .51)
             )
         )
 
     def teleopPeriodic(self):
-        pass
+        ...
+        # print(Robot.elevator.get_length_total_height())
+        # print(degrees(Robot.wrist.get_wrist_abs_angle() ))
+        # print(degrees(Robot.wrist.get_wrist_angle()))
+        # print(Robot.wrist.wrist_motor.get_sensor_position())
+        print(Robot.flywheel.get_velocity_linear())
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")

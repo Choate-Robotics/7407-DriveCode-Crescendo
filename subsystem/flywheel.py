@@ -9,11 +9,9 @@ from wpimath.system import LinearSystemLoop_1_1_1
 from wpimath.system.plant import LinearSystemId, DCMotor
 
 from toolkit.subsystem import Subsystem
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
+from toolkit.motors.rev_motors import SparkMax
 
-FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
-)
+from units.SI import radians_per_second, meters_per_second, radians
 
 class Flywheel(Subsystem):
 
@@ -22,11 +20,11 @@ class Flywheel(Subsystem):
 
         self.motor_1: SparkMax = SparkMax(
             can_id=config.flywheel_id_1,
-            config=FLYWHEEL_CONFIG
+            config=config.FLYWHEEL_CONFIG
         )
         self.motor_2: SparkMax = SparkMax(
             can_id=config.flywheel_id_2,
-            config=FLYWHEEL_CONFIG
+            config=config.FLYWHEEL_CONFIG
         )
 
         self.flywheel_MOI = (constants.flywheel_mass / 2 ) * (constants.flywheel_radius_outer ** 2)
@@ -36,29 +34,30 @@ class Flywheel(Subsystem):
         )
         self.flywheel_observer = KalmanFilter_1_1_1(
             self.flywheel_plant,
-            [3.0],
-            [0.01],
-            constants.flywheel_period
+            [3.0], # how accurate we think our model is
+            [0.05], # how accurate we think our encoder data is
+            config.period
         )
         self.flywheel_controller = LinearQuadraticRegulator_1_1(
             self.flywheel_plant,
-            [12.0],
-            [0.1],
+            [4.0], # velocity error tolerance
+            [6.0], # control effort tolerance
+            config.period
         )
-        self.flywheel_controller.latencyCompensate(self.flywheel_plant, constants.flywheel_period, 0.025)
+        self.flywheel_controller.latencyCompensate(self.flywheel_plant, config.period, 0.025)
         self.top_flywheel_state = LinearSystemLoop_1_1_1(
             self.flywheel_plant,
             self.flywheel_controller,
             self.flywheel_observer,
             12.0,
-            constants.flywheel_period
+            config.period
         )
         self.bottom_flywheel_state = LinearSystemLoop_1_1_1(
             self.flywheel_plant,
             self.flywheel_controller,
             self.flywheel_observer,
             12.0,
-            constants.flywheel_period
+            config.period
         )
 
 
@@ -75,6 +74,19 @@ class Flywheel(Subsystem):
         # Convert radians per second to RPM
         rpm = (angular_velocity * 60) / (2 * math.pi)
         return rpm
+    
+    @staticmethod
+    def linear_velocity_to_angular_velocity(linear_velocity):
+        # convert linear to angular velocity
+        vel = linear_velocity / constants.flywheel_radius_outer
+        return vel
+    
+    @staticmethod
+    def angular_velocity_to_linear_velocity(angular_velocity):
+        # Convert radians per second to RPM
+        vel = angular_velocity * constants.flywheel_radius_outer
+        return vel
+    
 
     def init(self) -> None:
         self.motor_1.init()
@@ -82,16 +94,21 @@ class Flywheel(Subsystem):
 
         self.initialized = True
 
-    def set_velocity(self, angular_velocity: float, motor=0) -> None:
+    def set_velocity(self, angular_velocity: radians_per_second, motor=0) -> None:
         if motor == 1:
-            self.motor_1.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
+            self.top_flywheel_state.setNextR([angular_velocity])
         elif motor == 2:
-            self.motor_2.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
+            self.bottom_flywheel_state.setNextR([angular_velocity])
         else:
-            self.motor_1.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
-            self.motor_2.set_raw_output(self.angular_velocity_to_rpm(angular_velocity))
+            self.top_flywheel_state.setNextR([angular_velocity])
+            self.bottom_flywheel_state.setNextR([angular_velocity])
+            
+    def set_velocity_linear(self, linear_velocity: meters_per_second, motor=0) -> None:
+        angular_velocity = linear_velocity / constants.flywheel_radius_outer
+        self.set_velocity(angular_velocity, motor)
 
-    def get_velocity(self, motor=0) -> float:
+
+    def get_velocity(self, motor=0) -> radians_per_second:
         if motor == 1:
             return self.rpm_to_angular_velocity(self.motor_1.get_sensor_velocity())
         elif motor == 2:
@@ -101,6 +118,12 @@ class Flywheel(Subsystem):
                 self.rpm_to_angular_velocity(self.motor_1.get_sensor_velocity()),
                 self.rpm_to_angular_velocity(self.motor_2.get_sensor_velocity())
             )
+            
+    def get_velocity_linear(self, motor=0) -> meters_per_second:
+        if motor == 0:
+            return (self.get_velocity(1) + self.get_velocity(2))/2 * constants.flywheel_radius_outer
+        else:
+            return self.get_velocity(motor) * constants.flywheel_radius_outer
         
     def set_voltage(self, voltage: float, motor=0) -> None:
         if motor == 1:
@@ -121,8 +144,53 @@ class Flywheel(Subsystem):
                 self.motor_1.motor.getAppliedOutput(),
                 self.motor_2.motor.getAppliedOutput()
             )
+            
+    def within_velocity(self, velocity: radians_per_second, tolerance: radians_per_second, motor=0) -> bool:
+        '''
+        Returns True if the flywheel velocity is within the tolerance of the target velocity
+        '''
+        
+        def tol(vel, target, tol):
+            return abs(vel - target) < tol
+        
+        if motor == 1:
+            return tol(self.get_velocity(1), velocity, tolerance)
+        elif motor == 2:
+            return tol(self.get_velocity(2), velocity, tolerance)
+        else:
+            return (
+                tol(self.get_velocity(1), velocity, tolerance) and
+                tol(self.get_velocity(2), velocity, tolerance)
+            )
+    
+    def within_velocity_linear(self, velocity: meters_per_second, tolerance: meters_per_second, motor=0) -> bool:
+        '''
+        Returns True if the flywheel velocity is within the tolerance of the target velocity
+        '''
+        
+        def tol(vel, target, tol):
+            return abs(vel - target) < tol
+        
+        if motor == 1:
+            return tol(self.get_velocity_linear(1), velocity, tolerance)
+        elif motor == 2:
+            return tol(self.get_velocity_linear(2), velocity, tolerance)
+        else:
+            return (
+                tol(self.get_velocity_linear(1), velocity, tolerance) and
+                tol(self.get_velocity_linear(2), velocity, tolerance)
+            )
         
     def periodic(self):
-        # self.top_flywheel_state.
-        # self.bottom_flywheel_state
-        ...
+        
+        # Correct the state estimate with the encoder and voltage
+        self.top_flywheel_state.correct([self.get_velocity(1)])
+        self.bottom_flywheel_state.correct([self.get_velocity(2)])
+
+        # Update our LQR to generate new voltage commands and use the voltage
+        self.top_flywheel_state.predict(config.period)
+        self.bottom_flywheel_state.predict(config.period)
+
+        # Set the next setpoint for the flywheel
+        self.set_voltage(self.top_flywheel_state.U(0), 1)
+        self.set_voltage(self.bottom_flywheel_state.U(0), 2)
