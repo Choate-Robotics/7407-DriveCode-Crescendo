@@ -6,17 +6,16 @@ import wpilib
 
 import command
 import config
-
-# import constants
-# import sensors
-# import subsystem
 import utils
 from oi.IT import IT
 from oi.OI import OI
 from robot_systems import Field, Robot
-from toolkit.subsystem import Subsystem
 
 # from wpilib import SmartDashboard
+from toolkit.subsystem import Subsystem
+
+# import constants
+# import sensors
 
 
 class _Robot(wpilib.TimedRobot):
@@ -46,8 +45,8 @@ class _Robot(wpilib.TimedRobot):
                 }.values()
             )
 
-            for my_subsystem in subsystems:
-                my_subsystem.init()
+            for subsystem in subsystems:
+                subsystem.init()
 
         try:
             init_subsystems()
@@ -58,24 +57,24 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
-        # def init_sensors():
-        #     my_sensors: list[Sensors] = list(
-        #         {
-        #             k: v
-        #             for k, v in Sensors.__dict__.items()
-        #             if isinstance(v, Sensors) and hasattr(v, "init")
-        #         }.values()
-        #     )
-
-        # for sensor in sensors:
-        #     sensor.init()
-        # Sensors.limelight.init()
-        # Field.odometry.enable()
-        # Field.calculations.init()
+        def init_sensors():
+            pass
+            # sensors: list[Sensors] = list(
+            #     {
+            #         k: v
+            #         for k, v in Sensors.__dict__.items()
+            #         if isinstance(v, Sensors) and hasattr(v, "init")
+            #     }.values()
+            # )
+            #
+            # for sensor in sensors:
+            #     sensor.init()
+            # # Sensors.limelight.init()
+            # Field.odometry.enable()
+            # Field.calculations.init()
 
         try:
-            ...
-            # init_sensors()
+            init_sensors()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString("sensor init", str(e))
@@ -91,13 +90,6 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
-
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
 
     def robotPeriodic(self):
         Field.POI.setNTValues()
@@ -138,6 +130,7 @@ class _Robot(wpilib.TimedRobot):
         try:
             # Field.calculations.update()
             ...
+
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString("odometry update", str(e))
@@ -151,6 +144,7 @@ class _Robot(wpilib.TimedRobot):
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
+
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
         self.scheduler.schedule(
