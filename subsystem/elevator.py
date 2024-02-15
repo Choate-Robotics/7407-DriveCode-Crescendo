@@ -1,18 +1,11 @@
 import rev
-
 import config
 import constants
 
+from units.SI import meters
+
 from toolkit.subsystem import Subsystem
-from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
-
-from units.SI import meters, radians
-
-# TODO: CHANGE WHEN ROBOT IS BUILT
-ELEVATOR_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, config.elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
-)
-
+from toolkit.motors.rev_motors import SparkMax
 
 class Elevator(Subsystem):
 
@@ -20,12 +13,12 @@ class Elevator(Subsystem):
         super().__init__()
         # Absolute encoder
         self.motor_extend: SparkMax = SparkMax(
-            config.elevator_can_id, config=ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id, config=config.ELEVATOR_CONFIG, inverted=False
         )
         self.motor_extend_encoder = None
 
         self.motor_extend_follower: SparkMax = SparkMax(
-            config.elevator_can_id_2, config=ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id_2, config=config.ELEVATOR_CONFIG, inverted=True
         )
 
         self.zeroed: bool = False
@@ -36,23 +29,47 @@ class Elevator(Subsystem):
         self.motor_extend_follower.init()
 
         # Set the motor_extend encoder to the motor's absolute encoder
-        self.motor_extend_encoder = self.motor_extend.get_absolute_encoder()
+        self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
 
-        # Set the motor's ramp rate
+        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+
+
+        # Limits motor acceleration
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
-        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=False)
+        # Inverted b/c motors r parallel facing out.
+        
+        # self.zero()
 
+    @staticmethod
+    def length_to_rotations(length: meters) -> float:
+        return (length * constants.elevator_gear_ratio) / constants.elevator_driver_gear_circumference
+    
+    @staticmethod
+    def rotations_to_length(rotations: float) -> meters:
+        return (rotations * constants.elevator_driver_gear_circumference) / constants.elevator_gear_ratio
+    
+    @staticmethod
+    def limit_length(length: meters) -> meters:
+        if length > constants.elevator_max_length:
+            return constants.elevator_max_length
+        elif length < 0.0:
+            return 0.0
+        return length
+    
     def set_length(self, length: meters) -> None:
         """
         Sets the length of the elevator in meters
         :param length: Length of the elevator (meters)
 
         """
-
+        length = self.limit_length(length)
+        
+        print(length)
+        print(self.length_to_rotations(length), 'elevator rotation')
+        
         self.motor_extend.set_target_position(
-            (length * constants.elevator_gear_ratio)
-            / constants.elevator_driver_gear_circumference
+            self.length_to_rotations(length)
         )
 
     def get_length(self) -> float:
@@ -60,34 +77,43 @@ class Elevator(Subsystem):
         Gets the length of the elevator in meters
         :return: Length of the elevator in meters
         """
-        return (
-                (self.motor_extend.get_sensor_position() / constants.elevator_gear_ratio)
-                * constants.elevator_driver_gear_circumference
-        )
+        return self.rotations_to_length(self.motor_extend.get_sensor_position())
+    
+    def get_length_total_height(self) -> meters:
+        
+        return self.get_length() + constants.elevator_bottom_total_height
 
-    def set_motor_extend_position(self, position: float) -> None:
+    def set_motor_extend_position(self, length: meters) -> None:
         """
         Set the position of motor_extend
         :param position: Position of the motor
 
         """
-
-        # Make sure the position is between 0 and 1
-        position = max(0.0, min(position, 1.0))
-
-        self.motor_extend.set_sensor_position(position * config.elevator_max_rotation)
+        length = self.limit_length(length)
+        
+        self.motor_extend.set_sensor_position(
+            self.length_to_rotations(length)
+        )
+        
+    def get_elevator_abs(self) -> meters:
+        
+        length = (self.motor_extend_encoder.getPosition() - config.elevator_zeroed_pos) * constants.elevator_max_length
+        print(length, 'abs length')
+        return length
+        
 
     def zero(self) -> None:
         """
         Zero the elevator
 
-        """
-
+        """  
+        
+        
+        length = self.limit_length(self.get_elevator_abs())
+    
+        print(length, 'elevator length (m)')
         # Reset the encoder to zero
-        self.motor_extend.set_sensor_position(
-            self.motor_extend_encoder.getPosition()
-            * constants.elevator_max_length
-        )
+        self.set_motor_extend_position(length)
 
         self.zeroed = True
 

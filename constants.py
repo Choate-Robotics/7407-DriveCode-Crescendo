@@ -1,14 +1,3 @@
-import math
-
-from wpimath.geometry import Rotation2d
-
-from units.SI import (
-    degrees_per_second__to__radians_per_second,
-    feet_to_meters,
-    inches_to_meters,
-    meters,
-    rotations_per_minute,
-)
 
 # c = drag coefficient
 # a = projectile sectional area (m^2)
@@ -20,7 +9,19 @@ from units.SI import (
 # y = height of target (COULD BE IN ODOMETRY) (m) const
 # tol = tolerance of error in distance to target (m)
 
+# Imports
+import math
+from wpimath.geometry import Rotation2d, Translation2d
+from units.SI import (
+    degrees_per_second__to__radians_per_second,
+    feet_to_meters,
+    inches_to_meters,
+    meters,
+    rotations_per_minute,
+    degrees_to_radians,
+)
 
+# Main
 c = 0.47  # drag coefficient
 a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
 m = 0.235301  # projectile mass (kg)
@@ -30,35 +31,25 @@ vzero = 15  # initial velocity of shooter flywheel (m/s) config
 # speaker_z = 1.7  # height of target (m) CHANGE THIS
 # speaker_location = Translation2d(0, 0)
 
-# DRIVETRAIN
-drivetrain_turn_gear_ratio = 18.4
-drivetrain_wheel_gear_ratio = 6.12
-
-track_width = 14 * inches_to_meters  # TODO: change to 20 inches for actual robot
-
+# Drivetrain
+drivetrain_turn_gear_ratio = 150/7
+drivetrain_wheel_gear_ratio = 5.9
+track_width = 20 * inches_to_meters  # TODO: change to 20 inches for actual robot
 drivetrain_length = 25 * inches_to_meters
-
-bumper_thickness = 1.5 * inches_to_meters
-
+bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
-
 drivetrain_max_vel = 80 * feet_to_meters
 drivetrain_max_accel = 5 * feet_to_meters
-
 drivetrain_max_angular_vel = 500 * degrees_per_second__to__radians_per_second
-
 drivetrain_move_motor_free_speed: rotations_per_minute = (
     6300  # 5676 is the free speed RPM of the NEO
 )
-
 drivetrain_wheel_diameter: meters = (
     4 * inches_to_meters
 )  # 3.5 is the diameter of the wheel in inches
-
 drivetrain_move_gear_ratio: rotations_per_minute = (
     drivetrain_move_motor_free_speed / drivetrain_wheel_gear_ratio
 )  # is the RPM constant multiple of the driving motor
-
 
 # the below variable is the rotation the motor rotates per meter of wheel movement
 drivetrain_move_gear_ratio_as_rotations_per_meter: float = (
@@ -67,10 +58,8 @@ drivetrain_move_gear_ratio_as_rotations_per_meter: float = (
 
 
 # Field
-
 field_width = 8.21  # meters
 field_length = 16.54  # meters
-
 
 class FieldPos:
     pose_reverse = Rotation2d(math.radians(180))
@@ -137,20 +126,25 @@ class FieldPos:
         source_y = 50.75 * inches_to_meters
         rotation = Rotation2d(math.radians(-240))
 
-
-# ELEVATOR
-elevator_gear_ratio: float = 25  # REAL VALUE: 25:1 gear ratio
+# Elevator
+elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio
 elevator_driver_gear_circumference: float = (
-    math.pi * 1 * inches_to_meters
+    math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
 elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
+elevator_bottom_total_height: meters = 26.25 * inches_to_meters
 
 # INTAKE
+intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
+intake_outer_gear_ratio = 58 / 12 #REAL VALUE: 58:12 gear ratio
+intake_deploy_gear_ratio = 20 * (32 / 14) #REAL VALUE: 20:1 * 32:14 gear ratio
 
-intake_inner_gear_ratio = 15 / 1  # TODO: placeholder
-intake_outer_gear_ratio = 20 / 1  # TODO: placeholder
-intake_deploy_gear_ratio = 20 / 1  # TODO: placeholder
+
+# LIMELIGHT
+limelight_height = 23 * inches_to_meters
+limelight_elevator_angle = 25 * degrees_to_radians
+limelight_back_yaw = 180 * degrees_to_radians
 
 
 # WRIST
@@ -160,11 +154,21 @@ wrist_time_to_max_vel = 0.3 #TODO: placeholder
 
 
 
-# FLYWHEEL
-flywheel_mass = 0.5  # TODO: placeholder
-flywheel_radius_outer = 2 * 0.0254  # TODO: placeholder
-flywheel_gear_ratio = 1 / 2  # TODO: placeholder
-flywheel_period = 0.03
+# Flywheel
+flywheel_mass = 1.3 + .127 #kilograms
+flywheel_radius_outer = 2 * 0.0254
+flywheel_gear_ratio = 1
+flywheel_period = .03
+shooter_height = 23 * inches_to_meters
+
+
+wrist_max_rotation = 55.5 * degrees_to_radians
+wrist_min_rotation = -40 * degrees_to_radians
+
+
+#pathing
+post_avoidance_distance = 0.5 
+
 
 shooter_height = 23 * inches_to_meters  # TODO: looks good, but needs to be tested
 
