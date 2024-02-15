@@ -29,12 +29,7 @@ class _Robot(wpilib.TimedRobot):
         if config.DEBUG_MODE:
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
+        
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
@@ -74,6 +69,7 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight.init()
             Sensors.limelight_back.init()
             Field.odometry.enable()
+            Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -83,16 +79,25 @@ class _Robot(wpilib.TimedRobot):
             if config.DEBUG_MODE:
                 raise e
 
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
+
         self.log.complete("Robot initialized")
-        # Field.POI.setRed()
+        
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
 
     def robotPeriodic(self):
-        # Field.odometry.disable()
+        
         Field.POI.setNTValues()
-        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-            config.active_team = config.Team.BLUE
-        else:
-            config.active_team = config.Team.RED
         
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
@@ -118,6 +123,24 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             Field.odometry.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        try:
+            Field.calculations.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+            
+        try:
+            Field.calculations.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))

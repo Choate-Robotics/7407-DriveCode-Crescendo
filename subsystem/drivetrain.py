@@ -15,6 +15,7 @@ from toolkit.subsystem_templates.drivetrain import (
     SwerveNode,
 )
 from units.SI import (
+
     meters,
     meters_per_second,
     radians,
@@ -50,11 +51,16 @@ class CustomSwerveNode(SwerveNode):
         self.m_turn.init()
         self.counter += 1
 
-    def initial_zero(self):
+    def zero(self):
+        """
+        Zeros the drivetrain
+
+        """
+
         self.m_turn.set_sensor_position(0)
         abs_encoder_position: float = self.encoder.getAbsolutePosition()
-        print(abs_encoder_position)
 
+        # Find the difference in current and zero absolute position
         encoder_difference: float = abs_encoder_position - self.absolute_encoder_zeroed_pos
 
         if encoder_difference > .5:
@@ -64,19 +70,12 @@ class CustomSwerveNode(SwerveNode):
 
         motor_change = encoder_difference * constants.drivetrain_turn_gear_ratio
 
-        print(-encoder_difference * 360, self.m_turn._can_id)
         self.m_turn.set_sensor_position(motor_change)
-
-    def zero(self):
-        self.initial_zero()
 
         self.m_turn.set_target_position(0)
 
     def get_abs(self):
         return self.encoder.getAbsolutePosition()
-
-    def raw_output(self, power):
-        self.m_move.set_raw_output(power)
 
     def set_motor_angle(self, pos: radians):
         self.m_turn.set_target_position(
@@ -91,9 +90,11 @@ class CustomSwerveNode(SwerveNode):
         )
 
     def set_motor_velocity(self, vel: meters_per_second):
-        # print(vel, 'meters per second')
-        rotations_per_second = vel * constants.drivetrain_move_gear_ratio_as_rotations_per_meter
-        # print(rotations_per_second, 'rotations per second')
+        rotations_per_second = (
+                vel *
+                constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+        )
+
         self.m_move.set_target_velocity(rotations_per_second)
 
     def get_motor_velocity(self) -> meters_per_second:
@@ -103,11 +104,10 @@ class CustomSwerveNode(SwerveNode):
         )
 
     def get_drive_motor_traveled_distance(self) -> meters:
-
         sensor_position = self.m_move.get_sensor_position()
-
         return (
-                sensor_position / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+                sensor_position
+                / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
 
