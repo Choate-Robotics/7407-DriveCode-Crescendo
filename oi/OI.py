@@ -21,7 +21,7 @@ class OI:
         Keymap.Drivetrain.RESET_GYRO.onTrue(command.DrivetrainZero(Robot.drivetrain)).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain))
         
-        Keymap.Flywheel.SHOOT.whileTrue(command.ShootSpeaker(
-            Robot.drivetrain, Field.calculations, Field.odometry,
-            Robot.elevator, Robot.wrist
-        ))
+        # Keymap.Flywheel.SHOOT.whileTrue(command.ShootSpeaker(
+        #     Robot.drivetrain, Field.calculations, Field.odometry,
+        #     Robot.elevator, Robot.wrist
+        # ))

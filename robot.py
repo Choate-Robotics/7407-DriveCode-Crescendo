@@ -80,12 +80,6 @@ class _Robot(wpilib.TimedRobot):
 
         self.log.complete("Robot initialized")
         
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
 
     def robotPeriodic(self):
         
