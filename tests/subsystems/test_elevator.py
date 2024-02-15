@@ -52,7 +52,8 @@ def test_set_length(test_input, elevator: Elevator):
         (test_input * constants.elevator_gear_ratio)
         / constants.elevator_driver_gear_circumference
     )
-    
+
+
 @pytest.mark.parametrize(
     "elevator_abs",
     [
@@ -62,12 +63,17 @@ def test_set_length(test_input, elevator: Elevator):
         (0),
     ],
 )
-
-@pytest.mark.skip(reason='test not finished, works however')
-def test_get_elevator_abs(elevator_abs, elevator: Elevator):
-    elevator.motor_extend_encoder.getPosition.return_value = elevator_abs
-    assert elevator.get_elevator_abs() == (elevator_abs - config.elevator_zeroed_pos) * constants.elevator_gear_ratio
+def test_get_elevator_abs(elevator_abs, elevator: Elevator, monkeypatch: MonkeyPatch):
+    monkeypatch.setattr(
+        elevator.motor_extend_encoder, "getPosition", lambda: elevator_abs
+    )
+    # elevator.motor_extend_encoder.getPosition.return_value = elevator_abs
+    assert (
+        elevator.get_elevator_abs()
+        == (elevator_abs - config.elevator_zeroed_pos) * constants.elevator_max_length
+    )
     # Temp
+
 
 @pytest.mark.parametrize(
     "test_input",
@@ -78,11 +84,10 @@ def test_get_elevator_abs(elevator_abs, elevator: Elevator):
         (0),
     ],
 )
-@pytest.mark.skip(reason='test not finished, works however')
-def test_get_length(test_input, elevator: Elevator):
-    # elevator.get_length()
-    # elevator.motor_extend.get_sensor_position.assert_called()
-    elevator.motor_extend.get_sensor_position.return_value = test_input
+def test_get_length(test_input, elevator: Elevator, monkeypatch: MonkeyPatch):
+    monkeypatch.setattr(
+        elevator.motor_extend, "get_sensor_position", lambda: test_input
+    )
     assert (
         elevator.get_length()
         == (test_input / constants.elevator_gear_ratio)
@@ -109,15 +114,18 @@ def test_set_motor_position(test_input, actual, elevator: Elevator):
         (0),
     ],
 )
-@pytest.mark.skip(reason='test not finished, works however')
-def test_zero(test_input, elevator: Elevator):
-    elevator.motor_extend_encoder.getPosition.return_value = test_input
-    elevator.zero()
-    elevator.motor_extend.set_sensor_position.assert_called_with(
-        elevator.length_to_rotations(elevator.limit_length(test_input))
+def test_zero(test_input, elevator: Elevator, monkeypatch: MonkeyPatch):
+    monkeypatch.setattr(
+        elevator.motor_extend_encoder, "getPosition", lambda: test_input
     )
-    assert elevator.zeroed is True
+    elevator.zero()
+    length = (test_input - config.elevator_zeroed_pos) * constants.elevator_max_length
+    length = elevator.limit_length(length)
+    elevator.motor_extend.set_sensor_position.assert_called_with(
+        elevator.length_to_rotations(length)
+    )
 
+    assert elevator.zeroed is True
 
 
 @pytest.mark.parametrize(
