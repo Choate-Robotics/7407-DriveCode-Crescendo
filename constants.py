@@ -31,11 +31,11 @@ speaker_z = 1.7  # height of target (m) CHANGE THIS
 speaker_location = Translation2d(0, 0)
 
 # Drivetrain
-drivetrain_turn_gear_ratio = 18.4
-drivetrain_wheel_gear_ratio = 6.12
-track_width = 14 * inches_to_meters  # TODO: change to 20 inches for actual robot
+drivetrain_turn_gear_ratio = 150/7
+drivetrain_wheel_gear_ratio = 5.9
+track_width = 20 * inches_to_meters  # TODO: change to 20 inches for actual robot
 drivetrain_length = 25 * inches_to_meters
-bumper_thickness = 1.5 * inches_to_meters
+bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
 drivetrain_max_vel = 80 * feet_to_meters
 drivetrain_max_accel = 5 * feet_to_meters
@@ -124,12 +124,13 @@ class FieldPos:
         rotation = Rotation2d(math.radians(-240))
 
 # Elevator
-elevator_gear_ratio: float = 25  # REAL VALUE: 25:1 gear ratio
+elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio
 elevator_driver_gear_circumference: float = (
     math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
 elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
+elevator_bottom_total_height: meters = 26.25 * inches_to_meters
 
 # INTAKE
 intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
@@ -147,14 +148,14 @@ wrist_time_to_max_vel = 0.3 #TODO: placeholder
 
 
 # Flywheel
-flywheel_mass = 1.3 #kilograms
+flywheel_mass = 1.3 + .127 #kilograms
 flywheel_radius_outer = 2 * 0.0254
 flywheel_gear_ratio = 1
 flywheel_period = .03
 shooter_height = 23 * inches_to_meters
 
 
-wrist_max_rotation = 60 * degrees_to_radians
+wrist_max_rotation = 55.5 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
 
 

@@ -7,7 +7,7 @@ from toolkit.motors.rev_motors import SparkMax
 from toolkit.subsystem import Subsystem
 from toolkit.utils.toolkit_math import bounded_angle_diff
 from units.SI import radians
-
+from wpilib import AnalogInput
 
 class Wrist(Subsystem):
     def __init__(self):
@@ -19,11 +19,11 @@ class Wrist(Subsystem):
         self.feed_motor = SparkMax(
             can_id=config.feed_motor_id, inverted=True, config=config.FEED_CONFIG
         )
-        self.note_staged: bool = True
+        self.note_staged: bool = False
         self.wrist_zeroed: bool = False
         self.rotation_disabled: bool = False
         self.feed_disabled: bool = False
-
+        self.distance_sensor: AnalogInput = None
         self.disable_rotation: bool = False
 
     def init(self):
@@ -31,6 +31,7 @@ class Wrist(Subsystem):
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
+        self.distance_sensor = self.feed_motor.get_analog()
         
     @staticmethod
     def limit_angle(angle: radians) -> radians:
@@ -49,7 +50,6 @@ class Wrist(Subsystem):
         """
         angle = self.limit_angle(angle)
         
-        current_angle = self.get_wrist_angle()
         
         ff = config.wrist_flat_ff * math.cos(angle)
         
@@ -69,6 +69,9 @@ class Wrist(Subsystem):
             * pi
             * 2
         )
+        
+    def note_detected(self) -> bool:
+        return self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
 
     def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """
@@ -78,25 +81,42 @@ class Wrist(Subsystem):
         :return: True if the wrist is at the given angle, False otherwise
         """
         return abs(bounded_angle_diff(self.get_wrist_angle(), angle)) < threshold
+    
+    def get_wrist_abs_angle(self):
+        
+        angle = self.wrist_abs_encoder.getPosition() - config.wrist_zeroed_pos
+        
+        if angle > .5:
+            return (1 - angle) * -2 * math.pi
+        else:
+            return angle * 2 * math.pi
+        
 
     def zero_wrist(self) -> None:  # taken from cyrus' code
         # Reset the encoder to zero
+        
+        pos = (self.get_wrist_abs_angle() / (2 * math.pi)) * constants.wrist_gear_ratio
+        print(math.degrees(self.get_wrist_abs_angle()))
+        print(pos)
         self.wrist_motor.set_sensor_position(
-            (self.wrist_abs_encoder.getPosition() - config.wrist_zeroed_pos) * constants.wrist_gear_ratio
+            pos
         )
         self.wrist_zeroed = True
         
     # feed in methods
     def feed_in(self):
         if not self.feed_disabled:
-            self.feed_motor.set_target_velocity(config.feeder_velocity)
+            # self.feed_motor.set_target_velocity(config.feeder_velocity)
+            self.feed_motor.set_raw_output(config.feeder_velocity)
 
     def feed_out(self):
         if not self.feed_disabled:
-            self.feed_motor.set_target_velocity(-(config.feeder_velocity))
+            # self.feed_motor.set_target_velocity(-(config.feeder_velocity))
+            self.feed_motor.set_raw_output(-(config.feeder_velocity))
     
     def stop_feed(self):
         self.feed_motor.set_target_velocity(0)
+        self.feed_motor.set_raw_output(0)
 
     def feed_note(self):
         if not self.feed_disabled:
