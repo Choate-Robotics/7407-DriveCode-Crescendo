@@ -205,7 +205,8 @@ class TrajectoryCalculator:
     def update(self):
         """
         updates both shooter and base
-        :return: base target angle
+        saves results in class variables wrist_angle and base_angle
+
         """
 
         self.wrist_angle = self.get_wrist_angle()
