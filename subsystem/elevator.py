@@ -23,6 +23,7 @@ class Elevator(Subsystem):
 
         self.zeroed: bool = False
         self.elevator_moving: bool = False
+        self.locked: bool = False
 
     def init(self) -> None:
         self.motor_extend.init()
@@ -49,8 +50,9 @@ class Elevator(Subsystem):
     def rotations_to_length(rotations: float) -> meters:
         return (rotations * constants.elevator_driver_gear_circumference) / constants.elevator_gear_ratio
     
-    @staticmethod
-    def limit_length(length: meters) -> meters:
+    def limit_length(self, length: meters) -> meters:
+        if self.locked and length > constants.elevator_max_length_stage:
+            return constants.elevator_max_length_stage
         if length > constants.elevator_max_length:
             return constants.elevator_max_length
         elif length < 0.0:
@@ -98,6 +100,7 @@ class Elevator(Subsystem):
     def get_elevator_abs(self) -> meters:
         
         length = (self.motor_extend_encoder.getPosition() - config.elevator_zeroed_pos) * constants.elevator_max_length
+        length = 0 if length < 0 else length
         print(length, 'abs length')
         return length
         
@@ -129,3 +132,10 @@ class Elevator(Subsystem):
         """
 
         self.set_length(self.get_length())
+        
+    def lock(self) -> None:
+        
+        self.locked = True
+        
+    def unlock(self) -> None:
+        self.locked = False

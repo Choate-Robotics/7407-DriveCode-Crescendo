@@ -149,7 +149,6 @@ elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.0  # TODO: PLACEHOLDER
 elevator_moving = False
-elevator_stage_max = 0.1  # meters
 elevator_zeroed_pos = 0.023  # TODO: PLACEHOLDER: meters
 
 # Wrist
@@ -159,7 +158,6 @@ feed_motor_id = 3
 wrist_flat_ff = -0.6 # TODO: FIND
 feeder_velocity = .8
 feeder_pass_velocity = 1
-wrist_stage_max = 22 * degrees_to_radians  # radians
 feeder_sensor_threshold = .4
 stage_timeout = 5
 wrist_tent_limit = 20 * degrees_to_radians
@@ -221,7 +219,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle = 42 * degrees_to_radians
+staging_angle = 54 * degrees_to_radians
 
 class Giraffe:
     
@@ -246,9 +244,9 @@ class Giraffe:
     
     kClimbPullUp = GiraffePos(0, 0)
     
-    kClimbTrap = GiraffePos(constants.elevator_max_length, 25 * degrees_to_radians)
+    kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
     
-    kAmp = GiraffePos(constants.elevator_max_length, -45 * degrees_to_radians)
+    kAmp = GiraffePos(constants.elevator_max_length, -20 * degrees_to_radians)
     
 """
 c = drag coefficient

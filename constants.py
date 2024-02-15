@@ -128,9 +128,9 @@ elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio
 elevator_driver_gear_circumference: float = (
     math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
-elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
 elevator_bottom_total_height: meters = 26.25 * inches_to_meters
+elevator_max_length_stage:float = 0 * inches_to_meters
 
 # INTAKE
 intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
@@ -157,6 +157,7 @@ shooter_height = 23 * inches_to_meters
 
 wrist_max_rotation = 55.5 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
+wrist_min_rotation_stage = 22 * degrees_to_radians
 
 
 #pathing

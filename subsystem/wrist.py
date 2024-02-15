@@ -25,6 +25,7 @@ class Wrist(Subsystem):
         self.feed_disabled: bool = False
         self.distance_sensor: AnalogInput = None
         self.disable_rotation: bool = False
+        self.locked: bool = False
 
     def init(self):
         self.wrist_motor.init()
@@ -33,8 +34,9 @@ class Wrist(Subsystem):
         self.feed_motor.init()
         self.distance_sensor = self.feed_motor.get_analog()
         
-    @staticmethod
-    def limit_angle(angle: radians) -> radians:
+    def limit_angle(self, angle: radians) -> radians:
+        if self.locked and angle <= constants.wrist_min_rotation_stage:
+            return constants.wrist_min_rotation_stage
         if angle <= constants.wrist_min_rotation:
             return constants.wrist_min_rotation
         elif angle >= constants.wrist_max_rotation:
@@ -127,3 +129,9 @@ class Wrist(Subsystem):
         
     def set_note_not_staged(self):
         self.note_staged = False
+        
+    def lock(self):
+        self.locked = True
+        
+    def unlock(self):
+        self.locked = False

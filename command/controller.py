@@ -141,11 +141,13 @@ class GiraffeLock(commands2.Command):
         
         self.elevator.lock()
         
+        self.wrist.lock()
+        
         def wrist_is_over_limit():
-            return self.wrist.get_wrist_angle() > config.wrist_stage_max
+            return self.wrist.get_wrist_angle() > constants.wrist_min_rotation_stage
         
         def elevator_is_over_limit():
-            return self.elevator.get_length() > config.elevator_stage_max
+            return self.elevator.get_length() > constants.elevator_max_length_stage
         
         
         commands = []
