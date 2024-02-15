@@ -122,8 +122,8 @@ def test_update_shooter(
     monkeypatch.setattr(constants, "m", 0.235301)
     monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
     monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
-    angle = trajectory_calc.update_shooter()
-    assert angle == pytest.approx(expected_answer, abs=math.radians(2))
+    angle = trajectory_calc.get_wrist_angle()
+    assert angle.radians() == pytest.approx(expected_answer, abs=math.radians(2))
 
 
 @pytest.mark.parametrize(
@@ -144,6 +144,6 @@ def test_update_base(
 ):
     monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
     trajectory_calc.init()
-    assert trajectory_calc.update_base().radians() == pytest.approx(
+    assert trajectory_calc.get_base_angle().radians() == pytest.approx(
         expected_angle, abs=math.radians(1)
     )

@@ -102,6 +102,9 @@ class TrajectoryCalculator:
     def init(self):
         pass
 
+    def set_target(self, target: Target):
+        self.target = target
+
     @staticmethod
     def calculate_distance_to_target(
         robot_pose: Pose2d, target_pose: Pose3d, shooter_height: float
@@ -158,7 +161,7 @@ class TrajectoryCalculator:
         )
         return result_angle
 
-    def update_shooter(self) -> float:
+    def get_wrist_angle(self) -> Rotation2d:
         """
         function runs sim to calculate a final angle with air resistance considered
 
@@ -184,10 +187,10 @@ class TrajectoryCalculator:
             # print(z_goal_error, theta_2, self.delta_z)
             if abs(z_goal_error) < config.shooter_tol:
                 self.shoot_angle = theta_2
-                return theta_2
+                return Rotation2d(theta_2)
             correction_angle = z_goal_error * z_to_angle_conversion
 
-    def update_base(self) -> Rotation2d:
+    def get_base_angle(self) -> Rotation2d:
         """
         updates rotation of base to face target
 
@@ -205,8 +208,8 @@ class TrajectoryCalculator:
         :return: base target angle
         """
 
-        self.update_shooter()
-        self.update_base()
+        self.wrist_angle = self.get_wrist_angle()
+        self.base_angle = self.get_base_angle()
 
     def run_sim(self, shooter_theta: radians) -> float:
         delta_x = self.target_horizontal_distance()
