@@ -8,6 +8,7 @@ class Robot:
     wrist: subsystem.Wrist = subsystem.Wrist()
     intake: subsystem.Intake = subsystem.Intake()
     elevator:subsystem.Elevator = subsystem.Elevator()
+    flywheel: subsystem.Flywheel = subsystem.Flywheel()
     drivetrain: subsystem.Drivetrain = subsystem.Drivetrain()
 
 

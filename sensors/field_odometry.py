@@ -197,6 +197,12 @@ class FieldOdometry:
         est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
         if not self.vision_on:
             est_pose = self.drivetrain.odometry.getPose()
+        else:
+            self.drivetrain.odometry.resetPosition(
+                self.drivetrain.get_heading(),
+                self.drivetrain.node_positions,
+                est_pose 
+            )
 
         self.table.putNumberArray('Estimated Pose', [
             est_pose.translation().X(),

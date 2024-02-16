@@ -30,7 +30,7 @@ class _Robot(wpilib.TimedRobot):
         if config.DEBUG_MODE:
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
-        
+
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
@@ -137,6 +137,12 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
+            
+        self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
+        
+        print(Robot.wrist.distance_sensor.getVoltage())
+        # print(Robot.intake.distance_sensor.getVoltage())
+        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
@@ -158,6 +164,7 @@ class _Robot(wpilib.TimedRobot):
             # command.SetElevator(Robot.elevator, .51)
         )
         )
+        self.scheduler.schedule(command.RunIntake(Robot.intake))
 
     def teleopPeriodic(self):
         pass

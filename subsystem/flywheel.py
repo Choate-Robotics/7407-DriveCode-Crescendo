@@ -2,7 +2,7 @@ import math
 import rev
 import config
 import constants
-
+import ntcore
 from wpimath.controller import LinearQuadraticRegulator_1_1
 from wpimath.estimator import KalmanFilter_1_1_1
 from wpimath.system import LinearSystemLoop_1_1_1
@@ -194,3 +194,7 @@ class Flywheel(Subsystem):
         # Set the next setpoint for the flywheel
         self.set_voltage(self.top_flywheel_state.U(0), 1)
         self.set_voltage(self.bottom_flywheel_state.U(0), 2)
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('flywheel')
+        table.putNumber('flywheel top velocity', self.get_velocity(1))
+        table.putNumber('flywheel bottom velocity', self.get_velocity(2))
