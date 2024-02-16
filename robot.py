@@ -12,7 +12,8 @@ import utils
 from oi.OI import OI
 from oi.IT import IT
 from wpilib import SmartDashboard
-
+import autonomous
+import math
 
 
 class _Robot(wpilib.TimedRobot):
@@ -30,6 +31,13 @@ class _Robot(wpilib.TimedRobot):
 
         
         self.scheduler.setPeriod(config.period)
+
+        self.auto_selection = wpilib.SendableChooser()
+        self.auto_selection.setDefaultOption("Two Notes", autonomous.two_note)
+        self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
+        self.auto_selection.addOption("Four Notes", autonomous.four_note)
+        self.auto_selection.addOption("Five Notes", autonomous.five_note)
+        self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
 
         self.log.info(f"Scheduler period set to {config.period} seconds")
 
@@ -59,6 +67,7 @@ class _Robot(wpilib.TimedRobot):
             # for sensor in sensors:
             #     sensor.init()
             Sensors.limelight.init()
+            Sensors.limelight_back.init()
             Field.odometry.enable()
             Field.calculations.init()
         try:
@@ -103,7 +112,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            # Sensors.limelight_back.update()
+            Sensors.limelight_back.update()
             Sensors.limelight.update()
         except Exception as e:
             self.log.error(str(e))
@@ -129,12 +138,26 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
+            
+        try:
+            Field.calculations.update()
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable('errors').putString('odometry update', str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+
+        # Field.odometry.disable()    
+        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveCustom(Robot.drivetrain)
+            # command.DriveSwerveHoldRotation(subsystem=Robot.drivetrain, theta_f=math.radians(180)), # for testing rotate command
+            command.DriveSwerveCustom(Robot.drivetrain),
+            
         )
         )
 
@@ -143,6 +166,14 @@ class _Robot(wpilib.TimedRobot):
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
+
+        Robot.drivetrain.n_front_left.zero()
+        Robot.drivetrain.n_front_right.zero()
+        Robot.drivetrain.n_back_left.zero()
+        Robot.drivetrain.n_back_right.zero()
+
+        # autonomous.four_note.run()
+        self.auto_selection.getSelected().run()
 
     def autonomousPeriodic(self):
         pass

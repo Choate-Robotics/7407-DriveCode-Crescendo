@@ -3,7 +3,7 @@ import time
 import ntcore
 
 from toolkit.sensors.odometry import VisionEstimator
-from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
+from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
 
 from subsystem import Drivetrain
 from units.SI import seconds
@@ -87,7 +87,6 @@ class FieldOdometry:
 
         self.update_from_internal()
 
-        self.drivetrain.odometry_estimator.setVisionMeasurementStdDevs((0.5, 0.5, math.radians(10)))
 
         vision_robot_pose_list = self.get_vision_poses()
 
@@ -100,11 +99,14 @@ class FieldOdometry:
 
             vision_time: float
             vision_robot_pose: Pose3d
-            vision_robot_pose, vision_time = vision_pose
+            pose_data: tuple[Pose3d, float]
+            pose_data, target_pose = vision_pose
+            vision_robot_pose, vision_time = pose_data
+            distance_to_target = target_pose.translation()
 
             if self.within_tolerance(vision_robot_pose):
-                self.add_vision_measure(vision_robot_pose, vision_time)
-
+                self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target)
+    
         return self.getPose()
 
     def update_odom(self, pose: Pose3d):
@@ -165,13 +167,15 @@ class FieldOdometry:
             self.drivetrain.get_heading(), self.drivetrain.node_positions
         )
 
-    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float):
+    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: Translation3d):
+        dist_calculations =  (abs(distance_to_target.norm() **2) / 2.5, abs(distance_to_target.norm() ** 2) / 2.5, abs(math.radians(40)))
+        # print(dist_calculations)
         self.drivetrain.odometry_estimator.addVisionMeasurement(
-            vision_pose.toPose2d(), vision_time
+            vision_pose.toPose2d(), vision_time, dist_calculations
         )
 
     def get_vision_poses(self):
-        vision_robot_pose_list: list[tuple[Pose3d, float]] | None
+        vision_robot_pose_list: list[tuple[tuple[Pose3d, float], Pose3d]] | None
         try:
             vision_robot_pose_list = (
                 self.vision_estimator.get_estimated_robot_pose()
