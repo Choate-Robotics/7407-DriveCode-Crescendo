@@ -1,13 +1,8 @@
 import utils
-import constants
-import wpilib
-import config
-from oi.keymap import Controllers
 from toolkit.command import SubsystemCommand
 from subsystem import Wrist
-from commands2 import SequentialCommandGroup
 from units.SI import radians
-import math
+from sensors.trajectory_calc import TrajectoryCalculator
 
 class ZeroWrist(SubsystemCommand[Wrist]):
 
@@ -98,6 +93,7 @@ class FeedOut(SubsystemCommand[Wrist]):
             utils.LocalLogger.debug("Fed-out")
 
 class PassNote(SubsystemCommand[Wrist]):
+
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -118,3 +114,20 @@ class PassNote(SubsystemCommand[Wrist]):
             utils.LocalLogger.debug("Note transfer interrupted")
         else:
             utils.LocalLogger.debug("Note transferred")
+
+class AimWrist(SubsystemCommand[Wrist]):
+    
+    def __init__(self, subsystem: Wrist, trajectory: TrajectoryCalculator):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+        self.trajectory = trajectory
+
+    def initialize(self):
+        self.get_pos = self.trajectory.update_shooter()
+        self.subsystem.set_wrist_angle(self.get_pos)
+
+    def execute(self):
+        pass
+
+    def isFinished(self):
+        return self.subsystem.is_at_angle(self.get_pos)

@@ -18,7 +18,6 @@ from wpimath.geometry import Rotation2d
 
 # from units.SI import seconds
 
-
 class TrajectoryCalculator:
     """
     TODO: FIND DRAG COEFFICIENT!!!!!!
