@@ -97,7 +97,7 @@ def test_back_current(intake: Intake):
 
 def test_inner_in(intake: Intake):
     intake.roll_inner_in()
-    intake.inner_motor.set_raw_output.assert_called_with(config.intake_inner_speed * constants.intake_inner_gear_ratio)
+    intake.inner_motor.set_raw_output.assert_called_with(config.intake_inner_pass_speed * constants.intake_inner_gear_ratio)
 
 def test_inner_stop(intake: Intake):
     intake.stop_inner()

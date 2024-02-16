@@ -111,12 +111,14 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.note_staged
+        return not self.subsystem.note_detected()
         # need to include beam break
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        # if interrupted:
-        #     # utils.LocalLogger.debug("Note transfer interrupted")
-        # else:
-        #     utils.LocalLogger.debug("Note transferred")
+        if interrupted:
+            ...
+            # utils.LocalLogger.debug("Note transfer interrupted")
+        else:
+            # utils.LocalLogger.debug("Note transferred")
+            self.subsystem.note_staged = False
