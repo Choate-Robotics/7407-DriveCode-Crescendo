@@ -201,7 +201,7 @@ flywheel_feed_forward = 0.65  # TODO: placeholder
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.01, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.9, 0.9),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.0, (-1.0, 1.0),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.0005, 0, 0.0004, 0.00017, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
