@@ -144,3 +144,4 @@ class Wrist(Subsystem):
         table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
         table.putBoolean('note in feeder', self.note_staged)
         table.putBoolean('note detected', self.note_detected())
+        table.putBoolean('wrist zeroed', self.wrist_zeroed)

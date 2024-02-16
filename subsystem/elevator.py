@@ -3,7 +3,7 @@ import config
 import constants
 
 from units.SI import meters
-
+import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
 
@@ -139,3 +139,14 @@ class Elevator(Subsystem):
         
     def unlock(self) -> None:
         self.locked = False
+        
+    def periodic(self) -> None:
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('elevator')
+        
+        table.putNumber('elevator height', self.get_length())
+        table.putNumber('elevator abs height', self.get_elevator_abs())
+        table.putBoolean('elevator moving', self.elevator_moving)
+        table.putBoolean('elevator locked', self.locked)
+        table.putBoolean('elevator zeroed', self.zeroed)
+        table.putNumber('elevator height total', self.get_length_total_height())
