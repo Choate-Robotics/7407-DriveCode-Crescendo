@@ -53,5 +53,5 @@ class Keymap:
         )
     class Shooter:
         AIM_AND_SHOOT = commands2.button.JoystickButton(
-            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
         )
