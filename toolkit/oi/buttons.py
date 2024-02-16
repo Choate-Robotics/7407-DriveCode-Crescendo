@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-import commands2 as commands
-import commands2.button
+import commands2
 
 from toolkit.oi.joysticks import Joysticks
 
@@ -10,7 +9,7 @@ from toolkit.oi.joysticks import Joysticks
 class Button:
     controller_id: int
 
-    def __call__(self) -> commands.Trigger: ...
+    def __call__(self) -> commands2.button.Trigger: ...
 
 
 @dataclass
@@ -20,12 +19,12 @@ class DefaultButton(Button):
     """
     button_id: int
 
-    def __call__(self) -> commands.Trigger:
+    def __call__(self) -> commands2.button.Trigger:
         if self.button_id < 0:
-            return commands.Trigger(
+            return commands2.button.Trigger(
                 lambda: Joysticks.joysticks[self.controller_id].getRawAxis(-self.button_id) > 0.8
             )
-        return commands.Trigger(
+        return commands2.button.Trigger(
             lambda: Joysticks.joysticks[self.controller_id].getRawButton(self.button_id)
         )
 
@@ -39,7 +38,7 @@ class AxisButton(Button):
     range_min: float = -1
     range_max: float = 1
 
-    def __call__(self) -> commands.Trigger:
-        return commands.Trigger(
+    def __call__(self) -> commands2.button.Trigger:
+        return commands2.button.Trigger(
             lambda: self.range_min <= Joysticks.joysticks[self.controller_id].getRawAxis(self.axis_id) <= self.range_max
         )

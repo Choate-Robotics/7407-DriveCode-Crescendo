@@ -53,10 +53,10 @@ class SparkMax(PIDMotor):
     _has_init_run: bool = False
     _logger: LocalLogger
     _abs_encoder = None
-
+    _get_analog = None
     _is_init: bool
 
-    def __init__(self, can_id: int, inverted: bool = True, brushless: bool = True, config: SparkMaxConfig = None):
+    def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None):
         """
 
         Args:
@@ -76,6 +76,8 @@ class SparkMax(PIDMotor):
         self._has_init_run = False
 
         self._abs_encoder = None
+        
+        self._get_analog = None
 
 
     def init(self):
@@ -94,13 +96,16 @@ class SparkMax(PIDMotor):
 
         self.motor = CANSparkMax(
             self._can_id,
-            CANSparkMax.MotorType.kBrushless if self._brushless else CANSparkMax.MotorType.kBrushed
-        )
+            CANSparkMax.MotorType.kBrushless if self._brushless or TimedRobot.isSimulation() else CANSparkMax.MotorType.kBrushed
+        ) # TODO: FIX TECH DEBT HERE
+        
+        self.pid_controller = self.motor.getPIDController() if self._brushless else None
+        self.encoder = self.motor.getEncoder() if self._brushless else None
+        self._set_config(self._config) if self._brushless else None
+        
         self.motor.setInverted(self._inverted)
-        self.pid_controller = self.motor.getPIDController()
-        self.encoder = self.motor.getEncoder()
-        self._set_config(self._config)
-
+        self.motor.burnFlash()
+            
         self._has_init_run = True
         self._logger.complete("Initialized")
 
@@ -108,6 +113,7 @@ class SparkMax(PIDMotor):
         if TimedRobot.isSimulation():
             return
         if error != REVLibError.kOk:
+            return
             match error:
                 case REVLibError.kInvalid:
                     self._logger.error("Invalid")
@@ -132,6 +138,11 @@ class SparkMax(PIDMotor):
         if self._abs_encoder is None:
             self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
         return self._abs_encoder
+    
+    def get_analog(self):
+        if self._get_analog is None:
+            self._get_analog = self.motor.getAnalog()
+        return self._get_analog
 
     def set_raw_output(self, x: float):
         """
@@ -142,21 +153,20 @@ class SparkMax(PIDMotor):
         """
         self.motor.set(x)
 
-    def get_abs(self):
-
+    def get_absolute_encoder(self):
         if self._abs_encoder is None:
             self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
 
         return self._abs_encoder
 
-    def set_target_position(self, pos: rotations):
+    def set_target_position(self, pos: rotations, arbff: float = 0):
         """
         Sets the target position of the motor controller in rotations
 
         Args:
             pos (float): The target position of the motor controller in rotations
         """
-        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition)
+        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff)
         self.error_check(result)
 
     def set_target_velocity(self, vel: rotations_per_second):  # Rotations per minute??
@@ -220,3 +230,4 @@ class SparkMax(PIDMotor):
             self.error_check(self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1]))
         if config.idle_mode is not None:
             self.error_check(self.motor.setIdleMode(config.idle_mode))
+        
