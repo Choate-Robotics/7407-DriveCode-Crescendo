@@ -4,10 +4,11 @@ from sensors import FieldOdometry, TrajectoryCalculator
 import logging
 from command import *
 import wpilib, config, constants
-import commands2
+import commands2, ntcore
 from wpimath.geometry import Pose2d, Rotation2d
 from commands2 import WaitUntilCommand, WaitCommand, ParallelCommandGroup, SequentialCommandGroup, InstantCommand, PrintCommand, ParallelDeadlineGroup, RunCommand
-
+from typing import Literal
+from units.SI import degrees_to_radians
 
 
 class Giraffe(commands2.Command):
@@ -20,6 +21,7 @@ class Giraffe(commands2.Command):
         self.aiming = False
         self.staging = False
         self.auto_height = False
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable('giraffe')
     
     def finish(self):
         self.finished = True
@@ -39,17 +41,6 @@ class Giraffe(commands2.Command):
             self.finished = True
             return # invalid target
         
-        if type(self.target.wrist_angle) == str:
-            if self.target.wrist_angle != 'aim' or self.target.wrist_angle != 'stage':
-                self.finished = True
-                print('incorrect string for wrist angle')
-                return # invalid string entry, must be 'aim' or 'stage'
-        
-        if type(self.target.height) == str:
-            if self.target.height != 'auto':
-                print('incorrect string for elevator height')
-                self.finished = True
-                return # invalid string entry, must be 'auto'
             
         
         
@@ -61,20 +52,22 @@ class Giraffe(commands2.Command):
         
         
         # if the target wrist angle is 'aim' then set the wrist angle to the calculated angle, we will pass off the aiming command at the end
-        if self.target.wrist_angle == 'aim':
+        if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kAim:
             continuous_commands.append(
                 PrintCommand("Aiming wrist")
             )
             self.aiming = True
-            self.target.wrist_angle = self.wrist.get_wrist_angle()
+            # self.target.wrist_angle = self.wrist.get_wrist_angle()
+            self.target.wrist_angle = 20 * degrees_to_radians
             debug_commands.append(
                 PrintCommand("Aiming wrist")
             )
         
         # if the target wrist angle is 'stage' then set the wrist angle to the staging angle, we will pass off the staging command at the end
-        elif self.target.wrist_angle == 'stage':
+        if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kStage:
             self.staging = True
             self.target.wrist_angle = config.staging_angle
+            print('staging note to wrist')
             continuous_commands.append(
                 FeedIn(self.wrist)
             )
@@ -82,7 +75,7 @@ class Giraffe(commands2.Command):
                 PrintCommand("Staging note to wrist")
             )
         
-        if self.target.height == 'auto':
+        if self.target.height == config.Giraffe.GiraffePos.Special.kHeightAuto:
             self.auto_height = True
             self.target.height = self.elevator.get_length()
             continuous_commands.append(
@@ -100,12 +93,18 @@ class Giraffe(commands2.Command):
             return # cant perform this action while elevator is locked down
             
         
+        if not type(self.target.height) == float and not type(self.target.height) == int:
+            print('height not float (possibly set wrong enum type)', type(self.target.height))
+            return
+        
+        if not type(self.target.wrist_angle) == float and not type(self.target.wrist_angle) == int:
+            print('wrist not float (possibly set wrong enum type)', type(self.target.wrist_angle))
+            return
         
         commands.append(
             ParallelCommandGroup(
                 SetElevator(self.elevator, self.target.height),
                 SetWrist(self.wrist, self.target.wrist_angle),
-                InstantCommand(self.finish),
             )
         )
         
@@ -114,17 +113,19 @@ class Giraffe(commands2.Command):
         )
         
         
-        commands += continuous_commands
+        # commands += continuous_commands
         
-        print('running alll commands like normal')
+        # print('running alll commands like normal')
         
-        commands2.CommandScheduler.schedule(ParallelCommandGroup(
+        commands2.CommandScheduler.getInstance().schedule(ParallelCommandGroup(
             SequentialCommandGroup(
                 *commands,
+                InstantCommand(lambda: self.finish()),
+                *continuous_commands
             ),
-            SequentialCommandGroup(
-                *debug_commands
-            )
+            # SequentialCommandGroup(
+            #     *debug_commands
+            # )
         )
         )
         
@@ -132,7 +133,9 @@ class Giraffe(commands2.Command):
         return self.finished
         
     def end(self, interrupted: bool):
+        print("GIRAFFE COMMAND FINISHED")
         if interrupted:
+            print("GIRAFFE INTERRUPTED")
             self.finished = True
     
 class GiraffeLock(commands2.Command):
@@ -206,9 +209,12 @@ class StageNote(SequentialCommandGroup):
     
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
+            # FeedIn(wrist).alongWith(
             Giraffe(elevator, wrist, config.Giraffe.kStage),
+            # ),
             PassIntakeNote(intake),
             WaitUntilCommand(wrist.note_detected),
+            IntakeIdle(intake),
             Giraffe(elevator, wrist, config.Giraffe.kIdle),
         )
     

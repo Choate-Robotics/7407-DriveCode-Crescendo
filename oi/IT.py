@@ -56,10 +56,25 @@ class IT:
         # # if note in feeder, run flywheel and wrist to aim
         button.Trigger(lambda: Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.GiraffePos(.2, math.radians(10)))\
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow).withTimeout(5)\
                 .andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)).withTimeout(5)\
                 .andThen(command.PassNote(Robot.wrist))
         )
+        
+        button.Trigger(lambda: Robot.intake.note_in_intake)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 10)
+            )
+            
+        button.Trigger(lambda: Robot.wrist.note_staged)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 25)
+            )
+            
+        button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 0)
+            )
         
         
         # # odom stage
