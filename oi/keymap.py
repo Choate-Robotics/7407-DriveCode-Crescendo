@@ -35,14 +35,27 @@ class Keymap:
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
         )
         
-    class Flywheel:
-        
-        SHOOT = commands2.button.Trigger(
+    class Elevator:
+        ELEVATOR_HIGH = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.Y
+        )
+        ELEVATOR_MID = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.B
+        )
+        ELEVATOR_LOW = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.A
+        )
+        CLIMB = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+    class Intake:
+        INTAKE_IN = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
+        )
+        INTAKE_OUT = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.RB
+        )
+    class Shooter:
+        AIM_AND_SHOOT = commands2.button.JoystickButton(
             lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
         )
-    class Elevator:
-        pass
-    class Intake:
-        pass
-    class Shooter:
-        pass
