@@ -75,7 +75,7 @@ class TrajectoryCalculator:
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
-            self.speaker_z - self.elevator.get_length() + constants.shooter_height
+            self.speaker_z - self.elevator.get_length() + constants.elevator_bottom_total_height
         )
         # print("delta_z", self.delta_z)
         # print("constant.shooter_height", constants.shooter_height)

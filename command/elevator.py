@@ -57,3 +57,5 @@ class SetElevator(SubsystemCommand[Elevator]):
             # utils.LocalLogger.debug("Elevator length: " + str(self.subsystem.get_length()), "SetElevator")
 
         self.elevator_moving = False
+        
+    

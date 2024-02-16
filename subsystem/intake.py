@@ -3,7 +3,7 @@ import constants
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
-
+import ntcore
 
 class Intake(Subsystem):
     
@@ -145,7 +145,15 @@ class Intake(Subsystem):
         """
         Stops inner rollers
         """
-        self.set_inner_velocity(0)
+        self.inner_motor.set_target_position(self.inner_motor.get_sensor_position())
+        
         
     def remove_note(self):
         self.note_in_intake = False
+        
+    def periodic(self) -> None:
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
+        
+        table.putBoolean('note in intake', self.note_in_intake)
+        table.putBoolean('note detected', self.detect_note())

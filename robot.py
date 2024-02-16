@@ -79,6 +79,7 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
+        
 
     def robotPeriodic(self):
 
@@ -130,7 +131,7 @@ class _Robot(wpilib.TimedRobot):
             
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
         
-        print(Robot.wrist.distance_sensor.getVoltage())
+        # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
         
 
@@ -139,22 +140,14 @@ class _Robot(wpilib.TimedRobot):
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
         self.scheduler.schedule(commands2.SequentialCommandGroup(
-            # command.DeployIntake(Robot.intake),
-            # command.FeedIn(Robot.wrist),
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain),
-            # command.IntakeIdle(Robot.intake)
-            # command.SetWrist(Robot.wrist, radians(20)),
-            # command.SetWrist(Robot.wrist, radians(20)),
-            # # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
-            # command.IntakeIdle(Robot.intake),
-            # # command.DeployTenting(Robot.intake)
-            # command.SetFlywheelLinearVelocity(Robot.flywheel, 30),
-            # # command.FeedIn(Robot.wrist)
-            # command.SetElevator(Robot.elevator, .51)
         )
         )
         self.scheduler.schedule(command.RunIntake(Robot.intake))
+        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
+        self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle))
 
     def teleopPeriodic(self):
         ...
@@ -175,6 +168,7 @@ class _Robot(wpilib.TimedRobot):
 
     def disabledPeriodic(self) -> None:
         pass
+    
 
 
 if __name__ == "__main__":

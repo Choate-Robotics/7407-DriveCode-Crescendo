@@ -70,7 +70,7 @@ class FeedIn(SubsystemCommand[Wrist]):
         return self.subsystem.note_detected()
 
     def end(self, interrupted: bool):
-        self.subsystem.stop_feed()
+        # self.subsystem.stop_feed()
         if interrupted:
             ...
             # utils.LocalLogger.debug("Feed in interrupted")
