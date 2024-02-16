@@ -105,7 +105,7 @@ class TrajectoryCalculator:
         updates rotation of base to face target
         :return: base target angle
         """
-        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.get(False).translation()
+        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         self.base_rotation2d = robot_to_speaker.angle()
