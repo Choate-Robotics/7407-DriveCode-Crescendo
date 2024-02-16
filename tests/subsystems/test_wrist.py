@@ -34,13 +34,13 @@ def wrist() -> Wrist:
 )
 def test_wrist_set_wrist_angle(test_input, disabled, wrist: Wrist):
     # wrist.init()
-    wrist.disable_rotation = disabled
+    wrist.rotation_disabled = disabled
     wrist.set_wrist_angle(test_input)
     if disabled:
         wrist.wrist_motor.set_target_position.assert_not_called()
     else:
         wrist.wrist_motor.set_target_position.assert_called_with(
-            test_input / (pi * 2) * constants.wrist_gear_ratio
+            test_input / (pi * 2) * constants.wrist_gear_ratio, config.wrist_flat_ff * math.cos(test_input)
         )
 
 
@@ -91,7 +91,7 @@ def test_zero_wrist(test_input, wrist: Wrist):
     wrist.wrist_motor.set_sensor_position.assert_called_with(
         test_input * constants.wrist_gear_ratio
     )
-    assert wrist.zeroed
+    assert wrist.wrist_zeroed
 
 
 @pytest.mark.parametrize(
@@ -102,9 +102,9 @@ def test_feed_in(test_input, wrist: Wrist):
     wrist.feed_disabled = test_input
     wrist.feed_in()
     if test_input:
-        wrist.feed_motor.set_target_velocity.assert_not_called()
+        wrist.feed_motor.set_raw_output.assert_not_called()
     else:
-        wrist.feed_motor.set_target_velocity.assert_called_with(config.feeder_velocity)
+        wrist.feed_motor.set_raw_output.assert_called_with(config.feeder_velocity)
 
 
 @pytest.mark.parametrize(
@@ -115,6 +115,6 @@ def test_feed_out(test_input, wrist: Wrist):
     wrist.feed_disabled = test_input
     wrist.feed_out()
     if test_input:
-        wrist.feed_motor.set_target_velocity.assert_not_called()
+        wrist.feed_motor.set_raw_output.assert_not_called()
     else:
-        wrist.feed_motor.set_target_velocity.assert_called_with(-config.feeder_velocity)
+        wrist.feed_motor.set_raw_output.assert_called_with(-config.feeder_velocity)

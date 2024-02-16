@@ -61,6 +61,7 @@ class TalonConfig:
 
         res = motor.configurator.apply(talon_config)
         if res != StatusCode.OK:
+            print(res)
             print('error! config not applying')
             raise RuntimeError
         else:

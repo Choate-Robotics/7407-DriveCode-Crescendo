@@ -14,6 +14,7 @@ from oi.IT import IT
 from wpilib import SmartDashboard
 import autonomous
 import math
+from math import degrees, radians
 
 
 class _Robot(wpilib.TimedRobot):
@@ -66,10 +67,11 @@ class _Robot(wpilib.TimedRobot):
 
             # for sensor in sensors:
             #     sensor.init()
-            Sensors.limelight.init()
+            Sensors.limelight_front.init()
             Sensors.limelight_back.init()
+            Sensors.limelight_intake.init()
             Field.odometry.enable()
-            Field.calculations.init()
+            # Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -87,18 +89,11 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
-        
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
 
     def robotPeriodic(self):
-        
+
         Field.POI.setNTValues()
-        
+
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
@@ -113,7 +108,8 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             Sensors.limelight_back.update()
-            Sensors.limelight.update()
+            Sensors.limelight_front.update()
+            Sensors.limelight_intake.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('limelight update', str(e))
@@ -131,33 +127,33 @@ class _Robot(wpilib.TimedRobot):
                 raise e
             
         try:
-            Field.calculations.update()
+            # Field.calculations.update()
+            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
 
             if config.DEBUG_MODE:
                 raise e
-            
-        try:
-            Field.calculations.update()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable('errors').putString('odometry update', str(e))
-
-            if config.DEBUG_MODE:
-                raise e
-
-        # Field.odometry.disable()    
-        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
+        # Robot.wrist.zero_wrist()
+        # Robot.elevator.zero()
         self.scheduler.schedule(commands2.SequentialCommandGroup(
+            # command.DeployIntake(Robot.intake),
+            # command.FeedIn(Robot.wrist),
             command.DrivetrainZero(Robot.drivetrain),
-            # command.DriveSwerveHoldRotation(subsystem=Robot.drivetrain, theta_f=math.radians(180)), # for testing rotate command
             command.DriveSwerveCustom(Robot.drivetrain),
-            
+            # command.IntakeIdle(Robot.intake)
+            # command.SetWrist(Robot.wrist, radians(20)),
+            # command.SetWrist(Robot.wrist, radians(20)),
+            # # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
+            # command.IntakeIdle(Robot.intake),
+            # # command.DeployTenting(Robot.intake)
+            # command.SetFlywheelLinearVelocity(Robot.flywheel, 30),
+            # # command.FeedIn(Robot.wrist)
+            # command.SetElevator(Robot.elevator, .51)
         )
         )
 

@@ -1,7 +1,7 @@
 from wpimath.geometry import Pose2d, Translation2d
 from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
 from robot_systems import Field
-from utils import POIPose, avoid_obstacles
+from utils import POIPose
 import config
 
 class CustomTrajectory:
