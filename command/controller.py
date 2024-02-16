@@ -35,16 +35,19 @@ class Giraffe(commands2.Command):
         debug_commands = []
         
         if self.target.height == None or self.target.wrist_angle == None:
+            print('elevator target or wrist target is none')
             self.finished = True
             return # invalid target
         
         if type(self.target.wrist_angle) == str:
             if self.target.wrist_angle != 'aim' or self.target.wrist_angle != 'stage':
                 self.finished = True
+                print('incorrect string for wrist angle')
                 return # invalid string entry, must be 'aim' or 'stage'
         
         if type(self.target.height) == str:
             if self.target.height != 'auto':
+                print('incorrect string for elevator height')
                 self.finished = True
                 return # invalid string entry, must be 'auto'
             
@@ -91,8 +94,9 @@ class Giraffe(commands2.Command):
         
         
          # if the desired elevator height is greater than 0 while the elevator is locked down
-        if self.target.height > config.elevator_stage_max and self.elevator.locked_down or self.target.wrist_angle < config.wrist_stage_max and self.elevator.locked_down:
+        if self.target.height > constants.elevator_max_length_stage and self.elevator.locked or self.target.wrist_angle < constants.wrist_min_rotation_stage and self.elevator.locked:
             self.finished = True
+            print('stage is in the way')
             return # cant perform this action while elevator is locked down
             
         
@@ -105,9 +109,14 @@ class Giraffe(commands2.Command):
             )
         )
         
+        debug_commands.append(
+            PrintCommand('running wrist and elevator normally')
+        )
+        
         
         commands += continuous_commands
         
+        print('running alll commands like normal')
         
         commands2.CommandScheduler.schedule(ParallelCommandGroup(
             SequentialCommandGroup(

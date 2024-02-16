@@ -248,7 +248,7 @@ class Giraffe:
     
     kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
     
-    kAmp = GiraffePos(constants.elevator_max_length, -20 * degrees_to_radians)
+    kAmp = GiraffePos(constants.elevator_max_length, -10 * degrees_to_radians)
     
 """
 c = drag coefficient

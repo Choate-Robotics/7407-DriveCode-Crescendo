@@ -144,7 +144,9 @@ class _Robot(wpilib.TimedRobot):
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
-        self.scheduler.schedule(command.RunIntake(Robot.intake))
+        # self.scheduler.schedule(command.RunIntake(Robot.intake))
+        self.scheduler.schedule(command.IntakeIdle(Robot.intake))
+        self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp))
 
     def teleopPeriodic(self):
         ...
