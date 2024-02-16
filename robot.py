@@ -40,6 +40,8 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Five Notes", autonomous.five_note)
         self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
 
+        wpilib.SmartDashboard.putData("Auto", self.auto_selection)
+
         self.log.info(f"Scheduler period set to {config.period} seconds")
 
         # Initialize subsystems and sensors
