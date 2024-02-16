@@ -25,9 +25,17 @@ class IT:
     @staticmethod
     def map_systems():
         log.info("Mapping systems...")
+        
+        def lock_giraffe():
+            Robot.elevator.lock()
+            Robot.wrist.lock()
+            
+        def unlock_giraffe():
+            Robot.elevator.unlock()
+            Robot.wrist.unlock()
 
         
-
+        # If outer roller detects a note, run the intake in
         button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
         .debounce(config.intake_sensor_debounce).onTrue(
             command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
@@ -39,22 +47,43 @@ class IT:
         # #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
         # #     )
         
-        # # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
+        # # if note in intake and index ready to receive, pass note to index
         button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            command.SetWrist(Robot.wrist, math.radians(55)).andThen(
-            command.PassIntakeNote(Robot.intake).alongWith(command.FeedIn(Robot.wrist))\
-                .andThen(InstantCommand(Robot.intake.remove_note))
-            )
+            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
         )
         
-        # # if note in intake and index ready to recieve, run in TODO: add wrist/index to this
+        # # if note in feeder, run flywheel and wrist to aim
         button.Trigger(lambda: Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            command.SetWrist(Robot.wrist, math.radians(10))\
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow).withTimeout(5)\
                 .andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)).withTimeout(5)\
                 .andThen(command.PassNote(Robot.wrist))
         )
+        
+        button.Trigger(lambda: Robot.intake.note_in_intake)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 10)
+            )
+            
+        button.Trigger(lambda: Robot.wrist.note_staged)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 25)
+            )
+            
+        button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 0)
+            )
+        
+        
+        # # odom stage
+        # button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Coordinates.Structures.Obstacles.kStage.getTranslation()) < config.stage_distance_threshold\
+        #     and (Robot.elevator.get_length() > config.elevator_stage_max or Robot.wrist.get_wrist_angle() < config.wrist_stage_max))\
+        #     .debounce(config.odometry_debounce).onTrue(
+        #         command.GiraffeLock(Robot.elevator, Robot.wrist)
+        #     ).onFalse(InstantCommand(unlock_giraffe))
+        
         
         def stop_limelight_pos():
             Sensors.limelight.cam_pos_moving = True
@@ -62,11 +91,6 @@ class IT:
         def start_limelight_pos():
             Sensors.limelight.cam_pos_moving = False
 
-        def setFieldRed():
-            Field.POI.setRed()
-
-        def setFieldBlue():
-            Field.POI.setBlue()
 
         # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
         #     .onTrue(InstantCommand(stop_limelight_pos))\
