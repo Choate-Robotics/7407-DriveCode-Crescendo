@@ -139,10 +139,13 @@ class Intake(Subsystem):
         """
         Rolls inner motors in
         """
-        self.set_inner_velocity(config.intake_inner_speed)
+        self.set_inner_velocity(config.intake_inner_pass_speed)
 
     def stop_inner(self):
         """
         Stops inner rollers
         """
         self.set_inner_velocity(0)
+        
+    def remove_note(self):
+        self.note_in_intake = False

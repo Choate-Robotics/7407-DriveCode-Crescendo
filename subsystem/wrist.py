@@ -71,9 +71,9 @@ class Wrist(Subsystem):
         )
         
     def note_detected(self) -> bool:
-        return self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
+        return .6 > self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
 
-    def is_at_angle(self, angle: radians, threshold=math.radians(2)):
+    def is_at_angle(self, angle: radians, threshold=math.radians(5)):
         """
         Checks if the wrist is at the given angle
         :param angle: The angle to check for
@@ -120,4 +120,4 @@ class Wrist(Subsystem):
 
     def feed_note(self):
         if not self.feed_disabled:
-            self.feed_motor.set_target_velocity(config.feeder_pass_velocity)
+            self.feed_motor.set_raw_output(config.feeder_pass_velocity)

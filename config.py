@@ -118,6 +118,7 @@ outer_intake_back_id = 17
 deploy_intake_id = 12
 
 intake_inner_speed = 0.25 
+intake_inner_pass_speed = .1
 intake_outer_speed = 1 
 intake_outer_idle_speed = .15
 
@@ -128,8 +129,8 @@ intake_timeout = 5
 intake_roller_current_limit = 15
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
-intake_sensor_debounce = 0.2
-intake_distance_sensor_threshold: float = 0.55
+intake_sensor_debounce = 0.1
+intake_distance_sensor_threshold: float = 0.45
 
 double_note_timeout = 2
 
@@ -150,10 +151,10 @@ wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
 wrist_flat_ff = -0.6 # TODO: FIND
-feeder_velocity = .8
-feeder_pass_velocity = 1
+feeder_velocity = .25
+feeder_pass_velocity = .5
 wrist_stage_max = 0  # TODO: PLACEHOLDER radians
-feeder_sensor_threshold = .4
+feeder_sensor_threshold = .53
 
 # DRIVETRAIN
 front_left_move_id = 7
@@ -161,7 +162,7 @@ front_left_turn_id = 8
 front_left_encoder_port = AnalogEncoder(3)
 front_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.860
 
-front_right_move_id = 5
+front_right_move_id = 4
 front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
 front_right_encoder_zeroed_pos = 0.536 if comp_bot.get() else 0.536
