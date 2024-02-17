@@ -122,6 +122,7 @@ def test_update_shooter(
     monkeypatch.setattr(constants, "m", 0.235301)
     monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
     monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
+    trajectory_calc.use_air_resistance = True
     angle = trajectory_calc.get_wrist_angle()
     assert angle.radians() == pytest.approx(expected_answer, abs=math.radians(2))
 

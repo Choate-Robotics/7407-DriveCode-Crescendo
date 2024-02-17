@@ -98,9 +98,10 @@ class TrajectoryCalculator:
         self.shoot_angle = 0
         self.elevator = elevator
         self.numerical_integration = NumericalIntegration()
+        self.use_air_resistance = False
 
-    def init(self):
-        pass
+    def init(self, set_air_resistance: bool = False):
+        self.use_air_resistance = set_air_resistance
 
     def set_target(self, target: Target):
         self.target = target
@@ -171,6 +172,9 @@ class TrajectoryCalculator:
         delta_z = self.target_vertical_distance()
         self.target.criteria.set_criteria_value(delta_x)
         theta_1 = self.calculate_angle_no_air()
+        if not self.use_air_resistance:
+            self.shoot_angle = theta_1
+            return Rotation2d(theta_1)
         theta_2 = theta_1 + np.radians(1)
         z_1 = self.run_sim(theta_1)
         z_2 = self.run_sim(theta_2)
@@ -227,7 +231,7 @@ class TrajectoryCalculator:
         t0, tf = 0, 60
         # Stop the integration when we hit the target.
         t, y = self.numerical_integration.adaptive_rk4(
-            self.deriv, u0, t0, tf, 0.001, 1e-9, self.target.criteria.end_condition
+            self.deriv, u0, t0, tf, 0.5, 1e-7, self.target.criteria.end_condition
         )
         target_variable = int(self.target.criteria.target_variable)
         criteria_variable = int(self.target.criteria.criteria_variable)
