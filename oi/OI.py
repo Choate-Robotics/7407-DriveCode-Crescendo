@@ -18,8 +18,9 @@ class OI:
     def map_controls():
         log.info("Mapping controls...")
 
-        Keymap.Drivetrain.RESET_GYRO.onTrue(command.DrivetrainZero(Robot.drivetrain)).onFalse(
-            command.DriveSwerveCustom(Robot.drivetrain))
+        Keymap.Drivetrain.RESET_GYRO.onTrue(
+            command.DrivetrainZero(Robot.drivetrain))\
+            .onFalse(command.DriveSwerveCustom(Robot.drivetrain))
         
         Keymap.Shooter.AIM.whileTrue(
             command.DriveSwerveAim(Robot.drivetrain, Field.calculations)

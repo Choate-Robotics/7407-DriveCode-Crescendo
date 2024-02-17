@@ -6,7 +6,7 @@ from command import *
 import wpilib, config, constants
 import commands2, ntcore
 from wpimath.geometry import Pose2d, Rotation2d
-from commands2 import WaitUntilCommand, WaitCommand, ParallelCommandGroup, SequentialCommandGroup, InstantCommand, PrintCommand, ParallelDeadlineGroup, RunCommand
+from commands2 import WaitUntilCommand, WaitCommand, ParallelCommandGroup, SequentialCommandGroup, InstantCommand, PrintCommand, ParallelDeadlineGroup, RunCommand, ParallelRaceGroup
 from typing import Literal
 from units.SI import degrees_to_radians
 
@@ -34,6 +34,7 @@ class Giraffe(commands2.Command):
         self.staging = False
         self.auto_height = False
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('giraffe')
+        
     
     def finish(self):
         self.finished = True
@@ -244,11 +245,10 @@ class StageNote(SequentialCommandGroup):
             Giraffe(elevator, wrist, config.Giraffe.kIdle),
         )
     
-class AimWristSpeaker(SequentialCommandGroup):
+class AimWristSpeaker(ParallelCommandGroup):
     """Aims the drivetrain, elevator, and wrist to shoot a note
 
     Args:
-        SequentialCommandGroup (drivetrain): Drivetrain subsystem
         SequentialCommandGroup (calculations): TrajectoryCalculator
         SequentialCommandGroup (elevator): Elevator subsystem
         SequentialCommandGroup (wrist): Wrist subsystem
@@ -256,10 +256,8 @@ class AimWristSpeaker(SequentialCommandGroup):
     """
     def __init__(self, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, flywheel: Flywheel, atPose: Pose2d | None = None):
         super().__init__(
-            ParallelCommandGroup(
-                SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
-                Giraffe(elevator, wrist, config.Giraffe.kAim, calculations),
-            ),
+            SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
+            Giraffe(elevator, wrist, config.Giraffe.kAim, calculations),
         )
         
 class Shoot(SequentialCommandGroup):
@@ -271,7 +269,10 @@ class Shoot(SequentialCommandGroup):
     """
     def __init__(self, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
-            PassNote(wrist).withInterrupt(lambda: flywheel.note_shot())
+            ParallelRaceGroup(
+                PassNote(wrist),
+                WaitUntilCommand(flywheel.note_shot)
+            )
         )
 class ShootAmp(SequentialCommandGroup):
     

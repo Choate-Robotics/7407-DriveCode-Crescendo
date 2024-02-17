@@ -145,16 +145,16 @@ class _Robot(wpilib.TimedRobot):
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
-        self.scheduler.schedule(
-            command.FeedIn(Robot.wrist).andThen(
+        # self.scheduler.schedule(
+        #     command.FeedIn(Robot.wrist).andThen(
             
-            commands2.ParallelCommandGroup(
-                command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow),
-                # command.AimWrist(Robot.wrist, Field.calculations),
-                command.SetFlywheelLinearVelocity(Robot.flywheel, 27),
-            )
-            )
-        )
+        #     commands2.ParallelCommandGroup(
+        #         command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow),
+        #         # command.AimWrist(Robot.wrist, Field.calculations),
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, 27),
+        #     )
+        #     )
+        # )
         # self.scheduler.schedule(command.RunIntake(Robot.intake))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))

@@ -53,7 +53,7 @@ class IT:
         # # if note in feeder, run flywheel and wrist to aim
         button.Trigger(lambda: Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            command.AimWristSpeaker(Robot.drivetrain, Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
+            command.AimWristSpeaker(Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
         )
         #FEEDER TRIGGERS ----------------
         
