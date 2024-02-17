@@ -137,6 +137,7 @@ class _Robot(wpilib.TimedRobot):
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
+        Field.calculations.init()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
         self.scheduler.schedule(commands2.SequentialCommandGroup(

@@ -16,7 +16,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonConfig
-from units.SI import degrees_to_radians, meters, radians
+from units.SI import degrees_to_radians, meters, radians, meters_per_second
 from typing import Literal
 comp_bot: DigitalInput = DigitalInput(
     9
@@ -191,11 +191,12 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed:meters = 5
-v0_flywheel = 15  # TODO: placeholder
+v0_flywheel:meters_per_second = 22  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
-
+flywheel_shot_tolerance:meters_per_second = 0.2
+flywheel_shot_current_threshold = 20
 # Configs 
 # TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(

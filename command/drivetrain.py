@@ -6,6 +6,7 @@ from toolkit.command import SubsystemCommand
 import config
 from subsystem import Drivetrain
 from sensors import TrajectoryCalculator
+from wpimath.controller import PIDController
 
 def curve_abs(x):
     curve = wpilib.SmartDashboard.getNumber('curve', 2)
@@ -63,58 +64,67 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         return False
     
     
-# class DriveSwerveAim(SubsystemCommand[Drivetrain]):
+class DriveSwerveAim(SubsystemCommand[Drivetrain]):
     
-#     driver_centric = False
-#     driver_centric_reversed = True
+    driver_centric = False
+    driver_centric_reversed = True
     
-#     def __init__(self, drivetrain, target_calc: TrajectoryCalculator):
-#         super().__init__(drivetrain)
-#         self.target_calc = target_calc
+    def __init__(self, drivetrain, target_calc: TrajectoryCalculator):
+        super().__init__(drivetrain)
+        self.target_calc = target_calc
+        self.theta_controller = PIDController(0.1, 0, 0)
         
 
-#     def initialize(self) -> None:
-#         pass
+    def initialize(self) -> None:
+        self.theta_controller.reset()
 
-#     def execute(self) -> None:
-#         dx, dy = (
-#             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
-#             self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
-#         )
+    def execute(self) -> None:
+        dx, dy = (
+            self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
+            self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
+        )
         
-#         target_angle = self.target_calc.get_bot_theta()
+        target_angle = self.target_calc.get_bot_theta()
+        d_theta = self.theta_controller.calculate(self.subsystem.gyro.get_robot_heading(), target_angle.radians())
         
+        def within_angle(heading, target, tolerance):
+            return abs(heading - target) < tolerance
         
+        if within_angle(self.subsystem.gyro.get_robot_heading(), target_angle.radians(), 0.1):
+            self.subsystem.ready_to_shoot = True
+        else:
+            self.subsystem.ready_to_shoot = False
 
-#         # if abs(d_theta) < 0.11:
-#         #     d_theta = 0
+        # if abs(d_theta) < 0.11:
+        #     d_theta = 0
 
-#         dx = curve(dx)
-#         dy = curve(dy)
-#         # d_theta = curve(d_theta)
+        dx = curve(dx)
+        dy = curve(dy)
+        # d_theta = curve(d_theta)
 
-#         dx *= self.subsystem.max_vel
-#         dy *= -self.subsystem.max_vel
-#         d_theta *= self.subsystem.max_angular_vel
+        dx *= self.subsystem.max_vel
+        dy *= -self.subsystem.max_vel
+        d_theta *= self.subsystem.max_angular_vel
 
-#         if config.driver_centric:
-#             self.subsystem.set_driver_centric((dy, -dx), -d_theta)
-#         elif self.driver_centric_reversed:
-#             self.subsystem.set_driver_centric((-dy, dx), d_theta)
-#         else:
-#             self.subsystem.set_robot_centric((dy, -dx), d_theta)
+        if config.driver_centric:
+            self.subsystem.set_driver_centric((dy, -dx), -d_theta)
+        elif self.driver_centric_reversed:
+            self.subsystem.set_driver_centric((-dy, dx), d_theta)
+        else:
+            self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
-#     def end(self, interrupted: bool) -> None:
-#         self.subsystem.n_front_left.set_motor_velocity(0)
-#         self.subsystem.n_front_right.set_motor_velocity(0)
-#         self.subsystem.n_back_left.set_motor_velocity(0)
-#         self.subsystem.n_back_right.set_motor_velocity(0)
+    def end(self, interrupted: bool) -> None:
+        self.subsystem.ready_to_shoot = False
+        self.subsystem.n_front_left.set_motor_velocity(0)
+        self.subsystem.n_front_right.set_motor_velocity(0)
+        self.subsystem.n_back_left.set_motor_velocity(0)
+        self.subsystem.n_back_right.set_motor_velocity(0)
 
-#     def isFinished(self) -> bool:
-#         return False
+    def isFinished(self) -> bool:
+        return False
 
-#     def runsWhenDisabled(self) -> bool:
-#         return False
+    def runsWhenDisabled(self) -> bool:
+        return False
 
 
 class DrivetrainZero(SubsystemCommand[Drivetrain]):

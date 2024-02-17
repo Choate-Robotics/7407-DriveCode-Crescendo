@@ -61,18 +61,24 @@ class AimWrist(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator):
         super().__init__(subsystem)
         self.subsystem = subsystem
-        self.traj_calc = TrajectoryCalculator
+        self.traj_calc = traj_calc
 
     def initialize(self):
         pass
 
     def execute(self):
         self.subsystem.set_wrist_angle(self.traj_calc.get_theta())
+        
+        if self.subsystem.is_at_angle(self.traj_calc.get_theta()):
+            self.subsystem.ready_to_Shoot = True
+        else:
+            self.subsystem.ready_to_shoot = False
 
     def isFinished(self):
         return False
 
     def end(self, interrupted:bool):
+        self.subsystem.ready_to_shoot = False
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
             self.subsystem.set_wrist_angle(wrist_angle) #stopping motor where it is

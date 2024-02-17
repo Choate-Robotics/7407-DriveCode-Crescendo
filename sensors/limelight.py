@@ -64,6 +64,15 @@ class Limelight:
         ]
 
         self.table.putNumberArray("camerapose_robotspace_set", campose)
+        
+    def get_cam_pose(self):
+        """
+        Gets the pose of the limelight relative to the robot's origin.
+
+        :return Pose3d: The pose of the limelight relative to the robot's origin
+        """
+
+        return self.origin_offset
 
     def set_cam_elevator_height(self, elevator_height: meters):
         """
@@ -294,6 +303,13 @@ class Limelight:
             )
             timestamp = Timer.getFPGATimestamp() - (botpose[6] / 1000)
             return pose, timestamp
+        
+    def enable_moving(self):
+        self.cam_pos_moving = True
+        
+    def disable_moving(self, new_pose: Pose3d):
+        self.set_cam_pose(new_pose)
+        self.cam_pos_moving = False
 
 
 class LimelightController(VisionEstimator):

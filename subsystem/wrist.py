@@ -27,6 +27,7 @@ class Wrist(Subsystem):
         self.distance_sensor: AnalogInput = None
         self.disable_rotation: bool = False
         self.locked: bool = False
+        self.ready_to_shoot: bool = False
 
     def init(self):
         self.wrist_motor.init()

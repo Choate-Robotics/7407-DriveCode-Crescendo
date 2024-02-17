@@ -13,10 +13,22 @@ from units.SI import degrees_to_radians
 
 class Giraffe(commands2.Command):
     
-    def __init__(self, elevator: Elevator, wrist: Wrist, target: config.Giraffe.GiraffePos):
+    """
+    Giraffe command that sets the elevator and wrist to a certain position.
+    
+    :param elevator: Elevator subsystem
+    :param wrist: Wrist subsystem
+    :param target: config.Giraffe.GiraffePos
+    :param shot_calc: TrajectoryCalculator | None
+    
+    Runs respective commands with safety and overlap checks.
+    """
+    
+    def __init__(self, elevator: Elevator, wrist: Wrist, target: config.Giraffe.GiraffePos, shot_calc: TrajectoryCalculator | None = None):
         self.elevator = elevator
         self.wrist = wrist
         self.target = target
+        self.shot_calc = shot_calc
         self.finished = False
         self.aiming = False
         self.staging = False
@@ -53,12 +65,16 @@ class Giraffe(commands2.Command):
         
         # if the target wrist angle is 'aim' then set the wrist angle to the calculated angle, we will pass off the aiming command at the end
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kAim:
+            if self.shot_calc == None:
+                print('no shot calc')
+                self.finished = True
+                return
             continuous_commands.append(
-                PrintCommand("Aiming wrist")
+                AimWrist(self.wrist, self.shot_calc)
             )
             self.aiming = True
-            # self.target.wrist_angle = self.wrist.get_wrist_angle()
-            self.target.wrist_angle = 17.5 * degrees_to_radians
+            self.target.wrist_angle = self.wrist.get_wrist_angle()
+            # self.target.wrist_angle = 17.5 * degrees_to_radians
             debug_commands.append(
                 PrintCommand("Aiming wrist")
             )
@@ -113,7 +129,6 @@ class Giraffe(commands2.Command):
         )
         
         
-        # commands += continuous_commands
         
         # print('running alll commands like normal')
         
@@ -139,7 +154,12 @@ class Giraffe(commands2.Command):
             self.finished = True
     
 class GiraffeLock(commands2.Command):
-    
+    """Locks the elevator and wrist to the stage position
+
+    Args:
+        commands2 (elevator): Elevator subsystem
+        commands2 (wrist): Wrist subsystem
+    """
     def __init__(self, elevator: Elevator, wrist: Wrist):
         self.elevator = elevator
         self.wrist = wrist
@@ -206,7 +226,13 @@ class GiraffeLock(commands2.Command):
     
     
 class StageNote(SequentialCommandGroup):
-    
+    """Stages a note to the feeder from the intake
+
+    Args:
+        SequentialCommandGroup (elevator): Elevator subsystem
+        SequentialCommandGroup (wrist): Wrist subsystem
+        SequentialCommandGroup (intake): Intake subsystem
+    """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             # FeedIn(wrist).alongWith(
@@ -218,19 +244,36 @@ class StageNote(SequentialCommandGroup):
             Giraffe(elevator, wrist, config.Giraffe.kIdle),
         )
     
-class ShootSpeaker(SequentialCommandGroup):
-    
+class AimSpeaker(SequentialCommandGroup):
+    """Aims the drivetrain, elevator, and wrist to shoot a note
+
+    Args:
+        SequentialCommandGroup (drivetrain): Drivetrain subsystem
+        SequentialCommandGroup (calculations): TrajectoryCalculator
+        SequentialCommandGroup (elevator): Elevator subsystem
+        SequentialCommandGroup (wrist): Wrist subsystem
+        SequentialCommandGroup (flywheel): Flywheel subsystem
+    """
     def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, flywheel: Flywheel, atPose: Pose2d | None = None):
         super().__init__(
             ParallelCommandGroup(
                 SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 Giraffe(elevator, wrist, config.Giraffe.kAim),
-                PrintCommand('Aim Drivetrain')
+                DriveSwerveAim(drivetrain, calculations)
             ),
-            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot),
-            PassNote(wrist),
         )
         
+class Shoot(SequentialCommandGroup):
+    """Shoots a note
+    
+    Args:
+        SequentialCommandGroup (wrist): Wrist subsystem
+        SequentialCommandGroup (flywheel): Flywheel subsystem
+    """
+    def __init__(self, wrist: Wrist, flywheel: Flywheel):
+        super().__init__(
+            PassNote(wrist).withInterrupt(lambda: flywheel.note_shot())
+        )
 class ShootAmp(SequentialCommandGroup):
     
     def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
@@ -240,7 +283,7 @@ class ShootAmp(SequentialCommandGroup):
                 Giraffe(elevator, wrist, config.Giraffe.kAmp),
                 PrintCommand('Lock Drivetrain with amp')
             ),
-            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot),
+            WaitUntilCommand(lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
             PassNote(self.wrist),
         )
         

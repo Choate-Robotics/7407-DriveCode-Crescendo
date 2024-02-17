@@ -11,7 +11,7 @@ from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
-from wpimath.geometry import Rotation2d
+from wpimath.geometry import Rotation2d, Translation3d, Translation2d
 
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
@@ -70,7 +70,8 @@ class TrajectoryCalculator:
         function runs sim to calculate a final angle with air resistance considered
         :return: target angle
         """
-        
+        if type(self.speaker) == Translation3d:
+            self.speaker = self.speaker.toTranslation2d()
         
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker)
