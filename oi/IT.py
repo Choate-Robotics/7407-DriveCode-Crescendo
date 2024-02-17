@@ -53,10 +53,7 @@ class IT:
         # # if note in feeder, run flywheel and wrist to aim
         button.Trigger(lambda: Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow).withTimeout(5)\
-            #     .andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)).withTimeout(5)\
-            #     .andThen(command.PassNote(Robot.wrist))
-            command.AimSpeaker(Robot.drivetrain, Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
+            command.AimWristSpeaker(Robot.drivetrain, Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
         )
         #FEEDER TRIGGERS ----------------
         
@@ -66,10 +63,10 @@ class IT:
         # if note in intake, start flywheel
         button.Trigger(lambda: Robot.intake.note_in_intake)\
             .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, 10)
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2)
             )
             
-        # if note in feeder, spin to set velocity
+        # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.note_staged)\
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
@@ -87,8 +84,9 @@ class IT:
         #SHOOTER TRIGGERS ----------------
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
             .onTrue(
-                command.PassNote(Robot.wrist).withTimeout(1)
+                command.Shoot(Robot.wrist, Robot.flywheel)
             )
+        #SHOOTER TRIGGERS ----------------
         
         #ODOMETRY TRIGGERS ----------------
         

@@ -49,14 +49,23 @@ class Keymap:
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
         )
     class Intake:
-        INTAKE_IN = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
+        INTAKE_IN = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
         )
-        INTAKE_OUT = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.RB
+        INTAKE_OUT = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
         )
     class Shooter:
         ...
-        # AIM_AND_SHOOT = commands2.button.JoystickButton(
-        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
-        # )
+        AIM = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+        )
+        
+    class Feeder:
+        FEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.RB
+        )
+        UNFEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
+        )
+        # UNJAM = 

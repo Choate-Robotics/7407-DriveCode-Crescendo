@@ -28,6 +28,7 @@ class Wrist(Subsystem):
         self.disable_rotation: bool = False
         self.locked: bool = False
         self.ready_to_shoot: bool = False
+        self.target_angle: radians = 0
 
     def init(self):
         self.wrist_motor.init()
@@ -53,7 +54,7 @@ class Wrist(Subsystem):
         :return: None
         """
         angle = self.limit_angle(angle)
-        
+        self.target_angle = angle
         
         ff = config.wrist_flat_ff * math.cos(angle)
         
@@ -146,3 +147,9 @@ class Wrist(Subsystem):
         table.putBoolean('note in feeder', self.note_staged)
         table.putBoolean('note detected', self.note_detected())
         table.putBoolean('wrist zeroed', self.wrist_zeroed)
+        table.putBoolean('ready to shoot', self.ready_to_shoot)
+        table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
+        table.putBoolean('rotation disabled', self.rotation_disabled)
+        table.putBoolean('feed disabled', self.feed_disabled)
+        table.putBoolean('locked', self.locked)
+        table.putNumber('target angle', math.degrees(self.target_angle))

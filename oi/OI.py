@@ -21,10 +21,11 @@ class OI:
         Keymap.Drivetrain.RESET_GYRO.onTrue(command.DrivetrainZero(Robot.drivetrain)).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain))
         
-        # Keymap.Flywheel.SHOOT.whileTrue(command.ShootSpeaker(
-        #     Robot.drivetrain, Field.calculations, Field.odometry,
-        #     Robot.elevator, Robot.wrist
-        # ))
+        Keymap.Shooter.AIM.whileTrue(
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
         
         Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake).onTrue(
             command.RunIntake(Robot.intake)

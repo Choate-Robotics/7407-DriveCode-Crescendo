@@ -244,7 +244,7 @@ class StageNote(SequentialCommandGroup):
             Giraffe(elevator, wrist, config.Giraffe.kIdle),
         )
     
-class AimSpeaker(SequentialCommandGroup):
+class AimWristSpeaker(SequentialCommandGroup):
     """Aims the drivetrain, elevator, and wrist to shoot a note
 
     Args:
@@ -254,12 +254,11 @@ class AimSpeaker(SequentialCommandGroup):
         SequentialCommandGroup (wrist): Wrist subsystem
         SequentialCommandGroup (flywheel): Flywheel subsystem
     """
-    def __init__(self, drivetrain: Drivetrain, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, flywheel: Flywheel, atPose: Pose2d | None = None):
+    def __init__(self, calculations: TrajectoryCalculator, elevator: Elevator, wrist: Wrist, flywheel: Flywheel, atPose: Pose2d | None = None):
         super().__init__(
             ParallelCommandGroup(
                 SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
-                Giraffe(elevator, wrist, config.Giraffe.kAim),
-                DriveSwerveAim(drivetrain, calculations)
+                Giraffe(elevator, wrist, config.Giraffe.kAim, calculations),
             ),
         )
         
