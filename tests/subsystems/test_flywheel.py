@@ -146,6 +146,8 @@ def test_within_velocity(velocity, expected, tolerance, result, flywheel: Flywhe
 def test_periodic(flywheel: Flywheel):
     flywheel.get_velocity = MagicMock()
     flywheel.get_velocity.return_value = 20
+    flywheel.get_current = MagicMock()
+    flywheel.get_current.return_value = 10
     flywheel.periodic()
     top_f = flywheel.top_flywheel_state.U(0)
     bottom_f = flywheel.bottom_flywheel_state.U(0)
