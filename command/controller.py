@@ -58,7 +58,7 @@ class Giraffe(commands2.Command):
             )
             self.aiming = True
             # self.target.wrist_angle = self.wrist.get_wrist_angle()
-            self.target.wrist_angle = 20 * degrees_to_radians
+            self.target.wrist_angle = 17.5 * degrees_to_radians
             debug_commands.append(
                 PrintCommand("Aiming wrist")
             )

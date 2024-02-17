@@ -98,14 +98,14 @@ class Intake(Subsystem):
         """
 
         self.set_inner_velocity(config.intake_inner_speed)
-        self.set_outer_velocity(config.intake_outer_speed)
+        self.set_outer_velocity(config.intake_outer_speed * 10)
 
     def roll_out(self):
         """
         Rolls inner and outer motors out
         """
-        self.set_inner_velocity(-config.intake_inner_speed)
-        self.set_outer_velocity(-config.intake_outer_speed)
+        self.set_inner_velocity(-config.intake_inner_speed * 10)
+        self.set_outer_velocity(-config.intake_outer_speed * 10)
 
     def rollers_idle_in(self):
         """

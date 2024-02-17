@@ -62,6 +62,7 @@ class EjectIntake(SubsystemCommand[Intake]):
     def end(self, interrupted) -> None:
         self.subsystem.stop_inner()
         self.subsystem.intake_running = False
+        self.subsystem.note_in_intake = False
 
 
 class IntakeIdle(SubsystemCommand[Intake]):

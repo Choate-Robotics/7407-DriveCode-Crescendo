@@ -61,7 +61,7 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.odometry.enable()
-            # Field.calculations.init()
+            Field.calculations.init()
         try:
             init_sensors()
         except Exception as e:
@@ -120,7 +120,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
             
         try:
-            # Field.calculations.update()
+            Field.calculations.update()
             ...
         except Exception as e:
             self.log.error(str(e))
@@ -144,10 +144,20 @@ class _Robot(wpilib.TimedRobot):
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
-        self.scheduler.schedule(command.RunIntake(Robot.intake))
+        self.scheduler.schedule(
+            command.FeedIn(Robot.wrist).andThen(
+            
+            commands2.ParallelCommandGroup(
+                command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow),
+                # command.AimWrist(Robot.wrist, Field.calculations),
+                command.SetFlywheelLinearVelocity(Robot.flywheel, 27),
+            )
+            )
+        )
+        # self.scheduler.schedule(command.RunIntake(Robot.intake))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow))
 
     def teleopPeriodic(self):
         ...

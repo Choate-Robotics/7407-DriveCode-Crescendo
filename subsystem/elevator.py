@@ -101,7 +101,7 @@ class Elevator(Subsystem):
         
         length = (self.motor_extend_encoder.getPosition() - config.elevator_zeroed_pos) * constants.elevator_max_length
         length = 0 if length < 0 else length
-        print(length, 'abs length')
+        # print(length, 'abs length')
         return length
         
 

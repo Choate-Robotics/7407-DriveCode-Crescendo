@@ -25,3 +25,15 @@ class OI:
         #     Robot.drivetrain, Field.calculations, Field.odometry,
         #     Robot.elevator, Robot.wrist
         # ))
+        
+        Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake).onTrue(
+            command.RunIntake(Robot.intake)
+        ).onFalse(
+            command.IntakeIdle(Robot.intake)
+        )
+        
+        Keymap.Intake.INTAKE_OUT.onTrue(
+            command.EjectIntake(Robot.intake)
+        ).onFalse(
+            command.IntakeIdle(Robot.intake)
+        )

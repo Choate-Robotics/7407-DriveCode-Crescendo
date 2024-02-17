@@ -4,8 +4,8 @@
 # import matplotlib.pyplot as plt
 # import ntcore
 import numpy as np
-
-import config
+from math import degrees, radians
+import config, ntcore
 import constants
 from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
@@ -38,9 +38,10 @@ class TrajectoryCalculator:
         self.shoot_angle = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
-
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
-
+        self.use_air_resistance=False
+        
     def init(self):
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
@@ -69,6 +70,8 @@ class TrajectoryCalculator:
         function runs sim to calculate a final angle with air resistance considered
         :return: target angle
         """
+        
+        
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker)
         )
@@ -81,24 +84,28 @@ class TrajectoryCalculator:
         # print("constant.shooter_height", constants.shooter_height)
         # print("elevator.get_length()", self.elevator.get_length())
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
-        theta_2 = theta_1 + np.radians(1)
-        z_1 = self.run_sim(theta_1)
-        z_2 = self.run_sim(theta_2)
-        z_goal_error = self.delta_z - z_2
-        z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-        correction_angle = z_goal_error * z_to_angle_conversion
-        for i in range(config.max_sim_times):
-            theta_1 = theta_2
-            theta_2 = theta_2 + correction_angle
-            z_1 = z_2
+        if not self.use_air_resistance:
+            self.shoot_angle=theta_1
+            return theta_1
+        else:
+            theta_2 = theta_1 + np.radians(1)
+            z_1 = self.run_sim(theta_1)
             z_2 = self.run_sim(theta_2)
             z_goal_error = self.delta_z - z_2
             z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-            # print(z_goal_error, theta_2, self.delta_z)
-            if abs(z_goal_error) < config.shooter_tol:
-                self.shoot_angle = theta_2
-                return theta_2
             correction_angle = z_goal_error * z_to_angle_conversion
+            for i in range(config.max_sim_times):
+                theta_1 = theta_2
+                theta_2 = theta_2 + correction_angle
+                z_1 = z_2
+                z_2 = self.run_sim(theta_2)
+                z_goal_error = self.delta_z - z_2
+                z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
+                # print(z_goal_error, theta_2, self.delta_z)
+                if abs(z_goal_error) < config.shooter_tol:
+                    self.shoot_angle = theta_2
+                    return theta_2
+                correction_angle = z_goal_error * z_to_angle_conversion
 
     def update_base(self):
         """
@@ -116,8 +123,15 @@ class TrajectoryCalculator:
         updates both shooter and base
         :return: base target angle
         """
+        
         self.update_shooter()
         self.update_base()
+        self.update_tables()
+
+    def update_tables(self):
+        self.table.putNumber('wrist angle', degrees(self.get_theta()))
+        
+        self.table.putNumber('bot angle', self.get_bot_theta().degrees())
 
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
@@ -148,7 +162,25 @@ class TrajectoryCalculator:
         """
         Returns the angle of the trajectory.
         """
-        return self.shoot_angle
+        if self.use_air_resistance:
+            return self.shoot_angle
+        else:
+            self.distance_to_target = (
+                self.odometry.getPose().translation().distance(self.speaker)
+            )
+            # print("distance_to_target", self.distance_to_target)
+            
+            self.delta_z = (
+                self.speaker_z - self.elevator.get_length() + constants.elevator_bottom_total_height
+            )
+            return self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
+        
+    
+    def get_bot_theta(self) -> Rotation2d:
+        '''
+        Returns the angle of the Robot
+        '''
+        return self.base_rotation2d
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u

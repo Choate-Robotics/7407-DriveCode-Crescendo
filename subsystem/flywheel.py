@@ -196,5 +196,5 @@ class Flywheel(Subsystem):
         self.set_voltage(self.bottom_flywheel_state.U(0), 2)
         
         table = ntcore.NetworkTableInstance.getDefault().getTable('flywheel')
-        table.putNumber('flywheel top velocity', self.get_velocity(1))
-        table.putNumber('flywheel bottom velocity', self.get_velocity(2))
+        table.putNumber('flywheel top velocity', self.get_velocity_linear(1))
+        table.putNumber('flywheel bottom velocity', self.get_velocity_linear(2))

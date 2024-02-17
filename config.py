@@ -113,8 +113,8 @@ limelight_led_mode = {
 }
 
 class LimelightPosition:
-    init_elevator_front = Pose3d(0, 0, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, 0))
-    init_elevator_back = Pose3d(0, 0, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
+    init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3, constants.limelight_height_LL3, Rotation3d(0, constants.limelight_elevator_angle, 0))
+    init_elevator_back = Pose3d(constants.limelight_right, constants.limelight_forward, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
     fixed_intake = Pose3d(0,0,0, Rotation3d(0,0,0))
 
 period: float = 0.03  # seconds
@@ -133,7 +133,7 @@ deploy_intake_timeout = .1
 deploy_tenting_timeout = .1
 
 intake_timeout = 5
-intake_roller_current_limit = 15
+intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1

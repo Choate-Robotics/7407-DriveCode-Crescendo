@@ -8,7 +8,7 @@ from subsystem import Wrist
 from commands2 import SequentialCommandGroup
 from units.SI import radians
 import math
-
+from sensors import TrajectoryCalculator
 class ZeroWrist(SubsystemCommand[Wrist]):
 
     def __init__(self, subsystem: Wrist):
@@ -55,6 +55,32 @@ class SetWrist(SubsystemCommand[Wrist]):
         # else:
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
        
+       
+class AimWrist(SubsystemCommand[Wrist]):
+
+    def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+        self.traj_calc = TrajectoryCalculator
+
+    def initialize(self):
+        pass
+
+    def execute(self):
+        self.subsystem.set_wrist_angle(self.traj_calc.get_theta())
+
+    def isFinished(self):
+        return False
+
+    def end(self, interrupted:bool):
+        if interrupted:
+            wrist_angle = self.subsystem.get_wrist_angle()
+            self.subsystem.set_wrist_angle(wrist_angle) #stopping motor where it is
+            # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
+        # else:
+        #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
+       
+
 class FeedIn(SubsystemCommand[Wrist]):
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
@@ -67,7 +93,8 @@ class FeedIn(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return self.subsystem.note_detected()
+        # return self.subsystem.note_detected()
+        return True
 
     def end(self, interrupted: bool):
         # self.subsystem.stop_feed()
