@@ -7,7 +7,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from rev import CANSparkMax
-import rev
+import rev, math
 from enum import Enum
 import constants
 
@@ -16,8 +16,8 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonConfig
-
-
+from units.SI import degrees_to_radians, meters, radians, meters_per_second
+from typing import Literal
 comp_bot: DigitalInput = DigitalInput(
     9
 )  # if true, we are using the practice bot (we will put a jumper on the DIO port)
@@ -55,8 +55,15 @@ period: float = 0.03  # seconds
 
 
 
+# Giraffe
+elevator_wrist_limit: float = 0.75 # TODO: PLACEHOLDER
+elevator_wrist_threshold: float = 0.75 # TODO: PLACEHOLDER
 
- 
+
+# odometry config
+
+odometry_debounce: float = 0.1 # TODO: PLACEHOLDER
+stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
 
 
 # Leds
@@ -106,8 +113,8 @@ limelight_led_mode = {
 }
 
 class LimelightPosition:
-    init_elevator_front = Pose3d(0, 0, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, 0))
-    init_elevator_back = Pose3d(0, 0, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
+    init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3, constants.limelight_height_LL3, Rotation3d(0, constants.limelight_elevator_angle, 0))
+    init_elevator_back = Pose3d(constants.limelight_right, constants.limelight_forward, constants.limelight_height, Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
     fixed_intake = Pose3d(0,0,0, Rotation3d(0,0,0))
 
 period: float = 0.03  # seconds
@@ -117,19 +124,22 @@ inner_intake_id = 13
 outer_intake_back_id = 17
 deploy_intake_id = 12
 
-intake_inner_speed = 0.25 
+intake_inner_speed = 0.2
+intake_inner_pass_speed = .1
+intake_inner_eject_speed = 1
 intake_outer_speed = 1 
 intake_outer_idle_speed = .15
+intake_outer_eject_speed = 1
 
 deploy_intake_timeout = .1 
 deploy_tenting_timeout = .1
 
 intake_timeout = 5
-intake_roller_current_limit = 15
+intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
-intake_sensor_debounce = 0.2
-intake_distance_sensor_threshold: float = 0.55
+intake_sensor_debounce = 0.1
+intake_distance_sensor_threshold: float = 0.4
 
 double_note_timeout = 2
 
@@ -137,23 +147,23 @@ double_note_timeout = 2
 
 elevator_can_id: int = 10
 elevator_can_id_2: int = 15
-elevator_ramp_rate: float = 1.0  # TODO: PLACEHOLDER
+elevator_ramp_rate: float = .3
 elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
 elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
 elevator_feed_forward: float = 0.0  # TODO: PLACEHOLDER
 elevator_moving = False
-elevator_stage_max = 0.1  # meters
 elevator_zeroed_pos = 0.023  # TODO: PLACEHOLDER: meters
-
+#helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
 wrist_flat_ff = -0.6 # TODO: FIND
-feeder_velocity = .8
-feeder_pass_velocity = 1
-wrist_stage_max = 0  # TODO: PLACEHOLDER radians
-feeder_sensor_threshold = .4
+stage_timeout = 5
+wrist_tent_limit = 20 * degrees_to_radians
+feeder_velocity = .4
+feeder_pass_velocity = .5
+feeder_sensor_threshold = .5
 
 # DRIVETRAIN
 front_left_move_id = 7
@@ -161,7 +171,7 @@ front_left_turn_id = 8
 front_left_encoder_port = AnalogEncoder(3)
 front_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.860
 
-front_right_move_id = 5
+front_right_move_id = 4
 front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
 front_right_encoder_zeroed_pos = 0.536 if comp_bot.get() else 0.536
@@ -182,17 +192,19 @@ drivetrain_reversed: bool = False
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
-v0_flywheel = 15  # TODO: placeholder
+flywheel_amp_speed:meters = 5
+v0_flywheel:meters_per_second = 22  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
-
+flywheel_shot_tolerance:meters_per_second = 0.2
+flywheel_shot_current_threshold = 20
 # Configs 
 # TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, elevator_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.2, 0.0, 0.01, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.00015, (-0.5, 0.5),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.0, (-1.0, 1.0),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.0005, 0, 0.0004, 0.00017, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -209,6 +221,57 @@ MOVE_CONFIG = TalonConfig(
 )
 
 
+
+# Giraffe
+
+staging_angle = 55.5 * degrees_to_radians
+
+class Giraffe:
+    
+    
+    
+    class GiraffePos:
+        
+        class Special(Enum):
+            
+            kStage = 0
+            kAim = 1
+            kHeightAuto = 2
+    
+        def __init__(self, height: meters | Special, wrist_angle: radians | Special):
+            self.height = height
+            self.wrist_angle = wrist_angle
+
+    
+    kIdle = GiraffePos(0, staging_angle)
+    
+    kStage = GiraffePos(0, GiraffePos.Special.kStage)
+    
+    kAim = GiraffePos(GiraffePos.Special.kHeightAuto, GiraffePos.Special.kAim)
+    
+    kAimLow = GiraffePos(0, GiraffePos.Special.kAim)
+    
+    kAimHigh = GiraffePos(constants.elevator_max_length , GiraffePos.Special.kAim)
+    
+    kClimbReach = GiraffePos(constants.elevator_max_length, 0)
+    
+    kClimbPullUp = GiraffePos(0, 0)
+    
+    kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
+    
+    kAmp = GiraffePos(constants.elevator_max_length, -10 * degrees_to_radians)
+    
+"""
+c = drag coefficient
+a = projectile area (m^2)
+m = projectile mass (kg)
+rho_air = air density (kg/m^3)
+g = acceleration due to gravity (m/s^2)
+v0 = initial velocity of shooter flywheel (m/s) config
+delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
+y = height of target (COULD BE IN ODOMETRY) (m) const
+tol = tolerance of error in distance to target (m)
+"""
 #Gyro
 gyro_id = 29
  

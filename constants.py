@@ -41,7 +41,7 @@ bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
 drivetrain_max_vel = 80 * feet_to_meters
 drivetrain_max_accel = 5 * feet_to_meters
-drivetrain_max_angular_vel = 500 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_vel = 5000 * degrees_per_second__to__radians_per_second
 drivetrain_move_motor_free_speed: rotations_per_minute = (
     6300  # 5676 is the free speed RPM of the NEO
 )
@@ -134,9 +134,9 @@ elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio
 elevator_driver_gear_circumference: float = (
     math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
-elevator_length: float = 0.55  # REAL VALUE: Meters
 elevator_max_length: float = 21 * inches_to_meters  # REAL VALUE: Meters
 elevator_bottom_total_height: meters = 26.25 * inches_to_meters
+elevator_max_length_stage: float = 0 * inches_to_meters
 
 # INTAKE
 intake_inner_gear_ratio = 36 / 11  # REAL VALUE: 36:11 gear ratio
@@ -145,7 +145,12 @@ intake_deploy_gear_ratio = 20 * (32 / 14)  # REAL VALUE: 20:1 * 32:14 gear ratio
 
 
 # LIMELIGHT
-limelight_height = 23 * inches_to_meters
+limelight_height = 26 * inches_to_meters
+limelight_height_LL3 = 26.17 * inches_to_meters
+limelight_right = -10.7255 * inches_to_meters
+limelight_right_LL3 = -10.6338 * inches_to_meters
+limelight_forward_LL3 = 10.186 * inches_to_meters
+limelight_forward = 2.395 * inches_to_meters
 limelight_elevator_angle = 25 * degrees_to_radians
 limelight_back_yaw = 180 * degrees_to_radians
 
@@ -166,6 +171,7 @@ shooter_height = 23 * inches_to_meters
 
 wrist_max_rotation = 55.5 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
+wrist_min_rotation_stage = 22 * degrees_to_radians
 
 
 # pathing

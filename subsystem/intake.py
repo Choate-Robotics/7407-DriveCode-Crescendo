@@ -3,7 +3,7 @@ import constants
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
-
+import ntcore
 
 class Intake(Subsystem):
     
@@ -104,8 +104,8 @@ class Intake(Subsystem):
         """
         Rolls inner and outer motors out
         """
-        self.set_inner_velocity(-config.intake_inner_speed)
-        self.set_outer_velocity(-config.intake_outer_speed)
+        self.set_inner_velocity(-config.intake_inner_eject_speed)
+        self.set_outer_velocity(-config.intake_outer_eject_speed)
 
     def rollers_idle_in(self):
         """
@@ -139,10 +139,26 @@ class Intake(Subsystem):
         """
         Rolls inner motors in
         """
-        self.set_inner_velocity(config.intake_inner_speed)
+        self.set_inner_velocity(config.intake_inner_pass_speed)
 
     def stop_inner(self):
         """
         Stops inner rollers
         """
-        self.set_inner_velocity(0)
+        self.inner_motor.set_target_position(self.inner_motor.get_sensor_position())
+        
+        
+    def remove_note(self):
+        self.note_in_intake = False
+        
+    def periodic(self) -> None:
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
+        
+        table.putBoolean('note in intake', self.note_in_intake)
+        table.putBoolean('note detected', self.detect_note())
+        table.putBoolean('distance sensor voltage', self.distance_sensor.getVoltage())
+        table.putBoolean('intake deployed', self.intake_deployed)
+        table.putBoolean('intake running', self.intake_running)
+        table.putNumber('deploy current', self.get_deploy_current())
+        table.putNumber('outer current', self.get_outer_current())

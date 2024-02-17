@@ -140,7 +140,7 @@ class Drivetrain(SwerveDrivetrain):
     max_vel: meters_per_second = constants.drivetrain_max_vel
     max_target_accel: meters_per_second_squared = constants.drivetrain_max_accel
     max_angular_vel: radians_per_second = constants.drivetrain_max_angular_vel
-    deadzone_velocity: meters_per_second = 0.02
+    deadzone_velocity: meters_per_second = 0.05
     deadzone_angular_velocity: radians_per_second = math.radians(5)
     start_angle: degrees = 0
     start_pose: Pose2d = Pose2d(
@@ -150,6 +150,7 @@ class Drivetrain(SwerveDrivetrain):
     )
     gyro_start_angle: radians = math.radians(start_angle)
     gyro_offset: radians = math.radians(0)
+    ready_to_shoot: bool = False
 
     def x_mode(self):
         self.n_front_left.set_motor_angle(math.radians(-45))
@@ -163,3 +164,4 @@ class Drivetrain(SwerveDrivetrain):
         bl = self.n_back_left.get_abs()
         br = self.n_back_right.get_abs()
         return [fl, fr, bl, br]
+    

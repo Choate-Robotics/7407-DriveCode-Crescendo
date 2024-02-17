@@ -24,23 +24,23 @@ def trajectory_calc():
     [
         (
             Pose2d(4, 2, Rotation2d(0)),
-            0.39275870608907804,
+            0.3283533945463254,
         ),
         (
             Pose2d(3, 0, Rotation2d(0)),
-            0.3729935526560053,
+            0.2952840561723981,
         ),
         (
             Pose2d(2, 2, Rotation2d(0)),
-            0.44281124347644474,
+            0.3938190353882768,
         ),
         (
             Pose2d(1, 4, Rotation2d(0)),
-            0.7405675431,
+            0.719368713509958,
         ),
         (
             Pose2d(0, 2, Rotation2d(0)),
-            0.470293281,
+            0.4264439888832886,
         ),
     ],
 )
@@ -50,6 +50,7 @@ def test_update_no_air(
     monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
     monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
     # print(f"target: {odometry}", sys.stdout)
+
     assert trajectory_calc.calculate_angle_no_air() == pytest.approx(
         expected_angle, abs=math.radians(1)
     )

@@ -2,6 +2,7 @@ import math
 from math import pi
 
 import config
+import ntcore
 import constants
 from toolkit.motors.rev_motors import SparkMax
 from toolkit.subsystem import Subsystem
@@ -25,6 +26,9 @@ class Wrist(Subsystem):
         self.feed_disabled: bool = False
         self.distance_sensor: AnalogInput = None
         self.disable_rotation: bool = False
+        self.locked: bool = False
+        self.ready_to_shoot: bool = False
+        self.target_angle: radians = 0
 
     def init(self):
         self.wrist_motor.init()
@@ -33,8 +37,9 @@ class Wrist(Subsystem):
         self.feed_motor.init()
         self.distance_sensor = self.feed_motor.get_analog()
         
-    @staticmethod
-    def limit_angle(angle: radians) -> radians:
+    def limit_angle(self, angle: radians) -> radians:
+        if self.locked and angle <= constants.wrist_min_rotation_stage:
+            return constants.wrist_min_rotation_stage
         if angle <= constants.wrist_min_rotation:
             return constants.wrist_min_rotation
         elif angle >= constants.wrist_max_rotation:
@@ -49,7 +54,7 @@ class Wrist(Subsystem):
         :return: None
         """
         angle = self.limit_angle(angle)
-        
+        self.target_angle = angle
         
         ff = config.wrist_flat_ff * math.cos(angle)
         
@@ -71,7 +76,7 @@ class Wrist(Subsystem):
         )
         
     def note_detected(self) -> bool:
-        return self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
+        return .6 > self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
 
     def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """
@@ -115,9 +120,36 @@ class Wrist(Subsystem):
             self.feed_motor.set_raw_output(-(config.feeder_velocity))
     
     def stop_feed(self):
-        self.feed_motor.set_target_velocity(0)
-        self.feed_motor.set_raw_output(0)
+        self.feed_motor.set_target_position(self.feed_motor.get_sensor_position())
 
     def feed_note(self):
         if not self.feed_disabled:
-            self.feed_motor.set_target_velocity(config.feeder_pass_velocity)
+            self.feed_motor.set_raw_output(config.feeder_pass_velocity)
+            
+    def set_note_staged(self):
+        self.note_staged = True
+        
+    def set_note_not_staged(self):
+        self.note_staged = False
+        
+    def lock(self):
+        self.locked = True
+        
+    def unlock(self):
+        self.locked = False
+        
+    def periodic(self) -> None:
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('wrist')
+        
+        table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
+        table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
+        table.putBoolean('note in feeder', self.note_staged)
+        table.putBoolean('note detected', self.note_detected())
+        table.putBoolean('wrist zeroed', self.wrist_zeroed)
+        table.putBoolean('ready to shoot', self.ready_to_shoot)
+        table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
+        table.putBoolean('rotation disabled', self.rotation_disabled)
+        table.putBoolean('feed disabled', self.feed_disabled)
+        table.putBoolean('locked', self.locked)
+        table.putNumber('target angle', math.degrees(self.target_angle))

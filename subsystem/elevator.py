@@ -3,7 +3,7 @@ import config
 import constants
 
 from units.SI import meters
-
+import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
 
@@ -23,6 +23,8 @@ class Elevator(Subsystem):
 
         self.zeroed: bool = False
         self.elevator_moving: bool = False
+        self.locked: bool = False
+        self.target_length: meters = 0.0
 
     def init(self) -> None:
         self.motor_extend.init()
@@ -49,8 +51,9 @@ class Elevator(Subsystem):
     def rotations_to_length(rotations: float) -> meters:
         return (rotations * constants.elevator_driver_gear_circumference) / constants.elevator_gear_ratio
     
-    @staticmethod
-    def limit_length(length: meters) -> meters:
+    def limit_length(self, length: meters) -> meters:
+        if self.locked and length > constants.elevator_max_length_stage:
+            return constants.elevator_max_length_stage
         if length > constants.elevator_max_length:
             return constants.elevator_max_length
         elif length < 0.0:
@@ -64,6 +67,7 @@ class Elevator(Subsystem):
 
         """
         length = self.limit_length(length)
+        self.target_length = length
         
         print(length)
         print(self.length_to_rotations(length), 'elevator rotation')
@@ -98,7 +102,8 @@ class Elevator(Subsystem):
     def get_elevator_abs(self) -> meters:
         
         length = (self.motor_extend_encoder.getPosition() - config.elevator_zeroed_pos) * constants.elevator_max_length
-        print(length, 'abs length')
+        length = 0 if length < 0 else length
+        # print(length, 'abs length')
         return length
         
 
@@ -129,3 +134,22 @@ class Elevator(Subsystem):
         """
 
         self.set_length(self.get_length())
+        
+    def lock(self) -> None:
+        
+        self.locked = True
+        
+    def unlock(self) -> None:
+        self.locked = False
+        
+    def periodic(self) -> None:
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('elevator')
+        
+        table.putNumber('elevator height', self.get_length())
+        table.putNumber('elevator abs height', self.get_elevator_abs())
+        table.putBoolean('elevator moving', self.elevator_moving)
+        table.putBoolean('elevator locked', self.locked)
+        table.putBoolean('elevator zeroed', self.zeroed)
+        table.putNumber('elevator height total', self.get_length_total_height())
+        table.putNumber('elevator target height', self.target_length)

@@ -34,9 +34,38 @@ class Keymap:
         X_MODE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
         )
+        
     class Elevator:
-        pass
+        ELEVATOR_HIGH = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.Y
+        )
+        ELEVATOR_MID = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.B
+        )
+        ELEVATOR_LOW = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.A
+        )
+        CLIMB = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
     class Intake:
-        pass
+        INTAKE_IN = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+        )
+        INTAKE_OUT = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
+        )
     class Shooter:
-        pass
+        ...
+        AIM = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+        )
+        
+    class Feeder:
+        FEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.RB
+        )
+        UNFEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
+        )
+        # UNJAM = 

@@ -2,7 +2,7 @@ import math
 import rev
 import config
 import constants
-
+import ntcore
 from wpimath.controller import LinearQuadraticRegulator_1_1
 from wpimath.estimator import KalmanFilter_1_1_1
 from wpimath.system import LinearSystemLoop_1_1_1
@@ -60,7 +60,7 @@ class Flywheel(Subsystem):
             config.period
         )
 
-
+        self.ready_to_shoot: bool = False
         self.initialized: bool = False
 
     @staticmethod
@@ -93,6 +93,10 @@ class Flywheel(Subsystem):
         self.motor_2.init()
 
         self.initialized = True
+        
+    def note_shot(self) -> bool:
+        return self.get_current(1) > config.flywheel_shot_current_threshold\
+            or self.get_current(2) > config.flywheel_shot_current_threshold
 
     def set_velocity(self, angular_velocity: radians_per_second, motor=0) -> None:
         if motor == 1:
@@ -145,6 +149,17 @@ class Flywheel(Subsystem):
                 self.motor_2.motor.getAppliedOutput()
             )
             
+    def get_current(self, motor=0) -> float:
+        if motor == 1:
+            return self.motor_1.motor.getOutputCurrent()
+        elif motor == 2:
+            return self.motor_2.motor.getOutputCurrent()
+        else:
+            return (
+                self.motor_1.motor.getOutputCurrent(),
+                self.motor_2.motor.getOutputCurrent()
+            )
+            
     def within_velocity(self, velocity: radians_per_second, tolerance: radians_per_second, motor=0) -> bool:
         '''
         Returns True if the flywheel velocity is within the tolerance of the target velocity
@@ -194,3 +209,20 @@ class Flywheel(Subsystem):
         # Set the next setpoint for the flywheel
         self.set_voltage(self.top_flywheel_state.U(0), 1)
         self.set_voltage(self.bottom_flywheel_state.U(0), 2)
+        
+        if self.within_velocity_linear(self.top_flywheel_state.nextR(0), config.flywheel_shot_tolerance):
+            self.ready_to_shoot = True
+        else:
+            self.ready_to_shoot = False
+        
+        table = ntcore.NetworkTableInstance.getDefault().getTable('flywheel')
+        table.putNumber('flywheel top velocity', self.get_velocity_linear(1))
+        table.putNumber('flywheel bottom velocity', self.get_velocity_linear(2))
+        table.putBoolean('ready to shoot', self.ready_to_shoot)
+        table.putBoolean('note shot', self.note_shot())
+        table.putBoolean('flywheel top target', self.top_flywheel_state.nextR(0))
+        table.putBoolean('flywheel bottom target', self.bottom_flywheel_state.nextR(0))
+        table.putNumber('flywheel top voltage', self.get_voltage(1))
+        table.putNumber('flywheel bottom voltage', self.get_voltage(2))
+        table.putNumber('flywheel top current', self.get_current(1))
+        table.putNumber('flywheel bottom current', self.get_current(2))
