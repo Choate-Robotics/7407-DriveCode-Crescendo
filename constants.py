@@ -23,7 +23,7 @@ from units.SI import (
 )
 
 # Main
-c = 0.47  # drag coefficient
+c = 1.28  # drag coefficient
 a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
 m = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
