@@ -260,15 +260,11 @@ class StageNote(SequentialCommandGroup):
     """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
-            # FeedIn(wrist).alongWith(
             Giraffe(elevator, wrist, config.Giraffe.kStage),
-            # ),
-            InstantCommand(lambda: wrist.feed_in()),
-            PassIntakeNote(intake),
-            WaitUntilCommand(wrist.note_detected),
-            InstantCommand(lambda: wrist.stop_feed()),
-            InstantCommand(lambda: wrist.set_note_staged()),
-            IntakeIdle(intake),
+            ParallelCommandGroup(
+                FeedIn(wrist),
+                PassIntakeNote(intake).andThen(IntakeIdle(intake)),
+            ),
             Giraffe(elevator, wrist, config.Giraffe.kAimLow),
         )
     

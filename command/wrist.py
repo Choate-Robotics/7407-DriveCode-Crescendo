@@ -96,21 +96,19 @@ class FeedIn(SubsystemCommand[Wrist]):
         self.subsystem.feed_in()
 
     def execute(self):
-        pass
+        
+        voltage = config.feeder_voltage * (config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage())
+        
+        self.subsystem.set_feed_voltage(voltage)
 
     def isFinished(self):
-        return False
+        return self.subsystem.note_detected()
         # return True
 
     def end(self, interrupted: bool):
-        pass
-        # self.subsystem.stop_feed()
-        if interrupted:
-            ...
-            # utils.LocalLogger.debug("Feed in interrupted")
-        else:
-            ...
-            # self.subsystem.note_staged = True
+        self.subsystem.stop_feed()
+        if not interrupted:
+            self.subsystem.note_staged = True
             # utils.LocalLogger.debug("Fed-in")
 
 class FeedOut(SubsystemCommand[Wrist]):

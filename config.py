@@ -162,7 +162,9 @@ wrist_flat_ff = -0.58 # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 20 * degrees_to_radians
 feeder_velocity = .2
+feeder_voltage = 4
 feeder_pass_velocity = .5
+feeder_pass_voltage = 2
 feeder_sensor_threshold = .6
 
 # DRIVETRAIN
