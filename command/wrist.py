@@ -99,16 +99,18 @@ class FeedIn(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        # return self.subsystem.note_detected()
-        return True
+        return False
+        # return True
 
     def end(self, interrupted: bool):
+        pass
         # self.subsystem.stop_feed()
         if interrupted:
             ...
             # utils.LocalLogger.debug("Feed in interrupted")
         else:
-            self.subsystem.note_staged = True
+            ...
+            # self.subsystem.note_staged = True
             # utils.LocalLogger.debug("Fed-in")
 
 class FeedOut(SubsystemCommand[Wrist]):

@@ -156,9 +156,11 @@ class _Robot(wpilib.TimedRobot):
         #     )
         # )
         # self.scheduler.schedule(command.RunIntake(Robot.intake))
-        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
+        self.scheduler.schedule(command.IntakeIdle(Robot.intake))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow))
+        self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle, Field.calculations))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
 
     def teleopPeriodic(self):
         ...

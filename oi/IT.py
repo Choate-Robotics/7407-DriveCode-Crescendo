@@ -51,10 +51,10 @@ class IT:
         
         #FEEDER TRIGGERS ----------------
         # # if note in feeder, run flywheel and wrist to aim
-        button.Trigger(lambda: Robot.wrist.note_staged)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            command.AimWristSpeaker(Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
-        )
+        # button.Trigger(lambda: Robot.wrist.note_staged)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     command.AimWristSpeaker(Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
+        # )
         #FEEDER TRIGGERS ----------------
         
         
