@@ -56,7 +56,9 @@ class Wrist(Subsystem):
         angle = self.limit_angle(angle)
         self.target_angle = angle
         
-        ff = config.wrist_flat_ff * math.cos(angle)
+        current_angle = self.get_wrist_angle()
+        
+        ff = config.wrist_flat_ff * math.cos(angle) #* (1 if angle < current_angle else -1)
         
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
@@ -76,7 +78,9 @@ class Wrist(Subsystem):
         )
         
     def note_detected(self) -> bool:
-        return .6 > self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
+        # return self.distance_sensor.getVoltage() < config.feeder_sensor_threshold
+        # return False
+        return self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
 
     def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """
@@ -112,19 +116,28 @@ class Wrist(Subsystem):
     def feed_in(self):
         if not self.feed_disabled:
             # self.feed_motor.set_target_velocity(config.feeder_velocity)
-            self.feed_motor.set_raw_output(config.feeder_velocity)
+            # self.feed_motor.set_raw_output(config.feeder_velocity)
+            self.feed_motor.set_target_voltage(config.feeder_voltage)
+            
+    def set_feed_voltage(self, voltage: float):
+        self.feed_motor.set_target_voltage(voltage)
 
     def feed_out(self):
         if not self.feed_disabled:
             # self.feed_motor.set_target_velocity(-(config.feeder_velocity))
-            self.feed_motor.set_raw_output(-(config.feeder_velocity))
+            # self.feed_motor.set_raw_output(-(config.feeder_velocity))
+            self.feed_motor.set_target_voltage(-config.feeder_voltage)
     
     def stop_feed(self):
-        self.feed_motor.set_target_position(self.feed_motor.get_sensor_position())
+        # self.feed_motor.set_target_position(self.feed_motor.get_sensor_position())
+            # self.feed_motor.set_raw_output(0)
+            self.feed_motor.set_target_voltage(0)
+        
 
     def feed_note(self):
         if not self.feed_disabled:
-            self.feed_motor.set_raw_output(config.feeder_pass_velocity)
+            # self.feed_motor.set_raw_output(config.feeder_pass_velocity)
+            self.feed_motor.set_target_voltage(config.feeder_pass_voltage)
             
     def set_note_staged(self):
         self.note_staged = True

@@ -1,7 +1,7 @@
 from utils import LocalLogger
 
 import commands2
-import command
+import command, config, constants
 from robot_systems import Robot, Sensors, Field
 from oi.keymap import Keymap
 
@@ -38,4 +38,30 @@ class OI:
             command.EjectIntake(Robot.intake)
         ).onFalse(
             command.IntakeIdle(Robot.intake)
+        )
+        
+        Keymap.Elevator.ELEVATOR_HIGH.onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
+        )
+        
+        Keymap.Elevator.ELEVATOR_MID.onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
+        )
+        
+        Keymap.Elevator.ELEVATOR_LOW.onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorLow)
+        )
+        
+        Keymap.Elevator.AMP.onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp)
+        ).onFalse(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
+        )
+        
+        Keymap.Feeder.CLEAR_NOTE.onTrue(
+            commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged()).alongWith(
+                command.PassNote(Robot.wrist).withTimeout(1).andThen(
+                    commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
+                )
+            )
         )

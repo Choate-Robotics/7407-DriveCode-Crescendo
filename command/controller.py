@@ -33,17 +33,19 @@ class Giraffe(commands2.Command):
         self.aiming = False
         self.staging = False
         self.auto_height = False
-        self.table = ntcore.NetworkTableInstance.getDefault().getTable('giraffe')
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable('giraffe commands')
         
     
     def finish(self):
         self.finished = True
+        self.table.putBoolean('finished', True)
     
     def initialize(self):
         self.finished = False
         self.aiming = False
         self.staging = False
         self.auto_height = False
+        self.table.putBoolean('finished', False)
         
         
         commands = []
@@ -86,10 +88,20 @@ class Giraffe(commands2.Command):
             self.target.wrist_angle = config.staging_angle
             print('staging note to wrist')
             continuous_commands.append(
-                FeedIn(self.wrist)
+                # FeedIn(self.wrist)
+                InstantCommand(lambda: self.wrist.feed_in())
             )
             debug_commands.append(
                 PrintCommand("Staging note to wrist")
+            )
+            
+        if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kCurrentAngle:
+            self.target.wrist_angle = self.wrist.get_wrist_angle()
+            continuous_commands.append(
+                PrintCommand("Setting wrist to current angle")
+            )
+            debug_commands.append(
+                PrintCommand("Setting wrist to current angle")
             )
         
         if self.target.height == config.Giraffe.GiraffePos.Special.kHeightAuto:
@@ -102,6 +114,14 @@ class Giraffe(commands2.Command):
                 PrintCommand("Auto height")
             )
         
+        if self.target.height == config.Giraffe.GiraffePos.Special.kCurrentHeight:
+            self.target.height = self.elevator.get_length()
+            continuous_commands.append(
+                PrintCommand("Setting elevator to current height")
+            )
+            debug_commands.append(
+                PrintCommand("Setting elevator to current height")
+            )
         
          # if the desired elevator height is greater than 0 while the elevator is locked down
         if self.target.height > constants.elevator_max_length_stage and self.elevator.locked or self.target.wrist_angle < constants.wrist_min_rotation_stage and self.elevator.locked:
@@ -136,6 +156,7 @@ class Giraffe(commands2.Command):
         commands2.CommandScheduler.getInstance().schedule(ParallelCommandGroup(
             SequentialCommandGroup(
                 *commands,
+                # WaitCommand(3),
                 InstantCommand(lambda: self.finish()),
                 *continuous_commands
             ),
@@ -152,7 +173,10 @@ class Giraffe(commands2.Command):
         print("GIRAFFE COMMAND FINISHED")
         if interrupted:
             print("GIRAFFE INTERRUPTED")
-            self.finished = True
+            # self.finished = True
+        else:
+            self.table.putBoolean('finished', False)
+        self.finished = False
     
 class GiraffeLock(commands2.Command):
     """Locks the elevator and wrist to the stage position
@@ -224,6 +248,7 @@ class GiraffeLock(commands2.Command):
     def end(self, interrupted: bool):
         if interrupted:
             self.finished = True
+            #potentially put coninuous commands here
     
     
 class StageNote(SequentialCommandGroup):
@@ -236,13 +261,12 @@ class StageNote(SequentialCommandGroup):
     """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
-            # FeedIn(wrist).alongWith(
             Giraffe(elevator, wrist, config.Giraffe.kStage),
-            # ),
-            PassIntakeNote(intake),
-            WaitUntilCommand(wrist.note_detected),
-            IntakeIdle(intake),
-            Giraffe(elevator, wrist, config.Giraffe.kIdle),
+            ParallelCommandGroup(
+                FeedIn(wrist),
+                PassIntakeNote(intake).andThen(IntakeIdle(intake)),
+            ),
+            Giraffe(elevator, wrist, config.Giraffe.kAimLow),
         )
     
 class AimWristSpeaker(ParallelCommandGroup):

@@ -178,6 +178,16 @@ class SparkMax(PIDMotor):
         """
         result = self.pid_controller.setReference(vel, CANSparkMax.ControlType.kVelocity)
         self.error_check(result)
+        
+    def set_target_voltage(self, voltage: float):
+        """
+        Sets the target voltage of the motor controller in volts
+
+        Args:
+            voltage (float): The target voltage of the motor controller in volts
+        """
+        result = self.pid_controller.setReference(voltage, CANSparkMax.ControlType.kVoltage)
+        self.error_check(result)
 
     def get_sensor_position(self) -> rotations:
         """

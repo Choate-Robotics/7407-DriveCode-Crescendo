@@ -48,17 +48,30 @@ class Keymap:
         CLIMB = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
         )
-    class Intake:
-        INTAKE_IN = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+        
+        AMP = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.X
         )
+    class Intake:
+        # INTAKE_IN = commands2.button.Trigger(
+        #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+        # )
+        
+        INTAKE_IN = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+        )
+        
         INTAKE_OUT = commands2.button.Trigger(
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
         )
     class Shooter:
         ...
+        # AIM = commands2.button.Trigger(
+        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+        # )
+        
         AIM = commands2.button.Trigger(
-            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
         )
         
     class Feeder:
@@ -68,4 +81,10 @@ class Keymap:
         UNFEED = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
         )
-        # UNJAM = 
+        
+        CLEAR_NOTE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+        )
+        
+        # UNJAM =
+         

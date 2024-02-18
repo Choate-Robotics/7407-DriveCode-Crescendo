@@ -139,7 +139,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.4
+intake_distance_sensor_threshold: float = 0.5
 
 double_note_timeout = 2
 
@@ -158,12 +158,14 @@ elevator_zeroed_pos = 0.023  # TODO: PLACEHOLDER: meters
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
-wrist_flat_ff = -0.6 # TODO: FIND
+wrist_flat_ff = -0.58 # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 20 * degrees_to_radians
-feeder_velocity = .4
+feeder_velocity = .2
+feeder_voltage = 4
 feeder_pass_velocity = .5
-feeder_sensor_threshold = .5
+feeder_pass_voltage = 2
+feeder_sensor_threshold = .6
 
 # DRIVETRAIN
 front_left_move_id = 7
@@ -193,7 +195,7 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed:meters = 5
-v0_flywheel:meters_per_second = 22  # TODO: placeholder
+v0_flywheel:meters_per_second = 8 #22  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
@@ -202,10 +204,10 @@ flywheel_shot_current_threshold = 20
 # Configs 
 # TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.2, 0.0, 0.01, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.2, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.003, 0.0, (-1.0, 1.0),idle_mode=rev.CANSparkMax.IdleMode.kBrake)
-FEED_CONFIG = SparkMaxConfig(0.0005, 0, 0.0004, 0.00017, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.03,idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -224,7 +226,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle = 55.5 * degrees_to_radians
+staging_angle = 58 * degrees_to_radians
 
 class Giraffe:
     
@@ -237,6 +239,8 @@ class Giraffe:
             kStage = 0
             kAim = 1
             kHeightAuto = 2
+            kCurrentAngle = 3
+            kCurrentHeight = 4
     
         def __init__(self, height: meters | Special, wrist_angle: radians | Special):
             self.height = height
@@ -257,9 +261,17 @@ class Giraffe:
     
     kClimbPullUp = GiraffePos(0, 0)
     
+    kTestFF = GiraffePos(0, 20 * degrees_to_radians)
+    
     kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
     
-    kAmp = GiraffePos(constants.elevator_max_length, -10 * degrees_to_radians)
+    kAmp = GiraffePos(0.2325, -26 * degrees_to_radians)
+    
+    kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
+    
+    kElevatorLow = GiraffePos(0, GiraffePos.Special.kCurrentAngle)
+    
+    kElevatorMid = GiraffePos(constants.elevator_max_length / 2, GiraffePos.Special.kCurrentAngle)
     
 """
 c = drag coefficient

@@ -157,7 +157,7 @@ class Intake(Subsystem):
         
         table.putBoolean('note in intake', self.note_in_intake)
         table.putBoolean('note detected', self.detect_note())
-        table.putBoolean('distance sensor voltage', self.distance_sensor.getVoltage())
+        table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
         table.putBoolean('intake deployed', self.intake_deployed)
         table.putBoolean('intake running', self.intake_running)
         table.putNumber('deploy current', self.get_deploy_current())
