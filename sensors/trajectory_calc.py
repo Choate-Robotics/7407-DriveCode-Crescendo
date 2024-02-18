@@ -10,6 +10,7 @@ from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from units.SI import radians
+from utils import POI, POIPose
 
 
 class TargetVariable(IntEnum):
@@ -59,7 +60,7 @@ class Target:
 
     def __init__(
         self,
-        pose: Pose3d,
+        pose: POIPose,
         velocity: float,
         criteria: TargetCriteria,
     ):
@@ -68,7 +69,10 @@ class Target:
         self.criteria = criteria
 
     def get_pose2d(self) -> Pose2d:
-        return self.pose.toPose2d()
+        return self.pose.get()
+
+    def get_poseZ(self) -> float:
+        return self.pose.getZ()
 
 
 # Targets
@@ -81,7 +85,9 @@ speaker_target_pose = Pose3d(
     Rotation3d(0, 0, 0),
 )
 target_criteria = TargetCriteria(TargetVariable.Z, TargetVariable.X, 5.0)
-speaker_target = Target(speaker_target_pose, constants.vzero, target_criteria)
+speaker_target = Target(
+    POI.Coordinates.Structures.Scoring.kSpeaker, constants.vzero, target_criteria
+)
 
 
 class TrajectoryCalculator:
@@ -135,7 +141,7 @@ class TrajectoryCalculator:
 
         @return: a float indicating the vertical distance to the target
         """
-        return self.target.pose.translation().Z() - (
+        return self.target.get_poseZ() - (
             constants.shooter_height + self.elevator.get_length()
         )
 
@@ -201,10 +207,17 @@ class TrajectoryCalculator:
         :return: base target angle
         """
         robot_pose_2d = self.odometry.getPose()
+        print("robot_pose_2d: ", robot_pose_2d)
+
         robot_to_speaker = (
             self.target.get_pose2d().translation() - robot_pose_2d.translation()
         )
-        return robot_to_speaker.angle()
+        print("target", self.target.get_pose2d().translation())
+        print("robot_to_speaker", robot_to_speaker)
+        answer = robot_to_speaker.angle().radians()
+        if answer < 0:
+            answer += 2 * np.pi
+        return Rotation2d(answer)
 
     def update(self):
         """

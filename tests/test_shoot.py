@@ -24,15 +24,15 @@ def trajectory_calc():
     [
         (
             Pose2d(2, 2, Rotation2d(0)),
-            0.755503671722051,
+            0.7973980580777741,
         ),
         (
             Pose2d(3, 2, Rotation2d(0)),
-            0.8095379799856197,
+            0.7344352839640675,
         ),
         (
             Pose2d(2, 2, Rotation2d(0)),
-            0.755503671722051,
+            0.7973980580777741,
         ),
         (
             Pose2d(1, 4, Rotation2d(0)),
@@ -40,7 +40,7 @@ def trajectory_calc():
         ),
         (
             Pose2d(0, 2, Rotation2d(0)),
-            0.7372533576437418,
+            1.203641775098618,
         ),
     ],
 )
@@ -69,22 +69,22 @@ def test_update_no_air(
         (
             0.56,
             Pose2d(3, 7, Rotation2d(0)),
-            1.6108861283837188,
+            2.2025600711060442,
         ),
         (
             0.9,
             Pose2d(2, 2, Rotation2d(0)),
-            3.8380380155817693,
+            2.364689623026117,
         ),
         (
             0.52,
             Pose2d(1, 4, Rotation2d(0)),
-            0.8996687585895019,
+            0.8666219138213125,
         ),
         (
             1.0031,
             Pose2d(3, 9, Rotation2d(0)),
-            4.873360734418127,
+            4.819134130136504,
         ),
     ],
 )
@@ -106,10 +106,10 @@ def test_run_sim(
 @pytest.mark.parametrize(
     "odometry, expected_answer",
     [
-        (Pose2d(2, 3, Rotation2d(0)), 0.514656225342555),
-        (Pose2d(1, 6.8, Rotation2d(0)), 0.8168519268236714),
-        (Pose2d(2, 5.1, Rotation2d(0)), 0.717954626335556),
-        (Pose2d(0.7, 5.54, Rotation2d(0)), 1.2705172634003417),
+        (Pose2d(2, 3, Rotation2d(0)), 0.6759875790800276),
+        (Pose2d(1, 6.8, Rotation2d(0)), 0.45088840191512236),
+        (Pose2d(2, 5.1, Rotation2d(0)), 0.5183718576288799),
+        (Pose2d(0.7, 5.54, Rotation2d(0)), 0.5366447015503899),
         (Pose2d(7, 4, Rotation2d(0)), 0.43793129522068697),
         (Pose2d(4, 2, Rotation2d(0)), 0.42853615436478704),
     ],
@@ -133,11 +133,11 @@ def test_update_shooter(
 @pytest.mark.parametrize(
     "odometry, expected_angle",
     [
-        (Pose2d(2, 3, Rotation2d(0)), 2.17795669397),
-        (Pose2d(1, 6.8, Rotation2d(0)), -2.12213750822),
-        (Pose2d(2, 5.1, Rotation2d(0)), 2.89376365937),
-        (Pose2d(6, 2.8, Rotation2d(0)), 2.69713889916),
-        (Pose2d(7, 4, Rotation2d(0)), 2.91682031799),
+        (Pose2d(2, 3, Rotation2d(0)), 3.3089451143081465),
+        (Pose2d(1, 6.8, Rotation2d(0)), 4.475265058044473),
+        (Pose2d(2, 5.1, Rotation2d(0)), 4.02533819476293),
+        (Pose2d(6, 2.8, Rotation2d(0)), 3.164566111786272),
+        (Pose2d(7, 4, Rotation2d(0)), 3.3304388005935888),
     ],
 )
 def test_update_base(
