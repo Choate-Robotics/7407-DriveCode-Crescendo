@@ -248,6 +248,7 @@ class GiraffeLock(commands2.Command):
     def end(self, interrupted: bool):
         if interrupted:
             self.finished = True
+            #potentially put coninuous commands here
     
     
 class StageNote(SequentialCommandGroup):
