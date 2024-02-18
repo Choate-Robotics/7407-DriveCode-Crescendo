@@ -141,7 +141,7 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return False
+        return not self.subsystem.note_detected()
         # need to include beam break
 
     def end(self, interrupted: bool):

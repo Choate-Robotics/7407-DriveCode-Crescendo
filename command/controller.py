@@ -158,7 +158,7 @@ class Giraffe(commands2.Command):
                 *commands,
                 # WaitCommand(3),
                 InstantCommand(lambda: self.finish()),
-                *continuous_commands
+                # *continuous_commands
             ),
             # SequentialCommandGroup(
             #     *debug_commands
@@ -264,8 +264,9 @@ class StageNote(SequentialCommandGroup):
             Giraffe(elevator, wrist, config.Giraffe.kStage),
             ParallelCommandGroup(
                 FeedIn(wrist),
-                PassIntakeNote(intake).andThen(IntakeIdle(intake)),
+                PassIntakeNote(intake),
             ),
+            # IntakeIdle(intake),
             Giraffe(elevator, wrist, config.Giraffe.kAimLow),
         )
     

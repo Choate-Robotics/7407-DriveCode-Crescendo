@@ -24,8 +24,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python3 -m pip install robotpy==2024.2.1.1
-          pip install coverage
-          python3 -m robotpy sync --user
+          python3 -m robotpy sync
 
 
       - name:

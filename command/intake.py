@@ -40,7 +40,7 @@ class PassIntakeNote(SubsystemCommand[Intake]):
         return not self.subsystem.detect_note()
 
     def end(self, interrupted) -> None:
-        self.subsystem.stop_inner()
+        # self.subsystem.stop_inner()
         if not interrupted and self.note_gone:
             # self.subsystem.note_in_intake = False
             self.subsystem.rollers_idle_in()
