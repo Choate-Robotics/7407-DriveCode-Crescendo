@@ -62,6 +62,7 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight_intake.init()
             Field.odometry.enable()
             Field.calculations.init()
+
         try:
             init_sensors()
         except Exception as e:
@@ -79,7 +80,6 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
-        
 
     def robotPeriodic(self):
 
@@ -98,7 +98,6 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         try:
-            ...
             Sensors.limelight_back.update()
             Sensors.limelight_front.update()
             Sensors.limelight_intake.update()
@@ -111,35 +110,33 @@ class _Robot(wpilib.TimedRobot):
 
         try:
             Field.odometry.update()
-            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         try:
             Field.calculations.update()
-            ...
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
-        
+
         # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
-        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         Field.calculations.init()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
+
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain),
@@ -147,7 +144,7 @@ class _Robot(wpilib.TimedRobot):
         )
         # self.scheduler.schedule(
         #     command.FeedIn(Robot.wrist).andThen(
-            
+
         #     commands2.ParallelCommandGroup(
         #         command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow),
         #         # command.AimWrist(Robot.wrist, Field.calculations),
@@ -182,7 +179,6 @@ class _Robot(wpilib.TimedRobot):
 
     def disabledPeriodic(self) -> None:
         pass
-    
 
 
 if __name__ == "__main__":

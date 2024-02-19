@@ -13,6 +13,7 @@ from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
 from wpimath.geometry import Rotation2d, Translation3d, Translation2d
 
+
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
 
@@ -40,8 +41,8 @@ class TrajectoryCalculator:
         self.elevator = elevator
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
-        self.use_air_resistance=False
-        
+        self.use_air_resistance = False
+
     def init(self):
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
@@ -53,15 +54,15 @@ class TrajectoryCalculator:
 
         phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
         result_angle = (
-            0.5
-            * np.arcsin(
-                np.sin(phi0)
-                + (constants.g
-                * distance_to_target
-                * np.cos(phi0)
-                / (config.v0_flywheel**2))
-            )
-            + 0.5 * phi0
+                0.5
+                * np.arcsin(
+            np.sin(phi0)
+            + (constants.g
+               * distance_to_target
+               * np.cos(phi0)
+               / (config.v0_flywheel ** 2))
+        )
+                + 0.5 * phi0
         )
         return result_angle
 
@@ -72,21 +73,21 @@ class TrajectoryCalculator:
         """
         if type(self.speaker) == Translation3d:
             self.speaker = self.speaker.toTranslation2d()
-        
+
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker)
         )
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
-            self.speaker_z - self.elevator.get_length() + constants.shooter_height
+                self.speaker_z - self.elevator.get_length() + constants.shooter_height
         )
         # print("delta_z", self.delta_z)
         # print("constant.shooter_height", constants.shooter_height)
         # print("elevator.get_length()", self.elevator.get_length())
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
-            self.shoot_angle=theta_1
+            self.shoot_angle = theta_1
             return theta_1
         else:
             theta_2 = theta_1 + np.radians(1)
@@ -124,7 +125,7 @@ class TrajectoryCalculator:
         updates both shooter and base
         :return: base target angle
         """
-        
+
         self.update_shooter()
         self.update_base()
         self.update_tables()
@@ -170,17 +171,16 @@ class TrajectoryCalculator:
                 self.odometry.getPose().translation().distance(self.speaker)
             )
             # print("distance_to_target", self.distance_to_target)
-            
+
             self.delta_z = (
-                self.speaker_z - self.elevator.get_length() + constants.elevator_bottom_total_height
+                    self.speaker_z - self.elevator.get_length() + constants.elevator_bottom_total_height
             )
             return self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
-        
-    
+
     def get_bot_theta(self) -> Rotation2d:
-        '''
+        """
         Returns the angle of the Robot
-        '''
+        """
         return self.base_rotation2d
 
     def deriv(self, t, u):
