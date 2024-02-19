@@ -98,7 +98,7 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         
-        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.Blue:
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
             config.active_team = config.Team.BLUE
         else:
             config.active_team = config.Team.RED
