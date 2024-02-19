@@ -72,7 +72,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
     def __init__(self, drivetrain, target_calc: TrajectoryCalculator):
         super().__init__(drivetrain)
         self.target_calc = target_calc
-        self.theta_controller = PIDController(0.1, 0, 0)
+        self.theta_controller = PIDController(0.02, 0, 0.01)
         
 
     def initialize(self) -> None:
@@ -85,7 +85,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         )
         
         target_angle = self.target_calc.get_bot_theta()
-        d_theta = self.theta_controller.calculate(self.subsystem.gyro.get_robot_heading(), target_angle.radians())
+        d_theta = self.theta_controller.calculate(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(), target_angle.radians())
         
         def within_angle(heading, target, tolerance):
             return abs(heading - target) < tolerance

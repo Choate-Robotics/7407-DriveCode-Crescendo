@@ -281,7 +281,8 @@ class POI:
                         Translation3d(
                             0,
                             constants.FieldPos.Scoring.speaker_y,
-                            constants.FieldPos.Scoring.speaker_z,
+                            # constants.FieldPos.Scoring.speaker_z,
+                            constants.speaker_z,
                         ),
                         Rotation3d(0, 0, constants.FieldPos.pose_reverse.radians()),
                     )

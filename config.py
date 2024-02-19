@@ -97,7 +97,7 @@ class Team(Enum):
     RED = 0
     BLUE = 1
 
-active_team: Team = Team.BLUE
+active_team: Team = Team.RED
 
 # LIMELIGHT
 class LimelightPipeline:
@@ -131,7 +131,7 @@ intake_outer_speed = 1
 intake_outer_idle_speed = .15
 intake_outer_eject_speed = 1
 
-deploy_intake_timeout = .1 
+deploy_intake_timeout = .25
 deploy_tenting_timeout = .1
 
 intake_timeout = 5
@@ -160,12 +160,12 @@ wrist_motor_id = 2
 feed_motor_id = 3
 wrist_flat_ff = -0.58 # TODO: FIND
 stage_timeout = 5
-wrist_tent_limit = 20 * degrees_to_radians
+wrist_tent_limit = 10 * degrees_to_radians
 feeder_velocity = .2
-feeder_voltage = 4
+feeder_voltage = 5.6
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
-feeder_sensor_threshold = .6
+feeder_sensor_threshold = .65
 
 # DRIVETRAIN
 front_left_move_id = 7
@@ -195,7 +195,7 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed:meters = 5
-v0_flywheel:meters_per_second = 8 #22  # TODO: placeholder
+v0_flywheel:meters_per_second = 22  # TODO: placeholder
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
@@ -204,7 +204,7 @@ flywheel_shot_current_threshold = 20
 # Configs 
 # TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.2, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.03,idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)

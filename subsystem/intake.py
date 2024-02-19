@@ -91,6 +91,10 @@ class Intake(Subsystem):
         """
 
         self.deploy_motor.set_raw_output(-0.5)
+        
+    def undeploy_tenting(self):
+        
+        self.deploy_motor.set_raw_output(0.5)
 
     def roll_in(self):
         """

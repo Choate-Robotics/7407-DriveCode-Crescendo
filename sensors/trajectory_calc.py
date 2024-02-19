@@ -56,10 +56,10 @@ class TrajectoryCalculator:
             0.5
             * np.arcsin(
                 np.sin(phi0)
-                + constants.g
+                + (constants.g
                 * distance_to_target
                 * np.cos(phi0)
-                / (config.v0_flywheel**2)
+                / (config.v0_flywheel**2))
             )
             + 0.5 * phi0
         )
@@ -131,7 +131,7 @@ class TrajectoryCalculator:
 
     def update_tables(self):
         self.table.putNumber('wrist angle', degrees(self.get_theta()))
-        
+        self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
 
     def run_sim(self, shooter_theta):

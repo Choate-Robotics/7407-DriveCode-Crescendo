@@ -45,9 +45,7 @@ class Keymap:
         ELEVATOR_LOW = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.A
         )
-        CLIMB = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
-        )
+        
         
         AMP = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.X
@@ -58,7 +56,7 @@ class Keymap:
         # )
         
         INTAKE_IN = commands2.button.Trigger(
-            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.5
         )
         
         INTAKE_OUT = commands2.button.Trigger(
@@ -66,13 +64,13 @@ class Keymap:
         )
     class Shooter:
         ...
-        # AIM = commands2.button.Trigger(
-        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
-        # )
-        
         AIM = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
         )
+        
+        # AIM = commands2.button.Trigger(
+        #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+        # )
         
     class Feeder:
         FEED = commands2.button.JoystickButton(
@@ -88,3 +86,16 @@ class Keymap:
         
         # UNJAM =
          
+    class Climb:
+        
+        CLIMB_UP = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.SELECT
+        )
+        
+        CLIMB_DOWN = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+        
+        # UNDO_CLIMB_UP = commands2.button.JoystickButton(
+        #     Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.
+        # )

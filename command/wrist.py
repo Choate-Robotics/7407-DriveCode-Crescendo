@@ -97,7 +97,7 @@ class FeedIn(SubsystemCommand[Wrist]):
 
     def execute(self):
         
-        voltage = config.feeder_voltage * (config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage())
+        voltage = config.feeder_voltage * ((config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage()))
         
         self.subsystem.set_feed_voltage(voltage)
 
@@ -151,5 +151,5 @@ class PassNote(SubsystemCommand[Wrist]):
         #     # utils.LocalLogger.debug("Note transfer interrupted")
         # else:
         #     # utils.LocalLogger.debug("Note transferred")
-        self.subsystem.note_staged = False
+        # self.subsystem.note_staged = False
             

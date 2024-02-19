@@ -59,9 +59,20 @@ class OI:
         )
         
         Keymap.Feeder.CLEAR_NOTE.onTrue(
-            commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged()).alongWith(
-                command.PassNote(Robot.wrist).withTimeout(1).andThen(
+                command.PassNote(Robot.wrist).withTimeout(2).andThen(commands2.WaitCommand(2).andThen(
                     commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
-                )
+                ).andThen(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)).alongWith(
+                    commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
+                ))
             )
+        
+        Keymap.Climb.CLIMB_UP.toggleOnTrue(
+            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        )\
+        #     .toggleOnFalse(
+        #     command.UndoClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        # )
+        
+        Keymap.Climb.CLIMB_DOWN.onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp)
         )
