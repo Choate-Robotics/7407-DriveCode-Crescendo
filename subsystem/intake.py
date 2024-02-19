@@ -5,8 +5,9 @@ from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
 import ntcore
 
+
 class Intake(Subsystem):
-    
+
     def __init__(self):
         super().__init__()
 
@@ -16,7 +17,6 @@ class Intake(Subsystem):
             config=config.INNER_CONFIG,
             inverted=True
         )
-
 
         self.outer_motor: SparkMax = SparkMax(
             can_id=config.outer_intake_back_id,
@@ -28,7 +28,6 @@ class Intake(Subsystem):
             config=config.DEPLOY_CONFIG,
             inverted=True
         )
-
 
         self.distance_sensor: AnalogInput = None
 
@@ -67,7 +66,7 @@ class Intake(Subsystem):
         """
         note_in_intake = self.distance_sensor.getVoltage() > config.intake_distance_sensor_threshold
         return note_in_intake
-    
+
     def detect_note_leaving(self) -> bool:
         """
         Detects if there is a note in the intake
@@ -77,12 +76,11 @@ class Intake(Subsystem):
         note_in_intake = self.distance_sensor.getVoltage() < .2
         return note_in_intake
 
-
     def deploy_roller(self):
         """
         Rotate deploy motor to deploy outer intake
         """
-        
+
         self.deploy_motor.set_raw_output(0.70)
 
     def deploy_tenting(self):
@@ -91,6 +89,9 @@ class Intake(Subsystem):
         """
 
         self.deploy_motor.set_raw_output(-0.5)
+
+    def undeploy_tenting(self):
+        self.deploy_motor.set_raw_output(0.5)
 
     def roll_in(self):
         """
@@ -104,8 +105,8 @@ class Intake(Subsystem):
         """
         Rolls inner and outer motors out
         """
-        self.set_inner_velocity(-config.intake_inner_speed)
-        self.set_outer_velocity(-config.intake_outer_speed)
+        self.set_inner_velocity(-config.intake_inner_eject_speed)
+        self.set_outer_velocity(-config.intake_outer_eject_speed)
 
     def rollers_idle_in(self):
         """
@@ -121,13 +122,11 @@ class Intake(Subsystem):
         self.set_outer_velocity(-config.intake_outer_idle_speed)
         self.set_inner_velocity(0)
 
-    
     def get_outer_current(self) -> float:
         """
         Return: current of back motor (float)
         """
         return self.outer_motor.motor.getOutputCurrent()
-    
 
     def get_deploy_current(self) -> float:
         """
@@ -146,14 +145,17 @@ class Intake(Subsystem):
         Stops inner rollers
         """
         self.inner_motor.set_target_position(self.inner_motor.get_sensor_position())
-        
-        
+
     def remove_note(self):
         self.note_in_intake = False
-        
+
     def periodic(self) -> None:
-        
         table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
-        
+
         table.putBoolean('note in intake', self.note_in_intake)
         table.putBoolean('note detected', self.detect_note())
+        table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
+        table.putBoolean('intake deployed', self.intake_deployed)
+        table.putBoolean('intake running', self.intake_running)
+        table.putNumber('deploy current', self.get_deploy_current())
+        table.putNumber('outer current', self.get_outer_current())

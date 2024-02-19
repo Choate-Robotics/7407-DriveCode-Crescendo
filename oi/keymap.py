@@ -35,14 +35,67 @@ class Keymap:
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
         )
         
-    class Flywheel:
+    class Elevator:
+        ELEVATOR_HIGH = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.Y
+        )
+        ELEVATOR_MID = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.B
+        )
+        ELEVATOR_LOW = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.A
+        )
         
-        SHOOT = commands2.button.Trigger(
+        
+        AMP = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.X
+        )
+    class Intake:
+        # INTAKE_IN = commands2.button.Trigger(
+        #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+        # )
+        
+        INTAKE_IN = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.5
+        )
+        
+        INTAKE_OUT = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
+        )
+    class Shooter:
+        ...
+        AIM = commands2.button.Trigger(
             lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
         )
-    class Elevator:
-        pass
-    class Intake:
-        pass
-    class Shooter:
-        pass
+        
+        # AIM = commands2.button.Trigger(
+        #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+        # )
+        
+    class Feeder:
+        FEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.RB
+        )
+        UNFEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
+        )
+        
+        CLEAR_NOTE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+        )
+        
+        # UNJAM =
+         
+    class Climb:
+        
+        CLIMB_UP = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.SELECT
+        )
+        
+        CLIMB_DOWN = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+        
+        # UNDO_CLIMB_UP = commands2.button.JoystickButton(
+        #     Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.
+        # )

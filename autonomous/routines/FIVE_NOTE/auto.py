@@ -156,7 +156,7 @@ auto = SequentialCommandGroup(
     InstantCommand(lambda: print("Intaked third note")),
 
     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-    command.SetFlywheelLinearVelocity(Robot.flywheel),
+    command.SetFlywheelLinearVelocity(Robot.flywheel, 5),
     InstantCommand(lambda: print("Shot third note")),
 
     path_3,

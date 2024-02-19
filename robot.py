@@ -73,7 +73,8 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.odometry.enable()
-            # Field.calculations.init()
+            Field.calculations.init()
+
         try:
             init_sensors()
         except Exception as e:
@@ -127,44 +128,50 @@ class _Robot(wpilib.TimedRobot):
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         try:
-            # Field.calculations.update()
-            ...
+            Field.calculations.update()
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable('errors').putString('odometry update', str(e))
 
             if config.DEBUG_MODE:
                 raise e
-            
+
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
-        
-        print(Robot.wrist.distance_sensor.getVoltage())
+
+        # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
         
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
-        # Robot.wrist.zero_wrist()
-        # Robot.elevator.zero()
+        Field.calculations.init()
+        Robot.wrist.zero_wrist()
+        Robot.elevator.zero()
+
         self.scheduler.schedule(commands2.SequentialCommandGroup(
-            # command.DeployIntake(Robot.intake),
-            # command.FeedIn(Robot.wrist),
             command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain),
-            # command.IntakeIdle(Robot.intake)
-            # command.SetWrist(Robot.wrist, radians(20)),
-            # command.SetWrist(Robot.wrist, radians(20)),
-            # # command.RunIntake(Robot.intake).withTimeout(config.intake_timeout),
-            # command.IntakeIdle(Robot.intake),
-            # # command.DeployTenting(Robot.intake)
-            # command.SetFlywheelLinearVelocity(Robot.flywheel, 30),
-            # # command.FeedIn(Robot.wrist)
-            # command.SetElevator(Robot.elevator, .51)
         )
         )
-        self.scheduler.schedule(command.RunIntake(Robot.intake))
+        # self.scheduler.schedule(
+        #     command.FeedIn(Robot.wrist).andThen(
+
+        #     commands2.ParallelCommandGroup(
+        #         command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow),
+        #         # command.AimWrist(Robot.wrist, Field.calculations),
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, 27),
+        #     )
+        #     )
+        # )
+        self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
+        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
+        # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
 
     def teleopPeriodic(self):
         pass
@@ -177,8 +184,6 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-
-        # autonomous.four_note.run()
         self.auto_selection.getSelected().run()
 
     def autonomousPeriodic(self):

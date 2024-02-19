@@ -43,8 +43,7 @@ class Limelight:
         self.cam_pos_moving: bool = False
 
     def init(self):
-        pass
-        # self.set_cam_pose(self.origin_offset)
+        self.set_cam_pose(self.origin_offset)
 
     def set_cam_pose(self, pose: Pose3d):
         """
@@ -65,6 +64,15 @@ class Limelight:
         ]
 
         self.table.putNumberArray("camerapose_robotspace_set", campose)
+        
+    def get_cam_pose(self):
+        """
+        Gets the pose of the limelight relative to the robot's origin.
+
+        :return Pose3d: The pose of the limelight relative to the robot's origin
+        """
+
+        return self.origin_offset
 
     def set_cam_elevator_height(self, elevator_height: meters):
         """
@@ -205,7 +213,6 @@ class Limelight:
         )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
-        self.targetpose = self.table.getNumberArray("botpose_targetspace", [0, 0, 0, 0, 0, 0])
 
     def target_exists(self, force_update: bool = False):
         """
@@ -297,17 +304,12 @@ class Limelight:
             timestamp = Timer.getFPGATimestamp() - (botpose[6] / 1000)
             return pose, timestamp
         
-    def get_target_pose(self):
-        if not self.target_exists():
-            return None
-        else:
-            targetpose: list = []
-            targetpose = self.targetpose
-            pose = Pose3d(
-                Translation3d(targetpose[0], targetpose[1], targetpose[2]),
-                Rotation3d(targetpose[3], targetpose[4], math.radians(targetpose[5])),
-            )
-            return pose
+    def enable_moving(self):
+        self.cam_pos_moving = True
+        
+    def disable_moving(self, new_pose: Pose3d):
+        self.set_cam_pose(new_pose)
+        self.cam_pos_moving = False
 
 
 class LimelightController(VisionEstimator):
@@ -315,7 +317,7 @@ class LimelightController(VisionEstimator):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
 
-    def get_estimated_robot_pose(self) -> list[tuple[tuple[Pose3d, float], Pose3d]] | None:
+    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float]] | None:
         poses = []
         for limelight in self.limelights:
             if (
@@ -324,7 +326,7 @@ class LimelightController(VisionEstimator):
                 and not limelight.cam_pos_moving
             ):
                 # print(limelight.name+' Is sending bot pose'
-                poses += [(limelight.get_bot_pose(), limelight.get_target_pose())]
+                poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
             return poses
         else:
