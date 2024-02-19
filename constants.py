@@ -29,7 +29,7 @@ m = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
 g = 9.8  # acceleration due to gravity (m/s^2)
 vzero = 15  # initial velocity of shooter flywheel (m/s) config
-# speaker_z = 1.7  # height of target (m) CHANGE THIS
+speaker_z = 1.7  # height of target (m) CHANGE THIS
 # speaker_location = Translation2d(0, 0)
 
 # Drivetrain
