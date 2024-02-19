@@ -1,4 +1,5 @@
 import command
+import config
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
 from command import Giraffe
@@ -9,7 +10,10 @@ from utils import POIPose
 from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
-    WaitCommand
+    WaitCommand,
+    ParallelCommandGroup,
+    PrintCommand,
+    WaitUntilCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -111,23 +115,48 @@ path_6 = FollowPathCustom(
 auto = SequentialCommandGroup(
     command.ZeroElevator(Robot.elevator),
     command.ZeroWrist(Robot.wrist),
+    ParallelCommandGroup(
+        command.SetFlywheelLinearVelocity(Robot.flywheel, 5),
+        # Shoot
+        SequentialCommandGroup(
+            SequentialCommandGroup(
+                # Stage Note
+                Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+                command.PassIntakeNote(Robot.intake),
+                WaitUntilCommand(Robot.wrist.note_detected),
+                command.IntakeIdle(Robot.intake),
+                Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle),
+
+                # Shoot in speaker
+                Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim),
+                PrintCommand("Shot first note"),
+            ),
+            path_1,
+
+        ),
+
+
+    ),
+
     command.RunIntake(Robot.intake),
-
-    Giraffe(Robot.elevator,
-    WaitCommand(1),
-    InstantCommand(lambda: print("Shot first note")),
-
-    path_1,
-
-    # command.RunIntake(Robot.intake),
     InstantCommand(lambda: print("Intaked second note")),
-    WaitCommand(1),
+
+    # Shoot
+    SequentialCommandGroup(
+        Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+        Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim),
+        command.SetFlywheelLinearVelocity(Robot.flywheel, 5),
+    ),
+
     InstantCommand(lambda: print("Shot second note")),
 
     path_2,
-    WaitCommand(0.75),
+
+    command.RunIntake(Robot.intake),
     InstantCommand(lambda: print("Intaked third note")),
-    WaitCommand(1),
+
+    Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+    command.SetFlywheelLinearVelocity(Robot.flywheel),
     InstantCommand(lambda: print("Shot third note")),
 
     path_3,
