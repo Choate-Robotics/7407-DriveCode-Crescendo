@@ -1,6 +1,8 @@
 import command
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
+from command import Giraffe
+
 from robot_systems import Robot
 from utils import POIPose
 
@@ -107,7 +109,11 @@ path_6 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
-    # command.ZeroElevator(Robot.elevator),
+    command.ZeroElevator(Robot.elevator),
+    command.ZeroWrist(Robot.wrist),
+    command.RunIntake(Robot.intake),
+
+    Giraffe(Robot.elevator,
     WaitCommand(1),
     InstantCommand(lambda: print("Shot first note")),
 
