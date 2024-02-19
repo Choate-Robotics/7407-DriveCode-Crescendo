@@ -11,7 +11,7 @@
 # Imports
 import math
 
-from wpimath.geometry import Rotation2d
+from wpimath.geometry import Rotation2d, Translation2d
 
 from units.SI import (
     degrees_per_second__to__radians_per_second,
@@ -28,9 +28,8 @@ a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
 m = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
 g = 9.8  # acceleration due to gravity (m/s^2)
-vzero = 15  # initial velocity of shooter flywheel (m/s) config
 speaker_z = 1.7  # height of target (m) CHANGE THIS
-# speaker_location = Translation2d(0, 0)
+speaker_location = Translation2d(0, 0)
 
 # Drivetrain
 drivetrain_turn_gear_ratio = 150 / 7
@@ -56,7 +55,6 @@ drivetrain_move_gear_ratio: rotations_per_minute = (
 drivetrain_move_gear_ratio_as_rotations_per_meter: float = (
     1 / (drivetrain_wheel_diameter * math.pi)
 ) * drivetrain_wheel_gear_ratio
-
 
 # Field
 field_width = 8.21  # meters
@@ -89,8 +87,6 @@ class FieldPos:
         speaker_z_bottom = 78.13 * inches_to_meters
 
         speaker_z = (speaker_z_top + speaker_z_bottom) / 2
-
-        speaker_x = 18.11 / 2 * inches_to_meters
 
         amp_y = field_width
 
@@ -134,9 +130,7 @@ elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio
 elevator_driver_gear_circumference: float = (
     math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
-elevator_max_length: float = (
-    21.653 * inches_to_meters
-)  # REAL VALUE: Meters (Huber says 21.5)
+elevator_max_length: float = 21.653 * inches_to_meters  # REAL VALUE: Meters
 elevator_bottom_total_height: meters = 26.25 * inches_to_meters
 elevator_max_length_stage: float = 0 * inches_to_meters
 
@@ -144,7 +138,6 @@ elevator_max_length_stage: float = 0 * inches_to_meters
 intake_inner_gear_ratio = 36 / 11  # REAL VALUE: 36:11 gear ratio
 intake_outer_gear_ratio = 58 / 12  # REAL VALUE: 58:12 gear ratio
 intake_deploy_gear_ratio = 20 * (32 / 14)  # REAL VALUE: 20:1 * 32:14 gear ratio
-
 
 # LIMELIGHT
 limelight_height = 26 * inches_to_meters
@@ -156,12 +149,9 @@ limelight_forward = 2.395 * inches_to_meters
 limelight_elevator_angle = 25 * degrees_to_radians
 limelight_back_yaw = 180 * degrees_to_radians
 
-
 # WRIST
-
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
 wrist_time_to_max_vel = 0.3  # TODO: placeholder
-
 
 # Flywheel
 flywheel_mass = 1.3 + 0.127  # kilograms
@@ -170,17 +160,9 @@ flywheel_gear_ratio = 1
 flywheel_period = 0.03
 shooter_height = 23 * inches_to_meters
 
-
 wrist_max_rotation = 58 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
 wrist_min_rotation_stage = 22 * degrees_to_radians
 
-
-# pathing
-post_avoidance_distance = 0.5
-
-
-shooter_height = 23 * inches_to_meters  # TODO: looks good, but needs to be tested
-
-# pathing
+# Pathing
 post_avoidance_distance = 0.5

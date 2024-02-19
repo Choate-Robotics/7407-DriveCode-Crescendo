@@ -1,8 +1,7 @@
-# import wpilib
+import wpilib  # noqa
 
 import config
-
-# import constants
+import constants  # noqa
 import sensors
 import subsystem
 import utils
@@ -21,7 +20,6 @@ class Pneumatics:
 
 
 class Sensors:
-    ...
     limelight_intake = sensors.Limelight(
         config.LimelightPosition.init_elevator_front, "limelight-i"
     )

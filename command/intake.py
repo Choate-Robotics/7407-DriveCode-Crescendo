@@ -4,6 +4,7 @@ from wpilib import Timer
 import config
 from subsystem import Intake
 
+
 class RunIntake(SubsystemCommand[Intake]):
 
     def initialize(self) -> None:
@@ -24,7 +25,8 @@ class RunIntake(SubsystemCommand[Intake]):
             self.subsystem.note_in_intake = True
             self.subsystem.rollers_idle_out()
         self.subsystem.intake_running = False
-        
+
+
 class PassIntakeNote(SubsystemCommand[Intake]):
 
     def initialize(self) -> None:
@@ -42,12 +44,12 @@ class PassIntakeNote(SubsystemCommand[Intake]):
     def end(self, interrupted) -> None:
         # self.subsystem.stop_inner()
         # if not interrupted and self.note_gone:
-            # self.subsystem.note_in_intake = False
-            # self.subsystem.rollers_idle_in()
+        # self.subsystem.note_in_intake = False
+        # self.subsystem.rollers_idle_in()
         self.subsystem.intake_running = False
         self.subsystem.note_in_intake = False
-        
-        
+
+
 class EjectIntake(SubsystemCommand[Intake]):
     def initialize(self) -> None:
         self.subsystem.roll_out()
@@ -77,9 +79,10 @@ class IntakeIdle(SubsystemCommand[Intake]):
 
     def isFinished(self) -> bool:
         return True
-    
+
     def end(self, interrupted) -> None:
         pass
+
 
 class DeployIntake(SubsystemCommand[Intake]):
     def initialize(self) -> None:
@@ -92,15 +95,16 @@ class DeployIntake(SubsystemCommand[Intake]):
 
     def isFinished(self) -> bool:
         return (
-            self.subsystem.get_deploy_current() > config.intake_deploy_current_limit
-            and
-            self.timer.get() > config.deploy_intake_timeout
+                self.subsystem.get_deploy_current() > config.intake_deploy_current_limit
+                and
+                self.timer.get() > config.deploy_intake_timeout
         )
-    
+
     def end(self, interrupted) -> None:
         self.subsystem.deploy_motor.set_raw_output(0)
         if not interrupted:
             self.subsystem.intake_deployed = True
+
 
 class DeployTenting(SubsystemCommand[Intake]):
     def initialize(self) -> None:
@@ -113,14 +117,14 @@ class DeployTenting(SubsystemCommand[Intake]):
 
     def isFinished(self) -> bool:
         return (
-            self.subsystem.get_deploy_current() > config.tenting_deploy_current_limit
-            and
-            self.timer.get() > config.deploy_tenting_timeout)
-    
+                self.subsystem.get_deploy_current() > config.tenting_deploy_current_limit
+                and
+                self.timer.get() > config.deploy_tenting_timeout)
+
     def end(self, interrupted) -> None:
         self.subsystem.deploy_motor.set_raw_output(0)
-        
-        
+
+
 class UnDeployTenting(SubsystemCommand[Intake]):
     def initialize(self) -> None:
         self.subsystem.undeploy_tenting()
@@ -132,9 +136,9 @@ class UnDeployTenting(SubsystemCommand[Intake]):
 
     def isFinished(self) -> bool:
         return (
-            self.subsystem.get_deploy_current() > config.tenting_deploy_current_limit
-            and
-            self.timer.get() > config.deploy_tenting_timeout)
-    
+                self.subsystem.get_deploy_current() > config.tenting_deploy_current_limit
+                and
+                self.timer.get() > config.deploy_tenting_timeout)
+
     def end(self, interrupted) -> None:
         self.subsystem.deploy_motor.set_raw_output(0)

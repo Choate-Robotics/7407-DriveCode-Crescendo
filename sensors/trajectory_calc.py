@@ -30,11 +30,15 @@ class TrajectoryCalculator:
     Game-piece trajectory calculator that updates based on odometry and vision data.
     """
 
+    delta_z: float
+    speaker_z: float
+    distance_to_target: float
+
     def __init__(self, odometry: FieldOdometry, elevator: Elevator):
         self.odometry = odometry
+        self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
         self.delta_z = 0
-        self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.shoot_angle = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator

@@ -28,6 +28,7 @@ from toolkit.subsystem_templates.drivetrain import (
 
 foc_active = False
 
+
 @dataclass
 class CustomSwerveNode(SwerveNode):
     m_move: TalonFX
@@ -102,6 +103,7 @@ class CustomSwerveNode(SwerveNode):
                 / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
 
+
 class Drivetrain(SwerveDrivetrain):
     n_front_left = CustomSwerveNode(
         TalonFX(config.front_left_move_id, foc=foc_active, config=config.MOVE_CONFIG),
@@ -164,4 +166,3 @@ class Drivetrain(SwerveDrivetrain):
         bl = self.n_back_left.get_abs()
         br = self.n_back_right.get_abs()
         return [fl, fr, bl, br]
-    

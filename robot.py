@@ -31,6 +31,16 @@ class _Robot(wpilib.TimedRobot):
         self.nt = ntcore.NetworkTableInstance.getDefault()
         self.scheduler = commands2.CommandScheduler.getInstance()
 
+    def handle(self, func, *args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            self.log.error(str(e))
+            self.nt.getTable("errors").putString(func.__name__, str(e))
+
+            if config.DEBUG_MODE:
+                raise e
+
     def robotInit(self):
         self.log._robot_log_setup()
 
@@ -54,14 +64,16 @@ class _Robot(wpilib.TimedRobot):
             for subsystem in subsystems:  # noqa
                 subsystem.init()
 
-        try:
-            init_subsystems()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable("errors").putString("subsystem init", str(e))
+        # try:
+        #     init_subsystems()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('subsystem init', str(e))
 
-            if config.DEBUG_MODE:
-                raise e
+        #     if config.DEBUG_MODE:
+        #         raise e
+
+        self.handle(init_subsystems)
 
         def init_sensors():
             sensors: list[Sensors] = list(  # noqa
@@ -80,14 +92,16 @@ class _Robot(wpilib.TimedRobot):
             Field.odometry.enable()
             Field.calculations.init()
 
-        try:
-            init_sensors()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable("errors").putString("sensor init", str(e))
+        # try:
+        #     init_sensors()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('sensor init', str(e))
 
-            if config.DEBUG_MODE:
-                raise e
+        #     if config.DEBUG_MODE:
+        #         raise e
+
+        self.handle(init_sensors)
 
         # Initialize Operator Interface
         OI.init()
@@ -99,51 +113,63 @@ class _Robot(wpilib.TimedRobot):
         self.log.complete("Robot initialized")
 
     def robotPeriodic(self):
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+            config.active_team = config.Team.BLUE
+        else:
+            config.active_team = config.Team.RED
+
         Field.POI.setNTValues()
 
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
-        try:
-            self.scheduler.run()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable("errors").putString("command scheduler", str(e))
+        # try:
+        #     self.scheduler.run()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('command scheduler', str(e))
 
-            if config.DEBUG_MODE:
-                raise e
+        #     if config.DEBUG_MODE:
+        #         raise e
 
-        try:
-            ...
-            Sensors.limelight_back.update()
-            Sensors.limelight_front.update()
-            Sensors.limelight_intake.update()
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable("errors").putString("limelight update", str(e))
+        self.handle(self.scheduler.run)
 
-            if config.DEBUG_MODE:
-                raise e
+        # try:
+        #     Sensors.limelight_back.update()
+        #     Sensors.limelight_front.update()
+        #     Sensors.limelight_intake.update()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('limelight update', str(e))
 
-        try:
-            Field.odometry.update()
-            ...
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable("errors").putString("odometry update", str(e))
+        #     if config.DEBUG_MODE:
+        #         raise e
 
-            if config.DEBUG_MODE:
-                raise e
+        self.handle(Sensors.limelight_back.update)
+        self.handle(Sensors.limelight_front.update)
+        self.handle(Sensors.limelight_intake.update)
 
-        try:
-            Field.calculations.update()
-            ...
-        except Exception as e:
-            self.log.error(str(e))
-            self.nt.getTable("errors").putString("odometry update", str(e))
+        # try:
+        #     Field.odometry.update()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('odometry update', str(e))
 
-            if config.DEBUG_MODE:
-                raise e
+        #     if config.DEBUG_MODE:
+        #         raise e
+
+        self.handle(Field.odometry.update)
+
+        # try:
+        #     Field.calculations.update()
+        # except Exception as e:
+        #     self.log.error(str(e))
+        #     self.nt.getTable('errors').putString('odometry update', str(e))
+
+        #     if config.DEBUG_MODE:
+        #         raise e
+
+        self.handle(Field.calculations.update)
 
         self.nt.getTable("swerve").putNumberArray(
             "abs encoders", Robot.drivetrain.get_abs()
@@ -157,6 +183,7 @@ class _Robot(wpilib.TimedRobot):
         Field.calculations.init()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
+
         self.scheduler.schedule(
             commands2.SequentialCommandGroup(
                 command.DrivetrainZero(Robot.drivetrain),
