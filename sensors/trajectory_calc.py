@@ -14,7 +14,11 @@ import config
 import constants
 from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator
-from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
+from toolkit.utils.toolkit_math import (
+    NumericalIntegration,
+    extrapolate,
+    find_position_numpy,
+)
 from units.SI import radians
 from utils import POI
 
@@ -39,15 +43,59 @@ class TrajectoryCalculator:
         )
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
+        self.use_lookup_table = False
 
     def init(
         self,
         set_air_resistance: bool = False,
+        set_lookup_table: bool = False,
     ):
         self.use_air_resistance = set_air_resistance
+        self.use_lookup_table = set_lookup_table
 
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
+        self.lookup_table = self.create_lookup_table()
+
+    def create_lookup_table(self):
+        """
+        creates a lookup table for the angle of the trajectory
+        """
+        old_lookup_table = self.use_lookup_table
+        self.use_lookup_table = False
+        final_distance = 10
+        initial_distance = 0.5
+        step = 0.1
+        delta_z = 1.1158003154678295
+        ans_low = []
+        ans_high = []
+        xs = [
+            initial_distance + step * i
+            for i in range(int((final_distance - initial_distance) / step))
+        ]
+        for i in xs:
+            ans_low.append(self.update_shooter(i, delta_z))
+            ans_high.append(
+                self.update_shooter(i, delta_z + constants.elevator_max_length)
+            )
+        self.use_lookup_table = old_lookup_table
+        return [np.array(xs), np.array(ans_low), np.array(ans_high)]
+
+    def calculate_angle_lookup(self, distance_to_target: float, delta_z) -> float:
+        """
+        calculates the angle of the trajectory using a lookup table
+        """
+        # lookup the distance to target in the table.
+        position = find_position_numpy(self.lookup_table[0], distance_to_target)
+        self.shoot_angle = extrapolate(
+            distance_to_target,
+            self.lookup_table[0][position - 1],
+            self.lookup_table[1][position - 1],
+            self.lookup_table[0][position],
+            self.lookup_table[1][position],
+        )
+        return self.shoot_angle
+        pass
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
         """
@@ -92,7 +140,7 @@ class TrajectoryCalculator:
             self.speaker_z - self.elevator.get_length() - constants.shooter_height
         )
 
-    def update_shooter(self) -> float:
+    def update_shooter(self, distance_to_target, delta_z) -> float:
         """
         function runs sim to calculate a final angle with air resistance considered
         :return: target angle
@@ -100,31 +148,34 @@ class TrajectoryCalculator:
 
         self.calculate_distance()
         self.calculate_vertical_distance()
-        # print("delta_z", self.delta_z)
-        # print("velocity", config.v0_flywheel)
-        # self.target.criteria.set_criteria_value(self.distance_to_target)
-        theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
-        if not self.use_air_resistance:
-            self.shoot_angle = theta_1
-            return theta_1
-        theta_2 = theta_1 + np.radians(1)
-        z_1 = self.run_sim(theta_1)
-        z_2 = self.run_sim(theta_2)
-        z_goal_error = self.delta_z - z_2
-        z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-        correction_angle = z_goal_error * z_to_angle_conversion
-        for i in range(config.max_sim_times):
-            theta_1 = theta_2
-            theta_2 = theta_2 + correction_angle
-            z_1 = z_2
+        if self.use_lookup_table and self.use_air_resistance:
+            return self.calculate_angle_lookup(distance_to_target, delta_z)
+        else:
+            # print("delta_z", self.delta_z)
+            # print("velocity", config.v0_flywheel)
+            # self.target.criteria.set_criteria_value(self.distance_to_target)
+            theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
+            if not self.use_air_resistance:
+                self.shoot_angle = theta_1
+                return theta_1
+            theta_2 = theta_1 + np.radians(1)
+            z_1 = self.run_sim(theta_1)
             z_2 = self.run_sim(theta_2)
             z_goal_error = self.delta_z - z_2
             z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
-            # print(z_goal_error, theta_2, self.delta_z)
-            if abs(z_goal_error) < config.shooter_tol:
-                self.shoot_angle = theta_2
-                return theta_2
             correction_angle = z_goal_error * z_to_angle_conversion
+            for i in range(config.max_sim_times):
+                theta_1 = theta_2
+                theta_2 = theta_2 + correction_angle
+                z_1 = z_2
+                z_2 = self.run_sim(theta_2)
+                z_goal_error = self.delta_z - z_2
+                z_to_angle_conversion = (theta_2 - theta_1) / (z_2 - z_1)
+                # print(z_goal_error, theta_2, self.delta_z)
+                if abs(z_goal_error) < config.shooter_tol:
+                    self.shoot_angle = theta_2
+                    return theta_2
+                correction_angle = z_goal_error * z_to_angle_conversion
 
     def update_base(self) -> Rotation2d:
         """
@@ -150,7 +201,9 @@ class TrajectoryCalculator:
         saves results in class variables wrist_angle and base_angle
 
         """
-        self.update_shooter()
+        self.calculate_distance()
+        self.calculate_vertical_distance()
+        self.update_shooter(self.distance_to_target, self.delta_z)
         self.update_base()
         self.update_tables()
 

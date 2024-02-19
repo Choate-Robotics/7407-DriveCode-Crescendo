@@ -134,7 +134,36 @@ def test_update_shooter(
     monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
     # trajectory_calc.use_air_resistance = True
     trajectory_calc.init(True)
-    trajectory_calc.update_shooter()
+    trajectory_calc.update()
+    angle = trajectory_calc.get_theta()
+    assert angle == pytest.approx(expected_answer, abs=math.radians(2))
+
+
+@pytest.mark.parametrize(
+    "odometry, expected_answer",
+    [
+        (Pose2d(2, 3, Rotation2d(0)), 0.5548955786706005),
+        (Pose2d(1, 6.8, Rotation2d(0)), 0.374759756027031),
+        (Pose2d(2, 5.1, Rotation2d(0)), 0.4230906580762768),
+        (Pose2d(0.7, 5.54, Rotation2d(0)), 0.43853530986790956),
+        (Pose2d(4, 2, Rotation2d(0)), 0.38005200933865474),
+        (Pose2d(8, 4, Rotation2d(0)), 0.42643661632888796),
+    ],
+)
+def test_update_lookup_shooter(
+    trajectory_calc, odometry, expected_answer, monkeypatch: MonkeyPatch
+):
+    monkeypatch.setattr(config, "v0_flywheel", 15)
+    monkeypatch.setattr(constants, "g", 9.8)
+    monkeypatch.setattr(constants, "c", 0.47)
+    monkeypatch.setattr(constants, "rho_air", 1.28)
+    monkeypatch.setattr(constants, "a", 14 * 0.0254 * 2 * 0.0254)
+    monkeypatch.setattr(constants, "m", 0.235301)
+    monkeypatch.setattr(trajectory_calc.odometry, "getPose", lambda: odometry)
+    monkeypatch.setattr(trajectory_calc.elevator, "get_length", lambda: 0.0)
+    # trajectory_calc.use_air_resistance = True
+    trajectory_calc.init(True, True)
+    trajectory_calc.update()
     angle = trajectory_calc.get_theta()
     assert angle == pytest.approx(expected_answer, abs=math.radians(2))
 

@@ -204,3 +204,16 @@ def extrapolate(x, x1, y1, x2, y2):
     # Use the line equation to extrapolate the y value
     y = m * x + c
     return y
+
+
+def find_position_numpy(arr, value):
+    # Find the indices where condition is True (elements greater than value)
+    greater_than_indices = np.where(arr > value)[0]
+
+    # Check if there are any elements greater than the value
+    if greater_than_indices.size > 0:
+        return greater_than_indices[
+            0
+        ]  # Return the position of the first element greater than value
+    else:
+        return None  # or any indication that no element is greater than the value
