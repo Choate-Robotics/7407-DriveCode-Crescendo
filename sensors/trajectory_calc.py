@@ -86,7 +86,7 @@ speaker_target_pose = Pose3d(
 )
 target_criteria = TargetCriteria(TargetVariable.Z, TargetVariable.X, 5.0)
 speaker_target = Target(
-    POI.Coordinates.Structures.Scoring.kSpeaker, constants.vzero, target_criteria
+    POI.Coordinates.Structures.Scoring.kSpeaker, 25, target_criteria
 )
 
 
@@ -157,12 +157,14 @@ class TrajectoryCalculator:
         # print(f"odometryPose: {self.odometry.getPose()}")
         # print(f"targetPose: {self.target.get_pose2d()}")
         # print(f"delta_x: {delta_x}, delta_z: {delta_z}")
-        phi0 = np.arctan(delta_z / delta_x) if delta_x != 0 else 0
+        # print(f"speed: {self.target.velocity}")
+
+        phi0 = np.arctan(delta_z / delta_x)
         result_angle = (
             0.5
             * np.arcsin(
                 np.sin(phi0)
-                + constants.g * delta_x * np.cos(phi0) / (config.v0_flywheel**2)
+                + constants.g * delta_x * np.cos(phi0) / (self.target.velocity**2)
             )
             + 0.5 * phi0
         )
@@ -207,13 +209,13 @@ class TrajectoryCalculator:
         :return: base target angle
         """
         robot_pose_2d = self.odometry.getPose()
-        print("robot_pose_2d: ", robot_pose_2d)
+        # print("robot_pose_2d: ", robot_pose_2d)
 
         robot_to_speaker = (
             self.target.get_pose2d().translation() - robot_pose_2d.translation()
         )
-        print("target", self.target.get_pose2d().translation())
-        print("robot_to_speaker", robot_to_speaker)
+        # print("target", self.target.get_pose2d().translation())
+        # print("robot_to_speaker", robot_to_speaker)
         answer = robot_to_speaker.angle().radians()
         if answer < 0:
             answer += 2 * np.pi
