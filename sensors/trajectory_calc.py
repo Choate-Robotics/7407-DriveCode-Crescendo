@@ -1,4 +1,5 @@
 from enum import IntEnum
+from math import degrees  # noqa
 from typing import Callable, List, Tuple
 
 import numpy as np
@@ -227,9 +228,14 @@ class TrajectoryCalculator:
         saves results in class variables wrist_angle and base_angle
 
         """
+        self.update_shooter()
+        self.update_base()
+        self.update_tables()
 
-        self.wrist_angle = self.get_wrist_angle()
-        self.base_angle = self.get_base_angle()
+    def update_tables(self):
+        self.table.putNumber("wrist angle", degrees(self.get_theta()))
+        self.table.putNumber("distance to target", self.distance_to_target)
+        self.table.putNumber("bot angle", self.get_bot_theta().degrees())
 
     def run_sim(self, shooter_theta: radians) -> float:
         delta_x = self.target_horizontal_distance()

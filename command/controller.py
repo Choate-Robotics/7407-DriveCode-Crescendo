@@ -158,7 +158,7 @@ class Giraffe(commands2.Command):
                 *commands,
                 # WaitCommand(3),
                 InstantCommand(lambda: self.finish()),
-                *continuous_commands
+                # *continuous_commands
             ),
             # SequentialCommandGroup(
             #     *debug_commands
@@ -259,14 +259,19 @@ class StageNote(SequentialCommandGroup):
         SequentialCommandGroup (wrist): Wrist subsystem
         SequentialCommandGroup (intake): Intake subsystem
     """
-    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal:TrajectoryCalculator):
         super().__init__(
-            Giraffe(elevator, wrist, config.Giraffe.kStage),
+            
             ParallelCommandGroup(
-                FeedIn(wrist),
-                PassIntakeNote(intake).andThen(IntakeIdle(intake)),
+            FeedIn(wrist),
+            # Giraffe(elevator, wrist, config.Giraffe.kStage),
+            PassIntakeNote(intake),
             ),
-            Giraffe(elevator, wrist, config.Giraffe.kAimLow),
+            WaitUntilCommand(lambda: wrist.note_detected()),
+            IntakeIdle(intake),
+            SetWrist(wrist, 20 * degrees_to_radians)
+            # AimWrist(wrist, traj_cal)
+            # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
         )
     
 class AimWristSpeaker(ParallelCommandGroup):
@@ -322,3 +327,11 @@ class EnableClimb(ParallelCommandGroup):
             )
         )
         
+        
+class UndoClimb(ParallelCommandGroup):
+    
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
+        super().__init__(
+            UnDeployTenting(intake),
+            Giraffe(elevator, wrist, config.Giraffe.kElevatorLow),
+        )

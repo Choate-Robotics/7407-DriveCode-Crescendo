@@ -1,24 +1,27 @@
-# from math import degrees, radians
+from math import degrees, radians  # noqa
 
 import commands2
 import ntcore
 import wpilib
+from wpilib import SmartDashboard  # noqa
 
 import command
 import config
-
-# import constants
-# import sensors
-# import subsystem
+import constants  # noqa
+import sensors  # noqa
+import subsystem  # noqa
 import utils
 from oi.IT import IT
 from oi.OI import OI
-from robot_systems import Field, Robot, Sensors
+from robot_systems import (  # noqa
+    Field,
+    LEDs,
+    Pneumatics,
+    PowerDistribution,
+    Robot,
+    Sensors,
+)
 from toolkit.subsystem import Subsystem
-
-# from wpilib import SmartDashboard
-
-# from robot_systems import LEDs, Pneumatics, PowerDistribution
 
 
 class _Robot(wpilib.TimedRobot):
@@ -48,8 +51,8 @@ class _Robot(wpilib.TimedRobot):
                 }.values()
             )
 
-            for my_subsystem in subsystems:
-                my_subsystem.init()
+            for subsystem in subsystems:  # noqa
+                subsystem.init()
 
         try:
             init_subsystems()
@@ -61,7 +64,7 @@ class _Robot(wpilib.TimedRobot):
                 raise e
 
         def init_sensors():
-            my_sensors: list[Sensors] = list(
+            sensors: list[Sensors] = list(  # noqa
                 {
                     k: v
                     for k, v in Sensors.__dict__.items()
@@ -69,8 +72,7 @@ class _Robot(wpilib.TimedRobot):
                 }.values()
             )
 
-            for my_sensor in my_sensors:
-                pass
+            # for sensor in sensors:
             #     sensor.init()
             Sensors.limelight_front.init()
             Sensors.limelight_back.init()
@@ -171,14 +173,15 @@ class _Robot(wpilib.TimedRobot):
         #     )
         #     )
         # )
-        # self.scheduler.schedule(command.RunIntake(Robot.intake))
-
-        self.scheduler.schedule(command.IntakeIdle(Robot.intake))
+        self.scheduler.schedule(
+            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
+        )
+        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle, Field.calculations))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30))) # noqa
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations)) # noqa
+        # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
-
 
     def teleopPeriodic(self):
         ...

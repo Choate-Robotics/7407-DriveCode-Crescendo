@@ -44,7 +44,7 @@ class IT:
         # # if note in intake and index ready to receive, pass note to index
         button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
-            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
+            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake, Field.calculations)
         )
         #INTAKE TRIGGERS ----------------
         
@@ -61,10 +61,10 @@ class IT:
         #FLYWHEEL TRIGGERS ----------------
         
         # if note in intake, start flywheel
-        button.Trigger(lambda: Robot.intake.note_in_intake)\
-            .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2)
-            )
+        # button.Trigger(lambda: Robot.intake.note_in_intake)\
+        #     .onTrue(
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2)
+        #     )
             
         # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.note_staged)\
@@ -73,19 +73,19 @@ class IT:
             )
             
         # if note not staged and not in intake, run flywheel slow
-        button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
-            .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, 5)
-            )
+        # button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
+        #     .onTrue(
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, 5)
+        #     )
             
         #FLYWHEEL TRIGGERS ----------------
         
         
         #SHOOTER TRIGGERS ----------------
-        button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
-            .onTrue(
-                command.Shoot(Robot.wrist, Robot.flywheel)
-            )
+        # button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
+        #     .onTrue(
+        #         command.Shoot(Robot.wrist, Robot.flywheel)
+        #     )
         #SHOOTER TRIGGERS ----------------
         
         #ODOMETRY TRIGGERS ----------------

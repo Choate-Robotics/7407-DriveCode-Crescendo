@@ -37,13 +37,13 @@ class PassIntakeNote(SubsystemCommand[Intake]):
 
     def isFinished(self) -> bool:
         self.note_gone = self.subsystem.detect_note_leaving()
-        return not self.subsystem.detect_note()
+        return True
 
     def end(self, interrupted) -> None:
-        self.subsystem.stop_inner()
-        if not interrupted and self.note_gone:
+        # self.subsystem.stop_inner()
+        # if not interrupted and self.note_gone:
             # self.subsystem.note_in_intake = False
-            self.subsystem.rollers_idle_in()
+            # self.subsystem.rollers_idle_in()
         self.subsystem.intake_running = False
         self.subsystem.note_in_intake = False
         
@@ -105,6 +105,25 @@ class DeployIntake(SubsystemCommand[Intake]):
 class DeployTenting(SubsystemCommand[Intake]):
     def initialize(self) -> None:
         self.subsystem.deploy_tenting()
+        self.timer = Timer()
+        self.timer.start()
+
+    def execute(self) -> None:
+        pass
+
+    def isFinished(self) -> bool:
+        return (
+            self.subsystem.get_deploy_current() > config.tenting_deploy_current_limit
+            and
+            self.timer.get() > config.deploy_tenting_timeout)
+    
+    def end(self, interrupted) -> None:
+        self.subsystem.deploy_motor.set_raw_output(0)
+        
+        
+class UnDeployTenting(SubsystemCommand[Intake]):
+    def initialize(self) -> None:
+        self.subsystem.undeploy_tenting()
         self.timer = Timer()
         self.timer.start()
 

@@ -97,7 +97,7 @@ class FeedIn(SubsystemCommand[Wrist]):
 
     def execute(self):
         
-        voltage = config.feeder_voltage * (config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage())
+        voltage = config.feeder_voltage * ((config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage()))
         
         self.subsystem.set_feed_voltage(voltage)
 
@@ -141,7 +141,7 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return False
+        return not self.subsystem.note_detected()
         # need to include beam break
 
     def end(self, interrupted: bool):
@@ -151,5 +151,5 @@ class PassNote(SubsystemCommand[Wrist]):
         #     # utils.LocalLogger.debug("Note transfer interrupted")
         # else:
         #     # utils.LocalLogger.debug("Note transferred")
-        self.subsystem.note_staged = False
+        # self.subsystem.note_staged = False
             
