@@ -40,8 +40,12 @@ class TrajectoryCalculator:
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
 
-    def init(self, set_air_resistance: bool = False):
+    def init(
+        self,
+        set_air_resistance: bool = False,
+    ):
         self.use_air_resistance = set_air_resistance
+
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
 
@@ -54,10 +58,11 @@ class TrajectoryCalculator:
         # update the distances
         # delta_x = self.target_horizontal_distance()
         # delta_z = self.target_vertical_distance()
-        # print(f"odometryPose: {self.odometry.getPose()}")
+        print(f"odometryPose: {self.odometry.getPose()}")
         # print(f"targetPose: {self.target.get_pose2d()}")
-        # print(f"delta_x: {delta_x}, delta_z: {delta_z}")
-        # print(f"speed: {self.target.velocity}")
+        print(f"delta_x: {distance_to_target}, delta_z: {delta_z}")
+        print(f"speed: {config.v0_flywheel}")
+        print(f"gravity: {constants.g}")
 
         phi0 = np.arctan(delta_z / distance_to_target)
         result_angle = (
@@ -73,22 +78,30 @@ class TrajectoryCalculator:
         )
         return result_angle
 
-    def update_shooter(self) -> float:
-        """
-        function runs sim to calculate a final angle with air resistance considered
-        :return: target angle
-        """
+    def calculate_distance(self):
         if type(self.speaker) is Translation3d:
             self.speaker = self.speaker.toTranslation2d()
 
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker)
         )
-        # print("distance_to_target", self.distance_to_target)
+        print("distance_to_target", self.distance_to_target)
 
+    def calculate_vertical_distance(self):
         self.delta_z = (
-            self.speaker_z - self.elevator.get_length() + constants.shooter_height
+            self.speaker_z - self.elevator.get_length() - constants.shooter_height
         )
+
+    def update_shooter(self) -> float:
+        """
+        function runs sim to calculate a final angle with air resistance considered
+        :return: target angle
+        """
+
+        self.calculate_distance()
+        self.calculate_vertical_distance()
+        print("delta_z", self.delta_z)
+        print("velocity", config.v0_flywheel)
         # self.target.criteria.set_criteria_value(self.distance_to_target)
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
@@ -151,6 +164,14 @@ class TrajectoryCalculator:
             # We've hit the target if the distance to target is 0.
             return u[0] > self.distance_to_target
 
+        print("distance to target", self.distance_to_target)
+        print("velocity", config.v0_flywheel)
+        print("c", constants.c)
+        print("a", constants.a)
+        print("m", constants.m)
+        print("g", constants.g)
+        print("rho_air", constants.rho_air)
+
         # Set the initial conditions
         u0 = (
             0,
@@ -162,7 +183,7 @@ class TrajectoryCalculator:
         t0, tf = 0, 60
         # Stop the integration when we hit the target.
         t, y = self.numerical_integration.adaptive_rk4(
-            self.deriv, u0, t0, tf, 0.5, 1e-6, hit_target
+            self.deriv, u0, t0, tf, 0.1, 1e-7, hit_target
         )
 
         return extrapolate(

@@ -45,7 +45,5 @@ class Field:
         Robot.drivetrain,
         sensors.LimelightController([Sensors.limelight_front, Sensors.limelight_back]),
     )
-    calculations = sensors.TrajectoryCalculator(
-        odometry, Robot.elevator, sensors.trajectory_calc.speaker_target
-    )
+    calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator)
     POI = utils.POI()
