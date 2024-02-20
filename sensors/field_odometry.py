@@ -106,7 +106,7 @@ class FieldOdometry:
             distance_to_target = target_pose.translation()
 
             if self.within_tolerance(vision_robot_pose):
-                self.add_vision_measure(vision_robot_pose, vision_time)
+                self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target)
 
         return self.getPose()
 

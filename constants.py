@@ -82,7 +82,7 @@ class FieldPos:
 
         speaker_z_bottom = 78.13 * inches_to_meters
 
-        speaker_z = (speaker_z_top + speaker_z_bottom) / 2
+        speaker_z = speaker_z_top #(speaker_z_top + speaker_z_bottom) / 2
 
         amp_y = field_width
 

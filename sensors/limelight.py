@@ -308,6 +308,9 @@ class Limelight:
         
     def get_target_pose(self):
         
+        if not self.target_exists():
+            return None
+        
         pose = Pose3d(
             Translation3d(self.targetpose[0], self.targetpose[1], self.targetpose[2]),
             Rotation3d(self.targetpose[3], self.targetpose[4], math.radians(self.targetpose[5])),
@@ -338,7 +341,7 @@ class LimelightController(VisionEstimator):
                 and not limelight.cam_pos_moving
             ):
                 # print(limelight.name+' Is sending bot pose'
-                poses += [limelight.get_bot_pose(), limelight.get_target_pose()]
+                poses += [(limelight.get_bot_pose(), limelight.get_target_pose())]
         if len(poses) > 0:
             return poses
         else:
