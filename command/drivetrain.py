@@ -105,9 +105,6 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         else:
             self.subsystem.ready_to_shoot = False
 
-        # if abs(d_theta) < 0.11:
-        #     d_theta = 0
-
         dx = curve(dx)
         dy = curve(dy)
 
