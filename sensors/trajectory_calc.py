@@ -79,7 +79,7 @@ class TrajectoryCalculator:
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
-                self.speaker_z - constants.shooter_height #TODO: ADD ELEVATOR LENGTH
+                self.speaker_z - self.elevator.get_length() - constants.shooter_height
         )
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
