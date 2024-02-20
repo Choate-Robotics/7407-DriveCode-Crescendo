@@ -304,6 +304,10 @@ class Limelight:
             timestamp = Timer.getFPGATimestamp() - (botpose[6] / 1000)
             return pose, timestamp
         
+    def get_target_pose(self):
+        
+        
+        
     def enable_moving(self):
         self.cam_pos_moving = True
         
@@ -323,10 +327,11 @@ class LimelightController(VisionEstimator):
             if (
                 limelight.april_tag_exists()
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
+                and limelight.get_target_pose()
                 and not limelight.cam_pos_moving
             ):
                 # print(limelight.name+' Is sending bot pose'
-                poses += [limelight.get_bot_pose()]
+                poses += [limelight.get_bot_pose(), limelight.get_target_pose()]
         if len(poses) > 0:
             return poses
         else:
