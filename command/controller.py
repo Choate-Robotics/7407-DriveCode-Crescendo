@@ -149,8 +149,10 @@ class Giraffe(commands2.Command):
             SequentialCommandGroup(
                 *commands,
                 # WaitCommand(3),
+                ParallelCommandGroup(
                 InstantCommand(lambda: self.finish()),
-                # *continuous_commands
+                *continuous_commands
+                )
             ),
             # SequentialCommandGroup(
             #     *debug_commands
