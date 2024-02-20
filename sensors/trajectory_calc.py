@@ -57,11 +57,10 @@ class TrajectoryCalculator:
                 0.5
                 * np.arcsin(
             np.sin(phi0)
-            + (constants.g
+            + constants.g
                * distance_to_target
                * np.cos(phi0)
                / (config.v0_flywheel ** 2))
-        )
                 + 0.5 * phi0
         )
         return result_angle
@@ -75,16 +74,13 @@ class TrajectoryCalculator:
             self.speaker = self.speaker.toTranslation2d()
 
         self.distance_to_target = (
-            self.odometry.getPose().translation().distance(self.speaker)
+            self.odometry.getPose().translation().distance(self.speaker) - constants.shooter_offset_y
         )
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
                 self.speaker_z - self.elevator.get_length() - constants.shooter_height
         )
-        # print("delta_z", self.delta_z)
-        # print("constant.shooter_height", constants.shooter_height)
-        # print("elevator.get_length()", self.elevator.get_length())
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
@@ -134,7 +130,8 @@ class TrajectoryCalculator:
         self.table.putNumber('wrist angle', degrees(self.get_theta()))
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
-
+        self.table.putNumber('delta z', self.delta_z)
+        
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
             # We've hit the target if the distance to target is 0.
@@ -160,22 +157,23 @@ class TrajectoryCalculator:
             self.distance_to_target, y[-2][0], y[-2][2], y[-1][0], y[-1][2]
         )
 
-    def get_theta(self) -> float:
+    def get_theta(self) -> radians:
         """
         Returns the angle of the trajectory.
         """
-        if self.use_air_resistance:
-            return self.shoot_angle
-        else:
-            self.distance_to_target = (
-                self.odometry.getPose().translation().distance(self.speaker)
-            )
-            # print("distance_to_target", self.distance_to_target)
+        return self.shoot_angle
+        # if self.use_air_resistance:
+        #     return self.shoot_angle
+        # else:
+        #     self.distance_to_target = (
+        #         self.odometry.getPose().translation().distance(self.speaker)
+        #     )
+        #     # print("distance_to_target", self.distance_to_target)
 
-            self.delta_z = (
-                    self.speaker_z - self.elevator.get_length() + constants.elevator_bottom_total_height
-            )
-            return self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
+        #     self.delta_z = (
+        #             self.speaker_z - self.elevator.get_length() - constants.shooter_height
+        #     )
+        #     return self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
 
     def get_bot_theta(self) -> Rotation2d:
         """
