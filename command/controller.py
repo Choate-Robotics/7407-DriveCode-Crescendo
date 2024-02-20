@@ -265,8 +265,8 @@ class StageNote(SequentialCommandGroup):
             ),
             WaitUntilCommand(lambda: wrist.note_detected()),
             IntakeIdle(intake),
-            SetWrist(wrist, 20 * degrees_to_radians)
-            # AimWrist(wrist, traj_cal)
+            # SetWrist(wrist, 20 * degrees_to_radians)
+            AimWrist(wrist, traj_cal)
             # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
         )
 

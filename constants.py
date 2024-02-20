@@ -156,7 +156,8 @@ flywheel_mass = 1.3 + .127  # kilograms
 flywheel_radius_outer = 2 * 0.0254
 flywheel_gear_ratio = 1
 flywheel_period = .03
-shooter_height = 23 * inches_to_meters
+shooter_height = 21 * inches_to_meters
+shooter_offset_y = 6 * inches_to_meters
 
 wrist_max_rotation = 58 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
