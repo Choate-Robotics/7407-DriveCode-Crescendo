@@ -309,7 +309,9 @@ class Shoot(SequentialCommandGroup):
 
 
 class ShootAmp(SequentialCommandGroup):
-
+    """
+    Shoots a note into the amp
+    """
     def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
             ParallelCommandGroup(
@@ -319,12 +321,14 @@ class ShootAmp(SequentialCommandGroup):
             ),
             WaitUntilCommand(
                 lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
-            PassNote(self.wrist),
+            PassNote(wrist),
         )
 
 
 class EnableClimb(ParallelCommandGroup):
-
+    """
+    Raises the elevator and wrist and deploys tenting to prepare for climb
+    """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
@@ -336,7 +340,9 @@ class EnableClimb(ParallelCommandGroup):
 
 
 class UndoClimb(ParallelCommandGroup):
-
+    """
+    Undeploys tenting and lowers elevator
+    """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             UnDeployTenting(intake),

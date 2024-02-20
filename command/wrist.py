@@ -12,7 +12,9 @@ from sensors import TrajectoryCalculator
 
 
 class ZeroWrist(SubsystemCommand[Wrist]):
-
+    """
+    Zeroes wrist
+    """
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -35,7 +37,11 @@ class ZeroWrist(SubsystemCommand[Wrist]):
 
 
 class SetWrist(SubsystemCommand[Wrist]):
-
+    """
+    Set wrist to given angle.
+    If interrupted, stops wrist where it is.
+    param angle: angle to set wrist to in radians
+    """
     def __init__(self, subsystem: Wrist, angle: radians):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -60,7 +66,9 @@ class SetWrist(SubsystemCommand[Wrist]):
 
 
 class AimWrist(SubsystemCommand[Wrist]):
-
+    """
+    Aims wrist to angle according to shooter calculations
+    """
     def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -73,7 +81,7 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.subsystem.set_wrist_angle(self.traj_calc.get_theta())
 
         if self.subsystem.is_at_angle(self.traj_calc.get_theta()):
-            self.subsystem.ready_to_Shoot = True
+            self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
 
@@ -91,6 +99,9 @@ class AimWrist(SubsystemCommand[Wrist]):
 
 
 class FeedIn(SubsystemCommand[Wrist]):
+    """
+    Feed note into back of feeder
+    """
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -116,6 +127,9 @@ class FeedIn(SubsystemCommand[Wrist]):
 
 
 class FeedOut(SubsystemCommand[Wrist]):
+    """
+    Feed note out back of feeder
+    """
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -138,7 +152,9 @@ class FeedOut(SubsystemCommand[Wrist]):
 
 
 class PassNote(SubsystemCommand[Wrist]):
-
+    """
+    Pass note into flywheels
+    """
     def initialize(self):
         self.subsystem.feed_note()
 

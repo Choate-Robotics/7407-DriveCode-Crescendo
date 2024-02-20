@@ -6,7 +6,9 @@ from subsystem import Intake
 
 
 class RunIntake(SubsystemCommand[Intake]):
-
+    """
+    Runs intake in until note detected
+    """
     def initialize(self) -> None:
         self.subsystem.roll_in()
         self.subsystem.intake_running = True
@@ -28,7 +30,9 @@ class RunIntake(SubsystemCommand[Intake]):
 
 
 class PassIntakeNote(SubsystemCommand[Intake]):
-
+    """
+    Pass note from intake to feeder
+    """
     def initialize(self) -> None:
         self.subsystem.roll_inner_in()
         self.subsystem.intake_running = True
@@ -51,6 +55,9 @@ class PassIntakeNote(SubsystemCommand[Intake]):
 
 
 class EjectIntake(SubsystemCommand[Intake]):
+    """
+    Eject note out of intake
+    """
     def initialize(self) -> None:
         self.subsystem.roll_out()
         self.subsystem.intake_running = True
@@ -68,6 +75,10 @@ class EjectIntake(SubsystemCommand[Intake]):
 
 
 class IntakeIdle(SubsystemCommand[Intake]):
+    """
+    Command to run while not actively intaking.
+    Intake runs in if we don't have a note, runs in if we do
+    """
     def initialize(self) -> None:
         if self.subsystem.note_in_intake:
             self.subsystem.rollers_idle_out()
@@ -85,6 +96,10 @@ class IntakeIdle(SubsystemCommand[Intake]):
 
 
 class DeployIntake(SubsystemCommand[Intake]):
+    """
+    Command to run at start of match.
+    Deploys outer intake
+    """
     def initialize(self) -> None:
         self.subsystem.deploy_roller()
         self.timer = Timer()
@@ -107,6 +122,9 @@ class DeployIntake(SubsystemCommand[Intake]):
 
 
 class DeployTenting(SubsystemCommand[Intake]):
+    """
+    Deploy tenting mechanism for climb
+    """
     def initialize(self) -> None:
         self.subsystem.deploy_tenting()
         self.timer = Timer()
@@ -126,6 +144,9 @@ class DeployTenting(SubsystemCommand[Intake]):
 
 
 class UnDeployTenting(SubsystemCommand[Intake]):
+    """
+    Undeploys tenting mech incase we don't want to climb
+    """
     def initialize(self) -> None:
         self.subsystem.undeploy_tenting()
         self.timer = Timer()

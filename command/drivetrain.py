@@ -20,6 +20,9 @@ def curve(x):
 
 
 class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
+    """
+    Main drive command
+    """
     driver_centric = False
     driver_centric_reversed = True
 
@@ -65,7 +68,9 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
     
     
 class DriveSwerveAim(SubsystemCommand[Drivetrain]):
-    
+    """
+    Aim drivetrain at speaker based on shooter calculations
+    """
     driver_centric = False
     driver_centric_reversed = True
     
@@ -128,6 +133,9 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
 
 
 class DrivetrainZero(SubsystemCommand[Drivetrain]):
+    """
+    Zeroes drivetrain
+    """
     def __init__(self, subsystem: Drivetrain):
         super().__init__(subsystem)
         self.subsystem = subsystem
