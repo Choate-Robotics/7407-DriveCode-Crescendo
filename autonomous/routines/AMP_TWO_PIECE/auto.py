@@ -1,12 +1,14 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from command import DrivetrainZero
+from command import DrivetrainZero, Giraffe, RunIntake, PassNote, SetFlywheelLinearVelocity
 from robot_systems import Robot
 from utils import POIPose
+import config
 
 from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
+    ParallelCommandGroup,
     WaitCommand
 )
 
@@ -101,17 +103,28 @@ path_5 = FollowPathCustom(
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
     DrivetrainZero(Robot.drivetrain),
-    path_1,
-    WaitCommand(1), # shoot
-    path_2,
-    WaitCommand(.75), # intake
-    path_3,
-    WaitCommand(1), # shoot
-    path_4,
-    WaitCommand(.75), # intake
-    path_5,
-    WaitCommand(1), # shoot
-    InstantCommand(lambda: print("Done")),
+    ParallelCommandGroup(
+        SetFlywheelLinearVelocity(Robot.flywheel, 2),
+        SequentialCommandGroup(
+            path_1,
+            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp), # aim
+            PassNote(Robot.wrist), # shoot
+            path_2,
+            RunIntake(Robot.intake), # intake
+            path_3,
+            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp), # aim
+            PassNote(Robot.wrist), # shoot
+            path_4,
+            RunIntake(Robot.intake), # intake
+            path_5,
+            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp), # aim
+            PassNote(Robot.wrist), # shoot
+            
+            InstantCommand(lambda: print("Done")),
+        )
+        
+    )
+    
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)
