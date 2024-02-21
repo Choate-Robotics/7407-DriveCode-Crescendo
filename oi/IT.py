@@ -3,7 +3,7 @@ from utils import LocalLogger
 
 
 
-from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
+from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand, ParallelCommandGroup, WaitUntilCommand, SequentialCommandGroup
 import command
 import config, math
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
@@ -45,6 +45,15 @@ class IT:
         button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
             command.StageNote(Robot.elevator, Robot.wrist, Robot.intake, Field.calculations)
+            # SequentialCommandGroup(
+            #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+            #     command.PassIntakeNote(Robot.intake),
+            #     WaitUntilCommand(lambda: Robot.wrist.note_detected()),
+            #     command.IntakeIdle(Robot.intake),
+            #     # SetWrist(wrist, 20 * degrees_to_radians)
+            #     # AimWrist(wrist, traj_cal)
+            #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations),
+            # )
         )
         #INTAKE TRIGGERS ----------------
         
@@ -61,22 +70,23 @@ class IT:
         #FLYWHEEL TRIGGERS ----------------
         
         # if note in intake, start flywheel
-        # button.Trigger(lambda: Robot.intake.note_in_intake)\
-        #     .onTrue(
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2)
-        #     )
+        button.Trigger(lambda: Robot.intake.note_in_intake)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2)
+            )
             
         # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.note_staged)\
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
+                # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
             )
             
         # if note not staged and not in intake, run flywheel slow
-        # button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
-        #     .onTrue(
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, 5)
-        #     )
+        button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
+            .onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2.5)
+            )
             
         #FLYWHEEL TRIGGERS ----------------
         

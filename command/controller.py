@@ -34,6 +34,7 @@ class Giraffe(commands2.Command):
         self.aiming = False
         self.staging = False
         self.auto_height = False
+        self.continuous_command: FeedIn | AimWrist | None = None
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('giraffe commands')
 
     def finish(self):
@@ -46,6 +47,8 @@ class Giraffe(commands2.Command):
         self.staging = False
         self.auto_height = False
         self.table.putBoolean('finished', False)
+        self.table.putBoolean('interrupted', False)
+        self.continuous_command: FeedIn | AimWrist | None = None
 
         commands = []
         debug_commands = []
@@ -59,7 +62,7 @@ class Giraffe(commands2.Command):
             PrintCommand("Running both elevator and wrist normally")
         )
 
-        continuous_commands = []
+        
 
         # if the target wrist angle is 'aim' then set the wrist angle to the calculated angle, we will pass off the aiming command at the end
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kAim:
@@ -67,9 +70,8 @@ class Giraffe(commands2.Command):
                 print('no shot calc')
                 self.finished = True
                 return
-            continuous_commands.append(
-                AimWrist(self.wrist, self.shot_calc)
-            )
+            self.continuous_command = AimWrist(self.wrist, self.shot_calc)
+            
             self.aiming = True
             self.target.wrist_angle = self.wrist.get_wrist_angle()
             # self.target.wrist_angle = 17.5 * degrees_to_radians
@@ -82,19 +84,14 @@ class Giraffe(commands2.Command):
             self.staging = True
             self.target.wrist_angle = config.staging_angle
             print('staging note to wrist')
-            continuous_commands.append(
-                # FeedIn(self.wrist)
-                InstantCommand(lambda: self.wrist.feed_in())
-            )
+            self.continuous_command = FeedIn(self.wrist)
+                # InstantCommand(lambda: self.wrist.feed_in())
             debug_commands.append(
                 PrintCommand("Staging note to wrist")
             )
 
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kCurrentAngle:
-            self.target.wrist_angle = self.wrist.get_wrist_angle()
-            continuous_commands.append(
-                PrintCommand("Setting wrist to current angle")
-            )
+            self.target.wrist_angle = self.wrist.get_wrist_angle() 
             debug_commands.append(
                 PrintCommand("Setting wrist to current angle")
             )
@@ -102,18 +99,12 @@ class Giraffe(commands2.Command):
         if self.target.height == config.Giraffe.GiraffePos.Special.kHeightAuto:
             self.auto_height = True
             self.target.height = self.elevator.get_length()
-            continuous_commands.append(
-                PrintCommand("Auto height")
-            )
             debug_commands.append(
                 PrintCommand("Auto height")
             )
 
         if self.target.height == config.Giraffe.GiraffePos.Special.kCurrentHeight:
             self.target.height = self.elevator.get_length()
-            continuous_commands.append(
-                PrintCommand("Setting elevator to current height")
-            )
             debug_commands.append(
                 PrintCommand("Setting elevator to current height")
             )
@@ -148,13 +139,13 @@ class Giraffe(commands2.Command):
         commands2.CommandScheduler.getInstance().schedule(ParallelCommandGroup(
             SequentialCommandGroup(
                 *commands,
-                # WaitCommand(3),
                 InstantCommand(lambda: self.finish()),
-                # *continuous_commands
+                # ParallelCommandGroup(
+                #     InstantCommand(lambda: self.finish()),
+                #     self.continuous_command
+                # )
             ),
-            # SequentialCommandGroup(
-            #     *debug_commands
-            # )
+            # self.continuous_command
         )
         )
 
@@ -164,11 +155,15 @@ class Giraffe(commands2.Command):
     def end(self, interrupted: bool):
         print("GIRAFFE COMMAND FINISHED")
         if interrupted:
-            print("GIRAFFE INTERRUPTED")
+            self.finished = False
+            self.table.putBoolean('interrupted', True)
+            # raise NotImplementedError
             # self.finished = True
         else:
             self.table.putBoolean('finished', False)
         self.finished = False
+        commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
+        
 
 
 class GiraffeLock(commands2.Command):
@@ -245,6 +240,32 @@ class GiraffeLock(commands2.Command):
             # potentially put continuous commands here
 
 
+# class StageNote(SequentialCommandGroup):
+#     """
+#     Stages a note to the feeder from the intake
+
+#     Args:
+#         SequentialCommandGroup (elevator): Elevator subsystem
+#         SequentialCommandGroup (wrist): Wrist subsystem
+#         SequentialCommandGroup (intake): Intake subsystem
+#     """
+
+#     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
+#         super().__init__(
+
+#             ParallelCommandGroup(
+#                 FeedIn(wrist),
+#                 # Giraffe(elevator, wrist, config.Giraffe.kStage),
+#                 PassIntakeNote(intake),
+#             ),
+#             WaitUntilCommand(lambda: wrist.note_detected()),
+#             IntakeIdle(intake),
+#             # SetWrist(wrist, 20 * degrees_to_radians)
+#             AimWrist(wrist, traj_cal)
+#             # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
+#         )
+
+
 class StageNote(SequentialCommandGroup):
     """
     Stages a note to the feeder from the intake
@@ -258,16 +279,18 @@ class StageNote(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
         super().__init__(
 
+            
+            Giraffe(elevator, wrist, config.Giraffe.kIdle),
             ParallelCommandGroup(
-                FeedIn(wrist),
-                # Giraffe(elevator, wrist, config.Giraffe.kStage),
-                PassIntakeNote(intake),
+            PassIntakeNote(intake),
+            FeedIn(wrist)
             ),
             WaitUntilCommand(lambda: wrist.note_detected()),
             IntakeIdle(intake),
-            SetWrist(wrist, 20 * degrees_to_radians)
+            # SetWrist(wrist, 20 * degrees_to_radians)
             # AimWrist(wrist, traj_cal)
-            # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
+            Giraffe(elevator, wrist, config.Giraffe.kIdle, traj_cal),
+            AimWrist(wrist, traj_cal)
         )
 
 
@@ -309,7 +332,9 @@ class Shoot(SequentialCommandGroup):
 
 
 class ShootAmp(SequentialCommandGroup):
-
+    """
+    Shoots a note into the amp
+    """
     def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
             ParallelCommandGroup(
@@ -319,12 +344,14 @@ class ShootAmp(SequentialCommandGroup):
             ),
             WaitUntilCommand(
                 lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
-            PassNote(self.wrist),
+            PassNote(wrist),
         )
 
 
 class EnableClimb(ParallelCommandGroup):
-
+    """
+    Raises the elevator and wrist and deploys tenting to prepare for climb
+    """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
@@ -336,7 +363,9 @@ class EnableClimb(ParallelCommandGroup):
 
 
 class UndoClimb(ParallelCommandGroup):
-
+    """
+    Undeploys tenting and lowers elevator
+    """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             UnDeployTenting(intake),

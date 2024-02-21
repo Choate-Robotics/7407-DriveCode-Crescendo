@@ -26,8 +26,6 @@ a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
 m = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
 g = 9.8  # acceleration due to gravity (m/s^2)
-speaker_z = 1.7  # height of target (m) CHANGE THIS
-speaker_location = Translation2d(0, 0)
 
 # Drivetrain
 drivetrain_turn_gear_ratio = 150 / 7
@@ -81,10 +79,14 @@ class FieldPos:
         speaker_y = 218.42 * inches_to_meters
 
         speaker_z_top = 82.90 * inches_to_meters
+        
+        speaker_depth = 18 * inches_to_meters
 
         speaker_z_bottom = 78.13 * inches_to_meters
 
-        speaker_z = (speaker_z_top + speaker_z_bottom) / 2
+        speaker_z = speaker_z_top #(speaker_z_top + speaker_z_bottom) / 2
+        
+        speaker_x = speaker_depth / 2.5
 
         amp_y = field_width
 
@@ -149,14 +151,15 @@ limelight_back_yaw = 180 * degrees_to_radians
 
 # WRIST
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
-wrist_time_to_max_vel = 0.3  #TODO: placeholder
+wrist_time_to_max_vel = 0.0  #TODO: placeholder
 
 # Flywheel
 flywheel_mass = 1.3 + .127  # kilograms
 flywheel_radius_outer = 2 * 0.0254
 flywheel_gear_ratio = 1
 flywheel_period = .03
-shooter_height = 23 * inches_to_meters
+shooter_height = 21 * inches_to_meters
+shooter_offset_y = 6 * inches_to_meters
 
 wrist_max_rotation = 58 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians

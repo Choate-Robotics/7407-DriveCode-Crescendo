@@ -60,7 +60,7 @@ def test_run_sim(
     monkeypatch.setattr(constants, "rho_air", 1.28)
     monkeypatch.setattr(constants, "a", 14 * 0.0254 * 2 * 0.0254)
     monkeypatch.setattr(constants, "m", 0.235301)
-    monkeypatch.setattr(constants, "speaker_z", 1.7)
+    monkeypatch.setattr(constants.FieldPos.Scoring, "speaker_z", 1.7)
     monkeypatch.setattr(constants, "shooter_height", 0.0)
 
     trajectory_calc.distance_to_target = x_distance

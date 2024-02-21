@@ -30,6 +30,7 @@ class Wrist(Subsystem):
         self.locked: bool = False
         self.ready_to_shoot: bool = False
         self.target_angle: radians = 0
+        self.wrist_moving: bool = False
 
     def init(self):
         self.wrist_motor.init()
@@ -64,7 +65,7 @@ class Wrist(Subsystem):
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
                 (angle / (pi * 2)) * constants.wrist_gear_ratio,
-                ff
+                ff# if angle < current_angle else 0
             )
 
     def get_wrist_angle(self):
@@ -151,7 +152,7 @@ class Wrist(Subsystem):
         self.locked = False
 
     def periodic(self) -> None:
-
+        # self.zero_wrist()
         table = ntcore.NetworkTableInstance.getDefault().getTable('wrist')
 
         table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
@@ -165,3 +166,4 @@ class Wrist(Subsystem):
         table.putBoolean('feed disabled', self.feed_disabled)
         table.putBoolean('locked', self.locked)
         table.putNumber('target angle', math.degrees(self.target_angle))
+        table.putBoolean('wrist moving', self.wrist_moving)

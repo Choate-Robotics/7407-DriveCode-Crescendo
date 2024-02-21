@@ -66,6 +66,7 @@ class FieldOdometry:
         self.vision_estimator_pose_weight: float = 0.4
         self.robot_pose_weight: float = 1 - self.vision_estimator_pose_weight
         self.degree_thres = 10
+        self.std_dev: tuple[float, float, float] = (0.5, 0.5, 0.5)
 
         self.dist_thres = 1.0
 
@@ -99,14 +100,14 @@ class FieldOdometry:
 
             vision_time: float
             vision_robot_pose: Pose3d
-            pose_data: tuple[Pose3d, float]
+
             pose_data, target_pose = vision_pose
             vision_robot_pose, vision_time = pose_data
             distance_to_target = target_pose.translation()
 
             if self.within_tolerance(vision_robot_pose):
                 self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target)
-    
+
         return self.getPose()
 
     def update_odom(self, pose: Pose3d):
@@ -168,10 +169,10 @@ class FieldOdometry:
         )
 
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: Translation3d):
-        dist_calculations =  (abs(distance_to_target.norm() **2) / 2.5, abs(distance_to_target.norm() ** 2) / 2.5, abs(math.radians(40)))
-        # print(dist_calculations)
+        dist_calculations = (abs(distance_to_target.norm() **2) / 2.5, abs(distance_to_target.norm() ** 2) / 2.5, abs(math.radians(40)))
+        self.std_dev = dist_calculations
         self.drivetrain.odometry_estimator.addVisionMeasurement(
-            vision_pose.toPose2d(), vision_time, dist_calculations
+            vision_pose.toPose2d(), vision_time, self.std_dev
         )
 
     def get_vision_poses(self):
@@ -229,6 +230,10 @@ class FieldOdometry:
 
         self.table.putNumberArray('Abs value',
                                   self.drivetrain.get_abs())
+        
+        self.table.putNumberArray('standard deviation',[
+            *self.std_dev
+        ])
 
         return est_pose
 

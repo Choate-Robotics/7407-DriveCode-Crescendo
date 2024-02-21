@@ -279,10 +279,9 @@ class POI:
                 kSpeaker = POIPose(
                     Pose3d(
                         Translation3d(
-                            0,
+                            constants.FieldPos.Scoring.speaker_x,
                             constants.FieldPos.Scoring.speaker_y,
-                            # constants.FieldPos.Scoring.speaker_z,
-                            constants.speaker_z,
+                            constants.FieldPos.Scoring.speaker_z
                         ),
                         Rotation3d(0, 0, constants.FieldPos.pose_reverse.radians()),
                     )

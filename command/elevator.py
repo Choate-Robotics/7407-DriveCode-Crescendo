@@ -5,7 +5,9 @@ from toolkit.command import SubsystemCommand
 from subsystem import Elevator
 
 class ZeroElevator(SubsystemCommand[Elevator]):
-        
+        """
+        Zeroes elevator
+        """
         def __init__(self, subsystem: Elevator):
             super().__init__(subsystem)
     
@@ -28,7 +30,10 @@ class ZeroElevator(SubsystemCommand[Elevator]):
 
 
 class SetElevator(SubsystemCommand[Elevator]):
-    
+    """
+    Set elevator to specified length.
+    param length: length to set elevator to (float)
+    """
     def __init__(self, subsystem: Elevator, length: float):
         super().__init__(subsystem)
         self.length: float = length

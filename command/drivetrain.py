@@ -7,7 +7,8 @@ import config
 from subsystem import Drivetrain
 from sensors import TrajectoryCalculator
 from wpimath.controller import PIDController
-
+from toolkit.utils.toolkit_math import bounded_angle_diff
+from math import modf
 def curve_abs(x):
     curve = wpilib.SmartDashboard.getNumber('curve', 2)
     return x ** curve
@@ -19,7 +20,17 @@ def curve(x):
     return curve_abs(x)
 
 
+def bound_angle(degrees:float):
+    degrees = degrees % 360
+    if degrees > 180:
+        degrees -= 360
+    return degrees
+    
+
 class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
+    """
+    Main drive command
+    """
     driver_centric = False
     driver_centric_reversed = True
 
@@ -65,17 +76,20 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
     
     
 class DriveSwerveAim(SubsystemCommand[Drivetrain]):
-    
+    """
+    Aim drivetrain at speaker based on shooter calculations
+    """
     driver_centric = False
     driver_centric_reversed = True
     
     def __init__(self, drivetrain, target_calc: TrajectoryCalculator):
         super().__init__(drivetrain)
         self.target_calc = target_calc
-        self.theta_controller = PIDController(0.02, 0, 0.01)
+        self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
         
 
     def initialize(self) -> None:
+        self.theta_controller.enableContinuousInput(-180, 180)
         self.theta_controller.reset()
 
     def execute(self) -> None:
@@ -84,8 +98,9 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
         )
         
+        
         target_angle = self.target_calc.get_bot_theta()
-        d_theta = self.theta_controller.calculate(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(), target_angle.radians())
+        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().degrees()), target_angle.degrees())
         
         def within_angle(heading, target, tolerance):
             return abs(heading - target) < tolerance
@@ -95,12 +110,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         else:
             self.subsystem.ready_to_shoot = False
 
-        # if abs(d_theta) < 0.11:
-        #     d_theta = 0
-
         dx = curve(dx)
         dy = curve(dy)
-        # d_theta = curve(d_theta)
 
         dx *= self.subsystem.max_vel
         dy *= -self.subsystem.max_vel
@@ -128,6 +139,9 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
 
 
 class DrivetrainZero(SubsystemCommand[Drivetrain]):
+    """
+    Zeroes drivetrain
+    """
     def __init__(self, subsystem: Drivetrain):
         super().__init__(subsystem)
         self.subsystem = subsystem

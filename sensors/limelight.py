@@ -40,6 +40,7 @@ class Limelight:
         self.botpose_blue: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.botpose_red: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.botpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
+        self.targetpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.cam_pos_moving: bool = False
 
     def init(self):
@@ -213,6 +214,7 @@ class Limelight:
         )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
+        self.targetpose = self.table.getNumberArray("botpose_targetspace", [0, 0, 0, 0, 0, 0])
 
     def target_exists(self, force_update: bool = False):
         """
@@ -304,6 +306,18 @@ class Limelight:
             timestamp = Timer.getFPGATimestamp() - (botpose[6] / 1000)
             return pose, timestamp
         
+    def get_target_pose(self):
+        
+        if not self.target_exists():
+            return None
+        
+        pose = Pose3d(
+            Translation3d(self.targetpose[0], self.targetpose[1], self.targetpose[2]),
+            Rotation3d(self.targetpose[3], self.targetpose[4], math.radians(self.targetpose[5])),
+        )
+        return pose
+        
+        
     def enable_moving(self):
         self.cam_pos_moving = True
         
@@ -317,16 +331,17 @@ class LimelightController(VisionEstimator):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
 
-    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float]] | None:
+    def get_estimated_robot_pose(self) -> list[tuple[tuple[Pose3d, float], Pose3d]] | None:
         poses = []
         for limelight in self.limelights:
             if (
                 limelight.april_tag_exists()
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
+                and limelight.get_target_pose()
                 and not limelight.cam_pos_moving
             ):
                 # print(limelight.name+' Is sending bot pose'
-                poses += [limelight.get_bot_pose()]
+                poses += [(limelight.get_bot_pose(), limelight.get_target_pose())]
         if len(poses) > 0:
             return poses
         else:

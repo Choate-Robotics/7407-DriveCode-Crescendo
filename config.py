@@ -1,4 +1,3 @@
-
 # from dataclasses import dataclass
 from enum import Enum
 
@@ -54,12 +53,9 @@ LOG_FILE_LEVEL: int = 1
 
 period: float = 0.03  # seconds
 
-
-
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
 elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
-
 
 # odometry config
 
@@ -118,6 +114,7 @@ limelight_led_mode = {
     "force_on": 3,
 }
 
+
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
                                  constants.limelight_height_LL3, Rotation3d(0, constants.limelight_elevator_angle, 0))
@@ -164,7 +161,7 @@ elevator_zeroed_pos = 0.023  # TODO: PLACEHOLDER: meters
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
-wrist_flat_ff = -0.6  # TODO: FIND
+wrist_flat_ff = -0.58  # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 10 * degrees_to_radians
 feeder_velocity = .2
@@ -212,13 +209,13 @@ flywheel_shot_current_threshold = 20
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.1, 0, 0.03, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(0.05, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, flywheel_feed_forward, (-.5, .75), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 TURN_CONFIG = SparkMaxConfig(
@@ -228,10 +225,9 @@ MOVE_CONFIG = TalonConfig(
     0.11, 0, 0, 0.25, 0.01, brake_mode=True  # integral_zone=1000, max_integral_accumulator=10000
 )
 
-
 # Giraffe
-staging_angle = 58 * degrees_to_radians
 
+staging_angle:radians = 57.5 * degrees_to_radians
 
 
 class Giraffe:
@@ -248,24 +244,24 @@ class Giraffe:
             self.wrist_angle = wrist_angle
 
     kIdle = GiraffePos(0, staging_angle)
-    
+
     kStage = GiraffePos(0, GiraffePos.Special.kStage)
-    
+
     kAim = GiraffePos(GiraffePos.Special.kHeightAuto, GiraffePos.Special.kAim)
-    
+
     kAimLow = GiraffePos(0, GiraffePos.Special.kAim)
-    
-    kAimHigh = GiraffePos(constants.elevator_max_length , GiraffePos.Special.kAim)
-    
+
+    kAimHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kAim)
+
     kClimbReach = GiraffePos(constants.elevator_max_length, 0)
-    
+
     kClimbPullUp = GiraffePos(0, 0)
 
     kTestFF = GiraffePos(0, 20 * degrees_to_radians)
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
 
-    kAmp = GiraffePos(constants.elevator_max_length, -10 * degrees_to_radians)
+    kAmp = GiraffePos(0.2325, -26 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
 
@@ -288,4 +284,3 @@ tol = tolerance of error in distance to target (m)
 
 # Gyro
 gyro_id = 29
-
