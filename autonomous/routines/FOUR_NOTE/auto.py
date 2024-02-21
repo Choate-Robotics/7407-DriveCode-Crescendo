@@ -1,6 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from robot_systems import Robot
+from robot_systems import Robot, Field
 from utils import POIPose
 from command import *
 import config
@@ -65,14 +65,14 @@ path_3 = FollowPathCustom(
 )
 
 auto = SequentialCommandGroup(
-    # ZeroWrist(Robot.wrist),
-    # ZeroElevator(Robot.elevator),
+    ZeroWrist(Robot.wrist),
+    ZeroElevator(Robot.elevator),
     # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel), #spin up flywheels
-    # ParallelCommandGroup( #aim
-    #     AimWrist(Robot.wrist),
-    #     DriveSwerveAim(Robot.drivetrain),
-    # ),
-    # PassNote(Robot.wrist), #shoot preload
+    ParallelCommandGroup( #aim
+        AimWrist(Robot.wrist, Field.calculations),
+        DriveSwerveAim(Robot.drivetrain, Field.calculations),
+    ).until(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot),
+    PassNote(Robot.wrist), #shoot preload
     
     # ParallelCommandGroup( #go to and collect first note
     #     path_1,
@@ -116,9 +116,9 @@ auto = SequentialCommandGroup(
     # ),
     # PassNote(Robot.wrist), #shoot note 3
 
-    path_1,
-    path_2,
-    path_3
+    # path_1,
+    # path_2,
+    # path_3
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

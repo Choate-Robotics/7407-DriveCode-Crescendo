@@ -86,11 +86,12 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         super().__init__(drivetrain)
         self.target_calc = target_calc
         self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
-        
+        self.subsystem.ready_to_shoot = False
 
     def initialize(self) -> None:
         self.theta_controller.enableContinuousInput(-180, 180)
         self.theta_controller.reset()
+        self.subsystem.ready_to_shoot = False
 
     def execute(self) -> None:
         dx, dy = (
@@ -105,7 +106,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         def within_angle(heading, target, tolerance):
             return abs(heading - target) < tolerance
         
-        if within_angle(self.subsystem.gyro.get_robot_heading(), target_angle.radians(), 0.1):
+        if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().degrees(), target_angle.radians()) < .1:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
