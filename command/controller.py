@@ -240,32 +240,6 @@ class GiraffeLock(commands2.Command):
             # potentially put continuous commands here
 
 
-# class StageNote(SequentialCommandGroup):
-#     """
-#     Stages a note to the feeder from the intake
-
-#     Args:
-#         SequentialCommandGroup (elevator): Elevator subsystem
-#         SequentialCommandGroup (wrist): Wrist subsystem
-#         SequentialCommandGroup (intake): Intake subsystem
-#     """
-
-#     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
-#         super().__init__(
-
-#             ParallelCommandGroup(
-#                 FeedIn(wrist),
-#                 # Giraffe(elevator, wrist, config.Giraffe.kStage),
-#                 PassIntakeNote(intake),
-#             ),
-#             WaitUntilCommand(lambda: wrist.note_detected()),
-#             IntakeIdle(intake),
-#             # SetWrist(wrist, 20 * degrees_to_radians)
-#             AimWrist(wrist, traj_cal)
-#             # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
-#         )
-
-
 class StageNote(SequentialCommandGroup):
     """
     Stages a note to the feeder from the intake
@@ -279,19 +253,45 @@ class StageNote(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
         super().__init__(
 
-            
-            Giraffe(elevator, wrist, config.Giraffe.kIdle),
             ParallelCommandGroup(
-            PassIntakeNote(intake),
-            FeedIn(wrist)
+                FeedIn(wrist),
+                # Giraffe(elevator, wrist, config.Giraffe.kStage),
+                PassIntakeNote(intake),
             ),
             WaitUntilCommand(lambda: wrist.note_detected()),
             IntakeIdle(intake),
             # SetWrist(wrist, 20 * degrees_to_radians)
-            # AimWrist(wrist, traj_cal)
-            Giraffe(elevator, wrist, config.Giraffe.kIdle, traj_cal),
             AimWrist(wrist, traj_cal)
+            # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
         )
+
+
+# class StageNote(SequentialCommandGroup):
+#     """
+#     Stages a note to the feeder from the intake
+
+#     Args:
+#         SequentialCommandGroup (elevator): Elevator subsystem
+#         SequentialCommandGroup (wrist): Wrist subsystem
+#         SequentialCommandGroup (intake): Intake subsystem
+#     """
+
+#     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
+#         super().__init__(
+
+            
+#             Giraffe(elevator, wrist, config.Giraffe.kIdle),
+#             ParallelCommandGroup(
+#             PassIntakeNote(intake),
+#             FeedIn(wrist)
+#             ),
+#             WaitUntilCommand(lambda: wrist.note_detected()),
+#             IntakeIdle(intake),
+#             # SetWrist(wrist, 20 * degrees_to_radians)
+#             # AimWrist(wrist, traj_cal)
+#             Giraffe(elevator, wrist, config.Giraffe.kIdle, traj_cal),
+#             AimWrist(wrist, traj_cal)
+#         )
 
 
 class AimWristSpeaker(ParallelCommandGroup):
