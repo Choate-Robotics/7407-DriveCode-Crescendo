@@ -125,7 +125,8 @@ class POIPose:
             print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
         else:
-            print("not inverting") if verbose else None
+            ...
+            # print("not inverting") if verbose else None
 
     def get(self, verbose: bool = True) -> Pose2d:
         """

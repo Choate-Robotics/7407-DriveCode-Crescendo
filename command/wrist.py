@@ -31,9 +31,10 @@ class ZeroWrist(SubsystemCommand[Wrist]):
     def end(self, interrupted: bool):
         if not interrupted:
             self.subsystem.wrist_zeroed = True
-            utils.LocalLogger.debug("Wrist zeroed")
+            # utils.LocalLogger.debug("Wrist zeroed")
         else:
-            utils.LocalLogger.debug("Wrist zeroing interrupted")
+            ...
+            # utils.LocalLogger.debug("Wrist zeroing interrupted")
 
 
 class SetWrist(SubsystemCommand[Wrist]):
