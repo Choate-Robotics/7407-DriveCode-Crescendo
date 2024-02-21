@@ -7,7 +7,10 @@ from units.SI import meters_per_second
 
 
 class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
-
+    """
+    Set velocity of both top and bottom flywheels.
+    param velocity: speed to set flywheels to in m/s
+    """
     def __init__(self, subsystem: Flywheel, velocity: meters_per_second):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -27,7 +30,10 @@ class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
 
 
 class SetFlywheelVelocityIndependent(SubsystemCommand[Flywheel]):
-
+    """
+    Set velocity of top and bottom flywheel independently.
+    param velocity: tuple. first value is top flywheel, second is bottom flywheel
+    """
     def __init__(self, subsystem: Flywheel, velocity: tuple[meters_per_second, meters_per_second]):
         super().__init__(subsystem)
         self.subsystem = subsystem
