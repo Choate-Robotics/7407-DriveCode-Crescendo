@@ -42,7 +42,9 @@ class SetWrist(SubsystemCommand[Wrist]):
         self.angle = angle
 
     def initialize(self):
+        self.subsystem.zero_wrist()
         self.subsystem.set_wrist_angle(self.angle)
+        self.subsystem.wrist_moving = True
 
     def execute(self):
         pass
@@ -55,7 +57,7 @@ class SetWrist(SubsystemCommand[Wrist]):
             wrist_angle = self.subsystem.get_wrist_angle()
             self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
-        # else:
+        self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
 
 
@@ -67,7 +69,7 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.traj_calc = traj_calc
 
     def initialize(self):
-        pass
+        self.subsystem.wrist_moving = True
 
     def execute(self):
         self.subsystem.set_wrist_angle(self.traj_calc.get_theta())
@@ -84,9 +86,10 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.subsystem.ready_to_shoot = False
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            self.subsystem.set_wrist_angle(wrist_angle)
+                #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
-        # else:
+        self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
 
 

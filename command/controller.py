@@ -47,6 +47,7 @@ class Giraffe(commands2.Command):
         self.staging = False
         self.auto_height = False
         self.table.putBoolean('finished', False)
+        self.table.putBoolean('interrupted', False)
         self.continuous_command: FeedIn | AimWrist | None = None
 
         commands = []
@@ -144,6 +145,7 @@ class Giraffe(commands2.Command):
                 #     self.continuous_command
                 # )
             ),
+            # self.continuous_command
         )
         )
 
@@ -153,12 +155,15 @@ class Giraffe(commands2.Command):
     def end(self, interrupted: bool):
         print("GIRAFFE COMMAND FINISHED")
         if interrupted:
-            print("GIRAFFE INTERRUPTED")
+            self.finished = False
+            self.table.putBoolean('interrupted', True)
+            # raise NotImplementedError
             # self.finished = True
         else:
             self.table.putBoolean('finished', False)
-            commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
         self.finished = False
+        commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
+        
 
 
 class GiraffeLock(commands2.Command):
@@ -235,32 +240,6 @@ class GiraffeLock(commands2.Command):
             # potentially put continuous commands here
 
 
-class StageNote(SequentialCommandGroup):
-    """
-    Stages a note to the feeder from the intake
-
-    Args:
-        SequentialCommandGroup (elevator): Elevator subsystem
-        SequentialCommandGroup (wrist): Wrist subsystem
-        SequentialCommandGroup (intake): Intake subsystem
-    """
-
-    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
-        super().__init__(
-
-            ParallelCommandGroup(
-                FeedIn(wrist),
-                # Giraffe(elevator, wrist, config.Giraffe.kStage),
-                PassIntakeNote(intake),
-            ),
-            WaitUntilCommand(lambda: wrist.note_detected()),
-            IntakeIdle(intake),
-            # SetWrist(wrist, 20 * degrees_to_radians)
-            AimWrist(wrist, traj_cal)
-            # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
-        )
-
-
 # class StageNote(SequentialCommandGroup):
 #     """
 #     Stages a note to the feeder from the intake
@@ -274,15 +253,45 @@ class StageNote(SequentialCommandGroup):
 #     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
 #         super().__init__(
 
-            
-#             Giraffe(elevator, wrist, config.Giraffe.kStage),
-#             PassIntakeNote(intake),
+#             ParallelCommandGroup(
+#                 FeedIn(wrist),
+#                 # Giraffe(elevator, wrist, config.Giraffe.kStage),
+#                 PassIntakeNote(intake),
+#             ),
 #             WaitUntilCommand(lambda: wrist.note_detected()),
 #             IntakeIdle(intake),
 #             # SetWrist(wrist, 20 * degrees_to_radians)
-#             # AimWrist(wrist, traj_cal)
-#             Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
+#             AimWrist(wrist, traj_cal)
+#             # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
 #         )
+
+
+class StageNote(SequentialCommandGroup):
+    """
+    Stages a note to the feeder from the intake
+
+    Args:
+        SequentialCommandGroup (elevator): Elevator subsystem
+        SequentialCommandGroup (wrist): Wrist subsystem
+        SequentialCommandGroup (intake): Intake subsystem
+    """
+
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
+        super().__init__(
+
+            
+            Giraffe(elevator, wrist, config.Giraffe.kIdle),
+            ParallelCommandGroup(
+            PassIntakeNote(intake),
+            FeedIn(wrist)
+            ),
+            WaitUntilCommand(lambda: wrist.note_detected()),
+            IntakeIdle(intake),
+            # SetWrist(wrist, 20 * degrees_to_radians)
+            # AimWrist(wrist, traj_cal)
+            Giraffe(elevator, wrist, config.Giraffe.kIdle, traj_cal),
+            AimWrist(wrist, traj_cal)
+        )
 
 
 class AimWristSpeaker(ParallelCommandGroup):

@@ -79,10 +79,14 @@ class FieldPos:
         speaker_y = 218.42 * inches_to_meters
 
         speaker_z_top = 82.90 * inches_to_meters
+        
+        speaker_depth = 18 * inches_to_meters
 
         speaker_z_bottom = 78.13 * inches_to_meters
 
         speaker_z = speaker_z_top #(speaker_z_top + speaker_z_bottom) / 2
+        
+        speaker_x = speaker_depth / 2.5
 
         amp_y = field_width
 
@@ -147,7 +151,7 @@ limelight_back_yaw = 180 * degrees_to_radians
 
 # WRIST
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
-wrist_time_to_max_vel = 0.3  #TODO: placeholder
+wrist_time_to_max_vel = 0.0  #TODO: placeholder
 
 # Flywheel
 flywheel_mass = 1.3 + .127  # kilograms
