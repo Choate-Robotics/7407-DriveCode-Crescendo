@@ -1,6 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from command import DrivetrainZero, Giraffe, RunIntake, PassNote, SetFlywheelLinearVelocity
+from command import DrivetrainZero, Giraffe, RunIntake, PassNote, SetFlywheelLinearVelocity, DriveSwerveAim, FeedIn, PassIntakeNote
 from robot_systems import Robot
 from utils import POIPose
 import config
@@ -117,31 +117,55 @@ path_6 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
-    DrivetrainZero(Robot.drivetrain),
-    ParallelCommandGroup(
-        SetFlywheelLinearVelocity(Robot.flywheel, 5),
-        SequentialCommandGroup(
-            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
-            PassNote(Robot.wrist), # shoot
+#     DrivetrainZero(Robot.drivetrain),
+#     ParallelCommandGroup(
+#         SetFlywheelLinearVelocity(Robot.flywheel, 5),
+        # SequentialCommandGroup(
+            # DriveSwerveAim(Robot.drivetrain),
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
+            # PassNote(Robot.wrist), # shoot
             path_1,
-            RunIntake(Robot.intake), # intake
+            WaitCommand(0.5),
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+            # ParallelCommandGroup(
+            #     FeedIn(Robot.wrist),
+            #     PassIntakeNote(Robot.intake),
+            # ),
+            # RunIntake(Robot.intake), # intake
             path_2,
-            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
-            PassNote(Robot.wrist), # shoot
+            WaitCommand(0.5),
+            # DriveSwerveAim(Robot.drivetrain),
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
+            # PassNote(Robot.wrist), # shoot
             path_3,
-            RunIntake(Robot.intake), # intake
+            WaitCommand(0.5),
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+            # ParallelCommandGroup(
+            #     FeedIn(Robot.wrist),
+            #     PassIntakeNote(Robot.intake),
+            # ),
+            # RunIntake(Robot.intake), # intake
             path_4,
-            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
-            PassNote(Robot.wrist), # shoot
+            WaitCommand(0.5),
+            # DriveSwerveAim(Robot.drivetrain),
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
+            # PassNote(Robot.wrist), # shoot
             path_5,
-            RunIntake(Robot.intake), # intake
-            path_6,
-            Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
-            PassNote(Robot.wrist), # shoot
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
+            # ParallelCommandGroup(
+            #     FeedIn(Robot.wrist),
+            #     PassIntakeNote(Robot.intake),
+            # ),
+            # RunIntake(Robot.intake), # intake
+            WaitCommand(0.5),
+            # path_6,
+            # DriveSwerveAim(Robot.drivetrain),
+            # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim), # aim
+            # PassNote(Robot.wrist), # shoot
             
             InstantCommand(lambda: print("Done")),
         )
-    )
-)
+#     )
+# )
 
 routine = AutoRoutine(Pose2d(*initial), auto)
