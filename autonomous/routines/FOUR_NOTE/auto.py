@@ -2,11 +2,13 @@ from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
 from robot_systems import Robot
 from utils import POIPose
-from command import DrivetrainZero
+from command import *
+import config
 
 from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
+    ParallelCommandGroup,
     WaitCommand
 )
 
@@ -63,15 +65,60 @@ path_3 = FollowPathCustom(
 )
 
 auto = SequentialCommandGroup(
-    # DrivetrainZero(Robot.drivetrain),
+    # ZeroWrist(Robot.wrist),
+    # ZeroElevator(Robot.elevator),
+    # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel), #spin up flywheels
+    # ParallelCommandGroup( #aim
+    #     AimWrist(Robot.wrist),
+    #     DriveSwerveAim(Robot.drivetrain),
+    # ),
+    # PassNote(Robot.wrist), #shoot preload
+    
+    # ParallelCommandGroup( #go to and collect first note
+    #     path_1,
+    #     RunIntake(Robot.intake)
+    # ),
+    # ParallelCommandGroup( #feed note from intake into wrist
+    #     PassIntakeNote(Robot.intake),
+    #     FeedIn(Robot.wrist)
+    # ),
+    # ParallelCommandGroup( #aim wrist and drivetrain
+    #     AimWrist(Robot.wrist),
+    #     DriveSwerveAim(Robot.drivetrain),
+    # ),
+    # PassNote(Robot.wrist), #shoot note one
+
+    # ParallelCommandGroup( #go to and collect note 2
+    #     path_2,
+    #     RunIntake(Robot.intake)
+    # ),
+    # ParallelCommandGroup( #feed note from intake into wrist
+    #     PassIntakeNote(Robot.intake),
+    #     FeedIn(Robot.wrist)
+    # ),
+    # ParallelCommandGroup( #aim wrist and drivetrain
+    #     AimWrist(Robot.wrist),
+    #     DriveSwerveAim(Robot.drivetrain),
+    # ),
+    # PassNote(Robot.wrist), #shoot note two
+    
+    # ParallelCommandGroup( #go to and collect note 3
+    #     path_3,
+    #     RunIntake(Robot.intake)
+    # ),
+    # ParallelCommandGroup( #feed note from intake into wrist
+    #     PassIntakeNote(Robot.intake),
+    #     FeedIn(Robot.wrist)
+    # ),
+    # ParallelCommandGroup( #aim wrist and drivetrain
+    #     AimWrist(Robot.wrist),
+    #     DriveSwerveAim(Robot.drivetrain)
+    # ),
+    # PassNote(Robot.wrist), #shoot note 3
+
     path_1,
-    WaitCommand(1),
-
     path_2,
-    WaitCommand(1),
-
-    path_3,
-    WaitCommand(1)
+    path_3
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)
