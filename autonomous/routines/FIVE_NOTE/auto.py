@@ -114,14 +114,21 @@ path_6 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = SequentialCommandGroup(
+    path_1,
+    path_2,
+    path_3,
+    path_4,
+    path_5,
+    path_6,
+
     # command.ZeroElevator(Robot.elevator),
     # command.ZeroWrist(Robot.wrist),
-    ParallelRaceGroup(
-        command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
-        SequentialCommandGroup(
-            InstantCommand(lambda: print("Entered Sequential Command")),
+    # ParallelRaceGroup(
+    #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+    #     SequentialCommandGroup(
+    #         InstantCommand(lambda: print("Entered Sequential Command")),
             # Shoot first note
-            SequentialCommandGroup(
+            # SequentialCommandGroup(
                 # Stage note to feeder from intake
                 # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
                 # ParallelCommandGroup(
@@ -133,15 +140,15 @@ auto = SequentialCommandGroup(
                 # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim, Field.calculations),
 
                 # Shoot note
-                ParallelRaceGroup(
-                    InstantCommand(lambda: print("Passing Note to flywheel")),
+                # ParallelRaceGroup(
+                #     InstantCommand(lambda: print("Passing Note to flywheel")),
                     # Passes note to flywheel
-                    command.PassNote(Robot.wrist),
-                    WaitUntilCommand(Robot.flywheel.note_shot)
-                ),
+                    # command.PassNote(Robot.wrist),
+                    # WaitUntilCommand(Robot.flywheel.note_shot)
+                # ),
 
-                PrintCommand("Shot first note"),
-            ),
+                # PrintCommand("Shot first note"),
+            # ),
 
             # # Go to second note
             # path_1,
@@ -237,9 +244,9 @@ auto = SequentialCommandGroup(
             #     ),
             #     PrintCommand("Shot fifth note"),
             # ),
-        ),
+        # ),
 
-    )
+    # )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

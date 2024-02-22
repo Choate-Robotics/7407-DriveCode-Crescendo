@@ -1,6 +1,6 @@
 from units.SI import meters, radians
 from robot_systems import Field
-import constants, math
+import constants, math, config
 from utils import POIPose
 from wpimath.geometry import Translation2d
 
@@ -8,7 +8,7 @@ coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
 
-initial: coord = (1.9, 5.5, 0)
+initial: coord = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.field_width/2, 0)
 
 get_second_note: path = (
     initial,
