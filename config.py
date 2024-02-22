@@ -204,6 +204,7 @@ max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.2
 flywheel_shot_current_threshold = 20
+auto_shoot_deadline = 1
 # Configs 
 # TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
