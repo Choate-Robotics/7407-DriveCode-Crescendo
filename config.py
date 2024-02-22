@@ -165,10 +165,13 @@ wrist_flat_ff = -0.58  # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 10 * degrees_to_radians
 feeder_velocity = .2
-feeder_voltage = 5.6
+feeder_voltage_feed = 8 # TODO: placeholder
+feeder_voltage_crawl = 4 # TODO: placeholder
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = .65
+feeder_beam_break_first_channel = 0 # TODO: placeholder
+feeder_beam_break_second_channel = 1 # TODO: placeholder
 
 # DRIVETRAIN
 front_left_move_id = 7
