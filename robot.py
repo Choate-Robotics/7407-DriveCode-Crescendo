@@ -50,6 +50,7 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Five Notes", autonomous.five_note)
         self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
+        self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
@@ -197,7 +198,7 @@ class _Robot(wpilib.TimedRobot):
         # )
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))

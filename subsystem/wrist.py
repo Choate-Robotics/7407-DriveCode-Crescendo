@@ -84,7 +84,7 @@ class Wrist(Subsystem):
         # return False
         return self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
 
-    def is_at_angle(self, angle: radians, threshold=math.radians(2)):
+    def is_at_angle(self, angle: radians, threshold=math.radians(5)):
         """
         Checks if the wrist is at the given angle
         :param angle: The angle to check for

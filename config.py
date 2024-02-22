@@ -204,12 +204,13 @@ max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.2
 flywheel_shot_current_threshold = 20
+auto_shoot_deadline = 1
 # Configs 
 # TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.05, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(0.09, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)

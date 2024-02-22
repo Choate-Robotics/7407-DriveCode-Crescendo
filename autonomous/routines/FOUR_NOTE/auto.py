@@ -1,12 +1,14 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from robot_systems import Robot
+from robot_systems import Robot, Field
 from utils import POIPose
-from command import DrivetrainZero
+from command import *
+import config
 
 from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
+    ParallelCommandGroup,
     WaitCommand
 )
 
@@ -63,15 +65,42 @@ path_3 = FollowPathCustom(
 )
 
 auto = SequentialCommandGroup(
-    # DrivetrainZero(Robot.drivetrain),
-    path_1,
-    WaitCommand(1),
+    ZeroWrist(Robot.wrist),
+    ZeroElevator(Robot.elevator),
+    # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel), #spin up flywheels
+    # ParallelCommandGroup( #aim
+    #     AimWrist(Robot.wrist, Field.calculations),
+    #     DriveSwerveAim(Robot.drivetrain, Field.calculations),
+    # ).until(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot),
+    # PassNote(Robot.wrist), #shoot preload
+    
+    ParallelCommandGroup( #shoot preload and deploy intake
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        DeployIntake(Robot.intake)
+    ),
+    
+    ParallelCommandGroup( #go to and collect first note
+        path_1,
+        RunIntake(Robot.intake)
+    ),
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note one
 
-    path_2,
-    WaitCommand(1),
+    ParallelCommandGroup( #go to and collect note 2
+        path_2,
+        RunIntake(Robot.intake)
+    ),
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note two
+    
+    ParallelCommandGroup( #go to and collect note 3
+        path_3,
+        RunIntake(Robot.intake)
+    ),
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note three
+    
 
-    path_3,
-    WaitCommand(1)
+    # path_1,
+    # path_2,
+    # path_3
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

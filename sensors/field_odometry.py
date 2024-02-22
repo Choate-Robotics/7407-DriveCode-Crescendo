@@ -235,6 +235,21 @@ class FieldOdometry:
             *self.std_dev
         ])
 
+        self.table.putBoolean('ready to shoot', self.drivetrain.ready_to_shoot)
+
+        def bound_angle(degrees:float):
+            degrees = degrees % 360
+            if degrees > 180:
+                degrees -= 360
+            if degrees < -180:
+                degrees +=360
+            return degrees
+
+        self.table.putNumber(
+            'estimated rotation',
+            math.degrees(bound_angle(self.drivetrain.odometry_estimator.getEstimatedPosition().rotation().degrees()))
+        )
+
         return est_pose
 
     def resetOdometry(self, pose: Pose2d):
