@@ -67,40 +67,39 @@ path_3 = FollowPathCustom(
 auto = SequentialCommandGroup(
     ZeroWrist(Robot.wrist),
     ZeroElevator(Robot.elevator),
-    # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel), #spin up flywheels
-    # ParallelCommandGroup( #aim
-    #     AimWrist(Robot.wrist, Field.calculations),
-    #     DriveSwerveAim(Robot.drivetrain, Field.calculations),
-    # ).until(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot),
-    # PassNote(Robot.wrist), #shoot preload
-    
-    ParallelCommandGroup( #shoot preload and deploy intake
+
+    # Shoot first note preload and deploy intake
+    ParallelCommandGroup(
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         DeployIntake(Robot.intake)
     ),
-    
-    ParallelCommandGroup( #go to and collect first note
+
+    # Get second note
+    ParallelCommandGroup(
         path_1,
         RunIntake(Robot.intake)
     ),
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note one
 
-    ParallelCommandGroup( #go to and collect note 2
+    # Shoot second note
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+
+    # Get third note
+    ParallelCommandGroup(
         path_2,
         RunIntake(Robot.intake)
     ),
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note two
-    
-    ParallelCommandGroup( #go to and collect note 3
+
+    # Shoot third note
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+
+    # Get fourth note
+    ParallelCommandGroup(
         path_3,
         RunIntake(Robot.intake)
     ),
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note three
-    
 
-    # path_1,
-    # path_2,
-    # path_3
+    # Shoot fourth note
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

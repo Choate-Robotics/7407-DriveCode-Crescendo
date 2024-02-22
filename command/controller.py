@@ -62,8 +62,6 @@ class Giraffe(commands2.Command):
             PrintCommand("Running both elevator and wrist normally")
         )
 
-        
-
         # if the target wrist angle is 'aim' then set the wrist angle to the calculated angle, we will pass off the aiming command at the end
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kAim:
             if self.shot_calc == None:
@@ -71,7 +69,7 @@ class Giraffe(commands2.Command):
                 self.finished = True
                 return
             self.continuous_command = AimWrist(self.wrist, self.shot_calc)
-            
+
             self.aiming = True
             self.target.wrist_angle = self.wrist.get_wrist_angle()
             # self.target.wrist_angle = 17.5 * degrees_to_radians
@@ -85,13 +83,13 @@ class Giraffe(commands2.Command):
             self.target.wrist_angle = config.staging_angle
             print('staging note to wrist')
             self.continuous_command = FeedIn(self.wrist)
-                # InstantCommand(lambda: self.wrist.feed_in())
+            # InstantCommand(lambda: self.wrist.feed_in())
             debug_commands.append(
                 PrintCommand("Staging note to wrist")
             )
 
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kCurrentAngle:
-            self.target.wrist_angle = self.wrist.get_wrist_angle() 
+            self.target.wrist_angle = self.wrist.get_wrist_angle()
             debug_commands.append(
                 PrintCommand("Setting wrist to current angle")
             )
@@ -163,7 +161,6 @@ class Giraffe(commands2.Command):
             self.table.putBoolean('finished', False)
         self.finished = False
         commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
-        
 
 
 class GiraffeLock(commands2.Command):
@@ -279,7 +276,7 @@ class StageNote(SequentialCommandGroup):
 #     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
 #         super().__init__(
 
-            
+
 #             Giraffe(elevator, wrist, config.Giraffe.kIdle),
 #             ParallelCommandGroup(
 #             PassIntakeNote(intake),
@@ -329,7 +326,8 @@ class Shoot(SequentialCommandGroup):
                 WaitUntilCommand(flywheel.note_shot)
             )
         )
-        
+
+
 class ShootAuto(SequentialCommandGroup):
     """Shoots a note during the autonomous period
 
@@ -339,14 +337,15 @@ class ShootAuto(SequentialCommandGroup):
         SequentialCommandGroup (flywheel): Flywheel subsystem
         SequentialCommandGroup (calculations): TrajectoryCalculator
     """
-    
+
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, flywheel: Flywheel, traj_cal: TrajectoryCalculator):
         super().__init__(
-            ParallelCommandGroup( #aim
+            ParallelCommandGroup(  # Aim
                 SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 AimWrist(wrist, traj_cal),
                 DriveSwerveAim(drivetrain, traj_cal),
-            ).until(lambda: wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot).withTimeout(config.auto_shoot_deadline),
+            ).until(lambda: wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot).withTimeout(
+                config.auto_shoot_deadline),
             PassNote(wrist),
         )
 
@@ -355,6 +354,7 @@ class ShootAmp(SequentialCommandGroup):
     """
     Shoots a note into the amp
     """
+
     def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
             ParallelCommandGroup(
@@ -372,6 +372,7 @@ class EnableClimb(ParallelCommandGroup):
     """
     Raises the elevator and wrist and deploys tenting to prepare for climb
     """
+
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
@@ -386,6 +387,7 @@ class UndoClimb(ParallelCommandGroup):
     """
     Undeploys tenting and lowers elevator
     """
+
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             UnDeployTenting(intake),
