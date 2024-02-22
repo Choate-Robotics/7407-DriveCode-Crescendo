@@ -329,6 +329,26 @@ class Shoot(SequentialCommandGroup):
                 WaitUntilCommand(flywheel.note_shot)
             )
         )
+        
+class ShootAuto(SequentialCommandGroup):
+    """Shoots a note during the autonomous period
+
+    Args:
+        SequentialCommandGroup (drivetrain): Drivetrain subsystem
+        SequentialCommandGroup (wrist): Wrist subsystem
+        SequentialCommandGroup (flywheel): Flywheel subsystem
+        SequentialCommandGroup (calculations): TrajectoryCalculator
+    """
+    
+    def __init__(self, drivetrain: Drivetrain, wrist: Wrist, flywheel: Flywheel, traj_cal: TrajectoryCalculator):
+        super().__init__(
+            ParallelCommandGroup( #aim
+                SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
+                AimWrist(wrist, traj_cal),
+                DriveSwerveAim(drivetrain, traj_cal),
+            ).until(lambda: wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
+            PassNote(wrist),
+        )
 
 
 class ShootAmp(SequentialCommandGroup):
@@ -343,7 +363,7 @@ class ShootAmp(SequentialCommandGroup):
                 PrintCommand('Lock Drivetrain with amp')
             ),
             WaitUntilCommand(
-                lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
+                lambda: not elevator.elevator_moving and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
             PassNote(wrist),
         )
 

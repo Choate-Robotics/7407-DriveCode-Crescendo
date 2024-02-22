@@ -68,11 +68,12 @@ auto = SequentialCommandGroup(
     ZeroWrist(Robot.wrist),
     ZeroElevator(Robot.elevator),
     # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel), #spin up flywheels
-    ParallelCommandGroup( #aim
-        AimWrist(Robot.wrist, Field.calculations),
-        DriveSwerveAim(Robot.drivetrain, Field.calculations),
-    ).until(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot),
-    PassNote(Robot.wrist), #shoot preload
+    # ParallelCommandGroup( #aim
+    #     AimWrist(Robot.wrist, Field.calculations),
+    #     DriveSwerveAim(Robot.drivetrain, Field.calculations),
+    # ).until(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot),
+    # PassNote(Robot.wrist), #shoot preload
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
     
     # ParallelCommandGroup( #go to and collect first note
     #     path_1,
