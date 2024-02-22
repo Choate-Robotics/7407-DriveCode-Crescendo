@@ -48,7 +48,7 @@ class SetWrist(SubsystemCommand[Wrist]):
         self.angle = angle
 
     def initialize(self):
-        self.subsystem.zero_wrist()
+        # self.subsystem.zero_wrist()
         self.subsystem.set_wrist_angle(self.angle)
         self.subsystem.wrist_moving = True
 
