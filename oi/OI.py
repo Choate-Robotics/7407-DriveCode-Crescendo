@@ -66,13 +66,26 @@ class OI:
                 ))
             )
         
-        Keymap.Climb.CLIMB_UP.toggleOnTrue(
-            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        )\
-        #     .toggleOnFalse(
-        #     command.UndoClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        # )
         
-        Keymap.Climb.CLIMB_DOWN.onTrue(
+        def start_climbing():
+            config.climbing = True
+            
+        def stop_climbing():
+            config.climbing = False
+        
+        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).OnTrue(
+            commands2.InstantCommand(lambda: start_climbing()).alongWith(
+            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        )
+        )
+        
+        Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).OnTrue(
+            commands2.InstantCommand(lambda: stop_climbing()).alongWith(
+            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        )
+        )
+        
+        
+        Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp)
         )

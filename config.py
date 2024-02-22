@@ -114,6 +114,9 @@ limelight_led_mode = {
     "force_on": 3,
 }
 
+# CLIMBING
+climbing: bool = False
+
 
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
