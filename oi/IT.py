@@ -30,10 +30,10 @@ class IT:
 
         #INTAKE TRIGGERS ----------------
         # If outer roller detects a note, run the intake in
-        button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
-        )
+        # button.Trigger(lambda: Robot.intake.get_outer_current() > config.intake_roller_current_limit and not Robot.intake.intake_running)\
+        # .debounce(config.intake_sensor_debounce).onTrue(
+        #     command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
+        # )
         
         # # If note in intake and wrist, after certain time, eject 
         # button.Trigger(lambda: Robot.intake.note_in_intake)\
@@ -45,15 +45,6 @@ class IT:
         button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
         .debounce(config.intake_sensor_debounce).onTrue(
             command.StageNote(Robot.elevator, Robot.wrist, Robot.intake, Field.calculations)
-            # SequentialCommandGroup(
-            #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-            #     command.PassIntakeNote(Robot.intake),
-            #     WaitUntilCommand(lambda: Robot.wrist.note_detected()),
-            #     command.IntakeIdle(Robot.intake),
-            #     # SetWrist(wrist, 20 * degrees_to_radians)
-            #     # AimWrist(wrist, traj_cal)
-            #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations),
-            # )
         )
         #INTAKE TRIGGERS ----------------
         
@@ -92,10 +83,10 @@ class IT:
         
         
         #SHOOTER TRIGGERS ----------------
-        # button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
-        #     .onTrue(
-        #         command.Shoot(Robot.wrist, Robot.flywheel)
-        #     )
+        button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
+            .onTrue(
+                command.Shoot(Robot.wrist, Robot.flywheel)
+            )
         #SHOOTER TRIGGERS ----------------
         
         #ODOMETRY TRIGGERS ----------------

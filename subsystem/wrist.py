@@ -35,7 +35,8 @@ class Wrist(Subsystem):
     def init(self):
         self.wrist_motor.init()
         self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
-        # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder)s
+        self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
+        self.wrist_motor.motor.burnFlash()
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
         self.distance_sensor = self.feed_motor.get_analog()
@@ -79,7 +80,7 @@ class Wrist(Subsystem):
 
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
-                (angle / (pi * 2)) * constants.wrist_gear_ratio,
+                self.radians_to_abs(angle),# (angle / (pi * 2)) * constants.wrist_gear_ratio,
                 ff# if angle < current_angle else 0
             )
 
@@ -93,6 +94,10 @@ class Wrist(Subsystem):
                 * pi
                 * 2
         )
+        
+        # return (
+        #     (self.wrist_abs_encoder.getPosition())
+        # )
 
     def note_detected(self) -> bool:
         # return self.distance_sensor.getVoltage() < config.feeder_sensor_threshold
@@ -106,7 +111,7 @@ class Wrist(Subsystem):
         :param threshold: The threshold to check for
         :return: True if the wrist is at the given angle, False otherwise
         """
-        return abs(bounded_angle_diff(self.get_wrist_angle(), angle)) < threshold
+        return abs(bounded_angle_diff(self.get_wrist_abs_angle(), angle)) < threshold
 
     def get_wrist_abs_angle(self):
 
@@ -167,7 +172,7 @@ class Wrist(Subsystem):
         # self.zero_wrist()
         table = ntcore.NetworkTableInstance.getDefault().getTable('wrist')
 
-        table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
+        # table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
         table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
         table.putBoolean('note in feeder', self.note_staged)
         table.putBoolean('note detected', self.note_detected())

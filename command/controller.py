@@ -327,7 +327,8 @@ class Shoot(SequentialCommandGroup):
             ParallelRaceGroup(
                 PassNote(wrist),
                 WaitUntilCommand(flywheel.note_shot)
-            )
+            ),
+            InstantCommand(lambda: wrist.set_note_not_staged())
         )
 
 
@@ -341,8 +342,7 @@ class ShootAmp(SequentialCommandGroup):
                 SetFlywheelLinearVelocity(flywheel, config.flywheel_amp_speed),
                 Giraffe(elevator, wrist, config.Giraffe.kAmp),
                 PrintCommand('Lock Drivetrain with amp')
-            ),
-            WaitUntilCommand(
+            ).until(
                 lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
             PassNote(wrist),
         )

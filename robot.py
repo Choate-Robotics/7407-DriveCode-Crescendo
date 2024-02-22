@@ -164,7 +164,7 @@ class _Robot(wpilib.TimedRobot):
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         Field.calculations.init()
-        Robot.wrist.zero_wrist()
+        # Robot.wrist.zero_wrist()
         Robot.elevator.zero()
 
         self.scheduler.schedule(commands2.SequentialCommandGroup(
@@ -185,6 +185,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
+        self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(30)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
