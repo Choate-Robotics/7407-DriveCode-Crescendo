@@ -1,8 +1,13 @@
-import command
 import config
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from command import Giraffe
+from command import (
+    ZeroWrist,
+    ZeroElevator,
+    ShootAuto,
+    DeployIntake,
+    RunIntake
+)
 
 from robot_systems import Robot, Field
 from utils import POIPose
@@ -112,141 +117,75 @@ path_6 = FollowPathCustom(
     period=0.03,
 )
 
-# Between paths, need to score rings
 auto = SequentialCommandGroup(
-    path_1,
-    path_2,
-    path_3,
+    ZeroWrist(Robot.wrist),
+    ZeroElevator(Robot.elevator),
+
+    # Shoot first note
+    ParallelCommandGroup(
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        DeployIntake(Robot.intake)
+    ),
+
+    # Get second note
+    ParallelCommandGroup(
+        path_1,
+        RunIntake(Robot.intake)
+    ),
+
+    # Shoot second note
+    ShootAuto(
+        Robot.drivetrain,
+        Robot.wrist,
+        Robot.flywheel,
+        Field.calculations
+    ),
+
+    # Get third note
+    ParallelCommandGroup(
+        path_2,
+        RunIntake(Robot.intake)
+    ),
+
+    # Shoot third note
+    ShootAuto(
+        Robot.drivetrain,
+        Robot.wrist,
+        Robot.flywheel,
+        Field.calculations
+    ),
+
+    # Get fourth note
+    ParallelCommandGroup(
+        path_3,
+        RunIntake(Robot.intake)
+    ),
+
+    # Go to midline to shoot fourth note
     path_4,
-    path_5,
+
+    # Shoot fourth note
+    ShootAuto(
+        Robot.drivetrain,
+        Robot.wrist,
+        Robot.flywheel,
+        Field.calculations
+    ),
+
+    # Get fifth note
+    ParallelCommandGroup(
+        path_5,
+        RunIntake(Robot.intake)
+    ),
+
     path_6,
 
-    # command.ZeroElevator(Robot.elevator),
-    # command.ZeroWrist(Robot.wrist),
-    # ParallelRaceGroup(
-    #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
-    #     SequentialCommandGroup(
-    #         InstantCommand(lambda: print("Entered Sequential Command")),
-            # Shoot first note
-            # SequentialCommandGroup(
-                # Stage note to feeder from intake
-                # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-                # ParallelCommandGroup(
-                #     command.FeedIn(Robot.wrist),
-                #     command.PassIntakeNote(Robot.intake),
-                # ),
-                #
-                # # Aim wrist
-                # Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim, Field.calculations),
-
-                # Shoot note
-                # ParallelRaceGroup(
-                #     InstantCommand(lambda: print("Passing Note to flywheel")),
-                    # Passes note to flywheel
-                    # command.PassNote(Robot.wrist),
-                    # WaitUntilCommand(Robot.flywheel.note_shot)
-                # ),
-
-                # PrintCommand("Shot first note"),
-            # ),
-
-            # # Go to second note
-            # path_1,
-            #
-            # # Intake second note
-            # command.RunIntake(Robot.intake),
-            # InstantCommand(lambda: print("Intaked second note")),
-            #
-            # # Shoot second note
-            # SequentialCommandGroup(
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-            #     ParallelCommandGroup(
-            #         command.FeedIn(Robot.wrist),
-            #         command.PassIntakeNote(Robot.intake),
-            #     ),
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim, Field.calculations),
-            #     ParallelRaceGroup(
-            #         command.PassNote(Robot.wrist),
-            #         WaitUntilCommand(Robot.flywheel.note_shot)
-            #     ),
-            #     PrintCommand("Shot second note"),
-            # ),
-            #
-            # # Go to third note
-            # path_2,
-            #
-            # # Intake third note
-            # command.RunIntake(Robot.intake),
-            # InstantCommand(lambda: print("Intaked third note")),
-            #
-            # # Shoot third note
-            # SequentialCommandGroup(
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-            #     ParallelCommandGroup(
-            #         command.FeedIn(Robot.wrist),
-            #         command.PassIntakeNote(Robot.intake),
-            #     ),
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim, Field.calculations),
-            #     ParallelRaceGroup(
-            #         command.PassNote(Robot.wrist),
-            #         WaitUntilCommand(Robot.flywheel.note_shot)
-            #     ),
-            #     PrintCommand("Shot third note"),
-            # ),
-            #
-            # # Go to fourth note
-            # path_3,
-            #
-            # # Intake fourth note
-            # command.RunIntake(Robot.intake),
-            # InstantCommand(lambda: print("Intaked fourth note")),
-            #
-            # # Go to midline for fourth note
-            # path_4,
-            # InstantCommand(lambda: print("Went to midline")),
-            #
-            # # Shoot fourth note
-            # SequentialCommandGroup(
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-            #     ParallelCommandGroup(
-            #         command.FeedIn(Robot.wrist),
-            #         command.PassIntakeNote(Robot.intake),
-            #     ),
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim, Field.calculations),
-            #     ParallelRaceGroup(
-            #         command.PassNote(Robot.wrist),
-            #         WaitUntilCommand(Robot.flywheel.note_shot)
-            #     ),
-            #     PrintCommand("Shot fourth note"),
-            # ),
-            #
-            # # Go to fifth note
-            # path_5,
-            #
-            # # Intake fifth note
-            # command.RunIntake(Robot.intake),
-            # InstantCommand(lambda: print("Intaked fifth note")),
-            #
-            # # Go to midline for fifth note
-            # path_6,
-            #
-            # # Shoot fifth note
-            # SequentialCommandGroup(
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kStage),
-            #     ParallelCommandGroup(
-            #         command.FeedIn(Robot.wrist),
-            #         command.PassIntakeNote(Robot.intake),
-            #     ),
-            #     Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim, Field.calculations),
-            #     ParallelRaceGroup(
-            #         command.PassNote(Robot.wrist),
-            #         WaitUntilCommand(Robot.flywheel.note_shot)
-            #     ),
-            #     PrintCommand("Shot fifth note"),
-            # ),
-        # ),
-
-    # )
+    ShootAuto(
+        Robot.drivetrain,
+        Robot.wrist,
+        Robot.flywheel,
+        Field.calculations
+    )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)
