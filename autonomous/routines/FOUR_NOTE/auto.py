@@ -73,49 +73,30 @@ auto = SequentialCommandGroup(
     #     DriveSwerveAim(Robot.drivetrain, Field.calculations),
     # ).until(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot),
     # PassNote(Robot.wrist), #shoot preload
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
     
-    # ParallelCommandGroup( #go to and collect first note
-    #     path_1,
-    #     RunIntake(Robot.intake)
-    # ),
-    # ParallelCommandGroup( #feed note from intake into wrist
-    #     PassIntakeNote(Robot.intake),
-    #     FeedIn(Robot.wrist)
-    # ),
-    # ParallelCommandGroup( #aim wrist and drivetrain
-    #     AimWrist(Robot.wrist),
-    #     DriveSwerveAim(Robot.drivetrain),
-    # ),
-    # PassNote(Robot.wrist), #shoot note one
+    ParallelCommandGroup( #shoot preload and deploy intake
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        DeployIntake(Robot.intake)
+    ),
+    
+    ParallelCommandGroup( #go to and collect first note
+        path_1,
+        RunIntake(Robot.intake)
+    ),
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note one
 
-    # ParallelCommandGroup( #go to and collect note 2
-    #     path_2,
-    #     RunIntake(Robot.intake)
-    # ),
-    # ParallelCommandGroup( #feed note from intake into wrist
-    #     PassIntakeNote(Robot.intake),
-    #     FeedIn(Robot.wrist)
-    # ),
-    # ParallelCommandGroup( #aim wrist and drivetrain
-    #     AimWrist(Robot.wrist),
-    #     DriveSwerveAim(Robot.drivetrain),
-    # ),
-    # PassNote(Robot.wrist), #shoot note two
+    ParallelCommandGroup( #go to and collect note 2
+        path_2,
+        RunIntake(Robot.intake)
+    ),
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note two
     
-    # ParallelCommandGroup( #go to and collect note 3
-    #     path_3,
-    #     RunIntake(Robot.intake)
-    # ),
-    # ParallelCommandGroup( #feed note from intake into wrist
-    #     PassIntakeNote(Robot.intake),
-    #     FeedIn(Robot.wrist)
-    # ),
-    # ParallelCommandGroup( #aim wrist and drivetrain
-    #     AimWrist(Robot.wrist),
-    #     DriveSwerveAim(Robot.drivetrain)
-    # ),
-    # PassNote(Robot.wrist), #shoot note 3
+    ParallelCommandGroup( #go to and collect note 3
+        path_3,
+        RunIntake(Robot.intake)
+    ),
+    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations), #shoot note three
+    
 
     # path_1,
     # path_2,
