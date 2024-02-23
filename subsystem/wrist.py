@@ -8,7 +8,7 @@ from toolkit.motors.rev_motors import SparkMax
 from toolkit.subsystem import Subsystem
 from toolkit.utils.toolkit_math import bounded_angle_diff
 from units.SI import radians
-from wpilib import AnalogInput
+from wpilib import DigitalInput
 
 
 class Wrist(Subsystem):
@@ -25,7 +25,8 @@ class Wrist(Subsystem):
         self.wrist_zeroed: bool = False
         self.rotation_disabled: bool = False
         self.feed_disabled: bool = False
-        self.distance_sensor: AnalogInput = None
+        self.beam_break_first: DigitalInput = None
+        self.beam_break_second: DigitalInput = None   
         self.disable_rotation: bool = False
         self.locked: bool = False
         self.ready_to_shoot: bool = False
@@ -39,7 +40,8 @@ class Wrist(Subsystem):
         self.wrist_motor.motor.burnFlash()
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
-        self.distance_sensor = self.feed_motor.get_analog()
+        self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
+        self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
 
     def limit_angle(self, angle: radians) -> radians:
         if self.locked and angle <= constants.wrist_min_rotation_stage:
@@ -100,9 +102,13 @@ class Wrist(Subsystem):
         # )
 
     def note_detected(self) -> bool:
-        # return self.distance_sensor.getVoltage() < config.feeder_sensor_threshold
-        # return False
-        return self.distance_sensor.getVoltage() > config.feeder_sensor_threshold
+        return not self.beam_break_second.get()
+
+    def detect_note_first(self) -> bool:
+        return not self.beam_break_first.get()
+    
+    def detect_note_second(self) -> bool:
+        return not self.beam_break_second.get()
 
     def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """
@@ -135,7 +141,7 @@ class Wrist(Subsystem):
         if not self.feed_disabled:
             # self.feed_motor.set_target_velocity(config.feeder_velocity)
             # self.feed_motor.set_raw_output(config.feeder_velocity)
-            self.feed_motor.set_target_voltage(config.feeder_voltage)
+            self.feed_motor.set_target_voltage(config.feeder_voltage_feed)
 
     def set_feed_voltage(self, voltage: float):
         self.feed_motor.set_target_voltage(voltage)
@@ -144,7 +150,7 @@ class Wrist(Subsystem):
         if not self.feed_disabled:
             # self.feed_motor.set_target_velocity(-(config.feeder_velocity))
             # self.feed_motor.set_raw_output(-(config.feeder_velocity))
-            self.feed_motor.set_target_voltage(-config.feeder_voltage)
+            self.feed_motor.set_target_voltage(-config.feeder_voltage_feed)
 
     def stop_feed(self):
         # self.feed_motor.set_target_position(self.feed_motor.get_sensor_position())

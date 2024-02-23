@@ -103,23 +103,28 @@ class AimWrist(SubsystemCommand[Wrist]):
 
 class FeedIn(SubsystemCommand[Wrist]):
     """
-    Feed note into back of feeder
+    Feed note into back of feeder. 
+    Start by going fast, until first beam break sees note, then slow down. 
+    Stop when second beam break sees note.
     """
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
+        self.first_note_detected: bool = False
 
     def initialize(self):
         self.subsystem.feed_in()
 
     def execute(self):
-        voltage = config.feeder_voltage * (
-        (config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage()))
+        if self.subsystem.detect_note_first():
+            self.first_note_detected = True
+
+        voltage = config.feeder_voltage_crawl if self.first_note_detected else config.feeder_voltage_feed
 
         self.subsystem.set_feed_voltage(voltage)
 
     def isFinished(self):
-        return self.subsystem.note_detected()
+        return self.subsystem.detect_note_second()
         # return True
 
     def end(self, interrupted: bool):
@@ -166,7 +171,6 @@ class PassNote(SubsystemCommand[Wrist]):
 
     def isFinished(self):
         return not self.subsystem.note_detected()
-        # need to include beam break
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()

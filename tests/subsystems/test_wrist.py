@@ -105,7 +105,7 @@ def test_feed_in(test_input, wrist: Wrist):
     if test_input:
         wrist.feed_motor.set_target_voltage.assert_not_called()
     else:
-        wrist.feed_motor.set_target_voltage.assert_called_with(config.feeder_voltage)
+        wrist.feed_motor.set_target_voltage.assert_called_with(config.feeder_voltage_feed)
 
 
 @pytest.mark.parametrize(
@@ -118,4 +118,4 @@ def test_feed_out(test_input, wrist: Wrist):
     if test_input:
         wrist.feed_motor.set_target_voltage.assert_not_called()
     else:
-        wrist.feed_motor.set_target_voltage.assert_called_with(-config.feeder_voltage)
+        wrist.feed_motor.set_target_voltage.assert_called_with(-config.feeder_voltage_feed)
