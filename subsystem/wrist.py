@@ -101,6 +101,9 @@ class Wrist(Subsystem):
         #     (self.wrist_abs_encoder.getPosition())
         # )
 
+    def note_detected(self) -> bool:
+        return not self.beam_break_second.get()
+
     def detect_note_first(self) -> bool:
         return not self.beam_break_first.get()
     

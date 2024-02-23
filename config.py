@@ -170,8 +170,8 @@ feeder_voltage_crawl = 4 # TODO: placeholder
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = .65
-feeder_beam_break_first_channel = 0 # TODO: placeholder
-feeder_beam_break_second_channel = 1 # TODO: placeholder
+feeder_beam_break_first_channel = 1
+feeder_beam_break_second_channel = 0
 
 # DRIVETRAIN
 front_left_move_id = 7
