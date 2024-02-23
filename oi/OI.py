@@ -73,13 +73,13 @@ class OI:
         def stop_climbing():
             config.climbing = False
         
-        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).OnTrue(
+        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
             commands2.InstantCommand(lambda: start_climbing()).alongWith(
             command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
         )
         )
         
-        Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).OnTrue(
+        Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).onTrue(
             commands2.InstantCommand(lambda: stop_climbing()).alongWith(
             command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
         )

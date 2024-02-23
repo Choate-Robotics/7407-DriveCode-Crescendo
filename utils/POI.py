@@ -118,14 +118,15 @@ class POIPose:
             and not self._red
         ):
             self._red = True
-            print("inverting") if verbose else None
+            # print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
         elif DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self._red:
             self._red = False
-            print("inverting") if verbose else None
+            # print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
         else:
-            print("not inverting") if verbose else None
+            ...
+            # print("not inverting") if verbose else None
 
     def get(self, verbose: bool = True) -> Pose2d:
         """

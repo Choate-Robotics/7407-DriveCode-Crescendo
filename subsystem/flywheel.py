@@ -220,7 +220,7 @@ class Flywheel(Subsystem):
         table.putBoolean('ready to shoot', self.ready_to_shoot)
         table.putBoolean('note shot', self.note_shot())
         table.putNumber('flywheel top target', self.top_flywheel_state.nextR(0))
-        table.putNumebr('flywheel bottom target', self.bottom_flywheel_state.nextR(0))
+        table.putNumber('flywheel bottom target', self.bottom_flywheel_state.nextR(0))
         table.putNumber('flywheel top voltage', self.get_voltage(1))
         table.putNumber('flywheel bottom voltage', self.get_voltage(2))
         table.putNumber('flywheel top current', self.get_current(1))

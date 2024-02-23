@@ -11,7 +11,7 @@ import subsystem
 import utils
 from oi.OI import OI
 from oi.IT import IT
-from wpilib import SmartDashboard
+from wpilib import SmartDashboard, DigitalInput
 from math import degrees, radians
 
 
@@ -95,6 +95,7 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
+        
 
     def robotPeriodic(self):
         
@@ -157,9 +158,10 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Field.calculations.update)
 
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
-
+        # print(config.elevator_zeroed_pos)
         # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
+        # print(DigitalInput(0).get())
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")

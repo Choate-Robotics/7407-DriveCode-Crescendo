@@ -161,9 +161,9 @@ class Drivetrain(SwerveDrivetrain):
         self.n_back_right.set_motor_angle(math.radians(-45))
 
     def get_abs(self):
-        fl = self.n_front_left.get_abs()
-        fr = self.n_front_right.get_abs()
-        bl = self.n_back_left.get_abs()
-        br = self.n_back_right.get_abs()
+        fl = self.n_front_left.get_abs() #0.467
+        fr = self.n_front_right.get_abs() #0.060
+        bl = self.n_back_left.get_abs() #0.727
+        br = self.n_back_right.get_abs() #0.860
         return [fl, fr, bl, br]
     
