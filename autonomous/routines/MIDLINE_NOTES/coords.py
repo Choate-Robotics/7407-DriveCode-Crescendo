@@ -13,8 +13,14 @@ path = Tuple[coord, waypoints, coord]
 
 initial: coord = (1.9 - drivetrain_length_with_bumpers/2, field_width-5.373, math.pi)
 
-get_first_ring: path = ( 
+come_out_shoot_preload: path = (
     initial,
+    [],
+    (initial[0]+2, initial[1], initial[2]),
+)
+
+get_first_ring: path = ( 
+    come_out_shoot_preload[2],
     [],
     Field.POI.Coordinates.Notes.MidLine.kFarRight,
 )
