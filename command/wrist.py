@@ -149,7 +149,7 @@ class FeedOut(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.note_staged
+        return not self.subsystem.detect_note_first()
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
@@ -174,6 +174,8 @@ class PassNote(SubsystemCommand[Wrist]):
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
+        if not interrupted:
+            self.subsystem.note_staged = False
         # if interrupted:
         #     ...
         #     # utils.LocalLogger.debug("Note transfer interrupted")
