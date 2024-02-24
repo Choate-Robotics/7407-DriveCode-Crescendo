@@ -145,7 +145,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.5
+intake_distance_sensor_threshold: float = 0.3
 
 double_note_timeout = 2
 
@@ -164,11 +164,12 @@ elevator_zeroed_pos = 0.110 if comp_bot.get() else 0.023  # TODO: PLACEHOLDER: m
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 feed_motor_id = 3
+feed_motor_ramp_rate = 0
 wrist_flat_ff = -0.58  # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 10 * degrees_to_radians
 feeder_velocity = .2
-feeder_voltage_feed = 8 # TODO: placeholder
+feeder_voltage_feed = 12 # TODO: placeholder
 feeder_voltage_crawl = 4 # TODO: placeholder
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
@@ -189,13 +190,13 @@ front_right_encoder_zeroed_pos = 0.060 if comp_bot.get() else 0.536
 
 back_left_move_id = 11
 back_left_turn_id = 14
-back_left_encoder_port = AnalogEncoder(0)
-back_left_encoder_zeroed_pos = 0.727 if comp_bot.get() else 0.458
+back_left_encoder_port = AnalogEncoder(1 if comp_bot.get() else 0)
+back_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.458
 
 back_right_move_id = 18
 back_right_turn_id = 16
-back_right_encoder_port = AnalogEncoder(1)
-back_right_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.984
+back_right_encoder_port = AnalogEncoder(0 if comp_bot.get() else 1)
+back_right_encoder_zeroed_pos = 0.727 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
@@ -215,7 +216,7 @@ flywheel_shot_current_threshold = 20
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(1, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(5, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)

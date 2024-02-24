@@ -40,6 +40,7 @@ class Wrist(Subsystem):
         self.wrist_motor.motor.burnFlash()
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
+        self.feed_motor.motor.setOpenLoopRampRate(config.feed_motor_ramp_rate)
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
         self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
 
@@ -156,6 +157,9 @@ class Wrist(Subsystem):
         # self.feed_motor.set_target_position(self.feed_motor.get_sensor_position())
         # self.feed_motor.set_raw_output(0)
         self.feed_motor.set_target_voltage(0)
+        
+    def feed_idle(self):
+        self.feed_motor.set_target_voltage(3)
 
     def feed_note(self):
         if not self.feed_disabled:
@@ -184,7 +188,8 @@ class Wrist(Subsystem):
         table.putBoolean('note detected', self.note_detected())
         table.putBoolean('wrist zeroed', self.wrist_zeroed)
         table.putBoolean('ready to shoot', self.ready_to_shoot)
-        table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
+        table.putBoolean('first beam break', not self.beam_break_first.get())
+        table.putBoolean('second beam break', not self.beam_break_second.get())
         table.putBoolean('rotation disabled', self.rotation_disabled)
         table.putBoolean('feed disabled', self.feed_disabled)
         table.putBoolean('locked', self.locked)

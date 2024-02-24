@@ -34,7 +34,7 @@ track_width = 20 * inches_to_meters  # TODO: change to 20 inches for actual robo
 drivetrain_length = 25 * inches_to_meters
 bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
-drivetrain_max_vel = 15.5 * feet_to_meters
+drivetrain_max_vel = 30 * feet_to_meters
 drivetrain_max_accel = 5 * feet_to_meters
 drivetrain_max_angular_vel = 1000 * degrees_per_second__to__radians_per_second
 drivetrain_move_motor_free_speed: rotations_per_minute = (
@@ -161,7 +161,7 @@ flywheel_period = .03
 shooter_height = 21 * inches_to_meters
 shooter_offset_y = 6 * inches_to_meters
 
-wrist_max_rotation = 58 * degrees_to_radians
+wrist_max_rotation = 56 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
 wrist_min_rotation_stage = 22 * degrees_to_radians
 

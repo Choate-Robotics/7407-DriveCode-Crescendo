@@ -29,7 +29,7 @@ class OI:
         )
         
         Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake).onTrue(
-            command.RunIntake(Robot.intake)
+            command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
         ).onFalse(
             command.IntakeIdle(Robot.intake)
         )
@@ -73,19 +73,19 @@ class OI:
         def stop_climbing():
             config.climbing = False
         
-        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
-            commands2.InstantCommand(lambda: start_climbing()).alongWith(
-            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        )
-        )
+        # Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
+        #     commands2.InstantCommand(lambda: start_climbing()).alongWith(
+        #     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        # )
+        # )
         
-        Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).onTrue(
-            commands2.InstantCommand(lambda: stop_climbing()).alongWith(
-            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        )
-        )
+        # Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).onTrue(
+        #     commands2.InstantCommand(lambda: stop_climbing()).alongWith(
+        #     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        # )
+        # )
         
         
-        Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp)
-        )
+        # Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
+        #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp)
+        # )
