@@ -29,9 +29,13 @@ class Flywheel(Subsystem):
         )
 
         self.flywheel_MOI = (constants.flywheel_mass / 2) * (constants.flywheel_radius_outer ** 2)
+        
+        self.shaft_MOI = (constants.flywheel_shaft_mass / 2) * (constants.flywheel_shaft_radius ** 2)
+        
+        self.total_MOI = self.flywheel_MOI + self.shaft_MOI
 
         self.flywheel_plant = LinearSystemId().flywheelSystem(
-            DCMotor.NEO(config.flywheel_motor_count), self.flywheel_MOI, constants.flywheel_gear_ratio
+            DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
         )
         self.flywheel_observer = KalmanFilter_1_1_1(
             self.flywheel_plant,
@@ -41,8 +45,8 @@ class Flywheel(Subsystem):
         )
         self.flywheel_controller = LinearQuadraticRegulator_1_1(
             self.flywheel_plant,
-            [8.0],  # velocity error tolerance
-            [6.0],  # control effort tolerance
+            [4.0],  # velocity error tolerance
+            [4.0],  # control effort tolerance
             config.period
         )
         self.flywheel_controller.latencyCompensate(self.flywheel_plant, config.period, 0.025)

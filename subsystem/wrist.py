@@ -35,7 +35,7 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
-        self.wrist_motor.motor.setClosedLoopRampRate(constants.wrist_time_to_max_vel)
+        self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
         self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
         self.wrist_motor.pid_controller.setPositionPIDWrappingEnabled(True)
         # self.wrist_motor.pid_controller.setPositionPIDWrappingMinInput(self.radians_to_abs(constants.wrist_max_rotation))
@@ -43,7 +43,6 @@ class Wrist(Subsystem):
         self.wrist_motor.motor.burnFlash()
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
-        # self.feed_motor.motor.setOpenLoopRampRate(config.feed_motor_ramp_rate)
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
         self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
 

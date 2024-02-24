@@ -153,24 +153,23 @@ double_note_timeout = 2
 
 elevator_can_id: int = 10
 elevator_can_id_2: int = 15
-elevator_ramp_rate: float = .3
-elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
-elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
-elevator_feed_forward: float = 0.0  # TODO: PLACEHOLDER
+elevator_ramp_rate: float = .2
+elevator_feed_forward: float = 0.0 
 elevator_moving = False
-elevator_zeroed_pos = 0.110 if comp_bot.get() else 0.023  # TODO: PLACEHOLDER: meters
+elevator_zeroed_pos = 0.110 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
+wrist_time_to_max_vel = 0.0  
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
 wrist_flat_ff = -0.58  # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 10 * degrees_to_radians
 feeder_velocity = .2
-feeder_voltage_feed = 12 # TODO: placeholder
-feeder_voltage_crawl = 4 # TODO: placeholder
+feeder_voltage_feed = 12
+feeder_voltage_crawl = 4
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = .65
@@ -205,14 +204,13 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 5
-v0_flywheel: meters_per_second = 22  # TODO: placeholder
+v0_flywheel: meters_per_second = 22
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.2
 flywheel_shot_current_threshold = 20
 # Configs 
-# TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
@@ -234,7 +232,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle:radians = 57.5 * degrees_to_radians
+staging_angle:radians = 55.5 * degrees_to_radians
 
 
 class Giraffe:
@@ -254,7 +252,7 @@ class Giraffe:
 
     kStage = GiraffePos(0, GiraffePos.Special.kStage)
 
-    kAim = GiraffePos(GiraffePos.Special.kHeightAuto, GiraffePos.Special.kAim)
+    kAim = GiraffePos(GiraffePos.Special.kCurrentAngle, GiraffePos.Special.kAim)
 
     kAimLow = GiraffePos(0, GiraffePos.Special.kAim)
 
