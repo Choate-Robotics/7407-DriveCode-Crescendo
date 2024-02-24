@@ -62,6 +62,11 @@ class Keymap:
         INTAKE_OUT = commands2.button.Trigger(
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
         )
+        
+        CLEAR_NOTE = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 180
+        )
+        
     class Shooter:
         ...
         AIM = commands2.button.Trigger(
@@ -80,8 +85,16 @@ class Keymap:
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
         )
         
-        CLEAR_NOTE = commands2.button.JoystickButton(
+        DUMP_NOTE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+        )
+        
+        CLEAR_NOTE = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 0
+        )
+        
+        FEED_NOTE_FLYWHEEL = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.5
         )
         
         # UNJAM =

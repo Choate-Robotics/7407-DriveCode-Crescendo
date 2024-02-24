@@ -95,6 +95,11 @@ class Flywheel(Subsystem):
     def init(self) -> None:
         self.motor_1.init()
         self.motor_2.init()
+        
+        # self.motor_1.motor.setSmartCurrentLimit(config.flywheel_stall_current, config.flywheel_free_current, config.flywheel_stall_rpm)
+        # self.motor_2.motor.setSmartCurrentLimit(config.flywheel_stall_current, config.flywheel_free_current, config.flywheel_stall_rpm)
+        # self.motor_2.motor.burnFlash()
+        # self.motor_1.motor.burnFlash()
 
         self.initialized = True
 

@@ -31,7 +31,7 @@ class OI:
         Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake).onTrue(
             command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
         ).onFalse(
-            command.IntakeIdle(Robot.intake)
+            command.IntakeIdle(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()))
         )
         
         Keymap.Intake.INTAKE_OUT.onTrue(
@@ -58,13 +58,29 @@ class OI:
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
         )
         
-        Keymap.Feeder.CLEAR_NOTE.onTrue(
+        Keymap.Feeder.DUMP_NOTE.onTrue(
                 command.PassNote(Robot.wrist).withTimeout(2).andThen(commands2.WaitCommand(2).andThen(
                     commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
                 ).andThen(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)).alongWith(
                     commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
                 ))
             )
+        
+        Keymap.Feeder.CLEAR_NOTE.onTrue(
+            commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
+        )
+        
+        Keymap.Feeder.FEED.and_(lambda: not Robot.wrist.note_detected()).onTrue(
+            commands2.InstantCommand(lambda: Robot.wrist.feed_in())
+        ).onFalse(
+            commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
+        )
+        
+        Keymap.Feeder.UNFEED.onTrue(
+            commands2.InstantCommand(lambda: Robot.wrist.feed_out())
+        ).onFalse(
+            commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
+        )
         
         
         def start_climbing():
