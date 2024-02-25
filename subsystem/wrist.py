@@ -35,12 +35,15 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
+        # self.wrist_motor.motor.restoreFactoryDefaults(True)
         self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
-        self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
-        self.wrist_motor.pid_controller.setPositionPIDWrappingEnabled(True)
+        # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
+        # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.encoder)
+        
+        # self.wrist_motor.pid_controller.setPositionPIDWrappingEnabled(False)
         # self.wrist_motor.pid_controller.setPositionPIDWrappingMinInput(self.radians_to_abs(constants.wrist_max_rotation))
         # self.wrist_motor.pid_controller.setPositionPIDWrappingMaxInput(self.radians_to_abs(constants.wrist_min_rotation))
-        self.wrist_motor.motor.burnFlash()
+        # self.wrist_motor.motor.burnFlash()
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
@@ -85,7 +88,7 @@ class Wrist(Subsystem):
 
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
-                self.radians_to_abs(angle),# (angle / (pi * 2)) * constants.wrist_gear_ratio,
+                (angle / (pi * 2)) * constants.wrist_gear_ratio,
                 ff# if angle < current_angle else 0
             )
 
@@ -120,7 +123,7 @@ class Wrist(Subsystem):
         :param threshold: The threshold to check for
         :return: True if the wrist is at the given angle, False otherwise
         """
-        return abs(bounded_angle_diff(self.get_wrist_abs_angle(), angle)) < threshold
+        return abs(bounded_angle_diff(self.get_wrist_angle(), angle)) < threshold
 
     def get_wrist_abs_angle(self):
 
@@ -186,6 +189,8 @@ class Wrist(Subsystem):
 
         # table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
         table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
+        # table.putNumber('wrist abs raw', self.wrist_abs_encoder.getPosition())
+        table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
         table.putBoolean('note in feeder', self.note_staged)
         table.putBoolean('note detected', self.note_detected())
         table.putBoolean('wrist zeroed', self.wrist_zeroed)
@@ -196,4 +201,6 @@ class Wrist(Subsystem):
         table.putBoolean('feed disabled', self.feed_disabled)
         table.putBoolean('locked', self.locked)
         table.putNumber('target angle', math.degrees(self.target_angle))
+        table.putNumber('target angle raw', self.radians_to_abs(self.target_angle))
         table.putBoolean('wrist moving', self.wrist_moving)
+        table.putNumber('wrist current', self.wrist_motor.motor.getOutputCurrent())

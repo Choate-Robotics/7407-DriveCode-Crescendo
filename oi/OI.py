@@ -4,6 +4,7 @@ import commands2
 import command, config, constants
 from robot_systems import Robot, Sensors, Field
 from oi.keymap import Keymap
+from math import radians
 
 log = LocalLogger("OI")
 
@@ -28,7 +29,7 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake).onTrue(
+        Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.detect_note()).onTrue(
             command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
         ).onFalse(
             command.IntakeIdle(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()))
@@ -59,9 +60,9 @@ class OI:
         )
         
         Keymap.Feeder.DUMP_NOTE.onTrue(
-                command.PassNote(Robot.wrist).withTimeout(2).andThen(commands2.WaitCommand(2).andThen(
+                command.PassNote(Robot.wrist).withTimeout(.5).andThen(commands2.WaitCommand(2).andThen(
                     commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
-                ).andThen(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)).alongWith(
+                ).andThen(command.SetWrist(Robot.wrist, config.staging_angle)).alongWith(
                     commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
                 ))
             )

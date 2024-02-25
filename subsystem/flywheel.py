@@ -45,7 +45,7 @@ class Flywheel(Subsystem):
         )
         self.flywheel_controller = LinearQuadraticRegulator_1_1(
             self.flywheel_plant,
-            [4.0],  # velocity error tolerance
+            [12.0],  # velocity error tolerance
             [4.0],  # control effort tolerance
             config.period
         )
@@ -96,10 +96,12 @@ class Flywheel(Subsystem):
         self.motor_1.init()
         self.motor_2.init()
         
+        self.motor_1.motor.setOpenLoopRampRate(2)
+        self.motor_2.motor.setOpenLoopRampRate(2)
         # self.motor_1.motor.setSmartCurrentLimit(config.flywheel_stall_current, config.flywheel_free_current, config.flywheel_stall_rpm)
         # self.motor_2.motor.setSmartCurrentLimit(config.flywheel_stall_current, config.flywheel_free_current, config.flywheel_stall_rpm)
-        # self.motor_2.motor.burnFlash()
-        # self.motor_1.motor.burnFlash()
+        self.motor_2.motor.burnFlash()
+        self.motor_1.motor.burnFlash()
 
         self.initialized = True
 
@@ -214,7 +216,7 @@ class Flywheel(Subsystem):
         self.top_flywheel_state.predict(config.period)
         self.bottom_flywheel_state.predict(config.period)
 
-        # Set the next setpoint for the flywheel
+        # # Set the next setpoint for the flywheel
         self.set_voltage(self.top_flywheel_state.U(0), 1)
         self.set_voltage(self.bottom_flywheel_state.U(0), 2)
 
@@ -228,9 +230,11 @@ class Flywheel(Subsystem):
         table.putNumber('flywheel bottom velocity', self.get_velocity_linear(2))
         table.putBoolean('ready to shoot', self.ready_to_shoot)
         table.putBoolean('note shot', self.note_shot())
-        table.putNumber('flywheel top target', self.top_flywheel_state.nextR(0))
-        table.putNumber('flywheel bottom target', self.bottom_flywheel_state.nextR(0))
+        table.putNumber('flywheel top target', self.angular_velocity_to_linear_velocity(self.top_flywheel_state.nextR(0)))
+        table.putNumber('flywheel bottom target', self.angular_velocity_to_linear_velocity(self.bottom_flywheel_state.nextR(0)))
         table.putNumber('flywheel top voltage', self.get_voltage(1))
         table.putNumber('flywheel bottom voltage', self.get_voltage(2))
         table.putNumber('flywheel top current', self.get_current(1))
         table.putNumber('flywheel bottom current', self.get_current(2))
+        table.putNumber('flywheel top bus voltage', self.motor_1.motor.getBusVoltage())
+        table.putNumber('flywheel bottom bus voltage', self.motor_2.motor.getBusVoltage())

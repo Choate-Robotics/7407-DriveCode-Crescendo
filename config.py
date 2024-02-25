@@ -19,7 +19,7 @@ from units.SI import degrees_to_radians, meters, radians, meters_per_second
 from typing import Literal
 
 comp_bot: DigitalInput = DigitalInput(
-    9
+    2
 )  # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 # from units.SI import (
@@ -161,14 +161,14 @@ elevator_zeroed_pos = 0.110 if comp_bot.get() else 0.023
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
-wrist_time_to_max_vel = 0.6
+wrist_time_to_max_vel = 0.0
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
 wrist_flat_ff = -0.58  # TODO: FIND
 stage_timeout = 5
 wrist_tent_limit = 10 * degrees_to_radians
 feeder_velocity = .2
-feeder_voltage_feed = 12
+feeder_voltage_feed = 6
 feeder_voltage_crawl = 4
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
@@ -214,13 +214,13 @@ flywheel_shot_current_threshold = 20
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(8.0, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.86, 0, 0.006, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kCoast
 )
 
 TURN_CONFIG = SparkMaxConfig(

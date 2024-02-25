@@ -23,7 +23,7 @@ class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
         print(self.subsystem.get_velocity_linear(), 'Current velocity')
 
     def isFinished(self):
-        return self.subsystem.within_velocity_linear(self.velocity, 0.1)
+        return self.subsystem.within_velocity_linear(self.velocity, 2)
 
     def end(self, interrupted: bool):
         print(self.subsystem.get_velocity_linear(), 'Final velocity')

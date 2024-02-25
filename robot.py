@@ -158,6 +158,7 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Field.calculations.update)
 
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
+        self.nt.getTable('swerve').putBoolean('comp bot', config.comp_bot.get())
         # print(config.elevator_zeroed_pos)
         # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
@@ -166,7 +167,7 @@ class _Robot(wpilib.TimedRobot):
     def teleopInit(self):
         # self.log.info("Teleop initialized")
         Field.calculations.init()
-        # Robot.wrist.zero_wrist()
+        Robot.wrist.zero_wrist()
         Robot.elevator.zero()
 
         self.scheduler.schedule(commands2.SequentialCommandGroup(
@@ -176,8 +177,9 @@ class _Robot(wpilib.TimedRobot):
         )
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        # self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
-        self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, 5))
+        # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
+        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
