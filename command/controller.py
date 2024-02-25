@@ -383,6 +383,17 @@ class UndoClimb(ParallelCommandGroup):
         )
 
 
+class ScoreTrap(SequentialCommandGroup):
+    """
+    Raises elevator and then feeds note out to score in trap
+    """
+    def __init__(self, elevator: Elevator, wrist: Wrist):
+        super().__init__(
+            Giraffe(elevator, wrist, config.Giraffe.kClimbTrap),
+            FeedOut(wrist)
+        )
+
+
 class EmergencyManuver(SequentialCommandGroup):
     
     def __init__(self, wrist:Wrist, intake: Intake):
