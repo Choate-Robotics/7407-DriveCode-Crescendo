@@ -67,7 +67,8 @@ class OI:
         )
         
         Keymap.Feeder.DUMP_NOTE.onTrue(
-            command.PassNote(Robot.wrist)
+            command.PassNote(Robot.wrist),
+            # command.SetWrist(Robot.wrist, radians(config.staging_angle))
             )
         
         Keymap.Feeder.CLEAR_NOTE.onTrue(
