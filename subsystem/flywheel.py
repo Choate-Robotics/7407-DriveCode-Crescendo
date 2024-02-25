@@ -45,8 +45,8 @@ class Flywheel(Subsystem):
         )
         self.flywheel_controller = LinearQuadraticRegulator_1_1(
             self.flywheel_plant,
-            [12.0],  # velocity error tolerance
-            [4.0],  # control effort tolerance
+            [4.0],  # velocity error tolerance
+            [12.0],  # control effort tolerance
             config.period
         )
         self.flywheel_controller.latencyCompensate(self.flywheel_plant, config.period, 0.025)
@@ -95,9 +95,11 @@ class Flywheel(Subsystem):
     def init(self) -> None:
         self.motor_1.init()
         self.motor_2.init()
+        self.motor_1.motor.setSmartCurrentLimit(200)
+        self.motor_2.motor.setSmartCurrentLimit(200)
         
-        # self.motor_1.motor.setOpenLoopRampRate(2)
-        # self.motor_2.motor.setOpenLoopRampRate(2)
+        self.motor_1.motor.setOpenLoopRampRate(2)
+        self.motor_2.motor.setOpenLoopRampRate(2)
         self.motor_2.motor.burnFlash()
         self.motor_1.motor.burnFlash()
 

@@ -9,6 +9,7 @@ import config, math
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
 from utils import LocalLogger
+from oi.keymap import Controllers
 
 
 from robot_systems import Robot, Sensors, Field
@@ -49,10 +50,10 @@ class IT:
         )
         
         
-        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
-        .onTrue(
-            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
-        )
+        # button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        # .onTrue(
+        #     command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
+        # )
         #INTAKE TRIGGERS ----------------
         
         
@@ -65,17 +66,45 @@ class IT:
         )
         
         # # if note in feeder, run flywheel and wrist to aim
+        # button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
+        # .onTrue(
+        #     command.AimWrist(Robot.wrist, Field.calculations)#)
+        # ).debounce(.1).onFalse(
+        #     command.SetWrist(Robot.wrist, math.radians(58.5))
+        # )
+        
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
+            .onTrue(
+                InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
+                    Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
+                    1
+                ))
+            ).onFalse(
+                InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
+                    Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
+                    0
+                ))
+            )
+            
         button.Trigger(lambda: Robot.wrist.note_staged)\
-        .onTrue(
-            command.AimWrist(Robot.wrist, Field.calculations)
-        )
+            .onTrue(
+                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                    1
+                ))
+            ).onFalse(
+                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                    0
+                ))
+            )
         #FEEDER TRIGGERS ----------------
         
         
         #FLYWHEEL TRIGGERS ----------------
             
         # if note in feeder, spin to set shot velocity
-        button.Trigger(lambda: Robot.wrist.note_staged)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))

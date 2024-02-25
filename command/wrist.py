@@ -170,7 +170,7 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.note_detected()
+        return not self.subsystem.detect_note_second() and not self.subsystem.detect_note_second()
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()

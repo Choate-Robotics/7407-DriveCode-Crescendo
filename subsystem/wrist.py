@@ -84,7 +84,7 @@ class Wrist(Subsystem):
 
         current_angle = self.get_wrist_angle()
 
-        ff = config.wrist_flat_ff * math.cos(angle)  #* (1 if angle < current_angle else -1)
+        ff = config.wrist_flat_ff * math.cos(angle) #* (1 if angle < current_angle else -1)
 
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(

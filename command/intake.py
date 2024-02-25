@@ -26,6 +26,28 @@ class RunIntake(SubsystemCommand[Intake]):
             self.subsystem.rollers_idle_out()
         self.subsystem.intake_running = False
 
+class RunIntakeConstant(SubsystemCommand[Intake]):
+    """
+    Runs intake in until note detected
+    """
+    def initialize(self) -> None:
+        self.subsystem.roll_in()
+        # self.subsystem.intake_running = True
+        self.note_detected = False
+
+    def execute(self) -> None:
+        pass
+
+    def isFinished(self) -> bool:
+        return False
+
+    def end(self, interrupted) -> None:
+        pass
+        # self.subsystem.stop_inner()
+        # if self.subsystem.note_in_intake:
+        #     self.subsystem.rollers_idle_out()
+        # self.subsystem.intake_running = False
+
 
 class PassIntakeNote(SubsystemCommand[Intake]):
     """

@@ -35,10 +35,10 @@ class OI:
         #     command.IntakeIdle(Robot.intake).andThen(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
         # )
         
-        Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.wrist.note_staged).onTrue(
+        Keymap.Intake.INTAKE_IN.onTrue(
             command.IntakeStageNote(Robot.wrist, Robot.intake)
         ).onFalse(
-            command.IntakeIdle(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
+            command.IntakeStageIdle(Robot.wrist, Robot.intake)
         )
         
         Keymap.Intake.INTAKE_OUT.onTrue(

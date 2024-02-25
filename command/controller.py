@@ -261,12 +261,21 @@ class StageNote(SequentialCommandGroup):
             IntakeIdle(intake),
         )
         
-class IntakeStageNote(ParallelCommandGroup):
+class IntakeStageNote(ParallelRaceGroup):
     
     def __init__(self, wrist: Wrist, intake: Intake):
         super().__init__(
-            InstantCommand(lambda: intake.roll_in()),
+            RunIntakeConstant(intake),
             FeedIn(wrist)
+        )
+    
+    
+class IntakeStageIdle(SequentialCommandGroup):
+    
+    def __init__(self, wrist: Wrist, intake: Intake):
+        super().__init__(
+            IntakeIdle(intake),
+            InstantCommand(lambda: wrist.stop_feed())
         )
 
 

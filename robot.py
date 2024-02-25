@@ -12,7 +12,7 @@ import utils
 from oi.OI import OI
 from oi.IT import IT
 from wpilib import SmartDashboard, DigitalInput
-from math import degrees, radians
+from math import degrees, radians, pi
 
 
 class _Robot(wpilib.TimedRobot):
@@ -160,10 +160,20 @@ class _Robot(wpilib.TimedRobot):
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
         if not self.isSimulation():
             self.nt.getTable('swerve').putBoolean('comp bot', config.comp_bot.get())
+            
+        self.nt.getTable('swerve').putNumber('abs front right', Robot.drivetrain.get_abs()[1])
+        self.nt.getTable('swerve').putNumber('front right rotation', Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi))
+        self.nt.getTable('swerve').putNumber('front right rotation error', (Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi)) - Robot.drivetrain.get_abs()[1])
+        
+        
         # print(config.elevator_zeroed_pos)
         # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
         # print(DigitalInput(0).get())
+        
+        self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
+        self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
+        
 
     def teleopInit(self):
         # self.log.info("Teleop initialized")
@@ -178,9 +188,10 @@ class _Robot(wpilib.TimedRobot):
         )
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
         # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)))
+        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(command.SetWrist(Robot.wrist, radians(20))))
+        # self.scheduler.schedule()
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
