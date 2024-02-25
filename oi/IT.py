@@ -50,10 +50,10 @@ class IT:
         )
         
         
-        # button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
-        # .onTrue(
-        #     command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
-        # )
+        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
+        .onTrue(
+            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
+        )
         #INTAKE TRIGGERS ----------------
         
         

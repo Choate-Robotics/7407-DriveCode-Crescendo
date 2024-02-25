@@ -61,7 +61,8 @@ class OI:
         # )
         
         Keymap.Elevator.AMP.onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp)
+            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
+            command.Amp(Robot.elevator, Robot.wrist, Robot.flywheel)
         ).onFalse(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
         )

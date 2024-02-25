@@ -190,7 +190,7 @@ front_left_encoder_zeroed_pos = 0.467 if comp_bot.get() else 0.860
 front_right_move_id = 4
 front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.060 if comp_bot.get() else 0.536
+front_right_encoder_zeroed_pos = 0.790 if comp_bot.get() else 0.536
 
 back_left_move_id = 11
 back_left_turn_id = 14
@@ -208,7 +208,7 @@ drivetrain_reversed: bool = False
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
-flywheel_amp_speed: meters = 5
+flywheel_amp_speed: meters = 15
 v0_flywheel: meters_per_second = 18
 idle_flywheel: meters_per_second = v0_flywheel / 2
 shooter_tol = 0.001  # For aim of shooter
@@ -272,7 +272,7 @@ class Giraffe:
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.2325, -26 * degrees_to_radians)
+    kAmp = GiraffePos(0.27, 0 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
 

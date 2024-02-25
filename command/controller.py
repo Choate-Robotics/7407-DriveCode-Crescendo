@@ -394,6 +394,22 @@ class ScoreTrap(SequentialCommandGroup):
         )
 
 
+class Amp(ParallelCommandGroup):
+    
+    def __init__(self, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
+        super().__init__(
+            SequentialCommandGroup(
+            ParallelCommandGroup(
+                SetElevator(elevator, config.Giraffe.kAmp.height),
+                SetWrist(wrist, 0)
+            ),
+            WaitCommand(.5),
+            SetWrist(wrist, -20 * degrees_to_radians)
+            ),
+            SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
+        )
+            
+
 class EmergencyManuver(SequentialCommandGroup):
     
     def __init__(self, wrist:Wrist, intake: Intake):
