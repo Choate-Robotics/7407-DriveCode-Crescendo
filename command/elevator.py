@@ -51,7 +51,7 @@ class SetElevator(SubsystemCommand[Elevator]):
 
     def isFinished(self):
         # Rounding to make sure it's not too precise (will cause err)
-        return round(self.subsystem.get_length(), 3) == round(self.length, 3)
+        return round(self.subsystem.get_length(), 2) == round(self.length, 2)
     
     def end(self, interrupted: bool):
         if interrupted:

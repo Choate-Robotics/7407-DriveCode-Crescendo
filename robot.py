@@ -186,9 +186,9 @@ class _Robot(wpilib.TimedRobot):
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
-        self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
+        # self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
+        # self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
         # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
         # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(command.SetWrist(Robot.wrist, radians(20))))
         # self.scheduler.schedule()
@@ -196,6 +196,7 @@ class _Robot(wpilib.TimedRobot):
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
+        self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length).andThen(command.SetElevator(Robot.elevator, 0)))
 
     def teleopPeriodic(self):
         ...
