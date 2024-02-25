@@ -18,13 +18,11 @@ class RunIntake(SubsystemCommand[Intake]):
         pass
 
     def isFinished(self) -> bool:
-        self.note_detected = self.subsystem.detect_note()
-        return self.note_detected
+        return self.subsystem.note_in_intake
 
     def end(self, interrupted) -> None:
         self.subsystem.stop_inner()
-        if not interrupted and self.note_detected:
-            self.subsystem.note_in_intake = True
+        if self.subsystem.note_in_intake:
             self.subsystem.rollers_idle_out()
         self.subsystem.intake_running = False
 
@@ -42,11 +40,10 @@ class PassIntakeNote(SubsystemCommand[Intake]):
         pass
 
     def isFinished(self) -> bool:
-        self.note_gone = self.subsystem.detect_note_leaving()
-        return True
+        return not self.subsystem.note_in_intake
 
     def end(self, interrupted) -> None:
-        # self.subsystem.stop_inner()
+        self.subsystem.stop_inner()
         # if not interrupted and self.note_gone:
         # self.subsystem.note_in_intake = False
         # self.subsystem.rollers_idle_in()

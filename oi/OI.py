@@ -29,10 +29,16 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.detect_note()).onTrue(
-            command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
+        # Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake and not Robot.wrist.note_staged).onTrue(
+        #     command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
+        # ).onFalse(
+        #     command.IntakeIdle(Robot.intake).andThen(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
+        # )
+        
+        Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.wrist.note_staged).onTrue(
+            command.IntakeStageNote(Robot.wrist, Robot.intake)
         ).onFalse(
-            command.IntakeIdle(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()))
+            command.IntakeIdle(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
         )
         
         Keymap.Intake.INTAKE_OUT.onTrue(
@@ -41,17 +47,18 @@ class OI:
             command.IntakeIdle(Robot.intake)
         )
         
-        Keymap.Elevator.ELEVATOR_HIGH.onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
-        )
+        # Keymap.Elevator.ELEVATOR_HIGH.onTrue(
+        #     # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
+        #     command.EmergencyManuver(Robot.wrist, Robot.intake)
+        # )
         
-        Keymap.Elevator.ELEVATOR_MID.onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
-        )
+        # Keymap.Elevator.ELEVATOR_MID.onTrue(
+        #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
+        # )
         
-        Keymap.Elevator.ELEVATOR_LOW.onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorLow)
-        )
+        # Keymap.Elevator.ELEVATOR_LOW.onTrue(
+        #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorLow)
+        # )
         
         Keymap.Elevator.AMP.onTrue(
             command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp)
@@ -60,11 +67,7 @@ class OI:
         )
         
         Keymap.Feeder.DUMP_NOTE.onTrue(
-                command.PassNote(Robot.wrist).withTimeout(.5).andThen(commands2.WaitCommand(2).andThen(
-                    commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
-                ).andThen(command.SetWrist(Robot.wrist, config.staging_angle)).alongWith(
-                    commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
-                ))
+            command.PassNote(Robot.wrist)
             )
         
         Keymap.Feeder.CLEAR_NOTE.onTrue(

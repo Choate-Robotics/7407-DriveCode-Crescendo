@@ -40,7 +40,7 @@ def test_wrist_set_wrist_angle(test_input, disabled, wrist: Wrist):
         wrist.wrist_motor.set_target_position.assert_not_called()
     else:
         wrist.wrist_motor.set_target_position.assert_called_with(
-            wrist.radians_to_abs(wrist.limit_angle(test_input)),
+            (wrist.limit_angle(test_input) / (2 * pi)) * constants.wrist_gear_ratio,
             config.wrist_flat_ff * math.cos(test_input),
         )
 

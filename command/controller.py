@@ -250,7 +250,7 @@ class StageNote(SequentialCommandGroup):
         SequentialCommandGroup (intake): Intake subsystem
     """
 
-    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
 
             ParallelCommandGroup(
@@ -258,11 +258,15 @@ class StageNote(SequentialCommandGroup):
                 # Giraffe(elevator, wrist, config.Giraffe.kStage),
                 PassIntakeNote(intake),
             ),
-            WaitUntilCommand(lambda: wrist.note_detected()),
             IntakeIdle(intake),
-            # SetWrist(wrist, 20 * degrees_to_radians)
-            AimWrist(wrist, traj_cal)
-            # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
+        )
+        
+class IntakeStageNote(ParallelCommandGroup):
+    
+    def __init__(self, wrist: Wrist, intake: Intake):
+        super().__init__(
+            InstantCommand(lambda: intake.roll_in()),
+            FeedIn(wrist)
         )
 
 
@@ -322,7 +326,7 @@ class Shoot(SequentialCommandGroup):
         SequentialCommandGroup (flywheel): Flywheel subsystem
     """
 
-    def __init__(self, wrist: Wrist, flywheel: Flywheel):
+    def __init__(self, wrist: Wrist):
         super().__init__(
             PassNote(wrist),
             InstantCommand(lambda: wrist.set_note_not_staged())
@@ -367,4 +371,18 @@ class UndoClimb(ParallelCommandGroup):
         super().__init__(
             UnDeployTenting(intake),
             Giraffe(elevator, wrist, config.Giraffe.kElevatorLow),
+        )
+
+
+class EmergencyManuver(SequentialCommandGroup):
+    
+    def __init__(self, wrist:Wrist, intake: Intake):
+        super().__init__(
+            ParallelCommandGroup(
+                PassIntakeNote(intake),
+                SetWrist(wrist, -10 * degrees_to_radians)
+            ),
+            DeployTenting(intake),
+            UnDeployTenting(intake),
+            SetWrist(wrist, config.staging_angle)
         )

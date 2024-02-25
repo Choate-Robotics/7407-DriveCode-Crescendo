@@ -63,6 +63,11 @@ odometry_debounce: float = 0.1  # TODO: PLACEHOLDER
 stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
 
 
+#STATE VARIABLES -- PLEASE DO NOT CHANGE
+
+
+
+
 # Leds
 def KRainbow():
     return {"type": 2}
@@ -161,7 +166,7 @@ elevator_zeroed_pos = 0.110 if comp_bot.get() else 0.023
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
-wrist_time_to_max_vel = 0.0
+wrist_time_to_max_vel = 0.1
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
 wrist_flat_ff = -0.58  # TODO: FIND
@@ -205,6 +210,7 @@ flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 5
 v0_flywheel: meters_per_second = 22
+idle_flywheel: meters_per_second = v0_flywheel / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
@@ -214,7 +220,7 @@ flywheel_shot_current_threshold = 20
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(.86, 0, 0.006, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.36, 0, 0.1, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -232,7 +238,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle:radians = 55.5 * degrees_to_radians
+staging_angle:radians = 56.5 * degrees_to_radians
 
 
 class Giraffe:

@@ -174,8 +174,6 @@ class PassNote(SubsystemCommand[Wrist]):
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        if not interrupted:
-            self.subsystem.note_staged = False
         # if interrupted:
         #     ...
         #     # utils.LocalLogger.debug("Note transfer interrupted")
