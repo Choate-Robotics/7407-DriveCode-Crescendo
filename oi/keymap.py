@@ -89,9 +89,7 @@ class Keymap:
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
         )
         
-        CLEAR_NOTE = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 0
-        )
+        # CLEAR_NOTE =
         
         FEED_NOTE_FLYWHEEL = commands2.button.Trigger(
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.5
@@ -107,6 +105,10 @@ class Keymap:
         
         CLIMB_DOWN = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+        
+        TRAP =  commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 0
         )
         
         # UNDO_CLIMB_UP = commands2.button.JoystickButton(

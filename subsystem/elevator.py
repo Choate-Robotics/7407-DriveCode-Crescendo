@@ -35,6 +35,7 @@ class Elevator(Subsystem):
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
 
         self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+        self.motor_extend_follower.motor.burnFlash()
 
         # Limits motor acceleration
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)

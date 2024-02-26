@@ -72,9 +72,9 @@ class OI:
             # command.SetWrist(Robot.wrist, radians(config.staging_angle))
             )
         
-        Keymap.Feeder.CLEAR_NOTE.onTrue(
-            commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
-        )
+        # Keymap.Feeder.CLEAR_NOTE.onTrue(
+        #     commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
+        # )
         
         Keymap.Feeder.FEED.and_(lambda: not Robot.wrist.note_detected()).onTrue(
             commands2.InstantCommand(lambda: Robot.wrist.feed_in())
@@ -94,12 +94,18 @@ class OI:
             
         def stop_climbing():
             config.climbing = False
+            
+        def climbed():
+            config.climbed = True
+            
+        def not_climbed():
+            config.climbed = False
         
-        # Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
-        #     commands2.InstantCommand(lambda: start_climbing()).alongWith(
-        #     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        # )
-        # )
+        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
+            commands2.InstantCommand(lambda: start_climbing()).alongWith(
+            command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        )
+        )
         
         # Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).onTrue(
         #     commands2.InstantCommand(lambda: stop_climbing()).alongWith(
@@ -108,6 +114,10 @@ class OI:
         # )
         
         
-        # Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
-        #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp)
-        # )
+        Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
+            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp).alongWith(
+                commands2.InstantCommand(lambda: climbed())
+            )
+        )
+        
+        Keymap.Climb.TRAP.and_(lambda: config.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))

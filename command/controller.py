@@ -9,7 +9,7 @@ from wpimath.geometry import Pose2d, Rotation2d
 from commands2 import WaitUntilCommand, WaitCommand, ParallelCommandGroup, SequentialCommandGroup, InstantCommand, \
     PrintCommand, ParallelDeadlineGroup, RunCommand, ParallelRaceGroup
 from typing import Literal
-from units.SI import degrees_to_radians
+from units.SI import degrees_to_radians, inches_to_meters
 
 
 class Giraffe(commands2.Command):
@@ -366,8 +366,10 @@ class EnableClimb(ParallelCommandGroup):
         super().__init__(
             Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
             SequentialCommandGroup(
-                WaitUntilCommand(lambda: wrist.get_wrist_angle() < config.wrist_tent_limit),
-                DeployTenting(intake)
+                # WaitUntilCommand(lambda: wrist.get_wrist_angle() < config.wrist_tent_limit),
+                WaitCommand(2),
+                DeployTenting(intake),
+                SetWrist(wrist, degrees_to_radians * 30)
             )
         )
 
@@ -389,8 +391,15 @@ class ScoreTrap(SequentialCommandGroup):
     """
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
-            Giraffe(elevator, wrist, config.Giraffe.kClimbTrap),
-            FeedOut(wrist)
+            # Giraffe(elevator, wrist, config.Giraffe.kClimbTrap),
+            SetWrist(wrist, -15 * degrees_to_radians),
+            SetElevator(elevator, constants.elevator_max_length - (6 * inches_to_meters)),
+            # InstantCommand(lambda: wrist.feed_out())
+            ParallelCommandGroup(
+                SetWrist(wrist, 0),
+                SetElevator(elevator, constants.elevator_max_length - (2 * inches_to_meters))
+            ).withTimeout(2).andThen(InstantCommand(lambda: wrist.feed_out())),
+            # FeedOut(wrist)
         )
 
 
@@ -404,7 +413,7 @@ class Amp(ParallelCommandGroup):
                 SetWrist(wrist, 0)
             ),
             WaitCommand(.5),
-            SetWrist(wrist, -20 * degrees_to_radians)
+            SetWrist(wrist, -10 * degrees_to_radians)
             ),
             SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )

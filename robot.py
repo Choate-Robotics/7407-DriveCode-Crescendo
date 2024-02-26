@@ -186,7 +186,7 @@ class _Robot(wpilib.TimedRobot):
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
-        # self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
+        self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         # self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
         # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
