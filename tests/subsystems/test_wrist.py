@@ -3,6 +3,7 @@ from math import pi
 from unittest.mock import MagicMock
 
 import pytest
+from pytest import MonkeyPatch
 
 import config
 import constants
@@ -62,19 +63,23 @@ def test_get_wrist_angle(test_input, wrist: Wrist):
 @pytest.mark.parametrize(
     "current_state, goal, threshold, expected",
     [
-        (0.5, 0.1, math.radians(2), False),
+        (0.5, -0.1, math.radians(2), False),
         (0.2, 0.2 - math.radians(1), math.radians(5), True),
         (0, 0.1, math.radians(2), False),
         (1.2, 1.2 + math.radians(1), math.radians(2), True),
         (1.2, 1.2 + math.radians(2), math.radians(1), False),
     ],
 )
-@pytest.mark.skip('need to fix the test when everything gets updated')
-def test_is_at_angle(current_state, goal, threshold, expected, wrist: Wrist):
-    wrist.wrist_abs_encoder.return_value = (
-        current_state * constants.wrist_gear_ratio / 2 / pi
-    )
-    print(bounded_angle_diff(current_state, goal))
+def test_is_at_angle(
+    current_state, goal, threshold, expected, wrist: Wrist, monkeypatch: MonkeyPatch
+):
+    monkeypatch.setattr(wrist, "get_wrist_angle", lambda: current_state)
+    # wrist.wrist_abs_encoder.return_value = (
+    #     current_state * constants.wrist_gear_ratio / 2 / pi
+    # )
+    print(f"threshold: {threshold}")
+    print(abs(bounded_angle_diff(current_state, goal)))
+    print(f"wrist angle: {wrist.get_wrist_angle()}")
     assert wrist.is_at_angle(goal, threshold) == expected
 
 
@@ -106,7 +111,9 @@ def test_feed_in(test_input, wrist: Wrist):
     if test_input:
         wrist.feed_motor.set_target_voltage.assert_not_called()
     else:
-        wrist.feed_motor.set_target_voltage.assert_called_with(config.feeder_voltage_feed)
+        wrist.feed_motor.set_target_voltage.assert_called_with(
+            config.feeder_voltage_feed
+        )
 
 
 @pytest.mark.parametrize(
@@ -119,4 +126,20 @@ def test_feed_out(test_input, wrist: Wrist):
     if test_input:
         wrist.feed_motor.set_target_voltage.assert_not_called()
     else:
-        wrist.feed_motor.set_target_voltage.assert_called_with(-config.feeder_voltage_feed)
+        wrist.feed_motor.set_target_voltage.assert_called_with(
+            -config.feeder_voltage_feed
+        )
+
+
+@pytest.mark.parametrize(
+    "test_input, answer",
+    [
+        (0, 0),
+        (0.2, 0.2),
+        (0.1, 0.1),
+        (-1.2, constants.wrist_min_rotation),
+        (2.2, constants.wrist_max_rotation),
+    ],
+)
+def test_limit_angle(test_input, answer, wrist: Wrist):
+    assert wrist.limit_angle(test_input) == answer
