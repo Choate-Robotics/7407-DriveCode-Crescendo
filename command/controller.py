@@ -358,21 +358,26 @@ class ShootAmp(SequentialCommandGroup):
         )
 
 
-class EnableClimb(ParallelCommandGroup):
+class EnableClimb(SequentialCommandGroup):
     """
     Raises the elevator and wrist and deploys tenting to prepare for climb
     """
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
-            Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
-            SequentialCommandGroup(
-                # WaitUntilCommand(lambda: wrist.get_wrist_angle() < config.wrist_tent_limit),
-                WaitCommand(2),
-                DeployTenting(intake),
-                SetWrist(wrist, degrees_to_radians * 30)
-            )
+            ParallelCommandGroup(
+                SetElevator(elevator, config.Giraffe.kClimbReach.height),
+                SetWrist(wrist, 30*degrees_to_radians)
+            ),
+            DeployTenting(intake)
+        
         )
 
+class ClimbDown(ParallelCommandGroup):
+    def __init__(self, elevator: Elevator, wrist: Wrist):
+        super().__init__(
+            SetElevatorClimbDown(elevator),
+            SetWrist(wrist, config.Giraffe.kClimbPullUp.wrist_angle)
+        )
 
 class UndoClimb(ParallelCommandGroup):
     """
@@ -392,12 +397,12 @@ class ScoreTrap(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
             # Giraffe(elevator, wrist, config.Giraffe.kClimbTrap),
-            SetWrist(wrist, -15 * degrees_to_radians),
-            SetElevator(elevator, constants.elevator_max_length - (6 * inches_to_meters)),
+            SetWrist(wrist, -25 * degrees_to_radians),
+            SetElevator(elevator, constants.elevator_max_length - (4 * inches_to_meters)),
             # InstantCommand(lambda: wrist.feed_out())
             ParallelCommandGroup(
                 SetWrist(wrist, 0),
-                SetElevator(elevator, constants.elevator_max_length - (2 * inches_to_meters))
+                SetElevator(elevator, constants.elevator_max_length - (1 * inches_to_meters))
             ).withTimeout(2).andThen(InstantCommand(lambda: wrist.feed_out())),
             # FeedOut(wrist)
         )

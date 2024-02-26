@@ -115,7 +115,7 @@ class OI:
         
         
         Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp).alongWith(
+            command.ClimbDown(Robot.elevator, Robot.wrist).alongWith(
                 commands2.InstantCommand(lambda: climbed())
             )
         )

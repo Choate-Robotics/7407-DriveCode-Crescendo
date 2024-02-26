@@ -160,6 +160,7 @@ elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = .2
 elevator_feed_forward: float = 0.0 
+elevator_climb_ff: float = -1.9
 elevator_moving = False
 elevator_zeroed_pos = 0.035 if comp_bot.get() else 0.023 
 #helloworld
