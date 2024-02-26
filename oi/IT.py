@@ -66,12 +66,12 @@ class IT:
         )
         
         # # if note in feeder, run flywheel and wrist to aim
-        # button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
-        # .onTrue(
-        #     command.AimWrist(Robot.wrist, Field.calculations)#)
-        # ).debounce(.1).onFalse(
-        #     command.SetWrist(Robot.wrist, math.radians(58.5))
-        # )
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
+        .onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations)#)
+        ).debounce(.25).onFalse(
+            command.SetWrist(Robot.wrist, math.radians(58.5))
+        )
         
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
             .onTrue(
