@@ -88,6 +88,11 @@ class OI:
             commands2.InstantCommand(lambda: Robot.wrist.stop_feed())
         )
         
+        def climb_ready():
+            config.ready_to_climb = True
+
+        def climb_not_ready():
+            config.ready_to_climb = False
         
         def start_climbing():
             config.climbing = True
@@ -102,8 +107,9 @@ class OI:
             config.climbed = False
         
         Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
-            commands2.InstantCommand(lambda: start_climbing()).alongWith(
+            commands2.InstantCommand(lambda: climb_ready()).andThen(commands2.InstantCommand(lambda: start_climbing()).alongWith(
             command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
+        )
         )
         )
         

@@ -120,6 +120,7 @@ limelight_led_mode = {
 }
 
 # CLIMBING
+ready_to_climb: bool = False
 climbing: bool = False
 climbed: bool = False
 
