@@ -68,10 +68,20 @@ class IT:
         # # if note in feeder, run flywheel and wrist to aim
         button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
         .and_(lambda: not config.ready_to_climb).onTrue(
-            command.AimWrist(Robot.wrist, Field.calculations)#)
-        ).debounce(.25).onFalse(
-            command.SetWrist(Robot.wrist, math.radians(58.5))
+            WaitCommand(.5).andThen(
+            command.AimWrist(Robot.wrist, Field.calculations))
+        ).onFalse(
+            WaitCommand(.5).andThen(
+            command.SetWrist(Robot.wrist, math.radians(59.5)))
         )
+        
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second())\
+            .onTrue(
+                InstantCommand(lambda: Robot.wrist.set_feed_voltage(config.feeder_voltage_crawl))
+            )\
+            .onFalse(
+                InstantCommand(lambda: Robot.wrist.stop_feed())
+            )
         
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
             .onTrue(

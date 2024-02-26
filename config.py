@@ -241,7 +241,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle:radians = 58 * degrees_to_radians
+staging_angle:radians = 59.5 * degrees_to_radians
 
 
 class Giraffe:
