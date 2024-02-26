@@ -11,8 +11,9 @@ import subsystem
 import utils
 from oi.OI import OI
 from oi.IT import IT
-from wpilib import SmartDashboard, DigitalInput
+from wpilib import SmartDashboard
 from math import degrees, radians, pi
+import time
 
 
 class _Robot(wpilib.TimedRobot):
@@ -48,9 +49,10 @@ class _Robot(wpilib.TimedRobot):
             subsystems: list[Subsystem] = list(
                 {k: v for k, v in Robot.__dict__.items() if isinstance(v, Subsystem) and hasattr(v, 'init')}.values()
             )
-
+            time.sleep(0.75)
             for subsystem in subsystems:
                 subsystem.init()
+                time.sleep(0.2)
 
         # try:
         #     init_subsystems()
