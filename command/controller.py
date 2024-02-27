@@ -420,7 +420,7 @@ class Amp(ParallelCommandGroup):
             WaitCommand(.5),
             SetWrist(wrist, -10 * degrees_to_radians)
             ),
-            SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
+            # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )
             
 

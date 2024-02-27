@@ -49,7 +49,7 @@ class _Robot(wpilib.TimedRobot):
             subsystems: list[Subsystem] = list(
                 {k: v for k, v in Robot.__dict__.items() if isinstance(v, Subsystem) and hasattr(v, 'init')}.values()
             )
-            time.sleep(0.75)
+            time.sleep(0.2)
             for subsystem in subsystems:
                 subsystem.init()
                 time.sleep(0.2)
@@ -178,7 +178,7 @@ class _Robot(wpilib.TimedRobot):
         
 
     def teleopInit(self):
-        # self.log.info("Teleop initialized")
+        self.log.info("Teleop initialized")
         Field.calculations.init()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()

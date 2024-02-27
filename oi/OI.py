@@ -47,24 +47,30 @@ class OI:
             command.IntakeIdle(Robot.intake)
         )
         
-        # Keymap.Elevator.ELEVATOR_HIGH.onTrue(
-        #     # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
-        #     command.EmergencyManuver(Robot.wrist, Robot.intake)
-        # )
+        Keymap.Elevator.ELEVATOR_HIGH.onTrue(
+            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
+            # command.EmergencyManuver(Robot.wrist, Robot.intake)
+            command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)
+        )
         
-        # Keymap.Elevator.ELEVATOR_MID.onTrue(
-        #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
-        # )
+        Keymap.Elevator.ELEVATOR_MID.onTrue(
+            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
+            command.SetElevator(Robot.elevator, config.Giraffe.kElevatorMid.height)
+        )
         
-        # Keymap.Elevator.ELEVATOR_LOW.onTrue(
-        #     command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorLow)
-        # )
+        Keymap.Elevator.ELEVATOR_LOW.onTrue(
+            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorLow)
+            command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
+        )
         
         Keymap.Elevator.AMP.onTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
             command.Amp(Robot.elevator, Robot.wrist, Robot.flywheel)
         ).onFalse(
-            command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
+            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
+            command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
+            command.SetWristIdle(Robot.wrist)
+            )
         )
         
         Keymap.Feeder.DUMP_NOTE.onTrue(

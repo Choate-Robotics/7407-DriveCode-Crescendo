@@ -72,7 +72,7 @@ class IT:
             command.AimWrist(Robot.wrist, Field.calculations))
         ).onFalse(
             WaitCommand(.5).andThen(
-            command.SetWrist(Robot.wrist, math.radians(59.5)))
+            command.SetWristIdle(Robot.wrist))
         )
         
         button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second())\
