@@ -11,7 +11,7 @@ coord = Tuple[meters, meters, radians]
 waypoints = Tuple[meters, meters]
 path = Tuple[coord, waypoints, coord]
 
-initial: coord = (1.9 - drivetrain_length_with_bumpers/2, field_width-5.373, math.pi)
+initial: coord = (0.484, 3.682, -2.101)
 
 leave: path = ( 
     initial,
