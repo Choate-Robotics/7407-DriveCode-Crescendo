@@ -49,7 +49,7 @@ class SetWrist(SubsystemCommand[Wrist]):
         self.angle = angle
 
     def initialize(self):
-        self.subsystem.zero_wrist()
+        # self.subsystem.zero_wrist()
         self.subsystem.set_wrist_angle(self.angle)
         self.subsystem.wrist_moving = True
 
@@ -67,6 +67,35 @@ class SetWrist(SubsystemCommand[Wrist]):
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
 
+
+class SetWristIdle(SubsystemCommand[Wrist]):
+    """
+    Set wrist to given angle.
+    If interrupted, stops wrist where it is.
+    param angle: angle to set wrist to in radians
+    """
+    def __init__(self, subsystem: Wrist):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+
+    def initialize(self):
+        # self.subsystem.zero_wrist()
+        self.subsystem.set_wrist_angle(config.staging_angle)
+        self.subsystem.wrist_moving = True
+
+    def execute(self):
+        pass
+
+    def isFinished(self):
+        return self.subsystem.is_at_angle(config.staging_angle)
+
+    def end(self, interrupted: bool):
+        if interrupted:
+            wrist_angle = self.subsystem.get_wrist_angle()
+            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
+        self.subsystem.wrist_moving = False
+        #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
 
 class AimWrist(SubsystemCommand[Wrist]):
     """
@@ -104,23 +133,28 @@ class AimWrist(SubsystemCommand[Wrist]):
 
 class FeedIn(SubsystemCommand[Wrist]):
     """
-    Feed note into back of feeder
+    Feed note into back of feeder. 
+    Start by going fast, until first beam break sees note, then slow down. 
+    Stop when second beam break sees note.
     """
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
+        self.first_note_detected: bool = False
 
     def initialize(self):
         self.subsystem.feed_in()
 
     def execute(self):
-        voltage = config.feeder_voltage * (
-        (config.feeder_sensor_threshold - self.subsystem.distance_sensor.getVoltage()))
+        if self.subsystem.detect_note_first():
+            self.first_note_detected = True
+
+        voltage = config.feeder_voltage_crawl if self.first_note_detected else config.feeder_voltage_feed
 
         self.subsystem.set_feed_voltage(voltage)
 
     def isFinished(self):
-        return self.subsystem.note_detected()
+        return self.subsystem.detect_note_second()
         # return True
 
     def end(self, interrupted: bool):
@@ -145,10 +179,12 @@ class FeedOut(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.note_staged
+        # return self.subsystem.detect_note_first()
+        return True
 
     def end(self, interrupted: bool):
-        self.subsystem.stop_feed()
+        ...
+        # self.subsystem.stop_feed()
         # if interrupted:
         #     # utils.LocalLogger.debug("Feed out interrupted")
         # else:
@@ -166,8 +202,7 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.note_detected()
-        # need to include beam break
+        return not self.subsystem.detect_note_second() and not self.subsystem.detect_note_second()
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()

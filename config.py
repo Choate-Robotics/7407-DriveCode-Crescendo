@@ -19,7 +19,7 @@ from units.SI import degrees_to_radians, meters, radians, meters_per_second
 from typing import Literal
 
 comp_bot: DigitalInput = DigitalInput(
-    9
+    2
 )  # if true, we are using the practice bot (we will put a jumper on the DIO port)
 
 # from units.SI import (
@@ -51,7 +51,7 @@ LOG_FILE_LEVEL: int = 1
 # anything else will log nothing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-period: float = 0.03  # seconds
+period: float = 0.04  # seconds
 
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
@@ -61,6 +61,11 @@ elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
 
 odometry_debounce: float = 0.1  # TODO: PLACEHOLDER
 stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
+
+
+#STATE VARIABLES -- PLEASE DO NOT CHANGE
+
+
 
 
 # Leds
@@ -114,6 +119,10 @@ limelight_led_mode = {
     "force_on": 3,
 }
 
+# CLIMBING
+ready_to_climb: bool = False
+climbing: bool = False
+climbed: bool = False
 
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
@@ -142,7 +151,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.5
+intake_distance_sensor_threshold: float = 0.3
 
 double_note_timeout = 2
 
@@ -150,46 +159,51 @@ double_note_timeout = 2
 
 elevator_can_id: int = 10
 elevator_can_id_2: int = 15
-elevator_ramp_rate: float = .3
-elevator_max_rotation: float = 1.0  # TODO: PLACEHOLDER
-elevator_auto_position: float = 1.0  # TODO: PLACEHOLDER
-elevator_feed_forward: float = 0.0  # TODO: PLACEHOLDER
+elevator_ramp_rate: float = .2
+elevator_feed_forward: float = 0.0 
+elevator_climb_ff: float = -1.9
 elevator_moving = False
-elevator_zeroed_pos = 0.023  # TODO: PLACEHOLDER: meters
+elevator_zeroed_pos = 0.035 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
+wrist_time_to_max_vel = 0.01
 feed_motor_id = 3
-wrist_flat_ff = -0.58  # TODO: FIND
+feed_motor_ramp_rate = 0
+wrist_flat_ff = -1
 stage_timeout = 5
-wrist_tent_limit = 10 * degrees_to_radians
+wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = .2
-feeder_voltage = 5.6
+feeder_voltage_feed = 8
+feeder_voltage_trap = 14
+feeder_voltage_crawl = 4
 feeder_pass_velocity = .5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = .65
+feeder_beam_break_first_channel = 1
+feeder_beam_break_second_channel = 0
 
 # DRIVETRAIN
 front_left_move_id = 7
 front_left_turn_id = 8
 front_left_encoder_port = AnalogEncoder(3)
-front_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.860
+front_left_encoder_zeroed_pos = 0.467 if comp_bot.get() else 0.860
 
 front_right_move_id = 4
 front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.536 if comp_bot.get() else 0.536
+front_right_encoder_zeroed_pos = 0.790 if comp_bot.get() else 0.536
 
 back_left_move_id = 11
 back_left_turn_id = 14
-back_left_encoder_port = AnalogEncoder(0)
-back_left_encoder_zeroed_pos = 0.458 if comp_bot.get() else 0.458
+back_left_encoder_port = AnalogEncoder(1 if comp_bot.get() else 0)
+back_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.458
 
 back_right_move_id = 18
 back_right_turn_id = 16
-back_right_encoder_port = AnalogEncoder(1)
-back_right_encoder_zeroed_pos = 0.984 if comp_bot.get() else 0.984
+back_right_encoder_port = AnalogEncoder(0 if comp_bot.get() else 1)
+back_right_encoder_zeroed_pos = 0.727 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
@@ -197,26 +211,26 @@ drivetrain_reversed: bool = False
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
-flywheel_amp_speed: meters = 5
-v0_flywheel: meters_per_second = 22  # TODO: placeholder
+flywheel_amp_speed: meters = 15
+v0_flywheel: meters_per_second = 18
+idle_flywheel: meters_per_second = v0_flywheel / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = 0.2
+flywheel_shot_tolerance: meters_per_second = 1
 flywheel_shot_current_threshold = 20
 auto_shoot_deadline = 1
 # Configs 
-# TODO: PLACEHOLDER
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.2, 0.0, 0.02, elevator_feed_forward, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.3, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
-WRIST_CONFIG = SparkMaxConfig(0.09, 0, 0.002, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.55, 0, 0.002, 0, (-.75, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kCoast
 )
 
 TURN_CONFIG = SparkMaxConfig(
@@ -228,7 +242,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle:radians = 57.5 * degrees_to_radians
+staging_angle:radians = 59.5 * degrees_to_radians
 
 
 class Giraffe:
@@ -248,21 +262,21 @@ class Giraffe:
 
     kStage = GiraffePos(0, GiraffePos.Special.kStage)
 
-    kAim = GiraffePos(GiraffePos.Special.kHeightAuto, GiraffePos.Special.kAim)
+    kAim = GiraffePos(GiraffePos.Special.kCurrentAngle, GiraffePos.Special.kAim)
 
     kAimLow = GiraffePos(0, GiraffePos.Special.kAim)
 
     kAimHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kAim)
 
-    kClimbReach = GiraffePos(constants.elevator_max_length, 0)
+    kClimbReach = GiraffePos(constants.elevator_max_length, 10*degrees_to_radians)
 
-    kClimbPullUp = GiraffePos(0, 0)
+    kClimbPullUp = GiraffePos(0, 50*degrees_to_radians)
 
     kTestFF = GiraffePos(0, 20 * degrees_to_radians)
 
-    kClimbTrap = GiraffePos(constants.elevator_max_length, 20 * degrees_to_radians)
+    kClimbTrap = GiraffePos(constants.elevator_max_length, 30 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.2325, -26 * degrees_to_radians)
+    kAmp = GiraffePos(0.27, 0 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
 

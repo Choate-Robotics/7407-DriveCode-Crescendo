@@ -35,6 +35,7 @@ class Elevator(Subsystem):
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
 
         self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+        self.motor_extend_follower.motor.burnFlash()
 
         # Limits motor acceleration
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
@@ -60,11 +61,11 @@ class Elevator(Subsystem):
             return 0.0
         return length
 
-    def set_length(self, length: meters) -> None:
+    def set_length(self, length: meters, arbff: float = 0) -> None:
         """
         Sets the length of the elevator in meters
         :param length: Length of the elevator (meters)
-
+        :param arbff: feed forward for the elevator
         """
         length = self.limit_length(length)
         self.target_length = length
@@ -73,7 +74,7 @@ class Elevator(Subsystem):
         print(self.length_to_rotations(length), 'elevator rotation')
 
         self.motor_extend.set_target_position(
-            self.length_to_rotations(length)
+            self.length_to_rotations(length), arbff
         )
 
     def get_length(self) -> float:

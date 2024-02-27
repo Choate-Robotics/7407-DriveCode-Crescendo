@@ -51,17 +51,22 @@ class Keymap:
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.X
         )
     class Intake:
-        # INTAKE_IN = commands2.button.Trigger(
-        #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
-        # )
-        
         INTAKE_IN = commands2.button.Trigger(
-            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.5
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
         )
+        
+        # INTAKE_IN = commands2.button.Trigger(
+        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.5
+        # )
         
         INTAKE_OUT = commands2.button.Trigger(
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
         )
+        
+        CLEAR_NOTE = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 180
+        )
+        
     class Shooter:
         ...
         AIM = commands2.button.Trigger(
@@ -80,8 +85,14 @@ class Keymap:
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.LB
         )
         
-        CLEAR_NOTE = commands2.button.JoystickButton(
+        DUMP_NOTE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+        )
+        
+        # CLEAR_NOTE =
+        
+        FEED_NOTE_FLYWHEEL = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.5
         )
         
         # UNJAM =
@@ -94,6 +105,10 @@ class Keymap:
         
         CLIMB_DOWN = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+        
+        TRAP =  commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 0
         )
         
         # UNDO_CLIMB_UP = commands2.button.JoystickButton(

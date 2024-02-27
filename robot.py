@@ -14,7 +14,8 @@ from oi.IT import IT
 from wpilib import SmartDashboard
 import autonomous
 import math
-from math import degrees, radians
+from math import degrees, radians, pi
+import time
 
 
 class _Robot(wpilib.TimedRobot):
@@ -61,9 +62,10 @@ class _Robot(wpilib.TimedRobot):
             subsystems: list[Subsystem] = list(
                 {k: v for k, v in Robot.__dict__.items() if isinstance(v, Subsystem) and hasattr(v, 'init')}.values()
             )
-
+            time.sleep(0.2)
             for subsystem in subsystems:
                 subsystem.init()
+                time.sleep(0.2)
 
         # try:
         #     init_subsystems()
@@ -108,6 +110,7 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.log.complete("Robot initialized")
+        
 
     def robotPeriodic(self):
         
@@ -170,13 +173,25 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Field.calculations.update)
 
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
-
+        if not self.isSimulation():
+            self.nt.getTable('swerve').putBoolean('comp bot', config.comp_bot.get())
+            
+        self.nt.getTable('swerve').putNumber('abs front right', Robot.drivetrain.get_abs()[1])
+        self.nt.getTable('swerve').putNumber('front right rotation', Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi))
+        self.nt.getTable('swerve').putNumber('front right rotation error', (Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi)) - Robot.drivetrain.get_abs()[1])
+        
+        
+        # print(config.elevator_zeroed_pos)
         # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
+        # print(DigitalInput(0).get())
+        
+        self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
+        self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
         
 
     def teleopInit(self):
-        # self.log.info("Teleop initialized")
+        self.log.info("Teleop initialized")
         Field.calculations.init()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
@@ -186,23 +201,19 @@ class _Robot(wpilib.TimedRobot):
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
-        # self.scheduler.schedule(
-        #     command.FeedIn(Robot.wrist).andThen(
-
-        #     commands2.ParallelCommandGroup(
-        #         command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow),
-        #         # command.AimWrist(Robot.wrist, Field.calculations),
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, 27),
-        #     )
-        #     )
-        # )
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
+        # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
+        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3)).andThen(command.SetWrist(Robot.wrist, radians(55))))
+        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(-20)))
+        
+        # self.scheduler.schedule()
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
+        # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length).andThen(command.SetElevator(Robot.elevator, 0)))
 
     def teleopPeriodic(self):
         pass

@@ -39,6 +39,7 @@ miles_to_inches = miles_to_meters * meters_to_inches
 miles_to_feet = miles_to_meters * meters_to_feet
 miles_to_yards = miles_to_meters * meters_to_yards
 
+
 # Rotation
 rotations = float
 rotations_to_degrees = 360
@@ -95,3 +96,12 @@ rotations_per_minute_per_second = float
 
 miles_per_hour = float
 miles_per_hour_to_meters_per_second: float = miles_to_meters * hours_to_seconds
+
+
+# Weight
+pounds = float
+pounds_to_kilograms = 0.453592
+
+kilograms = float
+kilograms_to_pounds = 1 / pounds_to_kilograms
+

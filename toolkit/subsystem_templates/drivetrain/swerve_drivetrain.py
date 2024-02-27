@@ -242,7 +242,7 @@ class SwerveDrivetrain(Subsystem):
             self.n_back_right.get_node_state()
         )
 
-    def set_driver_centric(self, vel: (meters_per_second, meters_per_second), angular_vel: radians_per_second):
+    def set_driver_centric(self, vel: tuple[meters_per_second, meters_per_second], angular_vel: radians_per_second):
         """
         Set the driver centric velocity and angular velocity. Driver centric runs with perspective of driver.
 
@@ -258,7 +258,7 @@ class SwerveDrivetrain(Subsystem):
 
         self.set_robot_centric(vel, angular_vel)
 
-    def set_robot_centric(self, vel: (meters_per_second, meters_per_second), angular_vel: radians_per_second):
+    def set_robot_centric(self, vel: tuple[meters_per_second, meters_per_second], angular_vel: radians_per_second):
         """
         Set the robot centric velocity and angular velocity. Robot centric runs with perspective of robot.
         Args:
@@ -278,10 +278,8 @@ class SwerveDrivetrain(Subsystem):
 
         new_states = self.kinematics.toSwerveModuleStates(self.chassis_speeds)
         normalized_states = self.kinematics.desaturateWheelSpeeds(new_states, self.max_vel)
-
         # normalized_states = new_states
         fl, fr, bl, br = normalized_states
-
         self.n_front_left.set(fl.speed, fl.angle.radians())
         self.n_front_right.set(fr.speed, fr.angle.radians())
         self.n_back_left.set(bl.speed, bl.angle.radians())
@@ -300,6 +298,9 @@ class SwerveDrivetrain(Subsystem):
         # )
 
         # self.chassis_speeds = self.kinematics.toChassisSpeeds(*self.node_states)
+
+    def periodic(self):
+        pass
 
     def stop(self):
         """
@@ -336,10 +337,11 @@ class SwerveDrivetrain(Subsystem):
             pose=pose,
             modulePositions=self.node_positions
         )
+        
 
     @staticmethod
     def _calculate_swerve_node(node_x: meters, node_y: meters, dx: meters_per_second, dy: meters_per_second,
-                               d_theta: radians_per_second) -> (meters_per_second, radians):
+                               d_theta: radians_per_second) -> tuple[meters_per_second, radians]:
         tangent_x, tangent_y = -node_y, node_x
         tangent_m = math.sqrt(tangent_x ** 2 + tangent_y ** 2)
         tangent_x /= tangent_m

@@ -27,7 +27,7 @@ class LEDs:
 
 
 class PowerDistribution:
-    pass
+    pd = wpilib.PowerDistribution(30, wpilib.PowerDistribution.ModuleType.kRev)
 
 
 class Field:

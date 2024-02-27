@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import config
 import constants
+import ntcore
 
 from dataclasses import dataclass
 from wpilib import AnalogEncoder
@@ -62,6 +63,8 @@ class CustomSwerveNode(SwerveNode):
             encoder_difference += 1
 
         motor_change = encoder_difference * constants.drivetrain_turn_gear_ratio
+        
+        ntcore.NetworkTableInstance.getDefault().getTable('swerve').putNumber('where the motor thinks it should be', motor_change)
 
         self.m_turn.set_sensor_position(motor_change)
 
@@ -161,8 +164,9 @@ class Drivetrain(SwerveDrivetrain):
         self.n_back_right.set_motor_angle(math.radians(-45))
 
     def get_abs(self):
-        fl = self.n_front_left.get_abs()
-        fr = self.n_front_right.get_abs()
-        bl = self.n_back_left.get_abs()
-        br = self.n_back_right.get_abs()
+        fl = self.n_front_left.get_abs() #0.467
+        fr = self.n_front_right.get_abs() #0.060
+        bl = self.n_back_left.get_abs() #0.727
+        br = self.n_back_right.get_abs() #0.860
         return [fl, fr, bl, br]
+    

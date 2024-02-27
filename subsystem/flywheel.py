@@ -29,9 +29,13 @@ class Flywheel(Subsystem):
         )
 
         self.flywheel_MOI = (constants.flywheel_mass / 2) * (constants.flywheel_radius_outer ** 2)
+        
+        self.shaft_MOI = (constants.flywheel_shaft_mass / 2) * (constants.flywheel_shaft_radius ** 2)
+        
+        self.total_MOI = self.flywheel_MOI + self.shaft_MOI
 
         self.flywheel_plant = LinearSystemId().flywheelSystem(
-            DCMotor.NEO(config.flywheel_motor_count), self.flywheel_MOI, constants.flywheel_gear_ratio
+            DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
         )
         self.flywheel_observer = KalmanFilter_1_1_1(
             self.flywheel_plant,
@@ -42,7 +46,7 @@ class Flywheel(Subsystem):
         self.flywheel_controller = LinearQuadraticRegulator_1_1(
             self.flywheel_plant,
             [4.0],  # velocity error tolerance
-            [6.0],  # control effort tolerance
+            [12.0],  # control effort tolerance
             config.period
         )
         self.flywheel_controller.latencyCompensate(self.flywheel_plant, config.period, 0.025)
@@ -91,6 +95,13 @@ class Flywheel(Subsystem):
     def init(self) -> None:
         self.motor_1.init()
         self.motor_2.init()
+        self.motor_1.motor.setSmartCurrentLimit(200)
+        self.motor_2.motor.setSmartCurrentLimit(200)
+        
+        self.motor_1.motor.setOpenLoopRampRate(2)
+        self.motor_2.motor.setOpenLoopRampRate(2)
+        self.motor_2.motor.burnFlash()
+        self.motor_1.motor.burnFlash()
 
         self.initialized = True
 
@@ -205,7 +216,7 @@ class Flywheel(Subsystem):
         self.top_flywheel_state.predict(config.period)
         self.bottom_flywheel_state.predict(config.period)
 
-        # Set the next setpoint for the flywheel
+        # # Set the next setpoint for the flywheel
         self.set_voltage(self.top_flywheel_state.U(0), 1)
         self.set_voltage(self.bottom_flywheel_state.U(0), 2)
 
@@ -219,9 +230,11 @@ class Flywheel(Subsystem):
         table.putNumber('flywheel bottom velocity', self.get_velocity_linear(2))
         table.putBoolean('ready to shoot', self.ready_to_shoot)
         table.putBoolean('note shot', self.note_shot())
-        table.putBoolean('flywheel top target', self.top_flywheel_state.nextR(0))
-        table.putBoolean('flywheel bottom target', self.bottom_flywheel_state.nextR(0))
+        table.putNumber('flywheel top target', self.angular_velocity_to_linear_velocity(self.top_flywheel_state.nextR(0)))
+        table.putNumber('flywheel bottom target', self.angular_velocity_to_linear_velocity(self.bottom_flywheel_state.nextR(0)))
         table.putNumber('flywheel top voltage', self.get_voltage(1))
         table.putNumber('flywheel bottom voltage', self.get_voltage(2))
         table.putNumber('flywheel top current', self.get_current(1))
         table.putNumber('flywheel bottom current', self.get_current(2))
+        table.putNumber('flywheel top bus voltage', self.motor_1.motor.getBusVoltage())
+        table.putNumber('flywheel bottom bus voltage', self.motor_2.motor.getBusVoltage())

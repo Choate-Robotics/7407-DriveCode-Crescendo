@@ -9,7 +9,7 @@ from wpimath.geometry import Pose2d, Rotation2d
 from commands2 import WaitUntilCommand, WaitCommand, ParallelCommandGroup, SequentialCommandGroup, InstantCommand, \
     PrintCommand, ParallelDeadlineGroup, RunCommand, ParallelRaceGroup
 from typing import Literal
-from units.SI import degrees_to_radians
+from units.SI import degrees_to_radians, inches_to_meters
 
 
 class Giraffe(commands2.Command):
@@ -247,7 +247,7 @@ class StageNote(SequentialCommandGroup):
         SequentialCommandGroup (intake): Intake subsystem
     """
 
-    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
+    def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
 
             ParallelCommandGroup(
@@ -255,11 +255,24 @@ class StageNote(SequentialCommandGroup):
                 # Giraffe(elevator, wrist, config.Giraffe.kStage),
                 PassIntakeNote(intake),
             ),
-            WaitUntilCommand(lambda: wrist.note_detected()),
             IntakeIdle(intake),
-            # SetWrist(wrist, 20 * degrees_to_radians)
-            AimWrist(wrist, traj_cal)
-            # Giraffe(elevator, wrist, config.Giraffe.kAimLow, traj_cal),
+        )
+        
+class IntakeStageNote(ParallelRaceGroup):
+    
+    def __init__(self, wrist: Wrist, intake: Intake):
+        super().__init__(
+            RunIntakeConstant(intake),
+            FeedIn(wrist)
+        )
+    
+    
+class IntakeStageIdle(SequentialCommandGroup):
+    
+    def __init__(self, wrist: Wrist, intake: Intake):
+        super().__init__(
+            IntakeIdle(intake),
+            InstantCommand(lambda: wrist.stop_feed())
         )
 
 
@@ -319,12 +332,10 @@ class Shoot(SequentialCommandGroup):
         SequentialCommandGroup (flywheel): Flywheel subsystem
     """
 
-    def __init__(self, wrist: Wrist, flywheel: Flywheel):
+    def __init__(self, wrist: Wrist):
         super().__init__(
-            ParallelRaceGroup(
-                PassNote(wrist),
-                WaitUntilCommand(flywheel.note_shot)
-            )
+            PassNote(wrist),
+            InstantCommand(lambda: wrist.set_note_not_staged())
         )
 
 
@@ -361,27 +372,33 @@ class ShootAmp(SequentialCommandGroup):
                 SetFlywheelLinearVelocity(flywheel, config.flywheel_amp_speed),
                 Giraffe(elevator, wrist, config.Giraffe.kAmp),
                 PrintCommand('Lock Drivetrain with amp')
-            ),
-            WaitUntilCommand(
-                lambda: not elevator.elevator_moving and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
+            ).until(
+                lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
             PassNote(wrist),
         )
 
 
-class EnableClimb(ParallelCommandGroup):
+class EnableClimb(SequentialCommandGroup):
     """
     Raises the elevator and wrist and deploys tenting to prepare for climb
     """
 
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
-            Giraffe(elevator, wrist, config.Giraffe.kClimbReach),
-            SequentialCommandGroup(
-                WaitUntilCommand(lambda: wrist.get_wrist_angle() < config.wrist_tent_limit),
-                DeployTenting(intake)
-            )
+            ParallelCommandGroup(
+                SetElevator(elevator, config.Giraffe.kClimbReach.height),
+                SetWrist(wrist, 30*degrees_to_radians)
+            ),
+            DeployTenting(intake)
+        
         )
 
+class ClimbDown(ParallelCommandGroup):
+    def __init__(self, elevator: Elevator, wrist: Wrist):
+        super().__init__(
+            SetElevatorClimbDown(elevator),
+            SetWrist(wrist, config.Giraffe.kClimbPullUp.wrist_angle)
+        )
 
 class UndoClimb(ParallelCommandGroup):
     """
@@ -392,4 +409,52 @@ class UndoClimb(ParallelCommandGroup):
         super().__init__(
             UnDeployTenting(intake),
             Giraffe(elevator, wrist, config.Giraffe.kElevatorLow),
+        )
+
+
+class ScoreTrap(SequentialCommandGroup):
+    """
+    Raises elevator and then feeds note out to score in trap
+    """
+    def __init__(self, elevator: Elevator, wrist: Wrist):
+        super().__init__(
+            # Giraffe(elevator, wrist, config.Giraffe.kClimbTrap),
+            SetWrist(wrist, -25 * degrees_to_radians),
+            SetElevator(elevator, constants.elevator_max_length - (4 * inches_to_meters)),
+            # InstantCommand(lambda: wrist.feed_out())
+            ParallelCommandGroup(
+                SetWrist(wrist, 0),
+                SetElevator(elevator, constants.elevator_max_length - (1 * inches_to_meters))
+            ).withTimeout(2).andThen(InstantCommand(lambda: wrist.feed_out())),
+            # FeedOut(wrist)
+        )
+
+
+class Amp(ParallelCommandGroup):
+    
+    def __init__(self, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
+        super().__init__(
+            SequentialCommandGroup(
+            ParallelCommandGroup(
+                SetElevator(elevator, config.Giraffe.kAmp.height),
+                SetWrist(wrist, 0)
+            ),
+            WaitCommand(.5),
+            SetWrist(wrist, -10 * degrees_to_radians)
+            ),
+            # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
+        )
+            
+
+class EmergencyManuver(SequentialCommandGroup):
+    
+    def __init__(self, wrist:Wrist, intake: Intake):
+        super().__init__(
+            ParallelCommandGroup(
+                PassIntakeNote(intake),
+                SetWrist(wrist, -10 * degrees_to_radians)
+            ),
+            DeployTenting(intake),
+            UnDeployTenting(intake),
+            SetWrist(wrist, config.staging_angle)
         )

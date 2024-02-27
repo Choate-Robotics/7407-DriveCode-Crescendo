@@ -1,13 +1,3 @@
-# c = drag coefficient
-# a = projectile sectional area (m^2)
-# m = projectile mass (kg)
-# rho_air = air density (kg/m^3)
-# g = acceleration due to gravity (m/s^2)
-# v0 = initial velocity of shooter flywheel (m/s) config
-# delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
-# y = height of target (COULD BE IN ODOMETRY) (m) const
-# tol = tolerance of error in distance to target (m)
-
 # Imports
 import math
 from wpimath.geometry import Rotation2d, Translation2d
@@ -18,14 +8,23 @@ from units.SI import (
     meters,
     rotations_per_minute,
     degrees_to_radians,
+    meters_per_second_squared,
+    kilograms
 )
 
 # Main
+
+
+# c = drag coefficient
+# a = projectile sectional area (m^2)
+# m = projectile mass (kg)
+# rho_air = air density (kg/m^3)
+# g = acceleration due to gravity (m/s^2)
 c = 0.47  # drag coefficient
 a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
-m = 0.235301  # projectile mass (kg)
+m:kilograms = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
-g = 9.8  # acceleration due to gravity (m/s^2)
+g:meters_per_second_squared = 9.8  # acceleration due to gravity (m/s^2)
 
 # Drivetrain
 drivetrain_turn_gear_ratio = 150 / 7
@@ -34,11 +33,11 @@ track_width = 20 * inches_to_meters  # TODO: change to 20 inches for actual robo
 drivetrain_length = 25 * inches_to_meters
 bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
-drivetrain_max_vel = 80 * feet_to_meters
+drivetrain_max_vel = 30 * feet_to_meters
 drivetrain_max_accel = 5 * feet_to_meters
 drivetrain_max_angular_vel = 1000 * degrees_per_second__to__radians_per_second
 drivetrain_move_motor_free_speed: rotations_per_minute = (
-    6300  # 5676 is the free speed RPM of the NEO
+    6000  # 5676 is the free speed RPM of the NEO
 )
 drivetrain_wheel_diameter: meters = (
         4 * inches_to_meters
@@ -126,13 +125,13 @@ class FieldPos:
 
 
 # Elevator
-elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio
-elevator_driver_gear_circumference: float = (
+elevator_gear_ratio: float = 25 / 2  # REAL VALUE: 25:1 gear ratio, divide by 2 to get top stage
+elevator_driver_gear_circumference: meters = (
         math.pi * 1.79 * inches_to_meters
 )  # REAL VALUE: Meters
-elevator_max_length: float = 21.653 * inches_to_meters  # REAL VALUE: Meters
+elevator_max_length: meters = 21.653 * inches_to_meters  # REAL VALUE: Meters
 elevator_bottom_total_height: meters = 26.25 * inches_to_meters
-elevator_max_length_stage: float = 0 * inches_to_meters
+elevator_max_length_stage: meters = 0 * inches_to_meters
 
 # INTAKE
 intake_inner_gear_ratio = 36 / 11  #REAL VALUE: 36:11 gear ratio
@@ -151,17 +150,18 @@ limelight_back_yaw = 180 * degrees_to_radians
 
 # WRIST
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
-wrist_time_to_max_vel = 0.0  #TODO: placeholder
+
 
 # Flywheel
-flywheel_mass = 1.3 + .127  # kilograms
-flywheel_radius_outer = 2 * 0.0254
-flywheel_gear_ratio = 1
-flywheel_period = .03
-shooter_height = 21 * inches_to_meters
-shooter_offset_y = 6 * inches_to_meters
+flywheel_mass = 1.3 # kilograms
+flywheel_shaft_mass = .127  # kilograms
+flywheel_radius_outer = 2 * inches_to_meters
+flywheel_shaft_radius = 0.5 * inches_to_meters
+flywheel_gear_ratio = 1 / 1 #REAL VALUE: 1:1 gear ratio
+shooter_height = 21 * inches_to_meters # REAL VALUE: Meters
+shooter_offset_y = 6 * inches_to_meters # REAL VALUE: Meters
 
-wrist_max_rotation = 58 * degrees_to_radians
+wrist_max_rotation = 59 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
 wrist_min_rotation_stage = 22 * degrees_to_radians
 
