@@ -1,13 +1,7 @@
 import config
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from command import (
-    ZeroWrist,
-    ZeroElevator,
-    ShootAuto,
-    DeployIntake,
-    RunIntake
-)
+from command import *
 
 from robot_systems import Robot, Field
 from utils import POIPose
@@ -121,70 +115,73 @@ auto = SequentialCommandGroup(
     ZeroWrist(Robot.wrist),
     ZeroElevator(Robot.elevator),
 
-    # Shoot first note
-    ParallelCommandGroup(
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        DeployIntake(Robot.intake)
-    ),
+    ParallelCommandGroup (
+        SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+        # Shoot first note
+        ParallelCommandGroup(
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            DeployIntake(Robot.intake)
+        ),
 
-    # Get second note
-    ParallelCommandGroup(
-        path_1,
-        RunIntake(Robot.intake)
-    ),
+        # Get second note
+        ParallelCommandGroup(
+            path_1,
+            RunIntake(Robot.intake)
+        ),
 
-    # Shoot second note
-    ShootAuto(
-        Robot.drivetrain,
-        Robot.wrist,
-        Robot.flywheel,
-        Field.calculations
-    ),
+        # Shoot second note
+        ShootAuto(
+            Robot.drivetrain,
+            Robot.wrist,
+            Robot.flywheel,
+            Field.calculations
+        ),
 
-    # Get third note
-    ParallelCommandGroup(
-        path_2,
-        RunIntake(Robot.intake)
-    ),
+        # Get third note
+        ParallelCommandGroup(
+            path_2,
+            RunIntake(Robot.intake)
+        ),
 
-    # Shoot third note
-    ShootAuto(
-        Robot.drivetrain,
-        Robot.wrist,
-        Robot.flywheel,
-        Field.calculations
-    ),
+        # Shoot third note
+        ShootAuto(
+            Robot.drivetrain,
+            Robot.wrist,
+            Robot.flywheel,
+            Field.calculations
+        ),
 
-    # Get fourth note
-    ParallelCommandGroup(
-        path_3,
-        RunIntake(Robot.intake)
-    ),
+        # Get fourth note
+        ParallelCommandGroup(
+            path_3,
+            RunIntake(Robot.intake)
+        ),
 
-    # Go to midline to shoot fourth note
-    path_4,
+        # Go to midline to shoot fourth note
+        path_4,
 
-    # Shoot fourth note
-    ShootAuto(
-        Robot.drivetrain,
-        Robot.wrist,
-        Robot.flywheel,
-        Field.calculations
-    ),
+        # Shoot fourth note
+        ShootAuto(
+            Robot.drivetrain,
+            Robot.wrist,
+            Robot.flywheel,
+            Field.calculations
+        ),
 
-    # Get fifth note
-    ParallelCommandGroup(
-        path_5,
-        RunIntake(Robot.intake)
-    ),
+        # Get fifth note
+        ParallelCommandGroup(
+            path_5,
+            RunIntake(Robot.intake)
+        ),
 
-    path_6,
+        path_6,
 
-    ShootAuto(
-        Robot.drivetrain,
-        Robot.wrist,
-        Robot.flywheel,
-        Field.calculations
+        ShootAuto(
+            Robot.drivetrain,
+            Robot.wrist,
+            Robot.flywheel,
+            Field.calculations
+        )
     )
 )
 
