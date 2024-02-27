@@ -52,6 +52,7 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Five Notes", autonomous.five_note)
         self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
+        self.auto_selection.addOption("Speaker Shoot Leave", autonomous.speaker_shoot_leave)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 

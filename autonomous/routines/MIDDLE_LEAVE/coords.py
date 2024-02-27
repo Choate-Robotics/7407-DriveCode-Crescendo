@@ -16,6 +16,6 @@ initial: coord = (1.219, 2.543, math.pi)
 leave: path = ( 
     initial,
     [],
-    (initial[0]+1.7, initial[1], math.pi),
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, -.7)),
 )
 
