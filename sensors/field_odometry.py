@@ -210,6 +210,10 @@ class FieldOdometry:
             est_pose.translation().Y(),
             est_pose.rotation().radians()
         ])
+        
+        self.table.putNumber('Estimated Rotation',
+                             est_pose.rotation().degrees()
+                             )
 
         n_states = self.drivetrain.node_states
 
@@ -234,6 +238,10 @@ class FieldOdometry:
         self.table.putNumberArray('standard deviation',[
             *self.std_dev
         ])
+        
+        self.table.putBoolean('drivetrain ready to shoot',
+                              self.drivetrain.ready_to_shoot
+                              )
 
         self.table.putBoolean('ready to shoot', self.drivetrain.ready_to_shoot)
 
