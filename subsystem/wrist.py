@@ -84,7 +84,7 @@ class Wrist(Subsystem):
 
         current_angle = self.get_wrist_angle()
 
-        ff = config.wrist_flat_ff * math.cos(angle)  #* (1 if angle < current_angle else -1)
+        ff = config.wrist_flat_ff * math.cos(angle) #* (1 if angle < current_angle else -1)
 
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
@@ -156,7 +156,7 @@ class Wrist(Subsystem):
         if not self.feed_disabled:
             # self.feed_motor.set_target_velocity(-(config.feeder_velocity))
             # self.feed_motor.set_raw_output(-(config.feeder_velocity))
-            self.feed_motor.set_target_voltage(-config.feeder_voltage_feed)
+            self.feed_motor.set_target_voltage(-config.feeder_voltage_trap)
 
     def stop_feed(self):
         # self.feed_motor.set_target_position(self.feed_motor.get_sensor_position())
@@ -204,3 +204,4 @@ class Wrist(Subsystem):
         table.putNumber('target angle raw', self.radians_to_abs(self.target_angle))
         table.putBoolean('wrist moving', self.wrist_moving)
         table.putNumber('wrist current', self.wrist_motor.motor.getOutputCurrent())
+        table.putNumber('wrist applied output', self.wrist_motor.motor.getAppliedOutput())

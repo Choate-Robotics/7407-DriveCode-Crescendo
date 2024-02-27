@@ -40,7 +40,7 @@ def test_wrist_set_wrist_angle(test_input, disabled, wrist: Wrist):
         wrist.wrist_motor.set_target_position.assert_not_called()
     else:
         wrist.wrist_motor.set_target_position.assert_called_with(
-            wrist.radians_to_abs(wrist.limit_angle(test_input)),
+            (wrist.limit_angle(test_input) / (2 * pi)) * constants.wrist_gear_ratio,
             config.wrist_flat_ff * math.cos(test_input),
         )
 
@@ -119,4 +119,4 @@ def test_feed_out(test_input, wrist: Wrist):
     if test_input:
         wrist.feed_motor.set_target_voltage.assert_not_called()
     else:
-        wrist.feed_motor.set_target_voltage.assert_called_with(-config.feeder_voltage_feed)
+        wrist.feed_motor.set_target_voltage.assert_called_with(-config.feeder_voltage_trap)

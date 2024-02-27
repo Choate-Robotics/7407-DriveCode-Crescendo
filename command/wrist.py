@@ -67,6 +67,35 @@ class SetWrist(SubsystemCommand[Wrist]):
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
 
 
+class SetWristIdle(SubsystemCommand[Wrist]):
+    """
+    Set wrist to given angle.
+    If interrupted, stops wrist where it is.
+    param angle: angle to set wrist to in radians
+    """
+    def __init__(self, subsystem: Wrist):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+
+    def initialize(self):
+        # self.subsystem.zero_wrist()
+        self.subsystem.set_wrist_angle(config.staging_angle)
+        self.subsystem.wrist_moving = True
+
+    def execute(self):
+        pass
+
+    def isFinished(self):
+        return self.subsystem.is_at_angle(config.staging_angle)
+
+    def end(self, interrupted: bool):
+        if interrupted:
+            wrist_angle = self.subsystem.get_wrist_angle()
+            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
+        self.subsystem.wrist_moving = False
+        #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
+
 class AimWrist(SubsystemCommand[Wrist]):
     """
     Aims wrist to angle according to shooter calculations
@@ -149,10 +178,12 @@ class FeedOut(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.detect_note_first()
+        # return self.subsystem.detect_note_first()
+        return True
 
     def end(self, interrupted: bool):
-        self.subsystem.stop_feed()
+        ...
+        # self.subsystem.stop_feed()
         # if interrupted:
         #     # utils.LocalLogger.debug("Feed out interrupted")
         # else:
@@ -170,12 +201,10 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.note_detected()
+        return not self.subsystem.detect_note_second() and not self.subsystem.detect_note_second()
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()
-        if not interrupted:
-            self.subsystem.note_staged = False
         # if interrupted:
         #     ...
         #     # utils.LocalLogger.debug("Note transfer interrupted")

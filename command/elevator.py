@@ -1,5 +1,5 @@
 import utils
-import constants
+import constants, config
 
 from toolkit.command import SubsystemCommand
 from subsystem import Elevator
@@ -51,7 +51,7 @@ class SetElevator(SubsystemCommand[Elevator]):
 
     def isFinished(self):
         # Rounding to make sure it's not too precise (will cause err)
-        return round(self.subsystem.get_length(), 3) == round(self.length, 3)
+        return round(self.subsystem.get_length(), 2) == round(self.length, 2)
     
     def end(self, interrupted: bool):
         if interrupted:
@@ -64,3 +64,34 @@ class SetElevator(SubsystemCommand[Elevator]):
         self.elevator_moving = False
         
     
+    
+class SetElevatorClimbDown(SubsystemCommand[Elevator]):
+    """
+    Climb down with feed forward
+    """
+    def __init__(self, subsystem: Elevator):
+        super().__init__(subsystem)
+        self.elevator_moving: bool = False
+
+    def initialize(self):
+
+        self.subsystem.set_length(0, config.elevator_climb_ff)
+        self.elevator_moving = True
+
+    def execute(self):
+        pass
+
+    def isFinished(self):
+        # Rounding to make sure it's not too precise (will cause err)
+        return round(self.subsystem.get_length(), 2) == 0
+    
+    def end(self, interrupted: bool):
+        if interrupted:
+            # utils.LocalLogger.debug("Ending elevator", "SetElevator")
+            self.subsystem.stop()
+        else:
+            ...
+            # utils.LocalLogger.debug("Elevator length: " + str(self.subsystem.get_length()), "SetElevator")
+
+        self.elevator_moving = False
+        

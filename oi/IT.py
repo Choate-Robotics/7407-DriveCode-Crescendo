@@ -9,6 +9,7 @@ import config, math
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
 from utils import LocalLogger
+from oi.keymap import Controllers
 
 
 from robot_systems import Robot, Sensors, Field
@@ -42,42 +43,85 @@ class IT:
         #     )
         
         # # if note in intake and index ready to receive, pass note to index
+        button.Trigger(lambda: Robot.intake.detect_note()).debounce(0).onTrue(
+            InstantCommand(lambda: Robot.intake.add_note())
+        ).onFalse(
+            InstantCommand(lambda: Robot.intake.remove_note())
+        )
+        
+        
         button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
-        .debounce(config.intake_sensor_debounce).onTrue(
-            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake, Field.calculations)
+        .onTrue(
+            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
         )
         #INTAKE TRIGGERS ----------------
         
         
         #FEEDER TRIGGERS ----------------
+        
+        button.Trigger(lambda: Robot.wrist.note_detected()).onTrue(
+            InstantCommand(lambda: Robot.wrist.set_note_staged())
+        ).onFalse(
+            InstantCommand(lambda: Robot.wrist.set_note_not_staged())
+        )
+        
         # # if note in feeder, run flywheel and wrist to aim
-        # button.Trigger(lambda: Robot.wrist.note_staged)\
-        # .debounce(config.intake_sensor_debounce).onTrue(
-        #     command.AimWristSpeaker(Field.calculations, Robot.elevator, Robot.wrist, Robot.flywheel)
-        # )
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
+        .and_(lambda: not config.ready_to_climb).onTrue(
+            WaitCommand(.5).andThen(
+            command.AimWrist(Robot.wrist, Field.calculations))
+        ).onFalse(
+            WaitCommand(.5).andThen(
+            command.SetWristIdle(Robot.wrist))
+        )
+        
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second())\
+            .onTrue(
+                InstantCommand(lambda: Robot.wrist.set_feed_voltage(config.feeder_voltage_crawl))
+            )\
+            .onFalse(
+                InstantCommand(lambda: Robot.wrist.stop_feed())
+            )
+        
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
+            .onTrue(
+                InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
+                    Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
+                    1
+                ))
+            ).onFalse(
+                InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
+                    Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
+                    0
+                ))
+            )
+            
+        button.Trigger(lambda: Robot.wrist.note_staged)\
+            .onTrue(
+                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                    1
+                ))
+            ).onFalse(
+                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                    0
+                ))
+            )
         #FEEDER TRIGGERS ----------------
         
         
         #FLYWHEEL TRIGGERS ----------------
-        
-        # if note in intake, start flywheel
-        button.Trigger(lambda: Robot.intake.note_in_intake)\
-            .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2)
-            )
             
         # if note in feeder, spin to set shot velocity
-        button.Trigger(lambda: Robot.wrist.note_staged)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
+            ).onFalse(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
             
-        # if note not staged and not in intake, run flywheel slow
-        button.Trigger(lambda: not Robot.wrist.note_staged and not Robot.intake.note_in_intake)\
-            .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel / 2.5)
-            )
             
         #FLYWHEEL TRIGGERS ----------------
         
@@ -85,7 +129,7 @@ class IT:
         #SHOOTER TRIGGERS ----------------
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
             .onTrue(
-                command.Shoot(Robot.wrist, Robot.flywheel)
+                command.Shoot(Robot.wrist)
             )
         #SHOOTER TRIGGERS ----------------
         
@@ -125,8 +169,8 @@ class IT:
             
 
         # if elevator is moving, disable limelight
-        button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
-            .onTrue(InstantCommand(stop_limelight_pos))\
-            .onFalse(InstantCommand(start_limelight_pos))
+        # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
+        #     .onTrue(InstantCommand(stop_limelight_pos))\
+        #     .onFalse(InstantCommand(start_limelight_pos))
             
         #LIMELIGHT TRIGGERS ----------------

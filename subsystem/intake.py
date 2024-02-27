@@ -145,6 +145,9 @@ class Intake(Subsystem):
         Stops inner rollers
         """
         self.inner_motor.set_target_position(self.inner_motor.get_sensor_position())
+        
+    def add_note(self):
+        self.note_in_intake = True
 
     def remove_note(self):
         self.note_in_intake = False

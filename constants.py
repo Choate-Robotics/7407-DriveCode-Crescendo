@@ -161,7 +161,7 @@ flywheel_gear_ratio = 1 / 1 #REAL VALUE: 1:1 gear ratio
 shooter_height = 21 * inches_to_meters # REAL VALUE: Meters
 shooter_offset_y = 6 * inches_to_meters # REAL VALUE: Meters
 
-wrist_max_rotation = 56 * degrees_to_radians
+wrist_max_rotation = 59 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians
 wrist_min_rotation_stage = 22 * degrees_to_radians
 
