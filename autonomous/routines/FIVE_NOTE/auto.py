@@ -116,7 +116,7 @@ auto = SequentialCommandGroup(
     ZeroElevator(Robot.elevator),
 
     ParallelCommandGroup (
-        SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+        
         # Shoot first note
         ParallelCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
