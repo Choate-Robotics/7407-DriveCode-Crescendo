@@ -64,42 +64,46 @@ path_3 = FollowPathCustom(
     )
 )
 
-auto = SequentialCommandGroup(
-    ZeroWrist(Robot.wrist),
-    ZeroElevator(Robot.elevator),
+auto = ParallelCommandGroup(
+    # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+    SequentialCommandGroup(
+        ZeroWrist(Robot.wrist),
+        ZeroElevator(Robot.elevator),
 
-    # Shoot first note preload and deploy intake
-    ParallelCommandGroup(
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        DeployIntake(Robot.intake)
-    ),
+        # Shoot first note preload and deploy intake
+        # ParallelCommandGroup(
+        #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-    # Get second note
-    ParallelCommandGroup(
-        path_1,
-        RunIntake(Robot.intake)
-    ),
+        #     DeployIntake(Robot.intake)
+        # ),
+        # SetWristIdle(Robot.wrist),
+        # # Get second note
+        # ParallelCommandGroup(
+            path_1,
+        #     IntakeStageNote(Robot.wrist, Robot.intake)
+        # ),
 
-    # Shoot second note
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # # Shoot second note
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-    # Get third note
-    ParallelCommandGroup(
-        path_2,
-        RunIntake(Robot.intake)
-    ),
+        # # Get third note
+        # ParallelCommandGroup(
+            path_2,
+        #     RunIntake(Robot.intake)
+        # ),
 
-    # Shoot third note
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # # Shoot third note
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-    # Get fourth note
-    ParallelCommandGroup(
-        path_3,
-        RunIntake(Robot.intake)
-    ),
+        # # Get fourth note
+        # ParallelCommandGroup(
+            path_3,
+        #     RunIntake(Robot.intake)
+        # ),
 
-    # Shoot fourth note
-    ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # # Shoot fourth note
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

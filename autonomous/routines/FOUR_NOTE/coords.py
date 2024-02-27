@@ -13,7 +13,7 @@ initial: coord = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.fi
 get_first_note: path = (
     initial,
     [],
-    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length/2, 0))
+    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-2*constants.drivetrain_length/3, 0))
 )
 
 get_second_note: path = (

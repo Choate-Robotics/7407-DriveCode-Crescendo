@@ -352,10 +352,10 @@ class ShootAuto(SequentialCommandGroup):
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, flywheel: Flywheel, traj_cal: TrajectoryCalculator):
         super().__init__(
             ParallelCommandGroup(  # Aim
-                SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
+                # SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 AimWrist(wrist, traj_cal),
                 DriveSwerveAim(drivetrain, traj_cal),
-            ).until(lambda: wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot).withTimeout(
+            ).until(lambda: wrist.ready_to_shoot and flywheel.ready_to_shoot).withTimeout(
                 config.auto_shoot_deadline),
             PassNote(wrist),
         )
