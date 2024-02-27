@@ -35,7 +35,8 @@ bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
 drivetrain_max_vel = 30 * feet_to_meters
 drivetrain_max_accel = 5 * feet_to_meters
-drivetrain_max_angular_vel = 1000 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_vel = 2000 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_accel = 1500 * degrees_per_second__to__radians_per_second
 drivetrain_move_motor_free_speed: rotations_per_minute = (
     6000  # 5676 is the free speed RPM of the NEO
 )

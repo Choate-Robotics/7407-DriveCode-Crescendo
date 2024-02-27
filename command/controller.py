@@ -412,13 +412,10 @@ class Amp(ParallelCommandGroup):
     
     def __init__(self, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
+            SetWrist(wrist, -20 * degrees_to_radians),
             SequentialCommandGroup(
-            ParallelCommandGroup(
+                WaitUntilCommand(lambda: wrist.get_wrist_angle() < (-5 * degrees_to_radians)),
                 SetElevator(elevator, config.Giraffe.kAmp.height),
-                SetWrist(wrist, 0)
-            ),
-            WaitCommand(.5),
-            SetWrist(wrist, -10 * degrees_to_radians)
             ),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )
