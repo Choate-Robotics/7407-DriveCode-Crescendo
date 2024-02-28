@@ -13,7 +13,8 @@ from commands2 import (
     ParallelCommandGroup,
     ParallelRaceGroup,
     PrintCommand,
-    WaitUntilCommand
+    WaitUntilCommand,
+    ParallelDeadlineGroup
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -31,7 +32,7 @@ path_1 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True,
     ),
     period=0.03,
 )
@@ -111,6 +112,7 @@ path_6 = FollowPathCustom(
     period=0.03,
 )
 
+
 auto = SequentialCommandGroup(
     ZeroWrist(Robot.wrist),
     ZeroElevator(Robot.elevator),
@@ -119,16 +121,23 @@ auto = SequentialCommandGroup(
         SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
         SequentialCommandGroup(
             # Shoot first note
-            ParallelCommandGroup(
+            SequentialCommandGroup(
+                DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-140)),
                 ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-                DeployIntake(Robot.intake)
+                # DeployIntake(Robot.intake)
             ),
 
-            # Get second note
-            ParallelCommandGroup(
-                path_1,
-                # RunIntake(Robot.intake)
-            ),
+
+
+            #
+            # DrivetrainZero(Robot.drivetrain),
+            #
+            # # Get second note
+            # ParallelCommandGroup(
+            #     path_1,
+            #     RunIntake(Robot.intake)
+            # ),
+            path_1
             #
             #     # Shoot second note
             #     ShootAuto(

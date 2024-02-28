@@ -1,3 +1,5 @@
+import math
+
 from subsystem import Elevator, Wrist, Intake, Drivetrain, Flywheel
 from sensors import FieldOdometry, TrajectoryCalculator
 
@@ -351,7 +353,7 @@ class ShootAuto(SequentialCommandGroup):
 
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, flywheel: Flywheel, traj_cal: TrajectoryCalculator):
         super().__init__(
-            ParallelCommandGroup(  # Aim
+            SequentialCommandGroup(  # Aim
                 # SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 AimWrist(wrist, traj_cal),
                 DriveSwerveAim(drivetrain, traj_cal),
