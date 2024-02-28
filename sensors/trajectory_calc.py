@@ -8,7 +8,7 @@ from math import degrees, radians
 import config, ntcore
 import constants
 from sensors.field_odometry import FieldOdometry
-from subsystem import Elevator
+from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
 from wpimath.geometry import Rotation2d, Translation3d, Translation2d
@@ -31,7 +31,7 @@ class TrajectoryCalculator:
     speaker_z: float
     distance_to_target: float
 
-    def __init__(self, odometry: FieldOdometry, elevator: Elevator):
+    def __init__(self, odometry: FieldOdometry, elevator: Elevator, flywheel: Flywheel):
         self.odometry = odometry
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
@@ -39,6 +39,7 @@ class TrajectoryCalculator:
         self.shoot_angle = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
+        self.flywheel = flywheel
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
@@ -60,7 +61,7 @@ class TrajectoryCalculator:
             + constants.g
                * distance_to_target
                * np.cos(phi0)
-               / (config.v0_flywheel ** 2))
+               / (self.flywheel.get_velocity_linear() ** 2))
                 + 0.5 * phi0
         )
         return result_angle
@@ -139,9 +140,9 @@ class TrajectoryCalculator:
 
         u0 = (
             0,
-            config.v0_flywheel * np.cos(shooter_theta),
+            self.flywheel.get_velocity_linear() * np.cos(shooter_theta),
             0.0,
-            config.v0_flywheel * np.sin(shooter_theta),
+            self.flywheel.get_velocity_linear() * np.sin(shooter_theta),
         )
         t0, tf = 0, 60
         # Stop the integration when we hit the target.

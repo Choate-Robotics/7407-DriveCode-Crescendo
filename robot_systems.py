@@ -31,7 +31,9 @@ class PowerDistribution:
 
 
 class Field:
-    odometry = sensors.FieldOdometry(Robot.drivetrain,
-                                     sensors.LimelightController([Sensors.limelight_front, Sensors.limelight_back]))
-    calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator)
+    odometry = sensors.FieldOdometry(
+        Robot.drivetrain,
+        sensors.LimelightController([Sensors.limelight_front, Sensors.limelight_back])
+        )
+    calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator, Robot.flywheel)
     POI = utils.POI()
