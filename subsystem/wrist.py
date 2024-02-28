@@ -116,7 +116,7 @@ class Wrist(Subsystem):
     def detect_note_second(self) -> bool:
         return not self.beam_break_second.get()
 
-    def is_at_angle(self, angle: radians, threshold=math.radians(5)):
+    def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """
         Checks if the wrist is at the given angle
         :param angle: The angle to check for

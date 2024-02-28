@@ -353,7 +353,7 @@ class ShootAuto(SequentialCommandGroup):
 
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, flywheel: Flywheel, traj_cal: TrajectoryCalculator):
         super().__init__(
-            SequentialCommandGroup(  # Aim
+            ParallelCommandGroup(  # Aim
                 # SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 AimWrist(wrist, traj_cal),
                 DriveSwerveAim(drivetrain, traj_cal),
