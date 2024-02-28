@@ -357,7 +357,8 @@ class ShootAuto(SequentialCommandGroup):
                 # SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),
                 AimWrist(wrist, traj_cal),
                 DriveSwerveAim(drivetrain, traj_cal),
-            ).until(lambda: wrist.ready_to_shoot and flywheel.ready_to_shoot).withTimeout(
+            ).until(lambda: drivetrain.ready_to_shoot and wrist.ready_to_shoot and flywheel.get_velocity_linear() > config.v0_flywheel - config.flywheel_shot_tolerance)\
+                .withTimeout(
                 config.auto_shoot_deadline),
             PassNote(wrist),
         )
