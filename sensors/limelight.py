@@ -37,9 +37,9 @@ class Limelight:
         self.pipeline: config.LimelightPipeline = config.LimelightPipeline.feducial
         self.t_class = None
         self.force_update = False
-        self.botpose_blue: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
-        self.botpose_red: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
-        self.botpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
+        self.botpose_blue: list[float] = [0,0,0,0,0,0,0,0,0,0,0]
+        self.botpose_red: list[float] = [0,0,0,0,0,0,0,0,0,0,0]
+        self.botpose: list[float] = [0,0,0,0,0,0,0,0,0,0,0]
         self.targetpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.cam_pos_moving: bool = False
 
@@ -206,14 +206,14 @@ class Limelight:
         self.get_neural_classId()
         # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose_red = self.table.getNumberArray(
-            "botpose_wpired", [0, 0, 0, 0, 0, 0]
+            "botpose_wpired", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
         # self.botpose_blue = self.table.getEntry("botpose_wpiblue").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose_blue = self.table.getNumberArray(
-            "botpose_wpiblue", [0, 0, 0, 0, 0, 0]
+            "botpose_wpiblue", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0])
+        self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0])
         self.targetpose = self.table.getNumberArray("botpose_targetspace", [0, 0, 0, 0, 0, 0])
 
     def target_exists(self, force_update: bool = False):
@@ -303,8 +303,11 @@ class Limelight:
                 Translation3d(botpose[0], botpose[1], botpose[2]),
                 Rotation3d(botpose[3], botpose[4], math.radians(botpose[5])),
             )
-            timestamp = Timer.getFPGATimestamp() - (botpose[6] / 1000)
-            return pose, timestamp
+            timestamp:float = Timer.getFPGATimestamp() - (botpose[6] / 1000)
+            tag_count:float = botpose[7]
+            tag_span:float = botpose[8]
+            ave_tag_dist:float = botpose[9]
+            return pose, timestamp, tag_count, ave_tag_dist
         
     def get_target_pose(self):
         
@@ -331,7 +334,7 @@ class LimelightController(VisionEstimator):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
 
-    def get_estimated_robot_pose(self) -> list[tuple[tuple[Pose3d, float], Pose3d]] | None:
+    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float]] | None:
         poses = []
         for limelight in self.limelights:
             if (
@@ -341,7 +344,7 @@ class LimelightController(VisionEstimator):
                 and not limelight.cam_pos_moving
             ):
                 # print(limelight.name+' Is sending bot pose'
-                poses += [(limelight.get_bot_pose(), limelight.get_target_pose())]
+                poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
             return poses
         else:

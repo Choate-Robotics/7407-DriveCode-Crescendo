@@ -161,7 +161,7 @@ elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = .2
 elevator_feed_forward: float = 0.0 
-elevator_climb_ff: float = -1.9
+elevator_climb_ff: float = -2.1
 elevator_moving = False
 elevator_zeroed_pos = 0.035 if comp_bot.get() else 0.023 
 #helloworld
@@ -216,7 +216,7 @@ v0_flywheel: meters_per_second = 18
 idle_flywheel: meters_per_second = v0_flywheel / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
-flywheel_feed_forward = 0.65  # TODO: placeholder
+flywheel_feed_forward = 0.0  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 1
 flywheel_shot_current_threshold = 20
 # Configs 
@@ -229,14 +229,14 @@ INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBra
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kCoast
+    0.055, 0.0, 0.01, flywheel_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kCoast
 )
 
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True  # integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=60  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 # Giraffe

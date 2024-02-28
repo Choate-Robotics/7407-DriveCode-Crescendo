@@ -101,12 +101,12 @@ class FieldOdometry:
             vision_time: float
             vision_robot_pose: Pose3d
 
-            pose_data, target_pose = vision_pose
-            vision_robot_pose, vision_time = pose_data
-            distance_to_target = target_pose.translation()
+            vision_robot_pose, vision_time,tag_count, distance_to_target = vision_pose
+            # vision_robot_pose, vision_time = pose_data
+            # distance_to_target = target_pose.translation()
 
             if self.within_tolerance(vision_robot_pose):
-                self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target)
+                self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count)
 
         return self.getPose()
 
@@ -168,15 +168,21 @@ class FieldOdometry:
             self.drivetrain.get_heading(), self.drivetrain.node_positions
         )
 
-    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: Translation3d):
-        dist_calculations = (abs(distance_to_target.norm() **2) / 2.5, abs(distance_to_target.norm() ** 2) / 2.5, abs(math.radians(40)))
+    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int):
+        
+        std_dev = abs(distance_to_target **2) / (2.5)
+        
+        if tag_count > 1:
+            std_dev = abs(distance_to_target ** (1 + (1/tag_count)))
+        
+        dist_calculations = (std_dev, std_dev, abs(math.radians(40)))
         self.std_dev = dist_calculations
         self.drivetrain.odometry_estimator.addVisionMeasurement(
             vision_pose.toPose2d(), vision_time, self.std_dev
         )
 
     def get_vision_poses(self):
-        vision_robot_pose_list: list[tuple[tuple[Pose3d, float], Pose3d]] | None
+        vision_robot_pose_list: list[tuple[Pose3d, float, float, float]] | None
         try:
             vision_robot_pose_list = (
                 self.vision_estimator.get_estimated_robot_pose()
