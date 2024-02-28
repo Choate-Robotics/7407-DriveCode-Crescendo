@@ -29,6 +29,10 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
+        Keymap.Drivetrain.X_MODE.onTrue(
+            commands2.InstantCommand(lambda: Robot.drivetrain.x_mode())
+        )
+        
         # Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake and not Robot.wrist.note_staged).onTrue(
         #     command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
         # ).onFalse(
@@ -71,6 +75,18 @@ class OI:
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
             command.SetWristIdle(Robot.wrist)
             )
+        )
+        
+        Keymap.Shooter.SET_WRIST_SUBWOOFER.onTrue(
+            command.SetWristIdle(Robot.wrist)
+        )
+        
+        Keymap.Shooter.ENABLE_AIM_WRIST.onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations)
+        )
+        
+        Keymap.Shooter.ENABLE_AIM_WRIST_OPERATOR.onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations)
         )
         
         Keymap.Feeder.DUMP_NOTE.onTrue(
