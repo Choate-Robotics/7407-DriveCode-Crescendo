@@ -50,6 +50,7 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Left Four Notes", autonomous.left_four_note)
+        self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
         self.auto_selection.addOption("Five Notes", autonomous.five_note)
         self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
