@@ -32,6 +32,6 @@ go_to_wing_boundary_1: path = (
 get_third_note: path = (
     go_to_wing_boundary_1[2],
     # need to tune
-    [Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(-4, -0.2))],
+    [],
     Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.7, 0))
 )
