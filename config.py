@@ -188,22 +188,22 @@ feeder_beam_break_second_channel = 0
 front_left_move_id = 7
 front_left_turn_id = 8
 front_left_encoder_port = AnalogEncoder(3)
-front_left_encoder_zeroed_pos = 0.467 if comp_bot.get() else 0.860
+front_left_encoder_zeroed_pos = 0.487 if comp_bot.get() else 0.860
 
 front_right_move_id = 4
 front_right_turn_id = 6
 front_right_encoder_port = AnalogEncoder(2)
-front_right_encoder_zeroed_pos = 0.790 if comp_bot.get() else 0.536
+front_right_encoder_zeroed_pos = 0.793 if comp_bot.get() else 0.536
 
 back_left_move_id = 11
 back_left_turn_id = 14
 back_left_encoder_port = AnalogEncoder(1 if comp_bot.get() else 0)
-back_left_encoder_zeroed_pos = 0.860 if comp_bot.get() else 0.458
+back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.458
 
 back_right_move_id = 18
 back_right_turn_id = 16
 back_right_encoder_port = AnalogEncoder(0 if comp_bot.get() else 1)
-back_right_encoder_zeroed_pos = 0.727 if comp_bot.get() else 0.984
+back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 

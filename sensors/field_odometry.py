@@ -172,8 +172,8 @@ class FieldOdometry:
         
         std_dev = abs(distance_to_target **2) / (2.5)
         
-        if tag_count > 1:
-            std_dev = abs(distance_to_target ** (1 + (1/tag_count)))
+        # if tag_count > 1:
+        #     std_dev = abs(distance_to_target ** (1 + (1/tag_count)))
         
         dist_calculations = (std_dev, std_dev, abs(math.radians(40)))
         self.std_dev = dist_calculations

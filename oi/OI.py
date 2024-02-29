@@ -55,11 +55,15 @@ class OI:
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
             # command.EmergencyManuver(Robot.wrist, Robot.intake)
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)
+        ).onFalse(
+            command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
         
         Keymap.Elevator.ELEVATOR_MID.onTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorMid.height)
+        ).onFalse(
+            command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
         
         Keymap.Elevator.ELEVATOR_LOW.onTrue(
