@@ -17,6 +17,7 @@ from autonomous.auto_routine import AutoRoutine
 from autonomous.routines.LEFT_FOUR_NOTE.coords import (
     get_first_note,
     get_second_note,
+    get_third_note,
     go_to_wing_boundary_1,
     initial
 )
@@ -65,12 +66,27 @@ path_3 = FollowPathCustom(
     )
 )
 
+path_4 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=get_third_note[0],
+        waypoints=[coord for coord in get_third_note[1]],
+        end_pose=get_third_note[2],
+        max_velocity=7,
+        max_accel=2,
+        start_velocity=0,
+        end_velocity=0,
+        rev=True
+    )
+)
+
 
 auto = ParallelCommandGroup(
     SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
     SequentialCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
+        DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
 
         # Shoot preload and deploy intake
         ParallelCommandGroup(
@@ -115,6 +131,14 @@ auto = ParallelCommandGroup(
         ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
+        ),
+
+        # Get fourth note
+        SequentialCommandGroup(
+            ParallelCommandGroup(
+                path_4,
+                IntakeStageNote(Robot.wrist, Robot.intake)
+            )
         ),
 
     )
