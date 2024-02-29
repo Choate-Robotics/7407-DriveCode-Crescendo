@@ -127,9 +127,17 @@ class IT:
         
         
         #SHOOTER TRIGGERS ----------------
+        
+        def reset_shooter():
+            Robot.wrist.set_note_not_staged()
+            Robot.drivetrain.ready_to_shoot = False
+            Robot.flywheel.ready_to_shoot = False
+        
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
             .onTrue(
-                command.Shoot(Robot.wrist)
+                command.Shoot(Robot.wrist).andThen(
+                InstantCommand(lambda: reset_shooter())
+                )
             )
         #SHOOTER TRIGGERS ----------------
         
