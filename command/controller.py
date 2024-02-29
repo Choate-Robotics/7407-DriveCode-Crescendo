@@ -386,7 +386,8 @@ class UndoClimb(ParallelCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             UnDeployTenting(intake),
-            Giraffe(elevator, wrist, config.Giraffe.kElevatorLow),
+            SetElevator(elevator, config.Giraffe.kIdle.height),
+            SetWristIdle(wrist)
         )
 
 

@@ -161,9 +161,9 @@ elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = .2
 elevator_feed_forward: float = 0.0 
-elevator_climb_ff: float = -2.1
+elevator_climb_ff: float = -3.7
 elevator_moving = False
-elevator_zeroed_pos = 0.035 if comp_bot.get() else 0.023 
+elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
@@ -221,7 +221,7 @@ flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.3, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.3, 0.0, 0.02, elevator_feed_forward, (-.5, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 WRIST_CONFIG = SparkMaxConfig(.55, 0, 0.002, 0, (-.75, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)

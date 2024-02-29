@@ -83,10 +83,11 @@ class FieldOdometry:
         Updates the robot's pose relative to the field. This should be called periodically.
         """
 
+        self.update_from_internal()
+
         if not self.vision_on:
             return self.getPose()
 
-        self.update_from_internal()
 
 
         vision_robot_pose_list = self.get_vision_poses()
@@ -217,9 +218,10 @@ class FieldOdometry:
             est_pose.rotation().radians()
         ])
         
-        self.table.putNumber('Estimated Rotation',
-                             est_pose.rotation().degrees()
-                             )
+        self.table.putNumber(
+            'Estimated Rotation',
+            est_pose.rotation().degrees()
+        )
 
         n_states = self.drivetrain.node_states
 

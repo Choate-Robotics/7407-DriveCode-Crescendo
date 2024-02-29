@@ -145,6 +145,13 @@ class OI:
         # )
         # )
         
+        Keymap.Climb.UNDO_CLIMB_UP.and_(lambda: config.climbing).onTrue(
+            commands2.InstantCommand(lambda: stop_climbing())
+            .alongWith(commands2.InstantCommand(lambda: climb_not_ready()).alongWith(
+            command.UndoClimb(Robot.elevator, Robot.wrist, Robot.intake)
+            ))
+        )
+        
         
         Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
             command.ClimbDown(Robot.elevator, Robot.wrist).alongWith(

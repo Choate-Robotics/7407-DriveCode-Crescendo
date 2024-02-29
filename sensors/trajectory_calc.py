@@ -53,17 +53,41 @@ class TrajectoryCalculator:
         Calculates the angle of the trajectory without air resistance.
         """
 
-        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
-        result_angle = (
-                0.5
-                * np.arcsin(
-            np.sin(phi0)
-            + constants.g
-               * distance_to_target
-               * np.cos(phi0)
-               / (self.flywheel.get_velocity_linear() ** 2))
-                + 0.5 * phi0
+        vels = self.odometry.drivetrain.chassis_speeds
+        
+        drivetrain_angle = self.get_rotation_to_speaker()
+        
+        
+        vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(vels, drivetrain_angle)
+        
+        rvx, rvy, rvo = (
+            vels.vx, vels.vy, vels.omega
         )
+        
+
+        # Calculate the horizontal angle without considering velocities
+        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
+
+
+        # Calculate the impact of floor velocities on the trajectory
+
+        
+        # Calculate the effective velocity
+        # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
+        v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
+
+        # Calculate the angle with floor velocities
+        result_angle = (
+            0.5 * np.arcsin(
+                np.sin(phi0)
+                + constants.g
+                * distance_to_target
+                * np.cos(phi0)
+                / (v_effective ** 2)
+            )
+            + 0.5 * phi0
+        )
+
         return result_angle
 
     def update_shooter(self):
@@ -105,16 +129,23 @@ class TrajectoryCalculator:
                     self.shoot_angle = theta_2
                     return theta_2
                 correction_angle = z_goal_error * z_to_angle_conversion
+                
+    def get_rotation_to_speaker(self):
+        """
+        returns rotation of base to face target
+        :return: base target angle
+        """
+        speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        robot_pose_2d = self.odometry.getPose()
+        robot_to_speaker = speaker_translation - robot_pose_2d.translation()
+        return robot_to_speaker.angle()
 
     def update_base(self):
         """
-        updates rotation of base to face target
+        updates rotation of base to score shot
         :return: base target angle
         """
-        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
-        robot_pose_2d = self.odometry.getPose()
-        robot_to_speaker = speaker_translation - robot_pose_2d.translation()
-        self.base_rotation2d = robot_to_speaker.angle()
+        self.base_rotation2d = self.get_rotation_to_speaker()
         return self.base_rotation2d
 
     def update(self):
