@@ -77,7 +77,7 @@ auto = ParallelCommandGroup(
             DeployIntake(Robot.intake)
         ),
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            # DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
         ),
         
@@ -90,7 +90,7 @@ auto = ParallelCommandGroup(
         # Shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            # DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
         ),
 
@@ -100,21 +100,21 @@ auto = ParallelCommandGroup(
             IntakeStageNote(Robot.wrist, Robot.intake)
         ),
 
-        # Shoot third note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-            SetWristIdle(Robot.wrist),
-        ),
+        # # Shoot third note
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # ParallelCommandGroup(
+        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+        #     SetWristIdle(Robot.wrist),
+        # ),
 
-        # Get fourth note
-        ParallelCommandGroup(
-            path_3,
-            IntakeStageNote(Robot.wrist, Robot.intake)
-        ),
+        # # Get fourth note
+        # ParallelCommandGroup(
+        #     path_3,
+        #     IntakeStageNote(Robot.wrist, Robot.intake)
+        # ),
 
-        # Shoot fourth note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # # Shoot fourth note
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
     )
 )
 

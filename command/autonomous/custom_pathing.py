@@ -1,7 +1,7 @@
 import math
 import time
 
-import ntcore, config
+import ntcore, config, constants
 
 from toolkit.command import SubsystemCommand
 from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
@@ -46,11 +46,11 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             PIDController(8, 0, 0, period),
             PIDController(8, 0, 0, period),
             ProfiledPIDControllerRadians(
-                0.05,
+                6,
                 0,
-                0.02,
+                0.003,
                 TrapezoidProfileRadians.Constraints(
-                    subsystem.max_angular_vel, subsystem.max_angular_vel / 0.001  # .001
+                    subsystem.max_angular_vel, constants.drivetrain_max_angular_accel
                 ),
                 period,
             ),
@@ -65,7 +65,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.finished: bool = False
 
     def initialize(self) -> None:
-        self.trajectory = self.trajectory_c.generate()
+        self.trajectory = self.trajectory_c.generate(self.subsystem.odometry_estimator.getEstimatedPosition())
         self.duration = self.trajectory.totalTime()
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
         self.start_time = time.perf_counter()
@@ -113,7 +113,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         )
 
 
-        self.subsystem.set_driver_centric((speeds.vx, speeds.vy), speeds.omega)
+        self.subsystem.set_driver_centric((speeds.vx, speeds.vy), -speeds.omega)
 
     def isFinished(self) -> bool:
         return self.finished

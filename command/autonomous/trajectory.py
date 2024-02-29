@@ -46,11 +46,14 @@ class CustomTrajectory:
         self.rev = rev
         self.obstacles = obstacles
         
-    def generate(self):
+    def generate(self, current_pose: Pose2d | None = None):
         
         # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
         
         temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
+
+        if current_pose is not None:
+            self.start_pose = current_pose
         
         if isinstance(self.start_pose, POIPose):
             self.start_pose = self.start_pose.get()
