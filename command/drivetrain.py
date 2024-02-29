@@ -112,10 +112,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         target_angle = self.target_calc.get_bot_theta()
         d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle.radians())
         
-        def within_angle(heading, target, tolerance):
-            return abs(heading - target) < tolerance
         
-        if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(), target_angle.radians()) < radians(3):
+        if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(), target_angle.radians()) < radians(1):
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False

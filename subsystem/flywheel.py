@@ -220,7 +220,7 @@ class Flywheel(Subsystem):
         self.set_voltage(self.top_flywheel_state.U(0), 1)
         self.set_voltage(self.bottom_flywheel_state.U(0), 2)
 
-        if self.within_velocity_linear(self.top_flywheel_state.nextR(0), config.flywheel_shot_tolerance):
+        if self.within_velocity_linear(self.angular_velocity_to_linear_velocity(self.top_flywheel_state.nextR(0)), config.flywheel_shot_tolerance):
             self.ready_to_shoot = True
         else:
             self.ready_to_shoot = False
