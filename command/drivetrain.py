@@ -203,11 +203,12 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
         super().__init__(subsystem)
         max_angular_vel = max_angular_vel or subsystem.max_angular_vel
         self.controller = PIDController(
-            1.2, 0, 0
+            9, 0, 0.003
         )
 
         self.controller.setTolerance(threshold)
         self.controller.enableContinuousInput(-math.pi, math.pi)
+        self.controller.setTolerance(radians(2))
 
         self.theta_f = theta_f
 
@@ -251,7 +252,7 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
         self.subsystem.n_back_right.set_motor_velocity(0)
 
     def isFinished(self) -> bool:
-        return self.t > 3
+        return self.t > 3 or self.controller.atSetpoint()
 
     def runsWhenDisabled(self) -> bool:
         return False
