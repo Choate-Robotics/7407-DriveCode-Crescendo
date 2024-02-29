@@ -53,7 +53,6 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Five Notes", autonomous.five_note)
         self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
-        self.auto_selection.addOption("Speaker Shoot Leave", autonomous.speaker_shoot_leave)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
@@ -190,8 +189,6 @@ class _Robot(wpilib.TimedRobot):
         
         self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
         self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
-
-        SmartDashboard.putNumber("Front left angle", Robot.drivetrain.n_front_left.get_turn_motor_angle())
         
 
     def teleopInit(self):

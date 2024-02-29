@@ -103,7 +103,7 @@ auto = ParallelCommandGroup(
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            # DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
         ),
 
