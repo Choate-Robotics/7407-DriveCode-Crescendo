@@ -27,3 +27,9 @@ get_third_note: path = (
     [Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length, -5*constants.FieldPos.Wing.note_gap/6))],
     Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-constants.drivetrain_length/3, 0))
 )
+
+go_to_midline = (
+    get_third_note[2],
+    [],
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft
+)
