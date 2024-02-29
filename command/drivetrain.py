@@ -203,7 +203,7 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
         super().__init__(subsystem)
         max_angular_vel = max_angular_vel or subsystem.max_angular_vel
         self.controller = PIDController(
-            1.2, 0, 0
+            9, 0, 0.003
         )
 
         self.controller.setTolerance(threshold)
