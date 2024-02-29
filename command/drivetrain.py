@@ -208,7 +208,7 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
 
         self.controller.setTolerance(threshold)
         self.controller.enableContinuousInput(-math.pi, math.pi)
-        self.controller.setTolerance(radians(2))
+        self.controller.setTolerance(radians(3))
 
         self.theta_f = theta_f
 

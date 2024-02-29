@@ -14,11 +14,11 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.FOUR_NOTE.coords import (
+from autonomous.routines.LEFT_FOUR_NOTE.coords import (
     get_first_note,
     get_second_note,
     get_third_note,
-    go_to_midline,
+    go_to_wing_boundary_1,
     initial
 )
 
@@ -44,21 +44,21 @@ path_2 = FollowPathCustom(
         start_pose=get_second_note[0],
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
-        max_velocity=5,
+        max_velocity=7,
         max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=True
     )
 )
 
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_third_note[0],
-        waypoints=[coord for coord in get_third_note[1]],
-        end_pose=get_third_note[2],
-        max_velocity=5,
+        start_pose=go_to_wing_boundary_1[0],
+        waypoints=[coord for coord in go_to_wing_boundary_1[1]],
+        end_pose=go_to_wing_boundary_1[2],
+        max_velocity=7,
         max_accel=2,
         start_velocity=0,
         end_velocity=0,
@@ -69,10 +69,10 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=go_to_midline[0],
-        waypoints=[coord for coord in go_to_midline[1]],
-        end_pose=go_to_midline[2],
-        max_velocity=5,
+        start_pose=get_third_note[0],
+        waypoints=[coord for coord in get_third_note[1]],
+        end_pose=get_third_note[2],
+        max_velocity=7,
         max_accel=2,
         start_velocity=0,
         end_velocity=0,
@@ -80,17 +80,21 @@ path_4 = FollowPathCustom(
     )
 )
 
+
 auto = ParallelCommandGroup(
     SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
     SequentialCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
+        DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
 
-        # Shoot first note preload and deploy intake
+        # Shoot preload and deploy intake
         ParallelCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
             DeployIntake(Robot.intake)
         ),
+
+        # Reset drivetrain
         ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
@@ -104,46 +108,39 @@ auto = ParallelCommandGroup(
 
         # Shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+
+        # Reset drivetrain
         ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
         ),
 
-        # Get third note
-        ParallelCommandGroup(
-            path_2,
-            IntakeStageNote(Robot.wrist, Robot.intake)
+        # Get third note and go back to wing
+        SequentialCommandGroup(
+            ParallelCommandGroup(
+                path_2,
+                IntakeStageNote(Robot.wrist, Robot.intake)
+            ),
+            path_3
         ),
 
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-        #     SetWristIdle(Robot.wrist),
-        # ),
 
-        # Get fourth note
-        ParallelCommandGroup(
-            path_3,
-            SequentialCommandGroup(
-                SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake)
-            )
-            
-        ),
-
-        # Shoot fourth note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
+        # Reset drivetrain
         ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
         ),
 
-        ParallelCommandGroup(
-            path_4,
-            IntakeStageNote(Robot.wrist, Robot.intake)
-        )
+        # Get fourth note
+        SequentialCommandGroup(
+            ParallelCommandGroup(
+                path_4,
+                IntakeStageNote(Robot.wrist, Robot.intake)
+            )
+        ),
+
     )
 )
 

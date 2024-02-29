@@ -219,7 +219,7 @@ max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.65  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
-auto_shoot_deadline = 5
+auto_shoot_deadline = 1.2
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.3, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake

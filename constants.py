@@ -60,6 +60,8 @@ field_length = 16.54  # meters
 class FieldPos:
     pose_reverse = Rotation2d(math.radians(180))
 
+    wing_boundary = 231 * inches_to_meters
+
     # all poses are relative to the blue field origin
     class Wing:
         note_x = 114 * inches_to_meters
@@ -74,6 +76,7 @@ class FieldPos:
         note_gap = 66 * inches_to_meters
 
         mid_line = field_length / 2
+
 
     class Scoring:
         speaker_y = 218.42 * inches_to_meters
