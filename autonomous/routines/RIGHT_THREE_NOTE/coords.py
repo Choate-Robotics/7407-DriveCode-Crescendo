@@ -9,7 +9,7 @@ coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
 
-initial: coord = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.FieldPos.MidLine.note_init, math.radians(-180))
+initial: coord = (2, 5.4, math.radians(-180))
 
 get_first_note: path = (
     initial,
