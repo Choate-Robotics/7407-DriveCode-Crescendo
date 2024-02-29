@@ -65,6 +65,12 @@ path_3 = FollowPathCustom(
     )
 )
 
+# auto = SequentialCommandGroup(
+#     path_1,
+#     path_2,
+#     path_3,
+#
+# )
 auto = ParallelCommandGroup(
     SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
     SequentialCommandGroup(
@@ -80,7 +86,7 @@ auto = ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
             SetWristIdle(Robot.wrist),
         ),
-        
+
         # Get second note
         ParallelCommandGroup(
             path_1,

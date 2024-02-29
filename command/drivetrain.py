@@ -128,7 +128,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             return abs(heading - target) < tolerance
 
         if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(),
-                              target_angle.radians()) < radians(1.5):
+                              target_angle.radians()) < radians(10):
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
@@ -208,7 +208,7 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
 
         self.controller.setTolerance(threshold)
         self.controller.enableContinuousInput(-math.pi, math.pi)
-        self.controller.setTolerance(radians(2))
+        self.controller.setTolerance(radians(3))
 
         self.theta_f = theta_f
 
