@@ -30,7 +30,7 @@ comp_bot: DigitalInput = DigitalInput(
 #     radians,
 # )
 
-DEBUG_MODE: bool = True
+DEBUG_MODE: bool = False
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
