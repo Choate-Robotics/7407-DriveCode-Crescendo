@@ -13,7 +13,7 @@ from units.SI import radians, radians_per_second, seconds, rotations_per_second,
     rotations
 
 from wpilib import TimedRobot
-
+from math import isnan
 hundred_ms = float
 
 
@@ -133,7 +133,11 @@ class SparkMax(PIDMotor):
                     self._logger.error(f'Uncommon Error {error}')
             if config.DEBUG_MODE:
                 raise RuntimeError(f'SparkMax Error: {error}')
-
+            
+    
+    def input_check(self, value):
+        return not isnan(value)
+    
     def abs_encoder(self):
         if self._abs_encoder is None:
             self._abs_encoder = self.motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
@@ -166,6 +170,12 @@ class SparkMax(PIDMotor):
         Args:
             pos (float): The target position of the motor controller in rotations
         """
+        
+        # if self.input_check(pos):
+        #     if config.DEBUG_MODE:
+        #         raise ValueError
+        #     return
+        
         result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff)
         self.error_check(result)
 

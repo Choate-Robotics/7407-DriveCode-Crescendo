@@ -124,6 +124,9 @@ ready_to_climb: bool = False
 climbing: bool = False
 climbed: bool = False
 
+# AMP
+amping: bool = False
+
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
                                  constants.limelight_height_LL3, Rotation3d(0, constants.limelight_elevator_angle, 0))
@@ -161,14 +164,14 @@ elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = .2
 elevator_feed_forward: float = 0.0 
-elevator_climb_ff: float = -1.9
+elevator_climb_ff: float = -3.7
 elevator_moving = False
-elevator_zeroed_pos = 0.035 if comp_bot.get() else 0.023 
+elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
-wrist_time_to_max_vel = 0.01
+wrist_time_to_max_vel = 0.0
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
 wrist_flat_ff = -1
@@ -212,18 +215,27 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 15
-v0_flywheel: meters_per_second = 18
+v0_flywheel: meters_per_second = 25
+# v0_effective_flywheel: meters_per_second = 12
 idle_flywheel: meters_per_second = v0_flywheel / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
-flywheel_feed_forward = 0.65  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = .5
-flywheel_shot_current_threshold = 20
 auto_shoot_deadline = 1.2
 auto_intake_note_deadline = 3
+flywheel_feed_forward = 0.0  # TODO: placeholder
+flywheel_shot_tolerance: meters_per_second = .5
+flywheel_shot_current_threshold = 20
+
+flywheel_manual: bool = False
+
+# Odometry
+odometry_visible_tags_threshold = 1
+odometry_tag_span_threshold = 0
+odometry_tag_distance_threshold = 4
+
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
-    0.3, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.3, 0.0, 0.02, elevator_feed_forward, (-.65, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 WRIST_CONFIG = SparkMaxConfig(.55, 0, 0.002, 0, (-.75, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -231,19 +243,19 @@ INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBra
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, flywheel_feed_forward, (1, 1), idle_mode=rev.CANSparkMax.IdleMode.kCoast
+    0.055, 0.0, 0.01, flywheel_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kCoast
 )
 
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True  # integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=60  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 # Giraffe
 
-staging_angle:radians = 59.5 * degrees_to_radians
+staging_angle:radians = 60 * degrees_to_radians
 
 
 class Giraffe:

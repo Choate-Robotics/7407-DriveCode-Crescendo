@@ -14,7 +14,7 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.FOUR_NOTE.coords import (
+from autonomous.routines.FOUR_NOTE_MIDDLE.coords import (
     get_first_note,
     get_second_note,
     get_third_note,
@@ -91,15 +91,14 @@ auto = ParallelCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
             DeployIntake(Robot.intake)
         ),
-        ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-            SetWristIdle(Robot.wrist),
-        ),
-
+        
         # Get second note
         ParallelCommandGroup(
             path_1,
-            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+            SequentialCommandGroup(
+                SetWristIdle(Robot.wrist),
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+            )
         ),
 
         # Shoot second note
@@ -117,10 +116,6 @@ auto = ParallelCommandGroup(
 
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-        #     SetWristIdle(Robot.wrist),
-        # ),
 
         # Get fourth note
         ParallelCommandGroup(

@@ -110,6 +110,9 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.subsystem.wrist_moving = True
 
     def execute(self):
+        
+        angle = self.traj_calc.get_theta()
+        
         self.subsystem.set_wrist_angle(self.traj_calc.get_theta())
 
         if self.subsystem.is_at_angle(self.traj_calc.get_theta()):

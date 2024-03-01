@@ -57,7 +57,7 @@ class CustomTrajectory:
             
         for i, waypoint in enumerate(self.waypoints):
             if isinstance(waypoint, POIPose):
-                self.waypoints[i] = waypoint.getTranslation()
+                self.waypoints[i] = waypoint.get().translation()
 
         if isinstance(self.end_pose, POIPose):
             self.end_pose = self.end_pose.get()

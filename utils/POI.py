@@ -52,7 +52,7 @@ class POIPose:
                 rotation = Rotation2d(math.radians(rotation))
             return POIPose(Pose2d(self._pose.translation(), rotation), self._red)
 
-    def withOffset(self, offset: Translation2d | Translation3d) -> POIPose:
+    def withOffset(self, offset: Translation2d | Translation3d, red: bool=True) -> POIPose:
         """
         Create a new POIPose with the translation offset by the given amount
 
@@ -62,16 +62,33 @@ class POIPose:
         Returns:
             POIPose: the new POIPose with the translation offset by the given amount
         """
-        if isinstance(self._pose, Pose3d):
-            return POIPose(
-                Pose3d(self._pose.translation() + offset, self._pose.rotation()),
-                self._red,
-            )
+        if red == self._red:
+            if isinstance(self._pose, Pose3d):
+                return POIPose(
+                    Pose3d(self._pose.translation() + offset, self._pose.rotation()),
+                    self._red,
+                )
+            else:
+                return POIPose(
+                    Pose2d(self._pose.translation() + offset, self._pose.rotation()),
+                    self._red,
+                )
         else:
-            return POIPose(
-                Pose2d(self._pose.translation() + offset, self._pose.rotation()),
-                self._red,
-            )
+            if isinstance(self._pose, Pose3d):
+                return POIPose(
+                    Pose3d(Translation3d(self._pose.translation().X() + offset.X(),
+                                          self._pose.translation().Y() - offset.Y(),
+                                           self._pose.translation().Z() + offset.Z()),
+                                             self._pose.rotation()),
+                    self._red,
+                )
+            else:
+                return POIPose(
+                    Pose2d(Translation2d(self._pose.translation().X() + offset.X(),
+                                          self._pose.translation().Y() - offset.Y()),
+                                            self._pose.rotation()),
+                    self._red,
+                )
 
     def __invertY(self, pose: Pose2d | Pose3d) -> Pose2d | Pose3d:
         """
@@ -117,13 +134,13 @@ class POIPose:
             or DriverStation.getAlliance() is None
             and not self._red
         ):
+            # print("inverting") if verbose else None
+            self._pose = self.__invertY(self._pose)
             self._red = True
-            # print("inverting") if verbose else None
-            self._pose = self.__invertY(self._pose)
         elif DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self._red:
-            self._red = False
             # print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
+            self._red = False
         else:
             ...
             # print("not inverting") if verbose else None
