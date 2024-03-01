@@ -97,7 +97,7 @@ auto = ParallelCommandGroup(
             path_1,
             SequentialCommandGroup(
                 SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake)
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
             )
         ),
 
@@ -111,7 +111,7 @@ auto = ParallelCommandGroup(
         # Get third note
         ParallelCommandGroup(
             path_2,
-            IntakeStageNote(Robot.wrist, Robot.intake)
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
         ),
 
         # Shoot third note
@@ -122,7 +122,7 @@ auto = ParallelCommandGroup(
             path_3,
             SequentialCommandGroup(
                 SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake)
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
             )
             
         ),
@@ -137,7 +137,7 @@ auto = ParallelCommandGroup(
 
         ParallelCommandGroup(
             path_4,
-            IntakeStageNote(Robot.wrist, Robot.intake)
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
         )
     )
 )
