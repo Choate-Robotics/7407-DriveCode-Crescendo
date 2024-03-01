@@ -91,7 +91,6 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight_front.init()
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
-            Field.odometry.disable()
             Field.calculations.init()
 
         # try:

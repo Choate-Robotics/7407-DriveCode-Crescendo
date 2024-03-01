@@ -162,19 +162,19 @@ class IT:
     #     # ODOMETRY TRIGGERS ----------------
 
     #     # LIMELIGHT TRIGGERS ----------------
-    #     def stop_limelight_pos():
-    #         Sensors.limelight_front.enable_moving()
-    #         Sensors.limelight_back.enable_moving()
+        def stop_limelight_pos():
+            Sensors.limelight_front.enable_moving()
+            Sensors.limelight_back.enable_moving()
 
-    #     def start_limelight_pos():
-    #         elevator_height = Robot.elevator.get_length()
-    #         z_pose = Transform3d(0, 0, elevator_height, Rotation3d(0, 0, 0))
+        def start_limelight_pos():
+            elevator_height = Robot.elevator.get_length()
+            z_pose = Transform3d(0, 0, elevator_height, Rotation3d(0, 0, 0))
 
-    #         front_pose = Sensors.limelight_front.get_cam_pose()
-    #         Sensors.limelight_front.disable_moving(front_pose + z_pose)
+            front_pose = Sensors.limelight_front.get_cam_pose()
+            Sensors.limelight_front.disable_moving(front_pose + z_pose)
 
-    #         back_pose = Sensors.limelight_back.get_cam_pose()
-    #         Sensors.limelight_back.disable_moving(back_pose + z_pose)
+            back_pose = Sensors.limelight_back.get_cam_pose()
+            Sensors.limelight_back.disable_moving(back_pose + z_pose)
 
         # if elevator is moving, disable limelight
         button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
