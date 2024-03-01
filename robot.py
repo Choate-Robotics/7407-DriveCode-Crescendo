@@ -89,12 +89,7 @@ class _Robot(wpilib.TimedRobot):
         
         self.handle(init_sensors)
 
-        # Initialize Operator Interface
-        OI.init()
-        OI.map_controls()
-
-        IT.init()
-        IT.map_systems()
+        
 
         self.log.complete("Robot initialized")
         
@@ -182,6 +177,13 @@ class _Robot(wpilib.TimedRobot):
         Field.calculations.init()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
+        
+        # Initialize Operator Interface
+        OI.init()
+        OI.map_controls()
+
+        IT.init()
+        IT.map_systems()
 
         self.scheduler.schedule(commands2.SequentialCommandGroup(
             command.DrivetrainZero(Robot.drivetrain),

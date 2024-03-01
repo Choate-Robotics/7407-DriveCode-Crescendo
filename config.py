@@ -235,6 +235,8 @@ odometry_tag_distance_threshold = 4
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.3, 0.0, 0.02, elevator_feed_forward, (-.65, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
+
+
 WRIST_CONFIG = SparkMaxConfig(.55, 0, 0.002, 0, (-.75, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
