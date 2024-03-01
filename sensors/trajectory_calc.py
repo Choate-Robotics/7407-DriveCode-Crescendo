@@ -89,7 +89,7 @@ class TrajectoryCalculator:
         )
         
         if not isinstance(result_angle, float) or not isinstance(result_angle, int):
-            result_angle = 0
+            result_angle = config.Giraffe.kIdle.wrist_angle
 
         return result_angle
 
