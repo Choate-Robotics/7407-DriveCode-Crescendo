@@ -39,6 +39,7 @@ miles_to_inches = miles_to_meters * meters_to_inches
 miles_to_feet = miles_to_meters * meters_to_feet
 miles_to_yards = miles_to_meters * meters_to_yards
 
+
 # Rotation
 rotations = float
 rotations_to_degrees = 360
@@ -74,24 +75,33 @@ days_to_minutes = days_to_seconds * seconds_to_minutes
 days_to_hours = days_to_seconds * seconds_to_hours
 
 # Velocity
-meters_per_second: Type[float] = float
-meters_per_second_squared: Type[float] = float
+meters_per_second = float
+meters_per_second_squared = float
 
-radians_per_second: Type[float] = float
+radians_per_second = float
 radians_per_second__to__degrees_per_second: float = radians_to_degrees
 radians_per_second__to__rotations_per_second: float = radians_to_rotations
 
-degrees_per_second: Type[float] = float
+degrees_per_second = float
 degrees_per_second__to__radians_per_second: float = degrees_to_radians
 degrees_per_second__to__rotations_per_second: float = degrees_to_rotations
 
-rotations_per_second: Type[float] = float
+rotations_per_second = float
 rotations_per_second__to__radians_per_second: float = rotations_to_radians
 rotations_per_second__to__degrees_per_second: int = rotations_to_degrees
 
-rotations_per_minute: Type[float] = float
-rotations_per_minute_per_meter: Type[float] = float
-rotations_per_minute_per_second: Type[float] = float
+rotations_per_minute = float
+rotations_per_minute_per_meter = float
+rotations_per_minute_per_second = float
 
-miles_per_hour: Type[float] = float
+miles_per_hour = float
 miles_per_hour_to_meters_per_second: float = miles_to_meters * hours_to_seconds
+
+
+# Weight
+pounds = float
+pounds_to_kilograms = 0.453592
+
+kilograms = float
+kilograms_to_pounds = 1 / pounds_to_kilograms
+
