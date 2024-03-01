@@ -176,9 +176,9 @@ class IT:
             back_pose = Sensors.limelight_back.get_cam_pose()
             Sensors.limelight_back.disable_moving(back_pose + z_pose)
 
-        # if elevator is moving, disable limelight
-        button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
-            .onTrue(InstantCommand(stop_limelight_pos))\
-            .onFalse(InstantCommand(start_limelight_pos))
+        # # if elevator is moving, disable limelight
+        # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
+        #     .onTrue(InstantCommand(stop_limelight_pos))\
+        #     .onFalse(InstantCommand(start_limelight_pos))
             
     #     #LIMELIGHT TRIGGERS ----------------
