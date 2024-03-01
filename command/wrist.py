@@ -31,9 +31,10 @@ class ZeroWrist(SubsystemCommand[Wrist]):
     def end(self, interrupted: bool):
         if not interrupted:
             self.subsystem.wrist_zeroed = True
-            utils.LocalLogger.debug("Wrist zeroed")
+            # utils.LocalLogger.debug("Wrist zeroed")
         else:
-            utils.LocalLogger.debug("Wrist zeroing interrupted")
+            ...
+            # utils.LocalLogger.debug("Wrist zeroing interrupted")
 
 
 class SetWrist(SubsystemCommand[Wrist]):
@@ -204,7 +205,7 @@ class PassNote(SubsystemCommand[Wrist]):
         pass
 
     def isFinished(self):
-        return not self.subsystem.detect_note_second() and not self.subsystem.detect_note_second()
+        return not self.subsystem.note_detected()
 
     def end(self, interrupted: bool):
         self.subsystem.stop_feed()

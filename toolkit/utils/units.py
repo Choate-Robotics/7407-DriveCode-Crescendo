@@ -1,19 +1,19 @@
-from toolkit.unum import Unum, units
+# from toolkit.unum import Unum, units
 
 # --- UNUMS ---
-m = units.m
-ft = Unum.unit("ft", 0.3048 * m, "foot")
-inch = Unum.unit("in", ft / 12, "inch")
-mile = units.mile
-
-s = units.s
-ms = units.ms
-minute = units.min
-hour = units.h
-
-rad = units.rad
-deg = units.deg
-rev = Unum.unit("rev", 360 * deg, "revolution")
+# m = units.m
+# ft = Unum.unit("ft", 0.3048 * m, "foot")
+# inch = Unum.unit("in", ft / 12, "inch")
+# mile = units.mile
+#
+# s = units.s
+# ms = units.ms
+# minute = units.min
+# hour = units.h
+#
+# rad = units.rad
+# deg = units.deg
+# rev = Unum.unit("rev", 360 * deg, "revolution")
 
 
 # --- TYPING ---

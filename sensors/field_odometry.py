@@ -82,6 +82,8 @@ class FieldOdometry:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
+        self.update_from_internal()
+
 
         self.update_from_internal()
 
@@ -256,6 +258,21 @@ class FieldOdometry:
         self.table.putBoolean('drivetrain ready to shoot',
                               self.drivetrain.ready_to_shoot
                               )
+
+        self.table.putBoolean('ready to shoot', self.drivetrain.ready_to_shoot)
+
+        def bound_angle(degrees:float):
+            degrees = degrees % 360
+            if degrees > 180:
+                degrees -= 360
+            if degrees < -180:
+                degrees +=360
+            return degrees
+
+        self.table.putNumber(
+            'estimated rotation',
+            math.degrees(bound_angle(self.drivetrain.odometry_estimator.getEstimatedPosition().rotation().degrees()))
+        )
 
         return est_pose
 

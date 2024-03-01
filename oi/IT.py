@@ -1,9 +1,6 @@
-
 from utils import LocalLogger
 
-
-
-from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand, ParallelCommandGroup, WaitUntilCommand, SequentialCommandGroup
+from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
 import command
 import config, math
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
@@ -11,9 +8,7 @@ from wpimath.geometry import Pose3d, Rotation3d, Transform3d
 from utils import LocalLogger
 from oi.keymap import Controllers
 
-
 from robot_systems import Robot, Sensors, Field
-
 
 log = LocalLogger("IT")
 
@@ -26,8 +21,6 @@ class IT:
     @staticmethod
     def map_systems():
         log.info("Mapping systems...")
-        
-        
 
         #INTAKE TRIGGERS ----------------
         # If outer roller detects a note, run the intake in
@@ -95,24 +88,24 @@ class IT:
                     0
                 ))
             )
-            
-        button.Trigger(lambda: Robot.wrist.note_staged)\
-            .onTrue(
-                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-                    1
-                ))
-            ).onFalse(
-                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-                    0
-                ))
-            )
-        #FEEDER TRIGGERS ----------------
+    #     button.Trigger(lambda: Robot.wrist.note_staged)\
+    #         .onTrue(
+    #             InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+    #                 Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+    #                 1
+    #             ))
+    #         ).onFalse(
+    #             InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+    #                 Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+    #                 0
+    #             ))
+    #         )
+    #     #FEEDER TRIGGERS ----------------
         
         
-        #FLYWHEEL TRIGGERS ----------------
+    #     #FLYWHEEL TRIGGERS ----------------
             
+
         # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
             .onTrue(
@@ -121,7 +114,7 @@ class IT:
             ).onFalse(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
-            
+ 
         button.Trigger(lambda: config.amping)\
             .onTrue(
                 command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
@@ -132,7 +125,7 @@ class IT:
             # )
             
             
-        #FLYWHEEL TRIGGERS ----------------
+    #     #FLYWHEEL TRIGGERS ----------------
         
         
         #SHOOTER TRIGGERS ----------------
@@ -150,44 +143,42 @@ class IT:
             )
         #SHOOTER TRIGGERS ----------------
         
-        #ODOMETRY TRIGGERS ----------------
+    #     #ODOMETRY TRIGGERS ----------------
         
-        def lock_giraffe():
-            Robot.elevator.lock()
-            Robot.wrist.lock()
-            
-        def unlock_giraffe():
-            Robot.elevator.unlock()
-            Robot.wrist.unlock()
-        
-        # # if close to stage, lock giraffe
-        # button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Coordinates.Structures.Obstacles.kStage.getTranslation()) < config.stage_distance_threshold\
-        #     and (Robot.elevator.get_length() > config.elevator_stage_max or Robot.wrist.get_wrist_angle() < config.wrist_stage_max))\
-        #     .debounce(config.odometry_debounce).onTrue(
-        #         command.GiraffeLock(Robot.elevator, Robot.wrist)
-        #     ).onFalse(InstantCommand(unlock_giraffe))
-        #ODOMETRY TRIGGERS ----------------
-        
-        #LIMELIGHT TRIGGERS ----------------
-        def stop_limelight_pos():
-            Sensors.limelight_front.enable_moving()
-            Sensors.limelight_back.enable_moving()
+    #     def lock_giraffe():
+    #         Robot.elevator.lock()
+    #         Robot.wrist.lock()
 
-        def start_limelight_pos():
-            
-            elevator_height = Robot.elevator.get_length()
-            z_pose = Transform3d(0, 0, elevator_height, Rotation3d(0, 0, 0))
-            
-            front_pose = Sensors.limelight_front.get_cam_pose()
-            Sensors.limelight_front.disable_moving(front_pose + z_pose)
-            
-            back_pose = Sensors.limelight_back.get_cam_pose()
-            Sensors.limelight_back.disable_moving(back_pose + z_pose)
-            
+    #     def unlock_giraffe():
+    #         Robot.elevator.unlock()
+    #         Robot.wrist.unlock()
+
+    #     # # if close to stage, lock giraffe
+    #     # button.Trigger(lambda: Field.odometry.getPose().translation().distance(Field.POI.Coordinates.Structures.Obstacles.kStage.getTranslation()) < config.stage_distance_threshold\
+    #     #     and (Robot.elevator.get_length() > config.elevator_stage_max or Robot.wrist.get_wrist_angle() < config.wrist_stage_max))\
+    #     #     .debounce(config.odometry_debounce).onTrue(
+    #     #         command.GiraffeLock(Robot.elevator, Robot.wrist)
+    #     #     ).onFalse(InstantCommand(unlock_giraffe))
+    #     # ODOMETRY TRIGGERS ----------------
+
+    #     # LIMELIGHT TRIGGERS ----------------
+    #     def stop_limelight_pos():
+    #         Sensors.limelight_front.enable_moving()
+    #         Sensors.limelight_back.enable_moving()
+
+    #     def start_limelight_pos():
+    #         elevator_height = Robot.elevator.get_length()
+    #         z_pose = Transform3d(0, 0, elevator_height, Rotation3d(0, 0, 0))
+
+    #         front_pose = Sensors.limelight_front.get_cam_pose()
+    #         Sensors.limelight_front.disable_moving(front_pose + z_pose)
+
+    #         back_pose = Sensors.limelight_back.get_cam_pose()
+    #         Sensors.limelight_back.disable_moving(back_pose + z_pose)
 
         # if elevator is moving, disable limelight
         button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
             .onTrue(InstantCommand(stop_limelight_pos))\
             .onFalse(InstantCommand(start_limelight_pos))
             
-        #LIMELIGHT TRIGGERS ----------------
+    #     #LIMELIGHT TRIGGERS ----------------
