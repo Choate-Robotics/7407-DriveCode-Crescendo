@@ -81,69 +81,69 @@ path_4 = FollowPathCustom(
 )
 
 auto = ParallelCommandGroup(
-    # SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+    SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
     SequentialCommandGroup(
-        # ZeroWrist(Robot.wrist),
-        # ZeroElevator(Robot.elevator),
+        ZeroWrist(Robot.wrist),
+        ZeroElevator(Robot.elevator),
 
-        # # Shoot first note preload and deploy intake
-        # ParallelCommandGroup(
-        #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        #     DeployIntake(Robot.intake)
-        # ),
-        # ParallelCommandGroup(
-        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-        #     SetWristIdle(Robot.wrist),
-        # ),
+        # Shoot first note preload and deploy intake
+        ParallelCommandGroup(
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            DeployIntake(Robot.intake)
+        ),
+        ParallelCommandGroup(
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            SetWristIdle(Robot.wrist),
+        ),
 
-        # # Get second note
-        # ParallelCommandGroup(
+        # Get second note
+        ParallelCommandGroup(
             path_1,
-        #     IntakeStageNote(Robot.wrist, Robot.intake)
-        # ),
+            IntakeStageNote(Robot.wrist, Robot.intake)
+        ),
 
-        # # Shoot second note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-        #     SetWristIdle(Robot.wrist),
-        # ),
+        # Shoot second note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        ParallelCommandGroup(
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            SetWristIdle(Robot.wrist),
+        ),
 
-        # # Get third note
-        # ParallelCommandGroup(
+        # Get third note
+        ParallelCommandGroup(
             path_2,
-        #     IntakeStageNote(Robot.wrist, Robot.intake)
-        # ),
+            IntakeStageNote(Robot.wrist, Robot.intake)
+        ),
 
-        # # Shoot third note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # # ParallelCommandGroup(
-        # #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-        # #     SetWristIdle(Robot.wrist),
-        # # ),
-
-        # # Get fourth note
-        # ParallelCommandGroup(
-            path_3,
-        #     SequentialCommandGroup(
-        #         SetWristIdle(Robot.wrist),
-        #         IntakeStageNote(Robot.wrist, Robot.intake)
-        #     )
-            
-        # ),
-
-        # # Shoot fourth note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
+        # Shoot third note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         # ParallelCommandGroup(
         #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
         #     SetWristIdle(Robot.wrist),
         # ),
 
-        # ParallelCommandGroup(
+        # Get fourth note
+        ParallelCommandGroup(
+            path_3,
+            SequentialCommandGroup(
+                SetWristIdle(Robot.wrist),
+                IntakeStageNote(Robot.wrist, Robot.intake)
+            )
+            
+        ),
+
+        # Shoot fourth note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+
+        ParallelCommandGroup(
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            SetWristIdle(Robot.wrist),
+        ),
+
+        ParallelCommandGroup(
             path_4,
-        #     IntakeStageNote(Robot.wrist, Robot.intake)
-        # )
+            IntakeStageNote(Robot.wrist, Robot.intake)
+        )
     )
 )
 

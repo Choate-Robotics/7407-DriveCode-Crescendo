@@ -113,7 +113,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         )
 
 
-        # self.subsystem.set_driver_centric((speeds.vx, speeds.vy), speeds.omega)
+        self.subsystem.set_driver_centric((speeds.vx, speeds.vy), speeds.omega)
 
     def isFinished(self) -> bool:
         return self.finished
