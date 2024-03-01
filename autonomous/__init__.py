@@ -12,3 +12,4 @@ from autonomous.routines.RIGHT_THREE_NOTE.auto import routine as right_three_not
 from autonomous.routines.AMP_TWO_PIECE.auto import routine as amp_auto
 from autonomous.routines.AIM_SHOOT.auto import routine as aim_shoot_auto
 from autonomous.routines.MIDDLE_LEAVE.auto import routine as speaker_shoot_leave
+from autonomous.routines.FOUR_NOTE_MIDDLE.auto import routine as four_note_middle

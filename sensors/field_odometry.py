@@ -82,11 +82,12 @@ class FieldOdometry:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
+        self.update_from_internal()
+
 
         if not self.vision_on:
             return self.getPose()
 
-        self.update_from_internal()
 
 
         vision_robot_pose_list = self.get_vision_poses()
