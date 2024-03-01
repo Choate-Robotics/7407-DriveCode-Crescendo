@@ -63,14 +63,28 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
         )
         
-        CLEAR_NOTE = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 180
-        )
+        
         
     class Shooter:
         ...
         AIM = commands2.button.Trigger(
             lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+        )
+        
+        ENABLE_AIM_WRIST = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
+        )
+        
+        SET_WRIST_SUBWOOFER = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 90
+        )
+        
+        ENABLE_AIM_WRIST_OPERATOR = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 270
+        )
+        
+        FLYWHEEL_MANUAL_REVERSE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.R_3
         )
         
         # AIM = commands2.button.Trigger(
@@ -111,6 +125,7 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 0
         )
         
-        # UNDO_CLIMB_UP = commands2.button.JoystickButton(
-        #     Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.
-        # )
+        UNDO_CLIMB_UP = commands2.button.Trigger(
+            lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 180
+        )
+        
