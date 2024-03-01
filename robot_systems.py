@@ -1,10 +1,14 @@
 import subsystem
 import sensors
-import wpilib
+import wpilib, config, constants, utils
 
 
 class Robot:
-    pass
+    wrist: subsystem.Wrist = subsystem.Wrist()
+    intake: subsystem.Intake = subsystem.Intake()
+    elevator: subsystem.Elevator = subsystem.Elevator()
+    drivetrain: subsystem.Drivetrain = subsystem.Drivetrain()
+    flywheel: subsystem.Flywheel = subsystem.Flywheel()
 
 
 class Pneumatics:
@@ -12,13 +16,24 @@ class Pneumatics:
 
 
 class Sensors:
-    pass
+    limelight_intake = sensors.Limelight(config.LimelightPosition.init_elevator_front, 'limelight-i')
+    limelight_back = sensors.Limelight(config.LimelightPosition.init_elevator_back, 'limelight-b')
+
+    limelight_front = sensors.Limelight(config.LimelightPosition.init_elevator_front)
+
 
 class LEDs:
     pass
 
+
 class PowerDistribution:
-    pass
+    pd = wpilib.PowerDistribution(30, wpilib.PowerDistribution.ModuleType.kRev)
+
 
 class Field:
-    pass
+    odometry = sensors.FieldOdometry(
+        Robot.drivetrain,
+        sensors.LimelightController([Sensors.limelight_front, Sensors.limelight_back])
+        )
+    calculations = sensors.TrajectoryCalculator(odometry, Robot.elevator, Robot.flywheel)
+    POI = utils.POI()

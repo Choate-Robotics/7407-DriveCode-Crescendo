@@ -45,13 +45,13 @@ class NonBasicUnitError(UnumError):
 #     array([5 [m], 6 [m], 7 [m], 8 [m]], dtype=object)
 # It seems like array.__div__ is called rather than Unum.__rdiv__,
 # with the result that the M is broadcast across the array.
-try:
-    from numpy import array
-    def uarray(array_like, *args, **kwargs):
-        """Convenience function to return a Unum containing a numpy array."""
-        return Unum.coerceToUnum(array(array_like, *args, **kwargs))
-except ImportError:
-    pass
+# try:
+#     from numpy import array
+#     def uarray(array_like, *args, **kwargs):
+#         """Convenience function to return a Unum containing a numpy array."""
+#         return Unum.coerceToUnum(array(array_like, *args, **kwargs))
+# except ImportError:
+#     pass
 
 
 class Unum(object):

@@ -1,16 +1,15 @@
 from dataclasses import dataclass
 
-import commands2 as commands
-import commands2.button
+import commands2
 
-from robotpy_toolkit_7407.oi.joysticks import Joysticks
+from toolkit.oi.joysticks import Joysticks
 
 
 @dataclass
 class Button:
     controller_id: int
 
-    def __call__(self) -> commands.button.Button: ...
+    def __call__(self) -> commands2.button.Trigger: ...
 
 
 @dataclass
@@ -20,12 +19,14 @@ class DefaultButton(Button):
     """
     button_id: int
 
-    def __call__(self) -> commands.button.Button:
+    def __call__(self) -> commands2.button.Trigger:
         if self.button_id < 0:
-            return commands.button.Button(
+            return commands2.button.Trigger(
                 lambda: Joysticks.joysticks[self.controller_id].getRawAxis(-self.button_id) > 0.8
             )
-        return commands.button.JoystickButton(Joysticks.joysticks[self.controller_id], self.button_id)
+        return commands2.button.Trigger(
+            lambda: Joysticks.joysticks[self.controller_id].getRawButton(self.button_id)
+        )
 
 
 @dataclass
@@ -37,7 +38,7 @@ class AxisButton(Button):
     range_min: float = -1
     range_max: float = 1
 
-    def __call__(self) -> commands.button.Button:
-        return commands.button.Button(
+    def __call__(self) -> commands2.button.Trigger:
+        return commands2.button.Trigger(
             lambda: self.range_min <= Joysticks.joysticks[self.controller_id].getRawAxis(self.axis_id) <= self.range_max
         )
