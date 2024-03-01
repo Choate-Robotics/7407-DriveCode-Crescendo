@@ -14,6 +14,8 @@ class XBoxController:
     START = 8
     L_JOY = (0, 1)  # (x, y)
     R_JOY = (4, 5)  # (x, y)
+    L_3 = 9
+    R_3 = 10
 
 
 class LogitechController:

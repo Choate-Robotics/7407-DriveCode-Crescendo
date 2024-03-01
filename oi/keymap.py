@@ -83,6 +83,10 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 270
         )
         
+        FLYWHEEL_MANUAL_REVERSE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.R_3
+        )
+        
         # AIM = commands2.button.Trigger(
         #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
         # )

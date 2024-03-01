@@ -1,7 +1,7 @@
 import math
 import time
 import ntcore
-
+import config
 from toolkit.sensors.odometry import VisionEstimator
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
 
@@ -82,11 +82,14 @@ class FieldOdometry:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
+        self.update_from_internal()
+
+
+        self.update_from_internal()
 
         if not self.vision_on:
             return self.getPose()
 
-        self.update_from_internal()
 
 
         vision_robot_pose_list = self.get_vision_poses()
@@ -101,11 +104,11 @@ class FieldOdometry:
             vision_time: float
             vision_robot_pose: Pose3d
 
-            vision_robot_pose, vision_time,tag_count, distance_to_target = vision_pose
+            vision_robot_pose, vision_time, tag_count, distance_to_target, tag_span = vision_pose
             # vision_robot_pose, vision_time = pose_data
             # distance_to_target = target_pose.translation()
 
-            if self.within_tolerance(vision_robot_pose):
+            if self.within_tolerance(vision_robot_pose, tag_count, distance_to_target, tag_span):
                 self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count)
 
         return self.getPose()
@@ -150,7 +153,13 @@ class FieldOdometry:
             return True
         return False
 
-    def within_tolerance(self, vision: Pose3d) -> bool:
+    def within_tolerance(self, vision: Pose3d, tag_count: float, distance_to_target: float, tag_span:float) -> bool:
+        if tag_count < config.odometry_visible_tags_threshold:
+            return False
+        # if tag_span < config.odometry_tag_span_threshold:
+        #     return False
+        if distance_to_target > config.odometry_tag_distance_threshold:
+            return False
         return True
         # if self.within_est_rotation(vision) and self.within_est_pos(vision):
         #     return True
@@ -182,7 +191,7 @@ class FieldOdometry:
         )
 
     def get_vision_poses(self):
-        vision_robot_pose_list: list[tuple[Pose3d, float, float, float]] | None
+        vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float]] | None
         try:
             vision_robot_pose_list = (
                 self.vision_estimator.get_estimated_robot_pose()
@@ -217,9 +226,10 @@ class FieldOdometry:
             est_pose.rotation().radians()
         ])
         
-        self.table.putNumber('Estimated Rotation',
-                             est_pose.rotation().degrees()
-                             )
+        self.table.putNumber(
+            'Estimated Rotation',
+            est_pose.rotation().degrees()
+        )
 
         n_states = self.drivetrain.node_states
 
@@ -248,6 +258,21 @@ class FieldOdometry:
         self.table.putBoolean('drivetrain ready to shoot',
                               self.drivetrain.ready_to_shoot
                               )
+
+        self.table.putBoolean('ready to shoot', self.drivetrain.ready_to_shoot)
+
+        def bound_angle(degrees:float):
+            degrees = degrees % 360
+            if degrees > 180:
+                degrees -= 360
+            if degrees < -180:
+                degrees +=360
+            return degrees
+
+        self.table.putNumber(
+            'estimated rotation',
+            math.degrees(bound_angle(self.drivetrain.odometry_estimator.getEstimatedPosition().rotation().degrees()))
+        )
 
         return est_pose
 

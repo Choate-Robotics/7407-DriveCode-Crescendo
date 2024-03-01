@@ -162,3 +162,4 @@ class Intake(Subsystem):
         table.putBoolean('intake running', self.intake_running)
         table.putNumber('deploy current', self.get_deploy_current())
         table.putNumber('outer current', self.get_outer_current())
+        table.putNumber('intake applied output', self.inner_motor.motor.getAppliedOutput())

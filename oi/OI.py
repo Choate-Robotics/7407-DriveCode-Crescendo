@@ -71,13 +71,23 @@ class OI:
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
         
+        def set_amping():
+            config.amping = True
+            
+        def set_not_amping():
+            config.amping = False
+        
         Keymap.Elevator.AMP.onTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
-            command.Amp(Robot.elevator, Robot.wrist, Robot.flywheel)
+            command.Amp(Robot.elevator, Robot.wrist).alongWith(
+                commands2.InstantCommand(lambda: set_amping())
+            )
         ).onFalse(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
             command.SetWristIdle(Robot.wrist)
+            ).alongWith(
+                commands2.InstantCommand(lambda: set_not_amping())
             )
         )
         
@@ -145,6 +155,13 @@ class OI:
         # )
         # )
         
+        Keymap.Climb.UNDO_CLIMB_UP.and_(lambda: config.climbing).onTrue(
+            commands2.InstantCommand(lambda: stop_climbing())
+            .alongWith(commands2.InstantCommand(lambda: climb_not_ready()).alongWith(
+            command.UndoClimb(Robot.elevator, Robot.wrist, Robot.intake)
+            ))
+        )
+        
         
         Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
             command.ClimbDown(Robot.elevator, Robot.wrist).alongWith(
@@ -153,3 +170,21 @@ class OI:
         )
         
         Keymap.Climb.TRAP.and_(lambda: config.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
+        
+        
+        def set_manual_flywheel():
+            config.flywheel_manual = True
+            
+        def set_auto_flywheel():
+            config.flywheel_manual = False
+            
+        #TODO: MANUAL REVERSE FLYWHEEL
+        # Keymap.Shooter.FLYWHEEL_MANUAL_REVERSE.onTrue(
+        #     commands2.InstantCommand(lambda: set_manual_flywheel()).alongWith(
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, -5)
+        #     )
+        # ).onFalse(
+        #     commands2.InstantCommand(lambda: set_auto_flywheel()).alongWith(
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
+        #     )
+        # )

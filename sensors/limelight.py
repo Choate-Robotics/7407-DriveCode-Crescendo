@@ -307,7 +307,7 @@ class Limelight:
             tag_count:float = botpose[7]
             tag_span:float = botpose[8]
             ave_tag_dist:float = botpose[9]
-            return pose, timestamp, tag_count, ave_tag_dist
+            return pose, timestamp, tag_count, ave_tag_dist, tag_span
         
     def get_target_pose(self):
         

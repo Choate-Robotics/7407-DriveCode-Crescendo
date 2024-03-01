@@ -1,3 +1,5 @@
+import math
+
 from subsystem import Elevator, Wrist, Intake, Drivetrain, Flywheel
 from sensors import FieldOdometry, TrajectoryCalculator
 
@@ -62,8 +64,6 @@ class Giraffe(commands2.Command):
             PrintCommand("Running both elevator and wrist normally")
         )
 
-        
-
         # if the target wrist angle is 'aim' then set the wrist angle to the calculated angle, we will pass off the aiming command at the end
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kAim:
             if self.shot_calc == None:
@@ -71,7 +71,7 @@ class Giraffe(commands2.Command):
                 self.finished = True
                 return
             self.continuous_command = AimWrist(self.wrist, self.shot_calc)
-            
+
             self.aiming = True
             self.target.wrist_angle = self.wrist.get_wrist_angle()
             # self.target.wrist_angle = 17.5 * degrees_to_radians
@@ -85,13 +85,13 @@ class Giraffe(commands2.Command):
             self.target.wrist_angle = config.staging_angle
             print('staging note to wrist')
             self.continuous_command = FeedIn(self.wrist)
-                # InstantCommand(lambda: self.wrist.feed_in())
+            # InstantCommand(lambda: self.wrist.feed_in())
             debug_commands.append(
                 PrintCommand("Staging note to wrist")
             )
 
         if self.target.wrist_angle == config.Giraffe.GiraffePos.Special.kCurrentAngle:
-            self.target.wrist_angle = self.wrist.get_wrist_angle() 
+            self.target.wrist_angle = self.wrist.get_wrist_angle()
             debug_commands.append(
                 PrintCommand("Setting wrist to current angle")
             )
@@ -163,7 +163,6 @@ class Giraffe(commands2.Command):
             self.table.putBoolean('finished', False)
         self.finished = False
         commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
-        
 
 
 class GiraffeLock(commands2.Command):
@@ -292,7 +291,7 @@ class IntakeStageIdle(SequentialCommandGroup):
 #     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
 #         super().__init__(
 
-            
+
 #             Giraffe(elevator, wrist, config.Giraffe.kIdle),
 #             ParallelCommandGroup(
 #             PassIntakeNote(intake),
@@ -338,7 +337,30 @@ class Shoot(SequentialCommandGroup):
     def __init__(self, wrist: Wrist):
         super().__init__(
             PassNote(wrist),
-            InstantCommand(lambda: wrist.set_note_not_staged())
+            InstantCommand(lambda: wrist.set_note_not_staged()),
+            SetWristIdle(wrist)
+        )
+
+
+class ShootAuto(SequentialCommandGroup):
+    """Shoots a note during the autonomous period
+
+    Args:
+        SequentialCommandGroup (drivetrain): Drivetrain subsystem
+        SequentialCommandGroup (wrist): Wrist subsystem
+        SequentialCommandGroup (flywheel): Flywheel subsystem
+        SequentialCommandGroup (calculations): TrajectoryCalculator
+    """
+
+    def __init__(self, drivetrain: Drivetrain, wrist: Wrist, flywheel: Flywheel, traj_cal: TrajectoryCalculator):
+        super().__init__(
+            ParallelCommandGroup(  # Aim
+                AimWrist(wrist, traj_cal),
+                DriveSwerveAim(drivetrain, traj_cal),
+            ).until(lambda: drivetrain.ready_to_shoot and wrist.ready_to_shoot and flywheel.ready_to_shoot)\
+                .withTimeout(
+                config.auto_shoot_deadline),
+            PassNote(wrist),
         )
 
 
@@ -346,6 +368,7 @@ class ShootAmp(SequentialCommandGroup):
     """
     Shoots a note into the amp
     """
+
     def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
         super().__init__(
             ParallelCommandGroup(
@@ -362,6 +385,7 @@ class EnableClimb(SequentialCommandGroup):
     """
     Raises the elevator and wrist and deploys tenting to prepare for climb
     """
+
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             ParallelCommandGroup(
@@ -383,10 +407,12 @@ class UndoClimb(ParallelCommandGroup):
     """
     Undeploys tenting and lowers elevator
     """
+
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             UnDeployTenting(intake),
-            Giraffe(elevator, wrist, config.Giraffe.kElevatorLow),
+            SetElevator(elevator, config.Giraffe.kIdle.height),
+            SetWristIdle(wrist)
         )
 
 
@@ -408,15 +434,13 @@ class ScoreTrap(SequentialCommandGroup):
         )
 
 
-class Amp(ParallelCommandGroup):
+class Amp(SequentialCommandGroup):
     
-    def __init__(self, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
+    def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
             SetWrist(wrist, -20 * degrees_to_radians),
-            SequentialCommandGroup(
-                WaitUntilCommand(lambda: wrist.get_wrist_angle() < (-5 * degrees_to_radians)),
-                SetElevator(elevator, config.Giraffe.kAmp.height),
-            ),
+            WaitCommand(.3),
+            SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )
             
