@@ -66,7 +66,7 @@ class TrajectoryCalculator:
         
 
         # Calculate the horizontal angle without considering velocities
-        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
+        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else np.radians(90)
 
 
         # Calculate the impact of floor velocities on the trajectory
@@ -87,6 +87,9 @@ class TrajectoryCalculator:
             )
             + 0.5 * phi0
         )
+        
+        if not isinstance(result_angle, float) or not isinstance(result_angle, int):
+            result_angle = 0
 
         return result_angle
 

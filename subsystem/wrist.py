@@ -58,6 +58,9 @@ class Wrist(Subsystem):
             return constants.wrist_max_rotation
         return angle
     
+    def check_value_type(self, value: float) -> bool:
+        return isinstance(value, float) or isinstance(value, int)
+    
     @staticmethod
     def abs_to_radians(abs_angle: float) -> radians:
         if abs_angle > .5:
@@ -79,6 +82,12 @@ class Wrist(Subsystem):
         :param pos: The position to set the wrist to(float)
         :return: None
         """
+        
+        if not self.check_value_type(angle):
+            if config.DEBUG_MODE:
+                raise ValueError("Angle must be a float or int")
+            return
+        
         angle = self.limit_angle(angle)
         self.target_angle = angle
 
