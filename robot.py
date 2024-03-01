@@ -93,6 +93,8 @@ class _Robot(wpilib.TimedRobot):
 
         self.log.complete("Robot initialized")
         
+        Robot.wrist.zero_wrist()
+        
 
     def robotPeriodic(self):
         
