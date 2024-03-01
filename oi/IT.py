@@ -114,7 +114,7 @@ class IT:
         #FLYWHEEL TRIGGERS ----------------
             
         # if note in feeder, spin to set shot velocity
-        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
@@ -122,14 +122,14 @@ class IT:
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
             
-        # button.Trigger(lambda: config.amping)\
-        #     .onTrue(
-        #         command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
-        #         # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
-        #     )\
-        #     # .onFalse(
-        #     #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
-        #     # )
+        button.Trigger(lambda: config.amping)\
+            .onTrue(
+                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
+                # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
+            )\
+            # .onFalse(
+            #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+            # )
             
             
         #FLYWHEEL TRIGGERS ----------------

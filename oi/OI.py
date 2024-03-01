@@ -79,7 +79,7 @@ class OI:
         
         Keymap.Elevator.AMP.onTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
-            command.Amp(Robot.elevator, Robot.wrist, Robot.flywheel).alongWith(
+            command.Amp(Robot.elevator, Robot.wrist).alongWith(
                 commands2.InstantCommand(lambda: set_amping())
             )
         ).onFalse(
@@ -170,3 +170,21 @@ class OI:
         )
         
         Keymap.Climb.TRAP.and_(lambda: config.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
+        
+        
+        def set_manual_flywheel():
+            config.flywheel_manual = True
+            
+        def set_auto_flywheel():
+            config.flywheel_manual = False
+            
+        #TODO: MANUAL REVERSE FLYWHEEL
+        # Keymap.Shooter.FLYWHEEL_MANUAL_REVERSE.onTrue(
+        #     commands2.InstantCommand(lambda: set_manual_flywheel()).alongWith(
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, -5)
+        #     )
+        # ).onFalse(
+        #     commands2.InstantCommand(lambda: set_auto_flywheel()).alongWith(
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
+        #     )
+        # )

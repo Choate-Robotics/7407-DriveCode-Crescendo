@@ -338,7 +338,8 @@ class Shoot(SequentialCommandGroup):
     def __init__(self, wrist: Wrist):
         super().__init__(
             PassNote(wrist),
-            InstantCommand(lambda: wrist.set_note_not_staged())
+            InstantCommand(lambda: wrist.set_note_not_staged()),
+            SetWristIdle(wrist)
         )
 
 
@@ -409,15 +410,13 @@ class ScoreTrap(SequentialCommandGroup):
         )
 
 
-class Amp(ParallelCommandGroup):
+class Amp(SequentialCommandGroup):
     
-    def __init__(self, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
+    def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
             SetWrist(wrist, -20 * degrees_to_radians),
-            SequentialCommandGroup(
-                WaitUntilCommand(lambda: wrist.get_wrist_angle() < (-5 * degrees_to_radians)),
-                SetElevator(elevator, config.Giraffe.kAmp.height),
-            ),
+            WaitCommand(.3),
+            SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )
             

@@ -91,9 +91,10 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         self.theta_controller = ProfiledPIDControllerRadians(
             9, 0, .003,
             constraints,
-            config.period
+            config.
+            period
             )
-        
+        self.theta_controller.setTolerance(radians(1), radians(3))
 
     def initialize(self) -> None:
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
@@ -113,7 +114,12 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle.radians())
         
         
-        if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(), target_angle.radians()) < radians(1):
+        # if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(), target_angle.radians()) < radians(1):
+        #     self.subsystem.ready_to_shoot = True
+        # else:
+        #     self.subsystem.ready_to_shoot = False
+        
+        if self.theta_controller.atSetpoint():
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False

@@ -4,7 +4,7 @@
 # import matplotlib.pyplot as plt
 # import ntcore
 import numpy as np
-from math import degrees, radians
+from math import degrees, radians, isnan
 import config, ntcore
 import constants
 from sensors.field_odometry import FieldOdometry
@@ -12,6 +12,7 @@ from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
 from wpimath.geometry import Rotation2d, Translation3d, Translation2d
+
 
 
 # from scipy.integrate import solve_ivp
@@ -74,7 +75,8 @@ class TrajectoryCalculator:
         
         # Calculate the effective velocity
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
+        # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
+        v_effective = config.v0_flywheel
 
         # Calculate the angle with floor velocities
         result_angle = (
@@ -88,7 +90,7 @@ class TrajectoryCalculator:
             + 0.5 * phi0
         )
         
-        if not isinstance(result_angle, float) or not isinstance(result_angle, int):
+        if isnan(result_angle):
             result_angle = config.Giraffe.kIdle.wrist_angle
 
         return result_angle
