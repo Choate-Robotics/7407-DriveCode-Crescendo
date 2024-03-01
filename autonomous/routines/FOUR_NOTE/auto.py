@@ -18,6 +18,7 @@ from autonomous.routines.FOUR_NOTE.coords import (
     get_first_note,
     get_second_note,
     get_third_note,
+    go_to_midline,
     initial
 )
 
@@ -65,12 +66,20 @@ path_3 = FollowPathCustom(
     )
 )
 
-# auto = SequentialCommandGroup(
-#     path_1,
-#     path_2,
-#     path_3,
-#
-# )
+path_4 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=go_to_midline[0],
+        waypoints=[coord for coord in go_to_midline[1]],
+        end_pose=go_to_midline[2],
+        max_velocity=5,
+        max_accel=2,
+        start_velocity=0,
+        end_velocity=0,
+        rev=True
+    )
+)
+
 auto = ParallelCommandGroup(
     SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
     SequentialCommandGroup(
@@ -108,19 +117,33 @@ auto = ParallelCommandGroup(
 
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        ParallelCommandGroup(
-            # DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-            SetWristIdle(Robot.wrist),
-        ),
+        # ParallelCommandGroup(
+        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+        #     SetWristIdle(Robot.wrist),
+        # ),
 
         # Get fourth note
         ParallelCommandGroup(
             path_3,
-            IntakeStageNote(Robot.wrist, Robot.intake)
+            SequentialCommandGroup(
+                SetWristIdle(Robot.wrist),
+                IntakeStageNote(Robot.wrist, Robot.intake)
+            )
+            
         ),
 
         # Shoot fourth note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+
+        ParallelCommandGroup(
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            SetWristIdle(Robot.wrist),
+        ),
+
+        ParallelCommandGroup(
+            path_4,
+            IntakeStageNote(Robot.wrist, Robot.intake)
+        )
     )
 )
 

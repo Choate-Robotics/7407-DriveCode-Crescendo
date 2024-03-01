@@ -128,7 +128,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             return abs(heading - target) < tolerance
 
         if bounded_angle_diff(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(),
-                              target_angle.radians()) < radians(10):
+                              target_angle.radians()) < radians(3):
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
