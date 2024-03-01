@@ -203,7 +203,7 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.scheduler.schedule(commands2.SequentialCommandGroup(
-            command.DrivetrainZero(Robot.drivetrain),
+            # command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
