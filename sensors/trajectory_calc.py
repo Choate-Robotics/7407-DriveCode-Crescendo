@@ -4,14 +4,15 @@
 # import matplotlib.pyplot as plt
 # import ntcore
 import numpy as np
-from math import degrees, radians
+from math import degrees, radians, isnan
 import config, ntcore
 import constants
 from sensors.field_odometry import FieldOdometry
-from subsystem import Elevator
+from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
 from wpimath.geometry import Rotation2d, Translation3d, Translation2d
+
 
 
 # from scipy.integrate import solve_ivp
@@ -31,7 +32,7 @@ class TrajectoryCalculator:
     speaker_z: float
     distance_to_target: float
 
-    def __init__(self, odometry: FieldOdometry, elevator: Elevator):
+    def __init__(self, odometry: FieldOdometry, elevator: Elevator, flywheel: Flywheel):
         self.odometry = odometry
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
@@ -39,6 +40,7 @@ class TrajectoryCalculator:
         self.shoot_angle = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
+        self.flywheel = flywheel
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
@@ -52,17 +54,45 @@ class TrajectoryCalculator:
         Calculates the angle of the trajectory without air resistance.
         """
 
-        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else 0
-        result_angle = (
-                0.5
-                * np.arcsin(
-            np.sin(phi0)
-            + constants.g
-               * distance_to_target
-               * np.cos(phi0)
-               / (config.v0_flywheel ** 2))
-                + 0.5 * phi0
+        vels = self.odometry.drivetrain.chassis_speeds
+        
+        drivetrain_angle = self.get_rotation_to_speaker()
+        
+        
+        vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(vels, drivetrain_angle)
+        
+        rvx, rvy, rvo = (
+            vels.vx, vels.vy, vels.omega
         )
+        
+
+        # Calculate the horizontal angle without considering velocities
+        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else np.radians(90)
+
+
+        # Calculate the impact of floor velocities on the trajectory
+
+        
+        # Calculate the effective velocity
+        # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
+        # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
+        v_effective = config.v0_flywheel
+
+        # Calculate the angle with floor velocities
+        result_angle = (
+            0.5 * np.arcsin(
+                np.sin(phi0)
+                + constants.g
+                * distance_to_target
+                * np.cos(phi0)
+                / (v_effective ** 2)
+            )
+            + 0.5 * phi0
+        )
+        
+        if isnan(result_angle):
+            result_angle = config.Giraffe.kIdle.wrist_angle
+
         return result_angle
 
     def update_shooter(self):
@@ -104,16 +134,23 @@ class TrajectoryCalculator:
                     self.shoot_angle = theta_2
                     return theta_2
                 correction_angle = z_goal_error * z_to_angle_conversion
+                
+    def get_rotation_to_speaker(self):
+        """
+        returns rotation of base to face target
+        :return: base target angle
+        """
+        speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        robot_pose_2d = self.odometry.getPose()
+        robot_to_speaker = speaker_translation - robot_pose_2d.translation()
+        return robot_to_speaker.angle()
 
     def update_base(self):
         """
-        updates rotation of base to face target
+        updates rotation of base to score shot
         :return: base target angle
         """
-        speaker_translation = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
-        robot_pose_2d = self.odometry.getPose()
-        robot_to_speaker = speaker_translation - robot_pose_2d.translation()
-        self.base_rotation2d = robot_to_speaker.angle()
+        self.base_rotation2d = self.get_rotation_to_speaker()
         return self.base_rotation2d
 
     def update(self):
@@ -139,9 +176,9 @@ class TrajectoryCalculator:
 
         u0 = (
             0,
-            config.v0_flywheel * np.cos(shooter_theta),
+            self.flywheel.get_velocity_linear() * np.cos(shooter_theta),
             0.0,
-            config.v0_flywheel * np.sin(shooter_theta),
+            self.flywheel.get_velocity_linear() * np.sin(shooter_theta),
         )
         t0, tf = 0, 60
         # Stop the integration when we hit the target.

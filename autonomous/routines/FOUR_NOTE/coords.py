@@ -3,7 +3,7 @@ from robot_systems import Field
 from wpimath.geometry import Translation2d
 import constants
 import math
-
+from utils.POI import POI, POIPose
 coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)

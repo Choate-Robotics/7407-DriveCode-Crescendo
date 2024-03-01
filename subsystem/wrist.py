@@ -36,7 +36,7 @@ class Wrist(Subsystem):
     def init(self):
         self.wrist_motor.init()
         # self.wrist_motor.motor.restoreFactoryDefaults(True)
-        self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
+        # self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
         # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
         # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.encoder)
         
@@ -57,6 +57,9 @@ class Wrist(Subsystem):
         elif angle >= constants.wrist_max_rotation:
             return constants.wrist_max_rotation
         return angle
+    
+    def check_value_type(self, value: float) -> bool:
+        return isinstance(value, float) or isinstance(value, int)
     
     @staticmethod
     def abs_to_radians(abs_angle: float) -> radians:
@@ -79,6 +82,12 @@ class Wrist(Subsystem):
         :param pos: The position to set the wrist to(float)
         :return: None
         """
+        
+        if not self.check_value_type(angle):
+            if config.DEBUG_MODE:
+                raise ValueError("Angle must be a float or int")
+            return
+        
         angle = self.limit_angle(angle)
         self.target_angle = angle
 
