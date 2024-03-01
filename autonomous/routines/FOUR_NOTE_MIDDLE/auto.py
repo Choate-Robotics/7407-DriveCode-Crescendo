@@ -91,21 +91,18 @@ auto = ParallelCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
             DeployIntake(Robot.intake)
         ),
-        
+        SetWristIdle(Robot.wrist).withTimeout(1),
         # Get second note
         ParallelCommandGroup(
             path_1,
-            SequentialCommandGroup(
-                SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
-            )
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
         ),
 
         # Shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-            SetWristIdle(Robot.wrist),
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+            SetWristIdle(Robot.wrist).withTimeout(1),
         ),
 
         # Get third note
@@ -116,14 +113,11 @@ auto = ParallelCommandGroup(
 
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
+        SetWristIdle(Robot.wrist).withTimeout(1),
         # Get fourth note
         ParallelCommandGroup(
             path_3,
-            SequentialCommandGroup(
-                SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
-            )
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
             
         ),
 
@@ -131,8 +125,8 @@ auto = ParallelCommandGroup(
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-            SetWristIdle(Robot.wrist),
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+            SetWristIdle(Robot.wrist).withTimeout(1),
         ),
 
         ParallelCommandGroup(

@@ -102,7 +102,7 @@ auto = ParallelCommandGroup(
     SequentialCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
-        DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+        DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
 
         # Shoot preload and deploy intake
         ParallelCommandGroup(
@@ -112,7 +112,7 @@ auto = ParallelCommandGroup(
 
         # Reset drivetrain
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
             SetWristIdle(Robot.wrist),
         ),
 
@@ -127,7 +127,7 @@ auto = ParallelCommandGroup(
 
         # Reset drivetrain
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
             SetWristIdle(Robot.wrist),
         ),
 
@@ -145,21 +145,21 @@ auto = ParallelCommandGroup(
 
         # Reset drivetrain
         ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
             SetWristIdle(Robot.wrist),
         ),
 
-        # Get fourth note
-        SequentialCommandGroup(
-            ParallelCommandGroup(
-                path_4,
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
-            ),
-            path_5
-        ),
+        # # Get fourth note
+        # SequentialCommandGroup(
+        #     ParallelCommandGroup(
+        #         path_4,
+        #         IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
+        #     ),
+        #     path_5
+        # ),
 
-        # Shoot fourth note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # # Shoot fourth note
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
     )
 )
