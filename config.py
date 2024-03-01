@@ -220,6 +220,7 @@ flywheel_feed_forward = 0.65  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
 auto_shoot_deadline = 1.2
+auto_intake_note_deadline = 3
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.3, 0.0, 0.02, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake

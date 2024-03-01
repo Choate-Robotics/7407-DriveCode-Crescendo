@@ -10,6 +10,7 @@ from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
     ParallelCommandGroup,
+    ParallelDeadlineGroup,
     WaitCommand
 )
 
@@ -118,7 +119,7 @@ auto = ParallelCommandGroup(
         # Get second note
         ParallelCommandGroup(
             path_1,
-            IntakeStageNote(Robot.wrist, Robot.intake)
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
         ),
 
         # Shoot second note
@@ -134,7 +135,7 @@ auto = ParallelCommandGroup(
         SequentialCommandGroup(
             ParallelCommandGroup(
                 path_2,
-                IntakeStageNote(Robot.wrist, Robot.intake)
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
             ),
             path_3
         ),
@@ -152,7 +153,7 @@ auto = ParallelCommandGroup(
         SequentialCommandGroup(
             ParallelCommandGroup(
                 path_4,
-                IntakeStageNote(Robot.wrist, Robot.intake)
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
             ),
             path_5
         ),
