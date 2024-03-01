@@ -71,13 +71,23 @@ class OI:
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
         
+        def set_amping():
+            config.amping = True
+            
+        def set_not_amping():
+            config.amping = False
+        
         Keymap.Elevator.AMP.onTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
-            command.Amp(Robot.elevator, Robot.wrist, Robot.flywheel)
+            command.Amp(Robot.elevator, Robot.wrist, Robot.flywheel).alongWith(
+                commands2.InstantCommand(lambda: set_amping())
+            )
         ).onFalse(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
             command.SetWristIdle(Robot.wrist)
+            ).alongWith(
+                commands2.InstantCommand(lambda: set_not_amping())
             )
         )
         

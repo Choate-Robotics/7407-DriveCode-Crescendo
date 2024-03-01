@@ -124,6 +124,9 @@ ready_to_climb: bool = False
 climbing: bool = False
 climbed: bool = False
 
+# AMP
+amping: bool = False
+
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
                                  constants.limelight_height_LL3, Rotation3d(0, constants.limelight_elevator_angle, 0))
@@ -168,7 +171,7 @@ elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
-wrist_time_to_max_vel = 0.01
+wrist_time_to_max_vel = 0.0
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
 wrist_flat_ff = -1
@@ -219,6 +222,12 @@ max_sim_times = 100  # To make sure that we don't have infinite while loop
 flywheel_feed_forward = 0.0  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
+
+# Odometry
+odometry_visible_tags_threshold = 1
+odometry_tag_span_threshold = 0
+odometry_tag_distance_threshold = 4
+
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.3, 0.0, 0.02, elevator_feed_forward, (-.5, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake

@@ -122,6 +122,15 @@ class IT:
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
             
+        # button.Trigger(lambda: config.amping)\
+        #     .onTrue(
+        #         command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
+        #         # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
+        #     )\
+        #     # .onFalse(
+        #     #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+        #     # )
+            
             
         #FLYWHEEL TRIGGERS ----------------
         
@@ -134,7 +143,7 @@ class IT:
             Robot.flywheel.ready_to_shoot = False
         
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
-            .onTrue(
+            .debounce(.1).onTrue(
                 command.Shoot(Robot.wrist).andThen(
                 InstantCommand(lambda: reset_shooter())
                 )
@@ -177,8 +186,8 @@ class IT:
             
 
         # if elevator is moving, disable limelight
-        # button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
-        #     .onTrue(InstantCommand(stop_limelight_pos))\
-        #     .onFalse(InstantCommand(start_limelight_pos))
+        button.Trigger(lambda: Robot.elevator.elevator_moving).debounce(0.1)\
+            .onTrue(InstantCommand(stop_limelight_pos))\
+            .onFalse(InstantCommand(start_limelight_pos))
             
         #LIMELIGHT TRIGGERS ----------------

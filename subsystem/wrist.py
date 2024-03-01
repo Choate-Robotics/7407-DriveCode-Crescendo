@@ -36,7 +36,7 @@ class Wrist(Subsystem):
     def init(self):
         self.wrist_motor.init()
         # self.wrist_motor.motor.restoreFactoryDefaults(True)
-        self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
+        # self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
         # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
         # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.encoder)
         
