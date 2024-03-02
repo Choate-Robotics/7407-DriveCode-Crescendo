@@ -145,11 +145,11 @@ class POIPose:
         #     ...
         #     # print("not inverting") if verbose else None
 
-        if (config.active_team == config.Team.RED or DriverStation.getAlliance() == DriverStation.Alliance.kRed) and not self._red:
+        if (config.active_team == config.Team.RED) and not self._red:
             # print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
             self._red = True
-        elif (config.active_team == config.Team.BLUE or DriverStation.getAlliance() == DriverStation.Alliance.kBlue) and self._red:
+        elif (config.active_team == config.Team.BLUE) and self._red:
             # print("inverting") if verbose else None
             self._pose = self.__invertY(self._pose)
             self._red = False
