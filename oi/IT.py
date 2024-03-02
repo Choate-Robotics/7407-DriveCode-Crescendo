@@ -34,19 +34,7 @@ class IT:
         #     .debounce(config.double_note_timeout).onTrue(
         #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
         #     )
-        
-        # # if note in intake and index ready to receive, pass note to index
-        button.Trigger(lambda: Robot.intake.detect_note()).debounce(0).onTrue(
-            InstantCommand(lambda: Robot.intake.add_note())
-        ).onFalse(
-            InstantCommand(lambda: Robot.intake.remove_note())
-        )
-        
-        
-        button.Trigger(lambda: Robot.intake.note_in_intake and not Robot.wrist.note_staged)\
-        .onTrue(
-            command.StageNote(Robot.elevator, Robot.wrist, Robot.intake)
-        )
+
         #INTAKE TRIGGERS ----------------
         
         
@@ -111,7 +99,7 @@ class IT:
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
-            ).onFalse(
+           ).onFalse(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
  

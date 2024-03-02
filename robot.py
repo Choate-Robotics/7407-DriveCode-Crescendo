@@ -57,8 +57,8 @@ class _Robot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
         self.team_selection = wpilib.SendableChooser()
-        self.team_selection.setDefaultOption("Blue", 1)
-        self.team_selection.addOption("Red", 0)
+        self.team_selection.setDefaultOption("Blue", config.Team.BLUE)
+        self.team_selection.addOption("Red", config.Team.RED)
 
         wpilib.SmartDashboard.putData("Team", self.team_selection)
 
@@ -119,7 +119,7 @@ class _Robot(wpilib.TimedRobot):
         # else:
         #     config.active_team = config.Team.RED
 
-        if self.team_selection.getSelected() == 1:
+        if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
         else:
             config.active_team = config.Team.RED
@@ -233,7 +233,7 @@ class _Robot(wpilib.TimedRobot):
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
-
+        Field.calculations.init()
         Robot.drivetrain.n_front_left.zero()
         Robot.drivetrain.n_front_right.zero()
         Robot.drivetrain.n_back_left.zero()
@@ -245,6 +245,7 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def disabledInit(self) -> None:
+
         self.log.info("Robot disabled")
 
     def disabledPeriodic(self) -> None:

@@ -1,6 +1,8 @@
 # Imports
 import math
 from wpimath.geometry import Rotation2d, Translation2d
+
+import config
 from units.SI import (
     degrees_per_second__to__radians_per_second,
     feet_to_meters,
@@ -79,7 +81,7 @@ class FieldPos:
 
 
     class Scoring:
-        speaker_y = 218.42 * inches_to_meters + 0.2
+        speaker_y = 218.42 * inches_to_meters + (0.2 if config.active_team == config.Team.RED else 0)
 
         speaker_z_top = 82.90 * inches_to_meters
         
