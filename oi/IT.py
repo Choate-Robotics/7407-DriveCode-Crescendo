@@ -88,18 +88,18 @@ class IT:
                     0
                 ))
             )
-    #     button.Trigger(lambda: Robot.wrist.note_staged)\
-    #         .onTrue(
-    #             InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-    #                 Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-    #                 1
-    #             ))
-    #         ).onFalse(
-    #             InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-    #                 Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-    #                 0
-    #             ))
-    #         )
+        button.Trigger(lambda: Robot.wrist.note_staged)\
+            .onTrue(
+                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                    1
+                ))
+            ).onFalse(
+                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                    0
+                ))
+            )
     #     #FEEDER TRIGGERS ----------------
         
         

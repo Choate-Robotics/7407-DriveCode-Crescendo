@@ -154,12 +154,15 @@ class FieldOdometry:
         return False
 
     def within_tolerance(self, vision: Pose3d, tag_count: float, distance_to_target: float, tag_span:float) -> bool:
-        if tag_count < config.odometry_visible_tags_threshold:
+        if tag_count <= 1:
+            if distance_to_target > config.odometry_tag_distance_threshold:
+                return False
+        elif tag_count >= 2:
+            if distance_to_target > config.odometry_two_tag_distance_threshold:
+                return False
+        else:
             return False
-        # if tag_span < config.odometry_tag_span_threshold:
-        #     return False
-        if distance_to_target > config.odometry_tag_distance_threshold:
-            return False
+
         return True
         # if self.within_est_rotation(vision) and self.within_est_pos(vision):
         #     return True

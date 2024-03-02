@@ -229,9 +229,10 @@ flywheel_shot_current_threshold = 20
 flywheel_manual: bool = False
 
 # Odometry
-odometry_visible_tags_threshold = 1
+odometry_visible_tags_threshold = 2
 odometry_tag_span_threshold = 0
 odometry_tag_distance_threshold = 4
+odometry_two_tag_distance_threshold = 7
 
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(

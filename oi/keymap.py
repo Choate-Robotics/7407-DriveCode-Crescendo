@@ -28,8 +28,8 @@ class Keymap:
         DRIVE_ROTATION_AXIS = JoystickAxis(
             Controllers.DRIVER, controllerDRIVER.R_JOY[0]
         )
-        RESET_GYRO = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
+        RESET_GYRO = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getPOV() == 180
         )
         X_MODE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
@@ -100,7 +100,7 @@ class Keymap:
         )
         
         DUMP_NOTE = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.A
         )
         
         # CLEAR_NOTE =
