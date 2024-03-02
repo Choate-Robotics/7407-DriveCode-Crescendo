@@ -15,7 +15,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonConfig
-from units.SI import degrees_to_radians, meters, radians, meters_per_second
+from units.SI import degrees_to_radians, meters, radians, meters_per_second, inches_to_meters
 from typing import Literal
 
 comp_bot: DigitalInput = DigitalInput(
@@ -292,7 +292,7 @@ class Giraffe:
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 30 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.27, 0 * degrees_to_radians)
+    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, 0 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
 

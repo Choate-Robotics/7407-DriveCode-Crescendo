@@ -438,7 +438,7 @@ class Amp(SequentialCommandGroup):
     
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
-            SetWrist(wrist, -20 * degrees_to_radians),
+            SetWrist(wrist, -25 * degrees_to_radians),
             WaitCommand(.3),
             SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))

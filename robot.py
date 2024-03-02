@@ -57,8 +57,8 @@ class _Robot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
         self.team_selection = wpilib.SendableChooser()
-        self.team_selection.setDefaultOption("Blue", 0)
-        self.team_selection.addOption("Red", 1)
+        self.team_selection.setDefaultOption("Blue", 1)
+        self.team_selection.addOption("Red", 0)
 
         wpilib.SmartDashboard.putData("Team", self.team_selection)
 
@@ -119,7 +119,7 @@ class _Robot(wpilib.TimedRobot):
         # else:
         #     config.active_team = config.Team.RED
 
-        if self.team_selection.getSelected() == 0:
+        if self.team_selection.getSelected() == 1:
             config.active_team = config.Team.BLUE
         else:
             config.active_team = config.Team.RED
