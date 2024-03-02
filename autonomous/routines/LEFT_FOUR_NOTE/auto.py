@@ -150,7 +150,10 @@ auto = SequentialCommandGroup(
 
             # Reset drivetrain
             ParallelCommandGroup(
-                DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
+                SequentialCommandGroup(
+                    DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
+                    DrivetrainZero(Robot.drivetrain)
+                ),
                 SetWristIdle(Robot.wrist).withTimeout(2),
             ),
         )

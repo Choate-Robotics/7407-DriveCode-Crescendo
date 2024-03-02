@@ -17,6 +17,8 @@ import math
 from math import degrees, radians, pi
 import time
 
+from units.SI import inches_to_meters
+
 
 class _Robot(wpilib.TimedRobot):
     def __init__(self):
@@ -121,8 +123,10 @@ class _Robot(wpilib.TimedRobot):
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
+            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
+            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters + 0.2
 
         Field.POI.setNTValues()
 
