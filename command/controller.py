@@ -390,7 +390,7 @@ class EnableClimb(SequentialCommandGroup):
         super().__init__(
             ParallelCommandGroup(
                 SetElevator(elevator, config.Giraffe.kClimbReach.height),
-                SetWrist(wrist, 30*degrees_to_radians)
+                SetWrist(wrist, 25 * degrees_to_radians)
             ),
             DeployTenting(intake)
         

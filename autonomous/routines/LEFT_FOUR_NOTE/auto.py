@@ -137,7 +137,10 @@ auto = ParallelCommandGroup(
                 path_2,
                 IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
             ),
-            path_3
+            ParallelCommandGroup(
+                SetFlywheelLinearVelocity(Robot.flywheel, 22).withTimeout(2),
+                path_3
+            )
         ),
 
         # Shoot third note
