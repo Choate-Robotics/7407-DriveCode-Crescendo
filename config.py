@@ -253,7 +253,7 @@ TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=50  # integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=60  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 # Giraffe
