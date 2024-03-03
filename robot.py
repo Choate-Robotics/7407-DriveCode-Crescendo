@@ -127,7 +127,7 @@ class _Robot(wpilib.TimedRobot):
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters + 0.2
+            constants.FieldPos.Scoring.speaker_y = (218.42 * inches_to_meters + 0.2) - 4 * inches_to_meters
 
         Field.POI.setNTValues()
 
@@ -204,6 +204,7 @@ class _Robot(wpilib.TimedRobot):
     def teleopInit(self):
         self.log.info("Teleop initialized")
         Field.calculations.init()
+        Field.odometry.set_std_tele()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
 
@@ -238,6 +239,7 @@ class _Robot(wpilib.TimedRobot):
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
+        Field.odometry.set_std_auto()
         Field.calculations.init()
         Robot.drivetrain.n_front_left.zero()
         Robot.drivetrain.n_front_right.zero()
@@ -250,6 +252,14 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def autonomousExit(self):
+        # Robot.drivetrain.gyro.reset_angle(radians(-180))
+        # Robot.drivetrain.n_front_left.zero()
+        # Robot.drivetrain.n_front_right.zero()
+        # Robot.drivetrain.n_back_left.zero()
+        # Robot.drivetrain.n_back_right.zero()
+        ...
+
+
         # Robot.drivetrain.gyro.reset_angle(radians(180))
         #
         # new_pose = Robot.drivetrain.odometry.getPose()

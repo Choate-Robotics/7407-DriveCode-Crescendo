@@ -134,7 +134,7 @@ auto = SequentialCommandGroup(
         )
     ),
     ParallelCommandGroup(
-        SetFlywheelLinearVelocity(Robot.flywheel, 22),
+        SetFlywheelLinearVelocity(Robot.flywheel, 21.5),
         SequentialCommandGroup(
             # Get third note and go back to wing
             SequentialCommandGroup(
@@ -148,7 +148,13 @@ auto = SequentialCommandGroup(
             # Shoot third note
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         )
-    )
+    ),
+
+    # Reset drivetrain
+    # ParallelCommandGroup(
+    #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
+    #     SetWristIdle(Robot.wrist).withTimeout(2),
+    # ),
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

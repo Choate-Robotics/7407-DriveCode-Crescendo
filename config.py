@@ -233,6 +233,8 @@ odometry_visible_tags_threshold = 2
 odometry_tag_span_threshold = 0
 odometry_tag_distance_threshold = 4
 odometry_two_tag_distance_threshold = 7
+odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
+odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
@@ -253,7 +255,7 @@ TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=60  # integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=70  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 # Giraffe
