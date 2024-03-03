@@ -147,15 +147,6 @@ auto = SequentialCommandGroup(
 
             # Shoot third note
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-            # Reset drivetrain
-            ParallelCommandGroup(
-                SequentialCommandGroup(
-                    DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
-                    DrivetrainZero(Robot.drivetrain)
-                ),
-                SetWristIdle(Robot.wrist).withTimeout(2),
-            ),
         )
     )
 )

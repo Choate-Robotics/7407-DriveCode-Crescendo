@@ -16,6 +16,7 @@ import autonomous
 import math
 from math import degrees, radians, pi
 import time
+from wpimath.geometry import Rotation2d, Pose2d
 
 from units.SI import inches_to_meters
 
@@ -246,6 +247,21 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.getSelected().run()
 
     def autonomousPeriodic(self):
+        pass
+
+    def autonomousExit(self):
+        # Robot.drivetrain.gyro.reset_angle(radians(180))
+        #
+        # new_pose = Robot.drivetrain.odometry.getPose()
+        #
+        # Robot.drivetrain.reset_odometry(
+        #     Pose2d(
+        #         new_pose.X(),
+        #         new_pose.Y(),
+        #         Rotation2d(180)
+        #     )
+        # )
+
         pass
 
     def disabledInit(self) -> None:
