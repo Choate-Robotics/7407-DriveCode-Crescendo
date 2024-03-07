@@ -143,7 +143,7 @@ intake_inner_speed = 0.2
 intake_inner_pass_speed = .1
 intake_inner_eject_speed = 1
 intake_outer_speed = 1
-intake_outer_idle_speed = .15
+intake_outer_idle_speed = 0
 intake_outer_eject_speed = 1
 
 deploy_intake_timeout = .25

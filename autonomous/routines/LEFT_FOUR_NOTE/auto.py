@@ -120,7 +120,7 @@ auto = SequentialCommandGroup(
             # Get second note
             ParallelCommandGroup(
                 path_1,
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline).andThen(IntakeIdle(Robot.intake))
             ),
 
             # Shoot second note
@@ -140,7 +140,7 @@ auto = SequentialCommandGroup(
             SequentialCommandGroup(
                 ParallelCommandGroup(
                     path_2,
-                    IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
+                    IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline).andThen(IntakeIdle(Robot.intake)),
                 ),
                 path_3
             ),
