@@ -292,9 +292,9 @@ class Limelight:
         else:
             botpose: list = []
 
-            if team == config.Team.RED or team == 0:
+            if config.active_team == config.Team.RED:
                 botpose = self.botpose_red
-            elif team == config.Team.BLUE or team == 1:
+            elif config.active_team == config.Team.BLUE:
                 botpose = self.botpose_blue
             else:
                 botpose = self.botpose

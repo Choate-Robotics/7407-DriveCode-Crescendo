@@ -91,7 +91,7 @@ auto = ParallelCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
             DeployIntake(Robot.intake)
         ),
-        SetWristIdle(Robot.wrist).withTimeout(1),
+        SetWristIdle(Robot.wrist).withTimeout(2),
         # Get second note
         ParallelCommandGroup(
             path_1,
@@ -102,7 +102,7 @@ auto = ParallelCommandGroup(
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-            SetWristIdle(Robot.wrist).withTimeout(1),
+            SetWristIdle(Robot.wrist).withTimeout(2),
         ),
 
         # Get third note
@@ -113,7 +113,7 @@ auto = ParallelCommandGroup(
 
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        SetWristIdle(Robot.wrist).withTimeout(1),
+        SetWristIdle(Robot.wrist).withTimeout(2),
         # Get fourth note
         ParallelCommandGroup(
             path_3,
@@ -126,7 +126,7 @@ auto = ParallelCommandGroup(
 
         ParallelCommandGroup(
             DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-            SetWristIdle(Robot.wrist).withTimeout(1),
+            SetWristIdle(Robot.wrist).withTimeout(2),
         ),
 
         ParallelCommandGroup(

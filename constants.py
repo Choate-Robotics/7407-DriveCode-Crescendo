@@ -1,6 +1,8 @@
 # Imports
 import math
 from wpimath.geometry import Rotation2d, Translation2d
+
+import config
 from units.SI import (
     degrees_per_second__to__radians_per_second,
     feet_to_meters,
@@ -22,9 +24,9 @@ from units.SI import (
 # g = acceleration due to gravity (m/s^2)
 c = 0.47  # drag coefficient
 a = 14 * 0.0254 * 2 * 0.0254  # projectile surface area (m^2)
-m:kilograms = 0.235301  # projectile mass (kg)
+m: kilograms = 0.235301  # projectile mass (kg)
 rho_air = 1.28  # air density (kg/m^3)
-g:meters_per_second_squared = 9.8  # acceleration due to gravity (m/s^2)
+g: meters_per_second_squared = 9.8  # acceleration due to gravity (m/s^2)
 
 # Drivetrain
 drivetrain_turn_gear_ratio = 150 / 7
@@ -77,18 +79,17 @@ class FieldPos:
 
         mid_line = field_length / 2
 
-
     class Scoring:
         speaker_y = 218.42 * inches_to_meters
 
         speaker_z_top = 82.90 * inches_to_meters
-        
+
         speaker_depth = 18 * inches_to_meters
 
         speaker_z_bottom = 78.13 * inches_to_meters
 
-        speaker_z = speaker_z_top #(speaker_z_top + speaker_z_bottom) / 2
-        
+        speaker_z = speaker_z_top  #(speaker_z_top + speaker_z_bottom) / 2
+
         speaker_x = speaker_depth / 2.5
 
         amp_y = field_width
@@ -155,15 +156,14 @@ limelight_back_yaw = 180 * degrees_to_radians
 # WRIST
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
 
-
 # Flywheel
-flywheel_mass = 1.3 # kilograms
+flywheel_mass = 1.3  # kilograms
 flywheel_shaft_mass = .127  # kilograms
 flywheel_radius_outer = 2 * inches_to_meters
 flywheel_shaft_radius = 0.5 * inches_to_meters
-flywheel_gear_ratio = 1 / 1 #REAL VALUE: 1:1 gear ratio
-shooter_height = 21 * inches_to_meters # REAL VALUE: Meters
-shooter_offset_y = 6 * inches_to_meters # REAL VALUE: Meters
+flywheel_gear_ratio = 1 / 1  #REAL VALUE: 1:1 gear ratio
+shooter_height = 21 * inches_to_meters  # REAL VALUE: Meters
+shooter_offset_y = 6 * inches_to_meters  # REAL VALUE: Meters
 
 wrist_max_rotation = 60 * degrees_to_radians
 wrist_min_rotation = -40 * degrees_to_radians

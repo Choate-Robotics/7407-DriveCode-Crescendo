@@ -28,8 +28,8 @@ class Keymap:
         DRIVE_ROTATION_AXIS = JoystickAxis(
             Controllers.DRIVER, controllerDRIVER.R_JOY[0]
         )
-        RESET_GYRO = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
+        RESET_GYRO = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getPOV() == 180
         )
         X_MODE = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
@@ -52,7 +52,7 @@ class Keymap:
         )
     class Intake:
         INTAKE_IN = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.4
         )
         
         # INTAKE_IN = commands2.button.Trigger(
@@ -60,7 +60,7 @@ class Keymap:
         # )
         
         INTAKE_OUT = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.5
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.4
         )
         
         
@@ -68,7 +68,7 @@ class Keymap:
     class Shooter:
         ...
         AIM = commands2.button.Trigger(
-            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.5
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.4
         )
         
         ENABLE_AIM_WRIST = commands2.button.JoystickButton(
@@ -100,13 +100,13 @@ class Keymap:
         )
         
         DUMP_NOTE = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.A
         )
         
         # CLEAR_NOTE =
         
         FEED_NOTE_FLYWHEEL = commands2.button.Trigger(
-            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.5
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.4
         )
         
         # UNJAM =

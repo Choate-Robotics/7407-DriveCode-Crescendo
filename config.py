@@ -15,7 +15,7 @@ from wpimath.geometry import Pose3d, Rotation3d
 
 from toolkit.motors import SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonConfig
-from units.SI import degrees_to_radians, meters, radians, meters_per_second
+from units.SI import degrees_to_radians, meters, radians, meters_per_second, inches_to_meters
 from typing import Literal
 
 comp_bot: DigitalInput = DigitalInput(
@@ -143,7 +143,7 @@ intake_inner_speed = 0.2
 intake_inner_pass_speed = .1
 intake_inner_eject_speed = 1
 intake_outer_speed = 1
-intake_outer_idle_speed = .15
+intake_outer_idle_speed = 0
 intake_outer_eject_speed = 1
 
 deploy_intake_timeout = .25
@@ -214,8 +214,8 @@ drivetrain_reversed: bool = False
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
-flywheel_amp_speed: meters = 15
-v0_flywheel: meters_per_second = 20
+flywheel_amp_speed: meters = 12
+v0_flywheel: meters_per_second = 18
 # v0_effective_flywheel: meters_per_second = 12
 idle_flywheel: meters_per_second = v0_flywheel / 2
 shooter_tol = 0.001  # For aim of shooter
@@ -229,9 +229,12 @@ flywheel_shot_current_threshold = 20
 flywheel_manual: bool = False
 
 # Odometry
-odometry_visible_tags_threshold = 1
+odometry_visible_tags_threshold = 2
 odometry_tag_span_threshold = 0
 odometry_tag_distance_threshold = 4
+odometry_two_tag_distance_threshold = 7
+odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
+odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
@@ -252,7 +255,7 @@ TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=60  # integral_zone=1000, max_integral_accumulator=10000
+    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=70  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 # Giraffe
@@ -291,7 +294,7 @@ class Giraffe:
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 30 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.27, 0 * degrees_to_radians)
+    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, 0 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
 
