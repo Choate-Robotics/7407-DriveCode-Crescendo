@@ -45,9 +45,11 @@ class TalonConfig:
 
         # current limits
         current_limits_config = talon_config.current_limits
-        current_limits_config.supply_current_limit = self.current_limit
-        current_limits_config.supply_current_limit_enable = True if self.current_limit > 0 else False
+        current_limits_config.stator_current_limit = self.current_limit
+        current_limits_config.stator_current_limit_enable = True if self.current_limit > 0 else False
         current_limits_config.supply_time_threshold = 1
+        # current_limits_config.
+
 
         # brake mode
         brake_mode_config = talon_config.motor_output

@@ -97,71 +97,64 @@ path_5 = FollowPathCustom(
 )
 
 
-auto = ParallelCommandGroup(
-    SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
-    SequentialCommandGroup(
-        ZeroWrist(Robot.wrist),
-        ZeroElevator(Robot.elevator),
-        DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-
-        # Shoot preload and deploy intake
-        ParallelCommandGroup(
-            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-            DeployIntake(Robot.intake)
-        ),
-
-        # Reset drivetrain
-        ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-            SetWristIdle(Robot.wrist),
-        ),
-
-        # Get second note
-        ParallelCommandGroup(
-            path_1,
-            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
-        ),
-
-        # Shoot second note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-        # Reset drivetrain
-        ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-            SetWristIdle(Robot.wrist),
-        ),
-
-        # Get third note and go back to wing
+auto = SequentialCommandGroup(
+    ParallelCommandGroup(
+        SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
         SequentialCommandGroup(
+            ZeroWrist(Robot.wrist),
+            ZeroElevator(Robot.elevator),
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+
+            # Shoot preload and deploy intake
             ParallelCommandGroup(
-                path_2,
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
+                ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+                DeployIntake(Robot.intake)
             ),
-            path_3
-        ),
 
-        # Shoot third note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Reset drivetrain
+            ParallelCommandGroup(
+                DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+                SetWristIdle(Robot.wrist).withTimeout(2),
+            ),
 
-        # Reset drivetrain
-        ParallelCommandGroup(
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
-            SetWristIdle(Robot.wrist),
-        ),
+            # Get second note
+            ParallelCommandGroup(
+                path_1,
+                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline).andThen(IntakeIdle(Robot.intake))
+            ),
 
-        # # Get fourth note
-        # SequentialCommandGroup(
-        #     ParallelCommandGroup(
-        #         path_4,
-        #         IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline),
-        #     ),
-        #     path_5
-        # ),
+            # Shoot second note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-        # # Shoot fourth note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Reset drivetrain
+            ParallelCommandGroup(
+                DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+                SetWristIdle(Robot.wrist).withTimeout(2),
+            ),
+        )
+    ),
+    ParallelCommandGroup(
+        SetFlywheelLinearVelocity(Robot.flywheel, 21.5),
+        SequentialCommandGroup(
+            # Get third note and go back to wing
+            SequentialCommandGroup(
+                ParallelCommandGroup(
+                    path_2,
+                    IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline).andThen(IntakeIdle(Robot.intake)),
+                ),
+                path_3
+            ),
 
-    )
+            # Shoot third note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        )
+    ),
+
+    # Reset drivetrain
+    # ParallelCommandGroup(
+    #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(180)).withTimeout(3),
+    #     SetWristIdle(Robot.wrist).withTimeout(2),
+    # ),
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

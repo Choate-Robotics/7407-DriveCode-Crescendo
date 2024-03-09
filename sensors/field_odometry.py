@@ -47,6 +47,22 @@ def weighted_pose_average(
     )
 
 
+def within_tolerance(vision: Pose3d, tag_count: float, distance_to_target: float, tag_span: float) -> bool:
+    if tag_count <= 1:
+        if distance_to_target > config.odometry_tag_distance_threshold:
+            return False
+    elif tag_count >= 2:
+        if distance_to_target > config.odometry_two_tag_distance_threshold:
+            return False
+    else:
+        return False
+
+    return True
+    # if self.within_est_rotation(vision) and self.within_est_pos(vision):
+    #     return True
+    # return False
+
+
 class FieldOdometry:
     """
     Keeps track of robot position relative to field using a vision estimator (e.g. limelight, photon-vision)
@@ -72,6 +88,8 @@ class FieldOdometry:
 
         self.vision_on = True
 
+        self.std_formula = lambda x: abs(x ** 2) / 2.5
+
     def enable(self):
         self.vision_on = True
 
@@ -84,13 +102,10 @@ class FieldOdometry:
         """
         self.update_from_internal()
 
-
         self.update_from_internal()
 
         if not self.vision_on:
             return self.getPose()
-
-
 
         vision_robot_pose_list = self.get_vision_poses()
 
@@ -108,7 +123,7 @@ class FieldOdometry:
             # vision_robot_pose, vision_time = pose_data
             # distance_to_target = target_pose.translation()
 
-            if self.within_tolerance(vision_robot_pose, tag_count, distance_to_target, tag_span):
+            if within_tolerance(vision_robot_pose, tag_count, distance_to_target, tag_span):
                 self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count)
 
         return self.getPose()
@@ -133,6 +148,12 @@ class FieldOdometry:
             weighted_pose
         )
 
+    def set_std_auto(self):
+        self.std_formula = config.odometry_std_auto_formula
+
+    def set_std_tele(self):
+        self.std_formula = config.odometry_std_tele_formula
+
     def within_est_pos(self, vision: Pose3d):
         est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
         dist = est_pose.translation().distance(vision.toPose2d().translation())
@@ -153,18 +174,6 @@ class FieldOdometry:
             return True
         return False
 
-    def within_tolerance(self, vision: Pose3d, tag_count: float, distance_to_target: float, tag_span:float) -> bool:
-        if tag_count < config.odometry_visible_tags_threshold:
-            return False
-        # if tag_span < config.odometry_tag_span_threshold:
-        #     return False
-        if distance_to_target > config.odometry_tag_distance_threshold:
-            return False
-        return True
-        # if self.within_est_rotation(vision) and self.within_est_pos(vision):
-        #     return True
-        # return False
-
     def update_from_internal(self):
 
         self.drivetrain.odometry_estimator.updateWithTime(
@@ -178,12 +187,13 @@ class FieldOdometry:
         )
 
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int):
-        
-        std_dev = abs(distance_to_target **2) / (2.5)
-        
+
+        # std_dev = abs(distance_to_target **2) / (2.5)
+        std_dev = self.std_formula(distance_to_target)
+
         # if tag_count > 1:
         #     std_dev = abs(distance_to_target ** (1 + (1/tag_count)))
-        
+
         dist_calculations = (std_dev, std_dev, abs(math.radians(40)))
         self.std_dev = dist_calculations
         self.drivetrain.odometry_estimator.addVisionMeasurement(
@@ -217,7 +227,7 @@ class FieldOdometry:
             self.drivetrain.odometry.resetPosition(
                 self.drivetrain.get_heading(),
                 self.drivetrain.node_positions,
-                est_pose 
+                est_pose
             )
 
         self.table.putNumberArray('Estimated Pose', [
@@ -225,7 +235,7 @@ class FieldOdometry:
             est_pose.translation().Y(),
             est_pose.rotation().radians()
         ])
-        
+
         self.table.putNumber(
             'Estimated Rotation',
             est_pose.rotation().degrees()
@@ -250,23 +260,23 @@ class FieldOdometry:
 
         self.table.putNumberArray('Abs value',
                                   self.drivetrain.get_abs())
-        
-        self.table.putNumberArray('standard deviation',[
+
+        self.table.putNumberArray('standard deviation', [
             *self.std_dev
         ])
-        
+
         self.table.putBoolean('drivetrain ready to shoot',
                               self.drivetrain.ready_to_shoot
                               )
 
         self.table.putBoolean('ready to shoot', self.drivetrain.ready_to_shoot)
 
-        def bound_angle(degrees:float):
+        def bound_angle(degrees: float):
             degrees = degrees % 360
             if degrees > 180:
                 degrees -= 360
             if degrees < -180:
-                degrees +=360
+                degrees += 360
             return degrees
 
         self.table.putNumber(
