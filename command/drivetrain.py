@@ -9,7 +9,7 @@ from toolkit.command import SubsystemCommand
 
 import config, constants
 from subsystem import Drivetrain
-from sensors import TrajectoryCalculator
+from sensors import TrajectoryCalculator, Limelight
 from wpimath.controller import PIDController, ProfiledPIDControllerRadians
 from wpimath.trajectory import TrapezoidProfileRadians
 from toolkit.utils.toolkit_math import bounded_angle_diff
@@ -249,3 +249,83 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
 
     def runsWhenDisabled(self) -> bool:
         return False
+
+
+class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
+    def __init__(self, subsystem: Drivetrain, LimeLight: Limelight):
+        '''
+        Lines up the robot with the target
+        :param drivetrain: Drivetrain subsystem
+        :param LimeLight: Limelight subsystem
+        :param target: (cube/cone) target to line up with'''
+        super().__init__(subsystem)
+        self.drivetrain = subsystem
+        self.limelight = LimeLight
+        self.target_exists = False
+        self.target_constrained = False
+        self.v_pid = PIDController(0.1, 0, 0.001)
+        self.h_pid = PIDController(0.08, 0, 0.001)
+        self.is_pipeline: bool = False
+        
+        
+    def initialize(self):
+        self.limelight.set_pipeline_mode(config.LimelightPipeline.neural)
+        self.v_pid.reset()
+        self.h_pid.reset()
+        self.v_pid.setTolerance(4)
+        self.h_pid.setTolerance(2)
+        
+    def execute(self):
+        if self.limelight.get_pipeline_mode() != config.LimelightPipeline.neural:
+            self.limelight.update()
+            return
+        if self.limelight.get_pipeline_mode() == config.LimelightPipeline.neural and self.limelight.t_class == self.tclass:
+            self.limelight.update()
+            self.is_pipeline = True
+            # print('can see')
+            if self.limelight.target_exists() == False or self.limelight.get_target() == None:
+                self.target_exists = False
+                # print('no target')
+                # print(self.limelight.table.getNumber('tv', 3))
+                self.drivetrain.set_robot_centric((0,0),0)
+                return
+            # self.nt.putBoolean('see target', True)
+            print("target")
+            tx, ty, ta = self.limelight.get_target(True)
+            
+            # self.nt.putNumber("tx", tx)
+            # self.nt.putNumber("ty", ty)
+            # self.nt.putNumber('ta', ta)
+            
+            
+            
+            if self.target_exists == False and self.target_exists:
+                self.target_exists = True
+                
+            # print("Tracking...")
+                
+            dy = self.v_pid.calculate(ty, config.object_detection_ty)
+            dx = self.h_pid.calculate(tx, config.object_detection_tx)
+            
+            # self.nt.putNumber('PID dx', dx)
+            # self.nt.putNumber('PID dy', dy)
+            
+            # if config.drivetrain_reversed:
+            #     dx *= -1
+            # else:
+            #     dy *= -1
+                
+            dx *= config.calculated_max_vel * config.object_detection_drivetrain_speed_dx
+            dy *= config.calculated_max_vel * config.object_detection_drivetrain_speed_dy
+                
+            self.drivetrain.set_robot_centric((-dy, dx), 0)
+            
+                # self.drivetrain.set_driver_centric((0,0), 0)
+            
+    def isFinished(self):
+        return self.h_pid.atSetpoint() and self.v_pid.atSetpoint() and self.is_pipeline
+        return False
+    
+    def end(self, interrupted: bool = False):
+        self.limelight.set_pipeline_mode(config.LimelightPipeline.feducial)
+        self.drivetrain.set_robot_centric((0, 0), 0)

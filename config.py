@@ -236,6 +236,16 @@ odometry_two_tag_distance_threshold = 7
 odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
 odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
+#object detection
+object_detection_ty = 0
+object_detection_ty_threshold = 2
+object_detection_tx = 0
+object_detection_tx_threshold = 2
+object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dy = .5
+
+
+
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig(
     0.3, 0.0, 0.02, elevator_feed_forward, (-.65, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
