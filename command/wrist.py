@@ -62,7 +62,7 @@ class SetWrist(SubsystemCommand[Wrist]):
     def end(self, interrupted: bool):
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            # self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
@@ -92,7 +92,7 @@ class SetWristIdle(SubsystemCommand[Wrist]):
     def end(self, interrupted: bool):
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            # self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
@@ -127,7 +127,7 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.subsystem.ready_to_shoot = False
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)
+            # self.subsystem.set_wrist_angle(wrist_angle)
                 #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
