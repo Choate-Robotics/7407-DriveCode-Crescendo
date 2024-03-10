@@ -90,7 +90,7 @@ class TrajectoryCalculator:
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
         # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
         # v_effective = config.v0_flywheel
-        v_effective = self.flywheel.get_velocity_linear() - rvx * np.cos(phi0)
+        v_effective = config.v0_flywheel + rvx * np.cos(phi0)
         self.v0_effective = v_effective
         # Calculate the angle with floor velocities
         result_angle = (
