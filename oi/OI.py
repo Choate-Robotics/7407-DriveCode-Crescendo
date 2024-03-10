@@ -39,7 +39,7 @@ class OI:
         #     command.IntakeIdle(Robot.intake).andThen(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
         # )
 
-        Keymap.Intake.INTAKE_IN.onTrue(
+        Keymap.Intake.INTAKE_IN.whileTrue(
             command.IntakeStageNote(Robot.wrist, Robot.intake)
         ).onFalse(
             command.IntakeStageIdle(Robot.wrist, Robot.intake)
@@ -77,7 +77,7 @@ class OI:
         def set_not_amping():
             config.amping = False
 
-        Keymap.Elevator.AMP.onTrue(
+        Keymap.Elevator.AMP.whileTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
             command.Amp(Robot.elevator, Robot.wrist).alongWith(
                 commands2.InstantCommand(lambda: set_amping())
