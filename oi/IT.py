@@ -76,7 +76,7 @@ class IT:
                     0
                 ))
             )
-        button.Trigger(lambda: Robot.wrist.note_staged)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
             .onTrue(
                 InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
                     Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
@@ -96,8 +96,8 @@ class IT:
 
         # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
-            .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
+            .whileTrue(
+                command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
            ).onFalse(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
@@ -106,11 +106,7 @@ class IT:
         button.Trigger(lambda: config.amping)\
             .onTrue(
                 command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
-                # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
-            )\
-            # .onFalse(
-            #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
-            # )
+            )
             
             
     #     #FLYWHEEL TRIGGERS ----------------
@@ -125,9 +121,7 @@ class IT:
         
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
             .debounce(.1).onTrue(
-                command.Shoot(Robot.wrist).andThen(
-                InstantCommand(lambda: reset_shooter())
-                )
+                command.Shoot(Robot.wrist)
             )
         #SHOOTER TRIGGERS ----------------
         
