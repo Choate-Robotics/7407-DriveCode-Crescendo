@@ -22,3 +22,7 @@ class SubsystemCommand(BasicCommand, Generic[T]):
         super().__init__()
         self.subsystem = subsystem
         self.addRequirements(subsystem)
+        self.setName(self._type())
+        
+    def _type(self):
+        return self.__class__.__name__

@@ -117,11 +117,6 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
 
-        # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-        #     config.active_team = config.Team.BLUE
-        # else:
-        #     config.active_team = config.Team.RED
-
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
@@ -134,51 +129,21 @@ class _Robot(wpilib.TimedRobot):
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
-        # try:
-        #     self.scheduler.run()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('command scheduler', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(self.scheduler.run)
+        
+        # self.handle(self.scheduler.onCommandInitialize(lambda command: self.log.info(f"Initializing command {command.getName()}")))
+        # self.handle(self.scheduler.onCommandFinish(lambda command: self.log.info(f"Finishing command {command.getName()}")))
+        # self.handle(self.scheduler.onCommandInterrupt(lambda command: self.log.info(f"Interrupting command {command.getName()}")))
 
-        # try:
-        #     Sensors.limelight_back.update()
-        #     Sensors.limelight_front.update()
-        #     Sensors.limelight_intake.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('limelight update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Sensors.limelight_back.update)
         self.handle(Sensors.limelight_front.update)
         self.handle(Sensors.limelight_intake.update)
 
-        # try:
-        #     Field.odometry.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
 
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Field.odometry.update)
 
-        # try:
-        #     Field.calculations.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Field.calculations.update)
 
@@ -197,9 +162,6 @@ class _Robot(wpilib.TimedRobot):
         # print(Robot.wrist.distance_sensor.getVoltage())
         # print(Robot.intake.distance_sensor.getVoltage())
         # print(DigitalInput(0).get())
-
-        self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
-        self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
