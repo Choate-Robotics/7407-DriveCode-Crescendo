@@ -157,10 +157,10 @@ limelight_back_yaw = 180 * degrees_to_radians
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
 
 # Flywheel
-flywheel_mass = 1.3  # kilograms
-flywheel_shaft_mass = .127  # kilograms
-flywheel_radius_outer = 2 * inches_to_meters
-flywheel_shaft_radius = 0.5 * inches_to_meters
+flywheel_mass:kilograms = 0.907185  # kilograms
+flywheel_shaft_mass:kilograms = .127  # kilograms
+flywheel_radius_outer:meters = 2 * inches_to_meters
+flywheel_shaft_radius:meters = 0.5 * inches_to_meters
 flywheel_gear_ratio = 1 / 1  #REAL VALUE: 1:1 gear ratio
 shooter_height = 21 * inches_to_meters  # REAL VALUE: Meters
 shooter_offset_y = 6 * inches_to_meters  # REAL VALUE: Meters
