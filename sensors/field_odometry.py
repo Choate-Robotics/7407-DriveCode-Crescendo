@@ -47,20 +47,7 @@ def weighted_pose_average(
     )
 
 
-def within_tolerance(vision: Pose3d, tag_count: float, distance_to_target: float, tag_span: float) -> bool:
-    if tag_count <= 1:
-        if distance_to_target > config.odometry_tag_distance_threshold:
-            return False
-    elif tag_count >= 2:
-        if distance_to_target > config.odometry_two_tag_distance_threshold:
-            return False
-    else:
-        return False
 
-    return True
-    # if self.within_est_rotation(vision) and self.within_est_pos(vision):
-    #     return True
-    # return False
 
 
 class FieldOdometry:
@@ -119,12 +106,11 @@ class FieldOdometry:
             vision_time: float
             vision_robot_pose: Pose3d
 
-            vision_robot_pose, vision_time, tag_count, distance_to_target, tag_span = vision_pose
+            vision_robot_pose, vision_time, tag_count, distance_to_target, tag_area = vision_pose
             # vision_robot_pose, vision_time = pose_data
             # distance_to_target = target_pose.translation()
 
-            if within_tolerance(vision_robot_pose, tag_count, distance_to_target, tag_span):
-                self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count)
+            self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count, tag_area)
 
         return self.getPose()
 
@@ -185,16 +171,29 @@ class FieldOdometry:
         self.drivetrain.odometry.update(
             self.drivetrain.get_heading(), self.drivetrain.node_positions
         )
+        
+    
 
-    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int):
+    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float):
 
-        # std_dev = abs(distance_to_target **2) / (2.5)
-        std_dev = self.std_formula(distance_to_target)
+        distance_deviation = self.getPose().translation().distance(vision_pose.toPose2d().translation())
+        std_dev = 0.5
+        std_dev_omega = abs(math.radians(20))
+        if tag_count < 2:
+            if distance_to_target > config.odometry_tag_distance_threshold:
+                return
+            if tag_area < config.odometry_tag_area_threshold:
+                return
+            if distance_deviation > config.odometry_distance_deviation_threshold:
+                return
+            std_dev = self.std_formula(distance_to_target)
+            std_dev_omega = abs(math.radians(40))
+        if tag_count == 2:
+            std_dev = self.std_formula(distance_to_target / 2)
+            if distance_to_target > config.odometry_two_tag_distance_threshold:
+                return
 
-        # if tag_count > 1:
-        #     std_dev = abs(distance_to_target ** (1 + (1/tag_count)))
-
-        dist_calculations = (std_dev, std_dev, abs(math.radians(40)))
+        dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
         self.drivetrain.odometry_estimator.addVisionMeasurement(
             vision_pose.toPose2d(), vision_time, self.std_dev

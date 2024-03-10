@@ -230,7 +230,8 @@ flywheel_manual: bool = False
 
 # Odometry
 odometry_visible_tags_threshold = 2
-odometry_tag_span_threshold = 0
+odometry_tag_area_threshold = 0
+odometry_vision_deviation_threshold = 0.5
 odometry_tag_distance_threshold = 4
 odometry_two_tag_distance_threshold = 7
 odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
