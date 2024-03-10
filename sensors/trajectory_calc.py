@@ -194,6 +194,17 @@ class TrajectoryCalculator:
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
         self.table.putNumber('delta z', self.delta_z)
+        self.table.putNumber('v effective', self.v0_effective)
+        self.table.putNumberArray('drivetrain speeds speaker', [
+            self.get_drivetrain_speeds_speaker_origin().vx,
+            self.get_drivetrain_speeds_speaker_origin().vy,
+            self.get_drivetrain_speeds_speaker_origin().omega
+        ])
+        self.table.putNumberArray('drivetrain speeds field', [
+            self.get_drivetrain_speeds_field_origin().vx,
+            self.get_drivetrain_speeds_field_origin().vy,
+            self.get_drivetrain_speeds_field_origin().omega
+        ])
         
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
