@@ -1,7 +1,7 @@
 import math
 
 from subsystem import Elevator, Wrist, Intake, Drivetrain, Flywheel
-from sensors import FieldOdometry, TrajectoryCalculator
+from sensors import FieldOdometry, TrajectoryCalculator, Limelight
 
 import logging
 from command import *
@@ -457,3 +457,26 @@ class EmergencyManuver(SequentialCommandGroup):
             UnDeployTenting(intake),
             SetWrist(wrist, config.staging_angle)
         )
+        
+        
+class AutoPickupNote(SequentialCommandGroup):
+    
+    def __init__(self, drivetrain: Drivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
+        super().__init__()
+        self.addCommands(
+            DriveSwerveNoteLineup(drivetrain, limelight),
+            ParallelCommandGroup(
+                SequentialCommandGroup(
+                    InstantCommand(
+                        lambda: drivetrain.set_robot_centric(
+                            (-config.object_detection_drivetrain_speed_dy * drivetrain.max_vel, 0), 0)
+                        ),
+                    WaitUntilCommand(lambda: intake.detect_note()),
+                    InstantCommand(
+                        lambda: drivetrain.set_robot_centric((0, 0), 0)
+                    )
+                ),
+            IntakeStageNote(wrist, intake)
+            )
+        )
+        
