@@ -464,6 +464,7 @@ class AutoPickupNote(SequentialCommandGroup):
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
         super().__init__()
         self.addCommands(
+            SetWristIdle(wrist),
             DriveSwerveNoteLineup(drivetrain, limelight),
             ParallelCommandGroup(
                 SequentialCommandGroup(
