@@ -1,9 +1,11 @@
 import utils
-import constants
+import constants, config
 
 from toolkit.command import SubsystemCommand
 from subsystem import Flywheel
+from sensors import TrajectoryCalculator
 from units.SI import meters_per_second
+
 
 
 class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
@@ -54,4 +56,30 @@ class SetFlywheelVelocityIndependent(SubsystemCommand[Flywheel]):
         )
 
     def end(self, interrupted: bool):
+        pass
+    
+    
+class SetFlywheelShootSpeaker(SubsystemCommand[Flywheel]):
+    
+    def __init__(self, subsystem: Flywheel, trajectory: TrajectoryCalculator):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+        self.traj = trajectory
+        
+    def initialize(self):
+        self.subsystem.set_velocity_linear(config.v0_flywheel_minimum, 1)
+        self.subsystem.set_velocity_linear(config.v0_flywheel_minimum, 2)
+    
+    def execute(self):
+        distance = self.traj.get_distance_to_target()
+        
+        speed = max(config.v0_flywheel_minimum + distance, config.v0_flywheel_maximum)
+        
+        self.subsystem.set_velocity_linear(speed, 1)
+        self.subsystem.set_velocity_linear(speed, 2)
+        
+    def isFinished(self) -> bool:
+        return False
+    
+    def end(self, interrupted: bool) -> None:
         pass

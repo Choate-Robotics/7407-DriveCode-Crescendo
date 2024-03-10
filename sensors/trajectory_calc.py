@@ -217,6 +217,10 @@ class TrajectoryCalculator:
         Returns the angle of the Robot
         """
         return self.base_rotation2d
+    
+    def get_distance_to_target(self) -> float:
+        
+        return self.distance_to_target
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u
