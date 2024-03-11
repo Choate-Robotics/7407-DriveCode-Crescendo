@@ -332,7 +332,6 @@ class Shoot(SequentialCommandGroup):
     
     Args:
         SequentialCommandGroup (wrist): Wrist subsystem
-        SequentialCommandGroup (flywheel): Flywheel subsystem
     """
 
     def __init__(self, wrist: Wrist):
