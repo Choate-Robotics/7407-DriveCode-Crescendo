@@ -46,15 +46,15 @@ class IT:
             InstantCommand(lambda: Robot.wrist.set_note_not_staged())
         )
         
-        # # if note in feeder, run flywheel and wrist to aim
-        button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
-        .and_(lambda: not config.ready_to_climb).onTrue(
-            WaitCommand(.5).andThen(
-            command.AimWrist(Robot.wrist, Field.calculations))
-        ).onFalse(
-            WaitCommand(.5).andThen(
-            command.SetWristIdle(Robot.wrist))
-        )
+        # # # if note in feeder, run flywheel and wrist to aim
+        # button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
+        # .and_(lambda: not config.ready_to_climb).onTrue(
+        #     WaitCommand(.5).andThen(
+        #     command.AimWrist(Robot.wrist, Field.calculations))
+        # ).onFalse(
+        #     WaitCommand(.5).andThen(
+        #     command.SetWristIdle(Robot.wrist))
+        # )
         
         button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second()).and_(lambda: not config.climbed)\
             .onTrue(

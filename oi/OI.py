@@ -24,9 +24,13 @@ class OI:
             .onFalse(command.DriveSwerveCustom(Robot.drivetrain))
 
         Keymap.Shooter.AIM.whileTrue(
-            command.DriveSwerveAim(Robot.drivetrain, Field.calculations)
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations).alongWith(
+                command.AimWrist(Robot.wrist, Field.calculations)
+            )
         ).onFalse(
-            command.DriveSwerveCustom(Robot.drivetrain)
+            command.DriveSwerveCustom(Robot.drivetrain).alongWith(
+                command.SetWristIdle(Robot.wrist)
+            )
         )
 
         Keymap.Drivetrain.X_MODE.onTrue(
