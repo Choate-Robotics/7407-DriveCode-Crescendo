@@ -21,11 +21,11 @@ class Flywheel(Subsystem):
 
         self.motor_1: SparkMax = SparkMax(
             can_id=config.flywheel_id_1,
-            # config=config.FLYWHEEL_CONFIG
+            config=config.FLYWHEEL_CONFIG
         )
         self.motor_2: SparkMax = SparkMax(
             can_id=config.flywheel_id_2,
-            # config=config.FLYWHEEL_CONFIG
+            config=config.FLYWHEEL_CONFIG
         )
 
         self.flywheel_MOI = (constants.flywheel_mass / 2) * (constants.flywheel_radius_outer ** 2)

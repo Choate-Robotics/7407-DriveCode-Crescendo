@@ -47,7 +47,7 @@ class SparkMax(PIDMotor):
     motor: CANSparkMax
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
-    _configs: [SparkMaxConfig] = []
+    _configs: list[SparkMaxConfig] = []
     _has_init_run: bool = False
     _logger: LocalLogger
     _abs_encoder = None
