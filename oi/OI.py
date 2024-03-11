@@ -33,7 +33,9 @@ class OI:
             .whileTrue(
                 command.AimWrist(Robot.wrist, Field.calculations)
             ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
                 command.SetWristIdle(Robot.wrist)
+                )
             )
 
         Keymap.Drivetrain.X_MODE.onTrue(
