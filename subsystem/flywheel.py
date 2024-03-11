@@ -238,3 +238,5 @@ class Flywheel(Subsystem):
         table.putNumber('flywheel bottom current', self.get_current(2))
         table.putNumber('flywheel top bus voltage', self.motor_1.motor.getBusVoltage())
         table.putNumber('flywheel bottom bus voltage', self.motor_2.motor.getBusVoltage())
+        table.putNumber('flywheel top applied output', self.motor_1.motor.getAppliedOutput())
+        table.putNumber('flywheel bottom applied output', self.motor_2.motor.getAppliedOutput())
