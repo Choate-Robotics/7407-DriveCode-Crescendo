@@ -7,7 +7,7 @@ from wpimath.geometry import Pose3d, Rotation3d, Transform3d
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
 from utils import LocalLogger
 from oi.keymap import Controllers
-
+from wpimath.filter import Debouncer
 from robot_systems import Robot, Sensors, Field
 
 log = LocalLogger("IT")
@@ -98,7 +98,7 @@ class IT:
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
             .onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
-           ).onFalse(
+           ).debounce(.3, Debouncer.DebounceType.kFalling).onFalse(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
  
