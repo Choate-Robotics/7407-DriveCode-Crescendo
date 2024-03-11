@@ -24,14 +24,17 @@ class OI:
             .onFalse(command.DriveSwerveCustom(Robot.drivetrain))
 
         Keymap.Shooter.AIM.whileTrue(
-            command.DriveSwerveAim(Robot.drivetrain, Field.calculations).alongWith(
-                command.AimWrist(Robot.wrist, Field.calculations)
-            )
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations)
         ).onFalse(
-            command.DriveSwerveCustom(Robot.drivetrain).alongWith(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
+        
+        Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
+            .whileTrue(
+                command.AimWrist(Robot.wrist, Field.calculations)
+            ).onFalse(
                 command.SetWristIdle(Robot.wrist)
             )
-        )
 
         Keymap.Drivetrain.X_MODE.onTrue(
             commands2.InstantCommand(lambda: Robot.drivetrain.x_mode())
