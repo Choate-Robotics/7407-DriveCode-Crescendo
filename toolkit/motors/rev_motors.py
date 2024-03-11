@@ -135,7 +135,9 @@ class SparkMax(PIDMotor):
             return
         if error != REVLibError.kOk:
             # return
-            raise RuntimeError(f'SparkMax Error: {error}')
+            if self._can_id == 1 or self._can_id == 19:
+                raise RuntimeError(f'SparkMax Error: {error}')
+            return
             match error:
                 case REVLibError.kInvalid:
                     self._logger.error("Invalid")
