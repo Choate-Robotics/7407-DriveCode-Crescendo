@@ -264,6 +264,7 @@ class IntakeStageNote(ParallelRaceGroup):
     
     def __init__(self, wrist: Wrist, intake: Intake):
         super().__init__(
+            SetWristIdle(wrist),
             RunIntakeConstant(intake),
             FeedIn(wrist)
         )
