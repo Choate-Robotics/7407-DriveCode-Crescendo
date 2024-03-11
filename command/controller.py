@@ -260,7 +260,7 @@ class StageNote(SequentialCommandGroup):
             IntakeIdle(intake),
         )
         
-class IntakeStageNote(ParallelRaceGroup):
+class IntakeStageNote(SequentialCommandGroup):
     
     def __init__(self, wrist: Wrist, intake: Intake):
         super().__init__(

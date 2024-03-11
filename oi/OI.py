@@ -47,7 +47,8 @@ class OI:
         # )
 
         Keymap.Intake.INTAKE_IN.whileTrue(
-            command.IntakeStageNote(Robot.wrist, Robot.intake)
+            command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
+            command.IntakeStageNote(Robot.wrist, Robot.intake))
         ).onFalse(
             command.IntakeStageIdle(Robot.wrist, Robot.intake)
         )
