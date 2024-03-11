@@ -40,11 +40,11 @@ class IT:
         
         #FEEDER TRIGGERS ----------------
         
-        button.Trigger(lambda: Robot.wrist.note_detected()).onTrue(
-            InstantCommand(lambda: Robot.wrist.set_note_staged())
-        ).onFalse(
-            InstantCommand(lambda: Robot.wrist.set_note_not_staged())
-        )
+        # button.Trigger(lambda: Robot.wrist.note_detected()).onTrue(
+        #     InstantCommand(lambda: Robot.wrist.set_note_staged())
+        # ).onFalse(
+        #     InstantCommand(lambda: Robot.wrist.set_note_not_staged())
+        # )
         
         # # if note in feeder, run flywheel and wrist to aim
         button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
