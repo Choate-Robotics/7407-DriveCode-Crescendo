@@ -98,8 +98,8 @@ class Flywheel(Subsystem):
         self.motor_1.motor.setSmartCurrentLimit(200)
         self.motor_2.motor.setSmartCurrentLimit(200)
         
-        self.motor_1.motor.setOpenLoopRampRate(2)
-        self.motor_2.motor.setOpenLoopRampRate(2)
+        self.motor_1.motor.setOpenLoopRampRate(0)
+        self.motor_2.motor.setOpenLoopRampRate(0)
         self.motor_2.motor.burnFlash()
         self.motor_1.motor.burnFlash()
 
