@@ -100,7 +100,9 @@ class IT:
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
            ).onFalse(
+                WaitCommand(.1).andThen(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+                )
             )
  
         button.Trigger(lambda: config.amping)\
