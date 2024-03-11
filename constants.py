@@ -82,7 +82,7 @@ class FieldPos:
     class Scoring:
         speaker_y = 218.42 * inches_to_meters
 
-        speaker_z_top = 82.90 * inches_to_meters
+        speaker_z_top = 82.90 * inches_to_meters + 4 * inches_to_meters
 
         speaker_depth = 18 * inches_to_meters
 
