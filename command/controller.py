@@ -337,7 +337,7 @@ class Shoot(SequentialCommandGroup):
     def __init__(self, wrist: Wrist):
         super().__init__(
             PassNote(wrist),
-            InstantCommand(lambda: wrist.set_note_not_staged()),
+            WaitCommand(.1),
             SetWristIdle(wrist)
         )
 

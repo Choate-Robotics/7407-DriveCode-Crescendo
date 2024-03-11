@@ -76,7 +76,7 @@ class IT:
                     0
                 ))
             )
-        button.Trigger(lambda: Robot.wrist.note_staged)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
             .onTrue(
                 InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
                     Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
@@ -125,9 +125,7 @@ class IT:
         
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
             .debounce(.1).onTrue(
-                command.Shoot(Robot.wrist).andThen(
-                InstantCommand(lambda: reset_shooter())
-                )
+                command.Shoot(Robot.wrist)
             )
         #SHOOTER TRIGGERS ----------------
         
