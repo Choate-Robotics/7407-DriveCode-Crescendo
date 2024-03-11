@@ -124,7 +124,9 @@ class IT:
         
         button.Trigger(lambda: Robot.wrist.ready_to_shoot and Robot.drivetrain.ready_to_shoot and Robot.flywheel.ready_to_shoot)\
             .debounce(.1).onTrue(
-                command.Shoot(Robot.wrist)
+                command.Shoot(Robot.wrist).andThen(
+                    InstantCommand(lambda: reset_shooter())
+                )
             )
         #SHOOTER TRIGGERS ----------------
         
