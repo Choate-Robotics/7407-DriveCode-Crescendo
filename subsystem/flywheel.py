@@ -34,18 +34,23 @@ class Flywheel(Subsystem):
         
         self.total_MOI = self.flywheel_MOI + self.shaft_MOI
 
-        self.flywheel_plant = LinearSystemId().flywheelSystem(
+        self.flywheel_plant_top = LinearSystemId().flywheelSystem(
             DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
         )
+        
+        self.flywheel_plant_bottom = LinearSystemId().flywheelSystem(
+            DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
+        )
+        
         self.flywheel_observer_top = KalmanFilter_1_1_1(
-            self.flywheel_plant,
+            self.flywheel_plant_top,
             [3.0],  # how accurate we think our model is
             [0.05],  # how accurate we think our encoder data is
             config.period
         )
         
         self.flywheel_observer_bottom = KalmanFilter_1_1_1(
-            self.flywheel_plant,
+            self.flywheel_plant_bottom,
             [3.0],  # how accurate we think our model is
             [0.05],  # how accurate we think our encoder data is
             config.period
@@ -65,8 +70,8 @@ class Flywheel(Subsystem):
             config.period
         )
         
-        self.flywheel_controller_top.latencyCompensate(self.flywheel_plant, config.period, 0.025)
-        self.flywheel_controller_bottom.latencyCompensate(self.flywheel_plant, config.period, 0.025)
+        self.flywheel_controller_top.latencyCompensate(self.flywheel_plant_top, config.period, 0.025)
+        self.flywheel_controller_bottom.latencyCompensate(self.flywheel_plant_bottom, config.period, 0.025)
         self.top_flywheel_state = LinearSystemLoop_1_1_1(
             self.flywheel_plant_top,
             self.flywheel_controller_top,
