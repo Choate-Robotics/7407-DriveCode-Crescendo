@@ -146,7 +146,8 @@ class FeedIn(SubsystemCommand[Wrist]):
         self.first_note_detected: bool = False
 
     def initialize(self):
-        self.subsystem.feed_in()
+        if not self.subsystem.detect_note_second():
+            self.subsystem.feed_in()
 
     def execute(self):
         if self.subsystem.detect_note_first():
@@ -154,7 +155,8 @@ class FeedIn(SubsystemCommand[Wrist]):
 
         voltage = config.feeder_voltage_crawl if self.first_note_detected else config.feeder_voltage_feed
 
-        self.subsystem.set_feed_voltage(voltage)
+        if not self.subsystem.detect_note_second():
+            self.subsystem.set_feed_voltage(voltage)
 
     def isFinished(self):
         return self.subsystem.detect_note_second()
