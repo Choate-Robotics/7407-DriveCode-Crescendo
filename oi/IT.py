@@ -97,10 +97,10 @@ class IT:
         # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
             .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel))
-        #    ).debounce(1, Debouncer.DebounceType.kFalling).onFalse(
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
-        #     )
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
+           ).debounce(1, Debouncer.DebounceType.kFalling).onFalse(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+            )
  
         button.Trigger(lambda: config.amping)\
             .onTrue(
