@@ -58,14 +58,14 @@ class Flywheel(Subsystem):
         
         self.flywheel_controller_top = LinearQuadraticRegulator_1_1(
             self.flywheel_plant_top,
-            [8.0],  # velocity error tolerance
+            [1.5],  # velocity error tolerance
             [12.0],  # control effort tolerance
             config.period
         )
         
         self.flywheel_controller_bottom = LinearQuadraticRegulator_1_1(
             self.flywheel_plant_bottom,
-            [8.0],  # velocity error tolerance
+            [1.5],  # velocity error tolerance
             [12.0],  # control effort tolerance
             config.period
         )
