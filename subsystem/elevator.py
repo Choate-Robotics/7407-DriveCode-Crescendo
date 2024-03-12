@@ -152,3 +152,5 @@ class Elevator(Subsystem):
         table.putBoolean('elevator zeroed', self.zeroed)
         table.putNumber('elevator height total', self.get_length_total_height())
         table.putNumber('elevator target height', self.target_length)
+        table.putNumber('elevator motor lead applied output', self.motor_extend.motor.getAppliedOutput())
+        table.putNumber('elevator motor follow applied output', self.motor_extend_follower.motor.getAppliedOutput())
