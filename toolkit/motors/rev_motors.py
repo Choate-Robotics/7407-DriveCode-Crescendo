@@ -72,8 +72,6 @@ class SparkMax(PIDMotor):
 
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
-        self._logger = LocalLogger(f'SparkMax: {self._can_id}')
-
         self._has_init_run = False
 
         self._abs_encoder = None
@@ -97,7 +95,7 @@ class SparkMax(PIDMotor):
         self.motor = CANSparkMax(
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless or TimedRobot.isSimulation() else CANSparkMax.MotorType.kBrushed
-        )  # TODO: FIX TECH DEBT HERE
+        )
 
         # Set pid controller
         self.pid_controller = self.motor.getPIDController() if self._brushless else None

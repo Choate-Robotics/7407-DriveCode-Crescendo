@@ -45,14 +45,14 @@ class Flywheel(Subsystem):
         self.flywheel_observer_top = KalmanFilter_1_1_1(
             self.flywheel_plant_top,
             [3.0],  # how accurate we think our model is
-            [0.05],  # how accurate we think our encoder data is
+            [0.02],  # how accurate we think our encoder data is
             config.period
         )
         
         self.flywheel_observer_bottom = KalmanFilter_1_1_1(
             self.flywheel_plant_bottom,
             [3.0],  # how accurate we think our model is
-            [0.05],  # how accurate we think our encoder data is
+            [0.02],  # how accurate we think our encoder data is
             config.period
         )
         
