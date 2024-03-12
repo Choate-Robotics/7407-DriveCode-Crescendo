@@ -27,9 +27,9 @@ class SparkMaxConfig:
         output_range: The minimum and maximum output of the controller as (min: float, max: float)
         idle_mode: Whether to brake or coast when the motor is not moving
     """
-    def __init__(self, k_P: Optional[float] = None, k_I: Optional[float] = None, k_D: Optional[float] = None,
-                 k_F: Optional[float] = None, output_range: Optional[tuple[float, float]] = None,
-                 idle_mode: Optional[CANSparkMax.IdleMode] = None):
+    def __init__(self, k_P: float = None, k_I: float = None, k_D: float = None,
+                 k_F: float = None, output_range: tuple[float, float] = None,
+                 idle_mode: CANSparkMax.IdleMode = None):
         self.k_P = k_P
         self.k_I = k_I
         self.k_D = k_D
