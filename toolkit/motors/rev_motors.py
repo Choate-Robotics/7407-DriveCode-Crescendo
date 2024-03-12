@@ -11,7 +11,7 @@ from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
 
-from wpilib import TimedRobot
+from wpilib import TimedRobot, Timer
 
 hundred_ms = float
 
