@@ -39,7 +39,7 @@ class RunIntakeConstant(SubsystemCommand[Intake]):
         pass
 
     def isFinished(self) -> bool:
-        return False
+        return True
 
     def end(self, interrupted) -> None:
         pass

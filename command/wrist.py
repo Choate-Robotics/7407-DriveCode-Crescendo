@@ -62,7 +62,7 @@ class SetWrist(SubsystemCommand[Wrist]):
     def end(self, interrupted: bool):
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            # self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
@@ -92,7 +92,7 @@ class SetWristIdle(SubsystemCommand[Wrist]):
     def end(self, interrupted: bool):
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
+            # self.subsystem.set_wrist_angle(wrist_angle)  #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
@@ -127,7 +127,7 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.subsystem.ready_to_shoot = False
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
-            self.subsystem.set_wrist_angle(wrist_angle)
+            # self.subsystem.set_wrist_angle(wrist_angle)
                 #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
@@ -146,7 +146,8 @@ class FeedIn(SubsystemCommand[Wrist]):
         self.first_note_detected: bool = False
 
     def initialize(self):
-        self.subsystem.feed_in()
+        if not self.subsystem.detect_note_second():
+            self.subsystem.feed_in()
 
     def execute(self):
         if self.subsystem.detect_note_first():
@@ -154,7 +155,8 @@ class FeedIn(SubsystemCommand[Wrist]):
 
         voltage = config.feeder_voltage_crawl if self.first_note_detected else config.feeder_voltage_feed
 
-        self.subsystem.set_feed_voltage(voltage)
+        if not self.subsystem.detect_note_second():
+            self.subsystem.set_feed_voltage(voltage)
 
     def isFinished(self):
         return self.subsystem.detect_note_second()

@@ -37,7 +37,7 @@ class TrajectoryCalculator:
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
         self.delta_z = 0
-        self.shoot_angle = 0
+        self.shoot_angle:radians = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
         self.flywheel = flywheel
@@ -90,7 +90,7 @@ class TrajectoryCalculator:
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
         # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
         # v_effective = config.v0_flywheel
-        v_effective = config.v0_flywheel + rvx * np.cos(phi0)
+        v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(phi0)
         self.v0_effective = v_effective
         # Calculate the angle with floor velocities
         result_angle = (
