@@ -244,10 +244,15 @@ ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
 
 
 WRIST_CONFIG = SparkMaxConfig(.55, 0, 0.002, 0, (-.75, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 FLYWHEEL_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, flywheel_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kCoast
 )
@@ -255,6 +260,7 @@ FLYWHEEL_CONFIG = SparkMaxConfig(
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
+
 MOVE_CONFIG = TalonConfig(
     0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=70  # integral_zone=1000, max_integral_accumulator=10000
 )
