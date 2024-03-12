@@ -157,7 +157,7 @@ limelight_back_yaw = 180 * degrees_to_radians
 wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
 
 # Flywheel
-flywheel_mass:kilograms = 0.907185  # kilograms
+flywheel_mass:kilograms = 0.78  # kilograms
 flywheel_shaft_mass:kilograms = .127  # kilograms
 flywheel_radius_outer:meters = 2 * inches_to_meters
 flywheel_shaft_radius:meters = 0.5 * inches_to_meters
