@@ -162,7 +162,7 @@ double_note_timeout = 2
 
 elevator_can_id: int = 10
 elevator_can_id_2: int = 15
-elevator_ramp_rate: float = .2
+elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0 
 elevator_climb_ff: float = -3.7
 elevator_moving = False

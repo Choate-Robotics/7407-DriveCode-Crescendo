@@ -38,7 +38,7 @@ class Elevator(Subsystem):
         self.motor_extend_follower.motor.burnFlash()
 
         # Limits motor acceleration
-        # self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
+        self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
 
         # Inverted b/c motors r parallel facing out.
 
