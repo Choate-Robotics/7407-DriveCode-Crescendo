@@ -260,10 +260,11 @@ class StageNote(SequentialCommandGroup):
             IntakeIdle(intake),
         )
         
-class IntakeStageNote(ParallelRaceGroup):
+class IntakeStageNote(SequentialCommandGroup):
     
     def __init__(self, wrist: Wrist, intake: Intake):
         super().__init__(
+            SetWristIdle(wrist),
             RunIntakeConstant(intake),
             FeedIn(wrist)
         )
@@ -331,12 +332,12 @@ class Shoot(SequentialCommandGroup):
     
     Args:
         SequentialCommandGroup (wrist): Wrist subsystem
-        SequentialCommandGroup (flywheel): Flywheel subsystem
     """
 
     def __init__(self, wrist: Wrist):
         super().__init__(
             PassNote(wrist),
+            WaitCommand(.5),
             SetWristIdle(wrist)
         )
 
@@ -387,12 +388,12 @@ class EnableClimb(SequentialCommandGroup):
 
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
+            SetWrist(wrist, -44 * degrees_to_radians),
             ParallelCommandGroup(
+                DeployTenting(intake),
                 SetElevator(elevator, config.Giraffe.kClimbReach.height),
                 SetWrist(wrist, 25 * degrees_to_radians)
             ),
-            DeployTenting(intake)
-        
         )
 
 class ClimbDown(ParallelCommandGroup):

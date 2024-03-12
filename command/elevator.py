@@ -22,8 +22,9 @@ class ZeroElevator(SubsystemCommand[Elevator]):
         
         def end(self, interrupted: bool):
             if interrupted:
+                ...
                 # utils.LocalLogger.debug("Ending elevator", "ZeroElevator")
-                self.subsystem.stop()
+                # self.subsystem.stop()
             else:
                 ...
                 # utils.LocalLogger.debug("Elevator zeroed: " + str(self.subsystem.zeroed), "ZeroElevator")
@@ -55,8 +56,9 @@ class SetElevator(SubsystemCommand[Elevator]):
     
     def end(self, interrupted: bool):
         if interrupted:
+            ...
             # utils.LocalLogger.debug("Ending elevator", "SetElevator")
-            self.subsystem.stop()
+            # self.subsystem.stop()
         else:
             ...
             # utils.LocalLogger.debug("Elevator length: " + str(self.subsystem.get_length()), "SetElevator")
@@ -87,8 +89,9 @@ class SetElevatorClimbDown(SubsystemCommand[Elevator]):
     
     def end(self, interrupted: bool):
         if interrupted:
+            ...
             # utils.LocalLogger.debug("Ending elevator", "SetElevator")
-            self.subsystem.stop()
+            # self.subsystem.stop()
         else:
             ...
             # utils.LocalLogger.debug("Elevator length: " + str(self.subsystem.get_length()), "SetElevator")

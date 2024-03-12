@@ -28,6 +28,15 @@ class OI:
         ).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain)
         )
+        
+        Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
+            .whileTrue(
+                command.AimWrist(Robot.wrist, Field.calculations)
+            ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
 
         Keymap.Drivetrain.X_MODE.onTrue(
             commands2.InstantCommand(lambda: Robot.drivetrain.x_mode())
@@ -39,8 +48,9 @@ class OI:
         #     command.IntakeIdle(Robot.intake).andThen(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
         # )
 
-        Keymap.Intake.INTAKE_IN.onTrue(
-            command.IntakeStageNote(Robot.wrist, Robot.intake)
+        Keymap.Intake.INTAKE_IN.whileTrue(
+            command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
+            command.IntakeStageNote(Robot.wrist, Robot.intake))
         ).onFalse(
             command.IntakeStageIdle(Robot.wrist, Robot.intake)
         )
@@ -77,18 +87,20 @@ class OI:
         def set_not_amping():
             config.amping = False
 
-        Keymap.Elevator.AMP.onTrue(
+        Keymap.Elevator.AMP.whileTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
-            command.Amp(Robot.elevator, Robot.wrist).alongWith(
-                commands2.InstantCommand(lambda: set_amping())
-            )
+            command.Amp(Robot.elevator, Robot.wrist)
         ).onFalse(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
                 command.SetWristIdle(Robot.wrist)
-            ).alongWith(
-                commands2.InstantCommand(lambda: set_not_amping())
             )
+        )
+        
+        Keymap.Elevator.AMP.onTrue(
+            commands2.InstantCommand(lambda: set_amping())
+        ).onFalse(
+            commands2.InstantCommand(lambda: set_not_amping())
         )
 
         Keymap.Shooter.SET_WRIST_SUBWOOFER.onTrue(

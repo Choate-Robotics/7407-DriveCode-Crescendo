@@ -139,7 +139,7 @@ inner_intake_id = 13
 outer_intake_back_id = 17
 deploy_intake_id = 12
 
-intake_inner_speed = 0.2
+intake_inner_speed = 0.5
 intake_inner_pass_speed = .1
 intake_inner_eject_speed = 1
 intake_outer_speed = 1

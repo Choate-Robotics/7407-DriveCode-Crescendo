@@ -37,7 +37,7 @@ class TrajectoryCalculator:
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
         self.delta_z = 0
-        self.shoot_angle = 0
+        self.shoot_angle:radians = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
         self.flywheel = flywheel
@@ -49,7 +49,7 @@ class TrajectoryCalculator:
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
 
-    def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
+    def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
         Calculates the angle of the trajectory without air resistance.
         """
@@ -75,8 +75,8 @@ class TrajectoryCalculator:
         
         # Calculate the effective velocity
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
-        v_effective = config.v0_flywheel_minimum
+        v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
+        # v_effective = config.v0_flywheel
 
         # Calculate the angle with floor velocities
         result_angle = (

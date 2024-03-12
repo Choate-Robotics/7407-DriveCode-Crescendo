@@ -34,33 +34,55 @@ class Flywheel(Subsystem):
         
         self.total_MOI = self.flywheel_MOI + self.shaft_MOI
 
-        self.flywheel_plant = LinearSystemId().flywheelSystem(
+        self.flywheel_plant_top = LinearSystemId().flywheelSystem(
             DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
         )
-        self.flywheel_observer = KalmanFilter_1_1_1(
-            self.flywheel_plant,
+        
+        self.flywheel_plant_bottom = LinearSystemId().flywheelSystem(
+            DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
+        )
+        
+        self.flywheel_observer_top = KalmanFilter_1_1_1(
+            self.flywheel_plant_top,
             [3.0],  # how accurate we think our model is
-            [0.05],  # how accurate we think our encoder data is
+            [0.01],  # how accurate we think our encoder data is
             config.period
         )
-        self.flywheel_controller = LinearQuadraticRegulator_1_1(
-            self.flywheel_plant,
-            [2.0],  # velocity error tolerance
+        
+        self.flywheel_observer_bottom = KalmanFilter_1_1_1(
+            self.flywheel_plant_bottom,
+            [3.0],  # how accurate we think our model is
+            [0.01],  # how accurate we think our encoder data is
+            config.period
+        )
+        
+        self.flywheel_controller_top = LinearQuadraticRegulator_1_1(
+            self.flywheel_plant_top,
+            [1.5],  # velocity error tolerance
             [12.0],  # control effort tolerance
             config.period
         )
-        self.flywheel_controller.latencyCompensate(self.flywheel_plant, config.period, 0.025)
+        
+        self.flywheel_controller_bottom = LinearQuadraticRegulator_1_1(
+            self.flywheel_plant_bottom,
+            [1.5],  # velocity error tolerance
+            [12.0],  # control effort tolerance
+            config.period
+        )
+        
+        self.flywheel_controller_top.latencyCompensate(self.flywheel_plant_top, config.period, 0.025)
+        self.flywheel_controller_bottom.latencyCompensate(self.flywheel_plant_bottom, config.period, 0.025)
         self.top_flywheel_state = LinearSystemLoop_1_1_1(
-            self.flywheel_plant,
-            self.flywheel_controller,
-            self.flywheel_observer,
+            self.flywheel_plant_top,
+            self.flywheel_controller_top,
+            self.flywheel_observer_top,
             12.0,
             config.period
         )
         self.bottom_flywheel_state = LinearSystemLoop_1_1_1(
-            self.flywheel_plant,
-            self.flywheel_controller,
-            self.flywheel_observer,
+            self.flywheel_plant_bottom,
+            self.flywheel_controller_bottom,
+            self.flywheel_observer_bottom,
             12.0,
             config.period
         )
@@ -238,3 +260,5 @@ class Flywheel(Subsystem):
         table.putNumber('flywheel bottom current', self.get_current(2))
         table.putNumber('flywheel top bus voltage', self.motor_1.motor.getBusVoltage())
         table.putNumber('flywheel bottom bus voltage', self.motor_2.motor.getBusVoltage())
+        table.putNumber('flywheel top applied output', self.motor_1.motor.getAppliedOutput())
+        table.putNumber('flywheel bottom applied output', self.motor_2.motor.getAppliedOutput())

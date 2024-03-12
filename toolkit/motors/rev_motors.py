@@ -11,7 +11,7 @@ from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
 
-from wpilib import TimedRobot
+from wpilib import TimedRobot, Timer
 
 hundred_ms = float
 
@@ -47,7 +47,7 @@ class SparkMax(PIDMotor):
     motor: CANSparkMax
     encoder: SparkMaxRelativeEncoder
     pid_controller: SparkMaxPIDController
-    _configs: [SparkMaxConfig] = []
+    _configs: list[SparkMaxConfig] = []
     _has_init_run: bool = False
     _logger: LocalLogger
     _abs_encoder = None
@@ -69,8 +69,6 @@ class SparkMax(PIDMotor):
         self._brushless = brushless
 
         self._configs.append(config)
-
-        self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
@@ -97,7 +95,7 @@ class SparkMax(PIDMotor):
         self.motor = CANSparkMax(
             self._can_id,
             CANSparkMax.MotorType.kBrushless if self._brushless or TimedRobot.isSimulation() else CANSparkMax.MotorType.kBrushed
-        )  # TODO: FIX TECH DEBT HERE
+        )
 
         # Set pid controller
         self.pid_controller = self.motor.getPIDController() if self._brushless else None
@@ -135,6 +133,9 @@ class SparkMax(PIDMotor):
         if TimedRobot.isSimulation():
             return
         if error != REVLibError.kOk:
+            # return
+            if self._can_id == 1 or self._can_id == 19:
+                raise RuntimeError(f'SparkMax Error: {error}')
             return
             match error:
                 case REVLibError.kInvalid:
