@@ -19,7 +19,7 @@ CANSparkMax
 
 
 @dataclass
-class SparkMaxConfig:
+class SparkMaxConfig():
     """
     Configuration for a SparkMax motor controller
 
@@ -110,8 +110,8 @@ class SparkMax(PIDMotor):
         
         
         
-        # time.sleep(0.3)
-        # self.motor.burnFlash()
+        time.sleep(0.3)
+        self.motor.burnFlash()
 
         self._has_init_run = True
         self._logger.complete("Initialized")
