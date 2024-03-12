@@ -106,7 +106,6 @@ class SparkMax(PIDMotor):
 
         self.motor.setInverted(self._inverted)
         self.motor.burnFlash()
-        self.motor.burnFlash()
 
         self._has_init_run = True
         self._logger.complete("Initialized")
