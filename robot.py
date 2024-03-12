@@ -200,6 +200,7 @@ class _Robot(wpilib.TimedRobot):
 
         self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
         self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
+        print(config.WRIST_CONFIG.k_P)
 
     def teleopInit(self):
         self.log.info("Teleop initialized")

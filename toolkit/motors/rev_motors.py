@@ -1,7 +1,6 @@
 from __future__ import annotations
 from builtins import type
 import config
-from dataclasses import dataclass
 from typing import Optional
 from utils import LocalLogger
 
@@ -15,10 +14,8 @@ from wpilib import TimedRobot, Timer
 
 hundred_ms = float
 
-CANSparkMax
 
-
-class SparkMaxConfig():
+class SparkMaxConfig:
     """
     Configuration for a SparkMax motor controller
 
