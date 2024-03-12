@@ -106,7 +106,7 @@ class IT:
  
         button.Trigger(lambda: config.amping)\
             .onTrue(
-                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
+                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 4))
             )
             
             
