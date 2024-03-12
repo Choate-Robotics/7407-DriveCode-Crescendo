@@ -82,7 +82,7 @@ class FieldPos:
     class Scoring:
         speaker_y = 218.42 * inches_to_meters
 
-        speaker_z_top = 82.90 * inches_to_meters + 4 * inches_to_meters
+        speaker_z_top = 82.90 * inches_to_meters
 
         speaker_depth = 18 * inches_to_meters
 
@@ -166,7 +166,7 @@ shooter_height = 21 * inches_to_meters  # REAL VALUE: Meters
 shooter_offset_y = 6 * inches_to_meters  # REAL VALUE: Meters
 
 wrist_max_rotation = 60 * degrees_to_radians
-wrist_min_rotation = -40 * degrees_to_radians
+wrist_min_rotation = -44 * degrees_to_radians
 wrist_min_rotation_stage = 22 * degrees_to_radians
 
 # Pathing
