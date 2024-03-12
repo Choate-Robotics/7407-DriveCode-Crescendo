@@ -10,7 +10,7 @@ import rev
 from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
-
+import time
 from wpilib import TimedRobot, Timer
 
 hundred_ms = float
@@ -105,6 +105,8 @@ class SparkMax(PIDMotor):
         self.set_motor_config(0)
 
         self.motor.setInverted(self._inverted)
+        
+        time.sleep(0.3)
         self.motor.burnFlash()
 
         self._has_init_run = True
@@ -126,7 +128,7 @@ class SparkMax(PIDMotor):
 
         """
 
-        self._set_config(self._configs[config_index]) if self._brushless else None
+        self._set_config(self._configs[config_index], config_index) if self._brushless else None
 
     def error_check(self, error: REVLibError):
         if TimedRobot.isSimulation():
@@ -243,18 +245,18 @@ class SparkMax(PIDMotor):
         result = self.motor.follow(master.motor, inverted)
         self.error_check(result)
 
-    def _set_config(self, config: SparkMaxConfig):
+    def _set_config(self, config: SparkMaxConfig, slot: int = 0):
         if config is None:
             return
         if config.k_P is not None:
-            self.error_check(self.pid_controller.setP(config.k_P))
+            self.error_check(self.pid_controller.setP(config.k_P, slot))
         if config.k_I is not None:
-            self.error_check(self.pid_controller.setI(config.k_I))
+            self.error_check(self.pid_controller.setI(config.k_I, slot))
         if config.k_D is not None:
-            self.error_check(self.pid_controller.setD(config.k_D))
+            self.error_check(self.pid_controller.setD(config.k_D, slot))
         if config.k_F is not None:
-            self.error_check(self.pid_controller.setFF(config.k_F))
+            self.error_check(self.pid_controller.setFF(config.k_F, slot))
         if config.output_range is not None:
-            self.error_check(self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1]))
+            self.error_check(self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1], slot))
         if config.idle_mode is not None:
             self.error_check(self.motor.setIdleMode(config.idle_mode))
