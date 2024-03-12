@@ -45,27 +45,27 @@ class Flywheel(Subsystem):
         self.flywheel_observer_top = KalmanFilter_1_1_1(
             self.flywheel_plant_top,
             [3.0],  # how accurate we think our model is
-            [0.02],  # how accurate we think our encoder data is
+            [0.01],  # how accurate we think our encoder data is
             config.period
         )
         
         self.flywheel_observer_bottom = KalmanFilter_1_1_1(
             self.flywheel_plant_bottom,
             [3.0],  # how accurate we think our model is
-            [0.02],  # how accurate we think our encoder data is
+            [0.01],  # how accurate we think our encoder data is
             config.period
         )
         
         self.flywheel_controller_top = LinearQuadraticRegulator_1_1(
             self.flywheel_plant_top,
-            [1.5],  # velocity error tolerance
+            [8.0],  # velocity error tolerance
             [12.0],  # control effort tolerance
             config.period
         )
         
         self.flywheel_controller_bottom = LinearQuadraticRegulator_1_1(
             self.flywheel_plant_bottom,
-            [1.5],  # velocity error tolerance
+            [8.0],  # velocity error tolerance
             [12.0],  # control effort tolerance
             config.period
         )
