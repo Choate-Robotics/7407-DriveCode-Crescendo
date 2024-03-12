@@ -18,7 +18,6 @@ hundred_ms = float
 CANSparkMax
 
 
-@dataclass
 class SparkMaxConfig():
     """
     Configuration for a SparkMax motor controller
