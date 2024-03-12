@@ -99,16 +99,16 @@ class SparkMax(PIDMotor):
             CANSparkMax.MotorType.kBrushless if self._brushless or TimedRobot.isSimulation() else CANSparkMax.MotorType.kBrushed
         )
 
-        
+        # Set pid controller
+        self.pid_controller = self.motor.getPIDController() if self._brushless else None
+        self.encoder = self.motor.getEncoder() if self._brushless else None
 
         # Use the default config
         self.set_motor_config(0)
 
         self.motor.setInverted(self._inverted)
         
-        # Set pid controller
-        self.pid_controller = self.motor.getPIDController() if self._brushless else None
-        self.encoder = self.motor.getEncoder() if self._brushless else None
+        
         
         # time.sleep(0.3)
         # self.motor.burnFlash()
@@ -138,7 +138,6 @@ class SparkMax(PIDMotor):
         if TimedRobot.isSimulation():
             return
         if error != REVLibError.kOk:
-            return
             match error:
                 case REVLibError.kInvalid:
                     self._logger.error("Invalid")
