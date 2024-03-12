@@ -138,6 +138,7 @@ class SparkMax(PIDMotor):
         if TimedRobot.isSimulation():
             return
         if error != REVLibError.kOk:
+            return
             match error:
                 case REVLibError.kInvalid:
                     self._logger.error("Invalid")
