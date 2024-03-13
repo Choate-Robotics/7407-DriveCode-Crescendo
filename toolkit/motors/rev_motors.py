@@ -100,7 +100,7 @@ class SparkMax(PIDMotor):
 
         # self.motor.restoreFactoryDefaults(True)
 
-        time.sleep(0.5)
+        time.sleep(0.5) if not TimedRobot.isSimulation() else None
 
         # Use the default config
         self.set_motor_config(0)
@@ -109,7 +109,7 @@ class SparkMax(PIDMotor):
         
         
         
-        time.sleep(0.3)
+        time.sleep(0.3) if not TimedRobot.isSimulation() else None
         self.motor.burnFlash()
 
         self._has_init_run = True
