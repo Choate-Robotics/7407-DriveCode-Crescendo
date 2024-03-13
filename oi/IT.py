@@ -56,7 +56,7 @@ class IT:
         #     command.SetWristIdle(Robot.wrist))
         # )
         
-        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second()).and_(lambda: not config.climbed)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second()).and_(lambda: not robot_states.climbed)\
             .onTrue(
                 InstantCommand(lambda: Robot.wrist.set_feed_voltage(config.feeder_voltage_crawl))
             )\

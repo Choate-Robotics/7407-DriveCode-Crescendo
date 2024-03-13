@@ -154,7 +154,7 @@ class OI:
         def not_climbed():
             states.climbed = False
 
-        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
+        Keymap.Climb.CLIMB_UP.and_(lambda: not states.climbing).onTrue(
             commands2.InstantCommand(lambda: climb_ready()).andThen(
                 commands2.InstantCommand(lambda: start_climbing()).alongWith(
                     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
@@ -162,26 +162,20 @@ class OI:
             )
         )
 
-        # Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).onTrue(
-        #     commands2.InstantCommand(lambda: stop_climbing()).alongWith(
-        #     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        # )
-        # )
-
-        Keymap.Climb.UNDO_CLIMB_UP.and_(lambda: config.climbing).onTrue(
+        Keymap.Climb.UNDO_CLIMB_UP.and_(lambda: states.climbing).onTrue(
             commands2.InstantCommand(lambda: stop_climbing())
             .alongWith(commands2.InstantCommand(lambda: climb_not_ready()).alongWith(
                 command.UndoClimb(Robot.elevator, Robot.wrist, Robot.intake)
             ))
         )
 
-        Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
+        Keymap.Climb.CLIMB_DOWN.and_(lambda: states.climbing).onTrue(
             command.ClimbDown(Robot.elevator, Robot.wrist).alongWith(
                 commands2.InstantCommand(lambda: climbed())
             )
         )
 
-        Keymap.Climb.TRAP.and_(lambda: config.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
+        Keymap.Climb.TRAP.and_(lambda: states.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
 
         def set_manual_flywheel():
             states.flywheel_manual = True
