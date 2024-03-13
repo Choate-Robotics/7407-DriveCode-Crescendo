@@ -99,9 +99,9 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController() if self._brushless else None
         self.encoder = self.motor.getEncoder() if self._brushless else None
 
-        self.motor.restoreFactoryDefaults(True)
+        # self.motor.restoreFactoryDefaults(True)
 
-        time.sleep(0.3)
+        time.sleep(0.5)
 
         # Use the default config
         self.set_motor_config(0)
