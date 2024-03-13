@@ -40,11 +40,11 @@ class IT:
         
         #FEEDER TRIGGERS ----------------
         
-        button.Trigger(lambda: Robot.wrist.note_detected()).onTrue(
-            InstantCommand(lambda: Robot.wrist.set_note_staged())
-        ).onFalse(
-            InstantCommand(lambda: Robot.wrist.set_note_not_staged())
-        )
+        # button.Trigger(lambda: Robot.wrist.note_detected()).onTrue(
+        #     InstantCommand(lambda: Robot.wrist.set_note_staged())
+        # ).onFalse(
+        #     InstantCommand(lambda: Robot.wrist.set_note_not_staged())
+        # )
         
         # # # if note in feeder, run flywheel and wrist to aim
         # button.Trigger(lambda: Robot.wrist.detect_note_first() and Robot.wrist.detect_note_second())\
@@ -96,20 +96,18 @@ class IT:
 
         # if note in feeder, spin to set shot velocity
         button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
-            .onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
+            .whileTrue(
+                command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+                # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
            ).debounce(1, Debouncer.DebounceType.kFalling).onFalse(
+
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
  
         button.Trigger(lambda: config.amping)\
             .onTrue(
-                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed / 3))
-                # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
-            )\
-            # .onFalse(
-            #     command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
-            # )
+                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 4))
+            )
             
             
     #     #FLYWHEEL TRIGGERS ----------------

@@ -162,8 +162,8 @@ double_note_timeout = 2
 
 elevator_can_id: int = 10
 elevator_can_id_2: int = 15
-elevator_ramp_rate: float = .2
-elevator_feed_forward: float = 0.0 
+elevator_ramp_rate: float = 0.0
+elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -3.7
 elevator_moving = False
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
@@ -215,9 +215,10 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 12
-v0_flywheel: meters_per_second = 18
+v0_flywheel_minimum: meters_per_second = 18
+v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12
-idle_flywheel: meters_per_second = v0_flywheel / 2
+idle_flywheel: meters_per_second = v0_flywheel_minimum / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 auto_shoot_deadline = 1.2
@@ -238,16 +239,24 @@ odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
 odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
 # Configs 
-ELEVATOR_CONFIG = SparkMaxConfig(
-    0.3, 0.0, 0.02, elevator_feed_forward, (-.65, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
+    0.2, 0.0, 0.08, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
+ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
+    0.5, 0.0, .02, -3.7,(-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+)
 
-WRIST_CONFIG = SparkMaxConfig(.55, 0, 0.002, 0, (-.75, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.2, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+
 FLYWHEEL_CONFIG = SparkMaxConfig(
     0.055, 0.0, 0.01, flywheel_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kCoast
 )
@@ -255,6 +264,7 @@ FLYWHEEL_CONFIG = SparkMaxConfig(
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
+
 MOVE_CONFIG = TalonConfig(
     0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=70  # integral_zone=1000, max_integral_accumulator=10000
 )

@@ -75,8 +75,11 @@ class TrajectoryCalculator:
         
         # Calculate the effective velocity
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
+        v_effective = config.v0_flywheel_minimum# + rvx + rvy
         # v_effective = config.v0_flywheel
+
+        if v_effective == 0:
+            return config.Giraffe.kIdle.wrist_angle
 
         # Calculate the angle with floor velocities
         result_angle = (
@@ -217,6 +220,10 @@ class TrajectoryCalculator:
         Returns the angle of the Robot
         """
         return self.base_rotation2d
+    
+    def get_distance_to_target(self) -> float:
+        
+        return self.distance_to_target
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u
