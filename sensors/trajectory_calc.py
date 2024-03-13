@@ -78,6 +78,9 @@ class TrajectoryCalculator:
         v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
         # v_effective = config.v0_flywheel
 
+        if v_effective == 0:
+            return config.Giraffe.kIdle.wrist_angle
+
         # Calculate the angle with floor velocities
         result_angle = (
             0.5 * np.arcsin(
