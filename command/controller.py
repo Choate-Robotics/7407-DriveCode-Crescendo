@@ -388,7 +388,7 @@ class EnableClimb(SequentialCommandGroup):
 
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
-            SetWrist(wrist, -44 * degrees_to_radians),
+            SetWrist(wrist, -42 * degrees_to_radians),
             ParallelCommandGroup(
                 DeployTenting(intake),
                 SetWrist(wrist, 25 * degrees_to_radians)
