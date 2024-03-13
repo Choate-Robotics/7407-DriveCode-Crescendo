@@ -239,7 +239,7 @@ ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
     100, 0.0, 0, elevator_feed_forward,(-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-WRIST_CONFIG = SparkMaxConfig(.18, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.16, 0, 0.003, .00015, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 

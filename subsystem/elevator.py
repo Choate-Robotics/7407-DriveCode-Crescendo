@@ -170,5 +170,5 @@ class Elevator(Subsystem):
         table.putNumber('elevator current', self.motor_extend.motor.getOutputCurrent())
         
         # set drivetrain control speed
-        states.drivetrain_controlled_vel = constants.drivetrain_max_vel * max((1 - (self.get_length_total_height() / constants.elevator_max_length)), .25)
-        states.drivetrain_controlled_angular_vel = constants.drivetrain_max_angular_vel * max((1 - (self.get_length_total_height() / constants.elevator_max_length)), .5)
+        states.drivetrain_controlled_vel = constants.drivetrain_max_vel * max((1 - (self.get_length() / constants.elevator_max_length)), .25)
+        states.drivetrain_controlled_angular_vel = constants.drivetrain_max_angular_vel * max((1 - (self.get_length() / constants.elevator_max_length)), .5)

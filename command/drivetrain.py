@@ -63,7 +63,7 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         # dx *= self.subsystem.max_vel
         dx *= states.drivetrain_controlled_vel
         # dy *= -self.subsystem.max_vel
-        dy *= states.drivetrain_controlled_vel
+        dy *= -states.drivetrain_controlled_vel
         
         # d_theta *= self.subsystem.max_angular_vel
         d_theta *= states.drivetrain_controlled_angular_vel
