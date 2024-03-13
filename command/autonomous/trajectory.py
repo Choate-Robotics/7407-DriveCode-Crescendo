@@ -3,6 +3,12 @@ from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
 from robot_systems import Field
 from utils import POIPose
 import config
+from enum import Enum
+
+class PoseType(Enum):
+    
+    current = 0
+
 
 class CustomTrajectory:
     """
@@ -26,7 +32,7 @@ class CustomTrajectory:
 
     def __init__(
         self,
-        start_pose: Pose2d | POIPose,
+        start_pose: Pose2d | POIPose | PoseType.current,
         waypoints: list[Translation2d] | list[POIPose],
         end_pose: Pose2d | POIPose,
         max_velocity: float,
@@ -50,17 +56,17 @@ class CustomTrajectory:
         
         # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
         
-        temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
+        active_start_pose, active_waypoints, active_end_pose = self.start_pose,[], self.end_pose
         
         if isinstance(self.start_pose, POIPose):
-            self.start_pose = self.start_pose.get()
+            active_start_pose = self.start_pose.get()
             
         for i, waypoint in enumerate(self.waypoints):
             if isinstance(waypoint, POIPose):
-                self.waypoints[i] = waypoint.get().translation()
+                active_waypoints = waypoint.get().translation()
 
         if isinstance(self.end_pose, POIPose):
-            self.end_pose = self.end_pose.get()
+            active_end_pose = self.end_pose.get()
         
         config = TrajectoryConfig(
             self.max_velocity,
@@ -72,9 +78,9 @@ class CustomTrajectory:
         
         
         self.trajectory = TrajectoryGenerator.generateTrajectory(
-            start=self.start_pose,
-            interiorWaypoints=self.waypoints,
-            end=self.end_pose,
+            start=active_start_pose,
+            interiorWaypoints=active_waypoints,
+            end=active_end_pose,
             config=config,
         )
         return self.trajectory
