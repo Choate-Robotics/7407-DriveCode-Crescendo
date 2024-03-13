@@ -239,9 +239,12 @@ odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
-    0.3, 0.0, 0.02, elevator_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.25, 0.0, 0.025, elevator_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
+ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
+    0.5, 0.0, .02, -3.7,(-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+)
 
 WRIST_CONFIG = SparkMaxConfig(.2, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
