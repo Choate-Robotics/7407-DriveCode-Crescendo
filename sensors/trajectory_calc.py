@@ -76,7 +76,9 @@ class TrajectoryCalculator:
 
         
         
-        rvx = self.get_drivetrain_speeds_speaker_origin().vx
+        rvx = self.get_drivetrain_speeds_field_origin().vx
+        
+        rvs = rvx * np.cos(self.get_rotation_to_speaker().radians())
         
 
         # Calculate the horizontal angle without considering velocities
@@ -90,7 +92,7 @@ class TrajectoryCalculator:
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
         # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
         # v_effective = config.v0_flywheel
-        v_effective = self.flywheel.get_velocity_linear() - rvx * np.cos(phi0)
+        v_effective = self.flywheel.get_velocity_linear() - rvs * np.cos(phi0)
         self.v0_effective = v_effective
 
 
