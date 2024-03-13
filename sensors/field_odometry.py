@@ -186,7 +186,7 @@ class FieldOdometry:
                 return
             if distance_deviation > config.odometry_distance_deviation_threshold:
                 return
-            std_dev = self.std_formula(distance_to_target)
+            std_dev = self.std_formula(distance_to_target / 2)
             std_dev_omega = abs(math.radians(40))
         if tag_count == 2:
             std_dev = 0.7
