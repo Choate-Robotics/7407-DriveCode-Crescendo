@@ -168,6 +168,7 @@ class TrajectoryCalculator:
         speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         t_total = self.get_distance_to_target() / (self.v0_effective * np.cos(self.get_theta()))  if self.v0_effective != 0 else 0
         
+        
         rvels = self.get_drivetrain_speeds_field_origin()
         
         robot_pose_2d = self.odometry.getPose()
