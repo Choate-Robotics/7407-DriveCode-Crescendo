@@ -12,7 +12,6 @@ from wpilib import TimedRobot
 
 hundred_ms = float
 
-
 class SparkMaxConfig:
     """
     Configuration for a SparkMax motor controller
