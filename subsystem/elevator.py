@@ -34,8 +34,9 @@ class Elevator(Subsystem):
         # Set the motor_extend encoder to the motor's absolute encoder
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
 
-        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
-        self.motor_extend_follower.motor.burnFlash()
+        # self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+        # self.motor_extend_follower.follow(self.motor_extend, True)
+        # self.motor_extend_follower.motor.burnFlash()
 
         # Limits motor acceleration
         self.motor_extend.motor.setClosedLoopRampRate(config.elevator_ramp_rate)
@@ -152,3 +153,5 @@ class Elevator(Subsystem):
         table.putBoolean('elevator zeroed', self.zeroed)
         table.putNumber('elevator height total', self.get_length_total_height())
         table.putNumber('elevator target height', self.target_length)
+        table.putNumber('elevator motor lead applied output', self.motor_extend.motor.getAppliedOutput())
+        table.putNumber('elevator motor follow applied output', self.motor_extend_follower.motor.getAppliedOutput())
