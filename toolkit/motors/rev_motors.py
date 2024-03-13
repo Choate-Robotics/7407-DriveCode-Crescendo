@@ -49,7 +49,7 @@ class SparkMax(PIDMotor):
     _get_analog = None
     _is_init: bool
 
-    def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None):
+    def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None, config_others: list[SparkMaxConfig] = None):
         """
 
         Args:
@@ -66,6 +66,11 @@ class SparkMax(PIDMotor):
         self._configs = []
 
         self._configs.append(config)
+        
+        if config_others is not None:
+            for config in config_others:
+                if isinstance(config, SparkMaxConfig):
+                    self._configs.append(config)
 
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
@@ -103,7 +108,9 @@ class SparkMax(PIDMotor):
         time.sleep(0.5) if not TimedRobot.isSimulation() else None
 
         # Use the default config
-        self.set_motor_config(0)
+        for enum, config in enumerate(self._configs):
+            time.sleep(0.5) if not TimedRobot.isSimulation() else None
+            self._set_config(config, enum)
 
         self.motor.setInverted(self._inverted)
         

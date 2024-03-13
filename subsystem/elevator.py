@@ -14,7 +14,7 @@ class Elevator(Subsystem):
         super().__init__()
         # Absolute encoder
         self.motor_extend: SparkMax = SparkMax(
-            config.elevator_can_id, config=config.ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id, config=config.ELEVATOR_CONFIG, inverted=False, config_others=[config.ELEVATOR_CLIMB_CONFIG]
         )
         self.motor_extend_encoder = None
 
