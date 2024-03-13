@@ -119,13 +119,6 @@ limelight_led_mode = {
     "force_on": 3,
 }
 
-# CLIMBING
-ready_to_climb: bool = False
-climbing: bool = False
-climbed: bool = False
-
-# AMP
-amping: bool = False
 
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
@@ -165,7 +158,6 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_moving = False
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
@@ -227,7 +219,6 @@ flywheel_feed_forward = 0.0  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
 
-flywheel_manual: bool = False
 
 # Odometry
 odometry_visible_tags_threshold = 2
@@ -248,7 +239,7 @@ ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
     100, 0.0, 0, elevator_feed_forward,(-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-WRIST_CONFIG = SparkMaxConfig(.2, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.18, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 

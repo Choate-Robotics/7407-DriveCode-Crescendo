@@ -2,7 +2,7 @@ from utils import LocalLogger
 
 from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
 import command
-import config, math
+import config, math, robot_states
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
 from utils import LocalLogger
@@ -111,7 +111,7 @@ class IT:
             
 
         # if note in feeder, spin to set shot velocity
-        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not robot_states.amping).and_(lambda: not robot_states.flywheel_manual)\
             .whileTrue(
                 command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
@@ -120,7 +120,7 @@ class IT:
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
  
-        button.Trigger(lambda: config.amping)\
+        button.Trigger(lambda: robot_states.amping)\
             .onTrue(
                 command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 4))
             )

@@ -6,7 +6,7 @@ from units.SI import meters
 import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
-
+import robot_states as states
 
 class Elevator(Subsystem):
 
@@ -168,3 +168,7 @@ class Elevator(Subsystem):
         table.putNumber('elevator motor lead applied output', self.motor_extend.motor.getAppliedOutput())
         table.putNumber('elevator motor follow applied output', self.motor_extend_follower.motor.getAppliedOutput())
         table.putNumber('elevator current', self.motor_extend.motor.getOutputCurrent())
+        
+        # set drivetrain control speed
+        states.drivetrain_controlled_vel = constants.drivetrain_max_vel * min((1 - (self.get_length_total_height() / constants.elevator_max_length)), .25)
+        states.drivetrain_controlled_angular_vel = constants.drivetrain_max_angular_vel * min((1 - (self.get_length_total_height() / constants.elevator_max_length)), .5)

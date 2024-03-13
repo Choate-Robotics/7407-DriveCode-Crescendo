@@ -15,6 +15,7 @@ from wpimath.trajectory import TrapezoidProfileRadians
 from toolkit.utils.toolkit_math import bounded_angle_diff
 from math import radians
 from wpimath.units import seconds
+import robot_states as states
 
 
 def curve_abs(x):
@@ -59,9 +60,14 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         dy = curve(dy)
         d_theta = curve(d_theta)
 
-        dx *= self.subsystem.max_vel
-        dy *= -self.subsystem.max_vel
-        d_theta *= self.subsystem.max_angular_vel
+        # dx *= self.subsystem.max_vel
+        dx *= states.drivetrain_controlled_vel
+        # dy *= -self.subsystem.max_vel
+        dy *= states.drivetrain_controlled_vel
+        
+        # d_theta *= self.subsystem.max_angular_vel
+        d_theta *= states.drivetrain_controlled_angular_vel
+        
 
         if config.driver_centric:
             self.subsystem.set_driver_centric((dy, -dx), -d_theta)

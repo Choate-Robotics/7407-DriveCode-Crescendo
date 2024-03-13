@@ -5,7 +5,7 @@ import command, config, constants
 from robot_systems import Robot, Sensors, Field
 from oi.keymap import Keymap
 from math import radians
-
+import robot_states as states
 log = LocalLogger("OI")
 
 
@@ -82,10 +82,10 @@ class OI:
         )
 
         def set_amping():
-            config.amping = True
+            states.amping = True
 
         def set_not_amping():
-            config.amping = False
+            states.amping = False
 
         Keymap.Elevator.AMP.whileTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
@@ -137,22 +137,22 @@ class OI:
         )
 
         def climb_ready():
-            config.ready_to_climb = True
+            states.ready_to_climb = True
 
         def climb_not_ready():
-            config.ready_to_climb = False
+            states.ready_to_climb = False
 
         def start_climbing():
-            config.climbing = True
+            states.climbing = True
 
         def stop_climbing():
-            config.climbing = False
+            states.climbing = False
 
         def climbed():
-            config.climbed = True
+            states.climbed = True
 
         def not_climbed():
-            config.climbed = False
+            states.climbed = False
 
         Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
             commands2.InstantCommand(lambda: climb_ready()).andThen(
@@ -184,10 +184,10 @@ class OI:
         Keymap.Climb.TRAP.and_(lambda: config.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
 
         def set_manual_flywheel():
-            config.flywheel_manual = True
+            states.flywheel_manual = True
 
         def set_auto_flywheel():
-            config.flywheel_manual = False
+            states.flywheel_manual = False
 
         #TODO: MANUAL REVERSE FLYWHEEL
         # Keymap.Shooter.FLYWHEEL_MANUAL_REVERSE.onTrue(
