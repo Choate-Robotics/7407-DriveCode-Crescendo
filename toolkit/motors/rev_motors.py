@@ -99,10 +99,10 @@ class SparkMax(PIDMotor):
         self.pid_controller = self.motor.getPIDController() if self._brushless else None
         self.encoder = self.motor.getEncoder() if self._brushless else None
 
-        self.motor.restoreFactoryDefaults()
+        self.motor.restoreFactoryDefaults(True)
 
         # Use the default config
-        self.set_motor_config(0)
+        # self.set_motor_config(0)
 
         self.motor.setInverted(self._inverted)
         
