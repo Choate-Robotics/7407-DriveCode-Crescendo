@@ -122,7 +122,7 @@ class IT:
  
         button.Trigger(lambda: robot_states.amping)\
             .onTrue(
-                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 4))
+                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 0))
             )
             
             
