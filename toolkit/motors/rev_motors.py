@@ -245,9 +245,6 @@ class SparkMax(PIDMotor):
         result = self.motor.follow(master.motor, inverted)
         self.error_check(result)
 
-    def follow(self, master: SparkMax, inverted: bool = False) -> None:
-        result = self.motor.follow(master.motor, inverted)
-        self.error_check(result)
 
     def _set_config(self, config: SparkMaxConfig, slot: int = 0):
         if config is None:

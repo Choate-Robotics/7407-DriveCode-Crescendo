@@ -34,7 +34,8 @@ class Elevator(Subsystem):
         # Set the motor_extend encoder to the motor's absolute encoder
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
 
-        self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+        # self.motor_extend_follower.motor.follow(self.motor_extend.motor, invert=True)
+        self.motor_extend_follower.follow(self.motor_extend, invert=True)
         # self.motor_extend_follower.motor.burnFlash()
 
         # Limits motor acceleration
