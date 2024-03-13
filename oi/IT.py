@@ -123,7 +123,7 @@ class IT:
             )
             
         button.Trigger(lambda: not Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second() and not robot_states.amping and not robot_states.flywheel_manual)\
-            .onTrue(
+            .debounce(1).onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
             
