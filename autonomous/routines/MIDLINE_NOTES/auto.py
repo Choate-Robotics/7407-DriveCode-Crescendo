@@ -134,7 +134,7 @@ path_4 = FollowPathCustom(
 
 # Between paths, need to score rings
 auto = ParallelCommandGroup(
-    command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+    command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
         command.ZeroWrist(Robot.wrist),
         command.ZeroElevator(Robot.elevator),

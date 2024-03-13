@@ -391,10 +391,10 @@ class EnableClimb(SequentialCommandGroup):
             SetWrist(wrist, -44 * degrees_to_radians),
             ParallelCommandGroup(
                 DeployTenting(intake),
-                SetElevator(elevator, config.Giraffe.kClimbReach.height),
                 SetWrist(wrist, 25 * degrees_to_radians)
             ),
-        )
+            SetElevator(elevator, config.Giraffe.kClimbReach.height),       
+            )
 
 class ClimbDown(ParallelCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist):
@@ -434,12 +434,11 @@ class ScoreTrap(SequentialCommandGroup):
         )
 
 
-class Amp(SequentialCommandGroup):
+class Amp(ParallelCommandGroup):
     
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
             SetWrist(wrist, -25 * degrees_to_radians),
-            WaitCommand(.3),
             SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )

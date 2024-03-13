@@ -92,6 +92,11 @@ class TrajectoryCalculator:
         # v_effective = config.v0_flywheel
         v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(phi0)
         self.v0_effective = v_effective
+
+
+        if v_effective == 0:
+            return config.Giraffe.kIdle.wrist_angle
+
         # Calculate the angle with floor velocities
         result_angle = (
             0.5 * np.arcsin(
@@ -254,6 +259,10 @@ class TrajectoryCalculator:
         Returns the angle of the Robot
         """
         return self.base_rotation2d
+    
+    def get_distance_to_target(self) -> float:
+        
+        return self.distance_to_target
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u
