@@ -244,7 +244,7 @@ class SparkMax(PIDMotor):
         return self.encoder.getVelocity()
 
     def follow(self, master: SparkMax, inverted: bool = False) -> None:
-        result = self.motor.follow(CANSparkMax, self._can_id, inverted)
+        result = self.motor.follow(master.motor, inverted)
         self.error_check(result)
 
 
