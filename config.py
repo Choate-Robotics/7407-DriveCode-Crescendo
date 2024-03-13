@@ -163,8 +163,8 @@ double_note_timeout = 2
 elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
-elevator_feed_forward: float = 0.0 
-elevator_climb_ff: float = -3.7
+elevator_feed_forward: float = 0.0
+elevator_climb_ff: float = 0.4
 elevator_moving = False
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
@@ -239,7 +239,7 @@ odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
 # Configs 
 ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
-    0.25, 0.0, 0.025, elevator_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.25, 0.0, 0.04, elevator_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
