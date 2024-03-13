@@ -85,9 +85,10 @@ class SetElevatorClimbDown(SubsystemCommand[Elevator]):
 
     def isFinished(self):
         # Rounding to make sure it's not too precise (will cause err)
-        return round(self.subsystem.get_length(), 2) == 0
+        return round(self.subsystem.get_length(), 2) <= 0 and self.subsystem.get_elevator_current() > 30
     
     def end(self, interrupted: bool):
+        self.subsystem.stop()
         if interrupted:
             ...
             # utils.LocalLogger.debug("Ending elevator", "SetElevator")
