@@ -1,7 +1,5 @@
 from __future__ import annotations
-from builtins import type
 import config
-from typing import Optional
 from utils import LocalLogger
 
 from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder, REVLibError
@@ -10,7 +8,7 @@ from toolkit.motor import PIDMotor
 from units.SI import radians, radians_per_second, seconds, rotations_per_second, \
     rotations
 import time
-from wpilib import TimedRobot, Timer
+from wpilib import TimedRobot
 
 hundred_ms = float
 
@@ -65,6 +63,8 @@ class SparkMax(PIDMotor):
         self._can_id = can_id
         self._inverted = inverted
         self._brushless = brushless
+        
+        self._configs = []
 
         self._configs.append(config)
 
@@ -100,6 +100,8 @@ class SparkMax(PIDMotor):
         self.encoder = self.motor.getEncoder() if self._brushless else None
 
         self.motor.restoreFactoryDefaults(True)
+
+        time.sleep(0.3)
 
         # Use the default config
         self.set_motor_config(0)
