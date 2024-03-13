@@ -389,7 +389,7 @@ class EnableClimb(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             ParallelCommandGroup(
-            SetWrist(wrist, -42 * degrees_to_radians),
+            SetWrist(wrist, -40 * degrees_to_radians),
             SetElevator(elevator, config.Giraffe.kClimbReach.height / 3),
             DeployTenting(intake),
             ),
