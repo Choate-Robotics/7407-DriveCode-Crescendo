@@ -248,11 +248,21 @@ class FieldOdometry:
             n_states[2].angle.radians(), n_states[2].speed,
             n_states[3].angle.radians(), n_states[3].speed
         ])
+        
+        speeds = self.drivetrain.chassis_speeds
 
-        self.table.putNumberArray('Velocity', [
-            self.drivetrain.chassis_speeds.vx,
-            self.drivetrain.chassis_speeds.vy,
-            self.drivetrain.chassis_speeds.omega
+        self.table.putNumberArray('Velocity Robot', [
+            speeds.vx,
+            speeds.vy,
+            speeds.omega
+        ])
+        
+        speeds_field = speeds.fromRobotRelativeSpeeds(speeds, self.drivetrain.get_heading())
+        
+        self.table.putNumberArray('Velocity Field', [
+            speeds_field.vx,
+            speeds_field.vy,
+            speeds_field.omega
         ])
 
         self.table.putNumber('Robot Heading Degrees', self.drivetrain.get_heading().degrees())
