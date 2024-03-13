@@ -109,7 +109,7 @@ class SparkMax(PIDMotor):
         
         
         
-        time.sleep(0.3) if not TimedRobot.isSimulation() else None
+        time.sleep(0.5) if not TimedRobot.isSimulation() else None
         self.motor.burnFlash()
 
         self._has_init_run = True
