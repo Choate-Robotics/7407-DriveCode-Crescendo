@@ -32,7 +32,7 @@ class CustomTrajectory:
 
     def __init__(
         self,
-        start_pose: Pose2d | POIPose | PoseType.current,
+        start_pose: Pose2d | POIPose | PoseType,
         waypoints: list[Translation2d] | list[POIPose],
         end_pose: Pose2d | POIPose,
         max_velocity: float,
@@ -60,6 +60,12 @@ class CustomTrajectory:
         
         if isinstance(self.start_pose, POIPose):
             active_start_pose = self.start_pose.get()
+            
+        if isinstance(self.start_pose, PoseType):
+            if self.start_pose == PoseType.current:
+                active_start_pose = Field.odometry.getPose()
+            else:
+                raise ValueError('Invalid PoseType')
             
         for i, waypoint in enumerate(self.waypoints):
             if isinstance(waypoint, POIPose):
