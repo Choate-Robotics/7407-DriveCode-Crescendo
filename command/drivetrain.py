@@ -135,8 +135,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         dx = curve(dx)
         dy = curve(dy)
 
-        dx *= self.subsystem.max_vel
-        dy *= -self.subsystem.max_vel
+        dx *= states.drivetrain_controlled_vel
+        dy *= -states.drivetrain_controlled_vel
         # d_theta *= self.subsystem.max_angular_vel
 
         if config.driver_centric:
@@ -233,8 +233,8 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
         dx = curve(dx)
         dy = curve(dy)
 
-        dx *= self.subsystem.max_vel
-        dy *= -self.subsystem.max_vel
+        dx *= states.drivetrain_controlled_vel
+        dy *= -states.drivetrain_controlled_vel
         # d_theta *= self.max_angular_vel
 
         if config.driver_centric:
