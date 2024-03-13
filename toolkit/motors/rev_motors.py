@@ -158,6 +158,7 @@ class SparkMax(PIDMotor):
             if config.DEBUG_MODE:
                 if error == REVLibError.kHALError:
                     print(f'SparkMax Error {self._can_id}: {error}')
+                    return
                 raise RuntimeError(f'SparkMax Error: {error}')
 
     def abs_encoder(self):
