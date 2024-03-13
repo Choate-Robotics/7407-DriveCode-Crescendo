@@ -77,6 +77,13 @@ class Elevator(Subsystem):
         self.motor_extend.set_target_position(
             self.length_to_rotations(length), arbff
         )
+        
+        
+    def set_elevator_climb_down(self) -> None:
+        """
+        Climb down with feed forward
+        """
+        self.motor_extend.set_target_position(0, config.elevator_climb_ff, 1)
 
     def get_length(self) -> float:
         """

@@ -77,7 +77,7 @@ class SetElevatorClimbDown(SubsystemCommand[Elevator]):
 
     def initialize(self):
 
-        self.subsystem.set_length(0, config.elevator_climb_ff)
+        self.subsystem.set_elevator_climb_down()
         self.elevator_moving = True
 
     def execute(self):
