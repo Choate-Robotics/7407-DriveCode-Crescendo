@@ -164,7 +164,7 @@ elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
-elevator_climb_ff: float = -3.7
+elevator_climb_ff: float = -1
 elevator_moving = False
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
@@ -245,7 +245,7 @@ ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
 )
 
 ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
-    0.3, 0.0, .003, elevator_feed_forward,(-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.5, 0.0, .003, elevator_feed_forward,(-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 WRIST_CONFIG = SparkMaxConfig(.2, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
