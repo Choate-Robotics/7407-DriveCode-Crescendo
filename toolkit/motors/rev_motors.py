@@ -102,7 +102,7 @@ class SparkMax(PIDMotor):
         self.motor.restoreFactoryDefaults(True)
 
         # Use the default config
-        # self.set_motor_config(0)
+        self.set_motor_config(0)
 
         self.motor.setInverted(self._inverted)
         
