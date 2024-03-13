@@ -166,7 +166,7 @@ class TrajectoryCalculator:
     
     def get_rotation_to_speaker_moving(self):
         speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
-        t_total = self.distance_to_target / self.v0_effective if self.v0_effective != 0 else 0
+        t_total = self.get_distance_to_target() / (self.v0_effective * np.cos(self.get_theta()))  if self.v0_effective != 0 else 0
         
         rvels = self.get_drivetrain_speeds_field_origin()
         
