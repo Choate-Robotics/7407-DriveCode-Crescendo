@@ -84,10 +84,10 @@ class Elevator(Subsystem):
         Climb down with feed forward
         """
         
-        length = -0.06
+        length = -0.2
         
-        if length < -0.1:
-            length = -0.1
+        if length < -0.2:
+            length = -0.2
         
         self.target_length = length #the only time we should ever set the target length to a negative value
         self.motor_extend.set_target_position(length, config.elevator_climb_ff, 1)
