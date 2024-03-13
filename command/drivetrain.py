@@ -103,7 +103,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         constraints = TrapezoidProfileRadians.Constraints(self.subsystem.max_angular_vel,
                                                           constants.drivetrain_max_angular_accel)
         self.theta_controller = ProfiledPIDControllerRadians(
-            8.1, 0, .003,
+            9.1, 0, .03,
             constraints,
             config.
             period
