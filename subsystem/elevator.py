@@ -83,7 +83,7 @@ class Elevator(Subsystem):
         """
         Climb down with feed forward
         """
-        self.motor_extend.set_target_position(0, 0, 1)
+        self.motor_extend.set_target_position(0, config.elevator_climb_ff, 1)
 
     def get_length(self) -> float:
         """
