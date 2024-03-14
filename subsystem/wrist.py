@@ -124,6 +124,9 @@ class Wrist(Subsystem):
     
     def detect_note_second(self) -> bool:
         return not self.beam_break_second.get()
+    
+    def note_in_feeder(self) -> bool:
+        return self.detect_note_first() or self.detect_note_second()
 
     def is_at_angle(self, angle: radians, threshold=math.radians(2)):
         """

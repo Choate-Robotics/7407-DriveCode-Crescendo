@@ -49,7 +49,7 @@ class SparkMax(PIDMotor):
     _get_analog = None
     _is_init: bool
 
-    def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None):
+    def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None, config_others: list[SparkMaxConfig] = None):
         """
 
         Args:
@@ -66,6 +66,11 @@ class SparkMax(PIDMotor):
         self._configs = []
 
         self._configs.append(config)
+        
+        if config_others is not None:
+            for config in config_others:
+                if isinstance(config, SparkMaxConfig):
+                    self._configs.append(config)
 
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
@@ -103,7 +108,10 @@ class SparkMax(PIDMotor):
         time.sleep(0.5) if not TimedRobot.isSimulation() else None
 
         # Use the default config
-        self.set_motor_config(0)
+        if self._configs[0] is not None and self._brushless:
+            for enum, config in enumerate(self._configs):
+                time.sleep(0.5) if not TimedRobot.isSimulation() else None
+                self._set_config(config, enum)
 
         self.motor.setInverted(self._inverted)
         
@@ -185,14 +193,14 @@ class SparkMax(PIDMotor):
 
         return self._abs_encoder
 
-    def set_target_position(self, pos: rotations, arbff: float = 0):
+    def set_target_position(self, pos: rotations, arbff: float = 0, slot: int = 0):
         """
         Sets the target position of the motor controller in rotations
 
         Args:
             pos (float): The target position of the motor controller in rotations
         """
-        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff)
+        result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff, pidSlot=slot)
         self.error_check(result)
 
     def set_target_velocity(self, vel: rotations_per_second):  # Rotations per minute??
