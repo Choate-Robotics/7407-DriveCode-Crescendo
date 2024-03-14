@@ -64,10 +64,9 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         dx *= states.drivetrain_controlled_vel
         # dy *= -self.subsystem.max_vel
         dy *= -states.drivetrain_controlled_vel
-        
+
         # d_theta *= self.subsystem.max_angular_vel
         d_theta *= states.drivetrain_controlled_angular_vel
-        
 
         if config.driver_centric:
             self.subsystem.set_driver_centric((dy, -dx), -d_theta)
@@ -103,16 +102,16 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         constraints = TrapezoidProfileRadians.Constraints(
             self.subsystem.max_angular_vel,
             constants.drivetrain_max_angular_accel
-            )
+        )
         self.theta_controller = ProfiledPIDControllerRadians(
             9.1, 0, .03,
             constraints,
             config.period
-            )
+        )
         self.theta_controller.setTolerance(
             config.drivetrain_aim_tolerance,
             radians(3)
-            )
+        )
 
     def initialize(self) -> None:
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
@@ -121,7 +120,6 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.chassis_speeds.omega
         )
 
-
     def execute(self) -> None:
         dx, dy = (
             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
@@ -129,9 +127,14 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         )
 
         target_angle = self.target_calc.get_bot_theta()
-        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle.radians())
-        
-        if self.theta_controller.atSetpoint():
+
+        d_theta = self.theta_controller.calculate(
+            bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()),
+            target_angle.radians())
+
+        wpilib.SmartDashboard.putNumber("Drivetrain angle", math.degrees(d_theta))
+
+        if abs(d_theta) <= config.drivetrain_aim_tolerance:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False

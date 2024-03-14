@@ -128,6 +128,8 @@ class _Robot(wpilib.TimedRobot):
         # else:
         #     config.active_team = config.Team.RED
 
+        SmartDashboard.putBoolean("Flywheel ready to shoot", Robot.flywheel.ready_to_shoot)
+
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
@@ -230,6 +232,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
+
         # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
         # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3)).andThen(command.SetWrist(Robot.wrist, radians(55))))
         # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(-20)))

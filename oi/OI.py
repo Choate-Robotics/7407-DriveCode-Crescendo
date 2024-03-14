@@ -1,3 +1,5 @@
+import math
+
 from utils import LocalLogger
 
 import commands2
@@ -30,8 +32,9 @@ class OI:
         )
         
         Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
-            .whileTrue(
-                command.AimWrist(Robot.wrist, Field.calculations)
+            .onTrue(
+                # command.AimWrist(Robot.wrist, Field.calculations)
+                command.SetWrist(Robot.wrist, math.radians(-10))
             ).onFalse(
                 commands2.WaitCommand(0.5).andThen(
                 command.SetWristIdle(Robot.wrist)

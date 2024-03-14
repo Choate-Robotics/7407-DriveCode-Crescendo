@@ -9,12 +9,14 @@ from commands2 import SequentialCommandGroup
 from units.SI import radians
 import math
 from sensors import TrajectoryCalculator
+from wpilib import SmartDashboard
 
 
 class ZeroWrist(SubsystemCommand[Wrist]):
     """
     Zeroes wrist
     """
+
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -43,6 +45,7 @@ class SetWrist(SubsystemCommand[Wrist]):
     If interrupted, stops wrist where it is.
     param angle: angle to set wrist to in radians
     """
+
     def __init__(self, subsystem: Wrist, angle: radians):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -74,6 +77,7 @@ class SetWristIdle(SubsystemCommand[Wrist]):
     If interrupted, stops wrist where it is.
     param angle: angle to set wrist to in radians
     """
+
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -97,10 +101,12 @@ class SetWristIdle(SubsystemCommand[Wrist]):
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
 
+
 class AimWrist(SubsystemCommand[Wrist]):
     """
     Aims wrist to angle according to shooter calculations
     """
+
     def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -110,10 +116,11 @@ class AimWrist(SubsystemCommand[Wrist]):
         self.subsystem.wrist_moving = True
 
     def execute(self):
-        
+
         angle = self.traj_calc.get_theta()
-        
-        self.subsystem.set_wrist_angle(angle)
+        SmartDashboard.putNumber("Wrist angle calculated", math.degrees(angle))
+
+        self.subsystem.set_wrist_angle(angle + math.radians(3))
 
         if self.subsystem.is_at_angle(angle, config.wrist_aim_tolerance):
             self.subsystem.ready_to_shoot = True
@@ -128,7 +135,7 @@ class AimWrist(SubsystemCommand[Wrist]):
         if interrupted:
             wrist_angle = self.subsystem.get_wrist_angle()
             # self.subsystem.set_wrist_angle(wrist_angle)
-                #stopping motor where it is
+            #stopping motor where it is
             # utils.LocalLogger.debug("Interrupted, Wrist position " + str(wrist_angle))
         self.subsystem.wrist_moving = False
         #     utils.LocalLogger.debug("Wrist position " + str(self.angle) + " acheived")
@@ -140,6 +147,7 @@ class FeedIn(SubsystemCommand[Wrist]):
     Start by going fast, until first beam break sees note, then slow down. 
     Stop when second beam break sees note.
     """
+
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -173,6 +181,7 @@ class FeedOut(SubsystemCommand[Wrist]):
     """
     Feed note out back of feeder
     """
+
     def __init__(self, subsystem: Wrist):
         super().__init__(subsystem)
         self.subsystem = subsystem
@@ -200,6 +209,7 @@ class PassNote(SubsystemCommand[Wrist]):
     """
     Pass note into flywheels
     """
+
     def initialize(self):
         self.subsystem.feed_note()
 

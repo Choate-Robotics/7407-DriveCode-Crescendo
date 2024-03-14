@@ -164,10 +164,10 @@ elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 wrist_time_to_max_vel = 0.0
-wrist_aim_tolerance: radians = .5 * degrees_to_radians
+wrist_aim_tolerance: radians = 4 * degrees_to_radians
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
-wrist_flat_ff = -0.9
+wrist_flat_ff = 0 # -0.9
 stage_timeout = 5
 wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = .2
@@ -202,7 +202,7 @@ back_right_encoder_port = AnalogEncoder(0 if comp_bot.get() else 1)
 back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
-drivetrain_aim_tolerance: radians = 1 * degrees_to_radians
+drivetrain_aim_tolerance: radians = 3 * degrees_to_radians
 
 # Flywheel
 flywheel_id_1 = 19
@@ -248,7 +248,7 @@ ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
     100, 0.0, 0, elevator_feed_forward,(-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-WRIST_CONFIG = SparkMaxConfig(.16, 0, 0.003, 0, (-.6, .6), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.25, 0, 0.003, 0, (-.6, .6), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 

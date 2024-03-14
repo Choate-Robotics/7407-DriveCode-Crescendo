@@ -128,7 +128,7 @@ class Wrist(Subsystem):
     def note_in_feeder(self) -> bool:
         return self.detect_note_first() or self.detect_note_second()
 
-    def is_at_angle(self, angle: radians, threshold=math.radians(2)):
+    def is_at_angle(self, angle: radians, threshold=math.radians(0.5)):
         """
         Checks if the wrist is at the given angle
         :param angle: The angle to check for
