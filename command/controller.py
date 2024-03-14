@@ -260,10 +260,11 @@ class StageNote(SequentialCommandGroup):
             IntakeIdle(intake),
         )
         
-class IntakeStageNote(ParallelRaceGroup):
+class IntakeStageNote(SequentialCommandGroup):
     
     def __init__(self, wrist: Wrist, intake: Intake):
         super().__init__(
+            SetWristIdle(wrist),
             RunIntakeConstant(intake),
             FeedIn(wrist)
         )
@@ -331,13 +332,12 @@ class Shoot(SequentialCommandGroup):
     
     Args:
         SequentialCommandGroup (wrist): Wrist subsystem
-        SequentialCommandGroup (flywheel): Flywheel subsystem
     """
 
     def __init__(self, wrist: Wrist):
         super().__init__(
             PassNote(wrist),
-            InstantCommand(lambda: wrist.set_note_not_staged()),
+            WaitCommand(.5),
             SetWristIdle(wrist)
         )
 
@@ -389,12 +389,16 @@ class EnableClimb(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             ParallelCommandGroup(
-                SetElevator(elevator, config.Giraffe.kClimbReach.height),
+            SetWrist(wrist, -40 * degrees_to_radians),
+            SetElevator(elevator, config.Giraffe.kClimbReach.height / 3),
+            DeployTenting(intake),
+            ),
+            SetWrist(wrist, 35 * degrees_to_radians),
+            ParallelCommandGroup(
+                SetElevator(elevator, config.Giraffe.kClimbReach.height),       
                 SetWrist(wrist, 25 * degrees_to_radians)
             ),
-            DeployTenting(intake)
-        
-        )
+            )
 
 class ClimbDown(ParallelCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist):
@@ -434,12 +438,11 @@ class ScoreTrap(SequentialCommandGroup):
         )
 
 
-class Amp(SequentialCommandGroup):
+class Amp(ParallelCommandGroup):
     
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
             SetWrist(wrist, -25 * degrees_to_radians),
-            WaitCommand(.3),
             SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )

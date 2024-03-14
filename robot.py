@@ -69,13 +69,19 @@ class _Robot(wpilib.TimedRobot):
 
         # Initialize subsystems and sensors
         def init_subsystems():
-            subsystems: list[Subsystem] = list(
-                {k: v for k, v in Robot.__dict__.items() if isinstance(v, Subsystem) and hasattr(v, 'init')}.values()
-            )
+            subsystems: list[Subsystem] = [
+                Robot.drivetrain,
+                Robot.elevator,
+                Robot.wrist,
+                Robot.intake,
+                Robot.flywheel,
+            ]
+            
             time.sleep(0.2)
             for subsystem in subsystems:
                 subsystem.init()
                 time.sleep(0.2)
+
 
         # try:
         #     init_subsystems()
@@ -200,6 +206,7 @@ class _Robot(wpilib.TimedRobot):
 
         self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
         self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
+        # print(config.WRIST_CONFIG.k_P)
 
     def teleopInit(self):
         self.log.info("Teleop initialized")

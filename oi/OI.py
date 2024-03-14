@@ -5,7 +5,7 @@ import command, config, constants
 from robot_systems import Robot, Sensors, Field
 from oi.keymap import Keymap
 from math import radians
-
+import robot_states as states
 log = LocalLogger("OI")
 
 
@@ -28,6 +28,15 @@ class OI:
         ).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain)
         )
+        
+        Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
+            .whileTrue(
+                command.AimWrist(Robot.wrist, Field.calculations)
+            ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
 
         Keymap.Drivetrain.X_MODE.onTrue(
             commands2.InstantCommand(lambda: Robot.drivetrain.x_mode())
@@ -39,8 +48,9 @@ class OI:
         #     command.IntakeIdle(Robot.intake).andThen(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
         # )
 
-        Keymap.Intake.INTAKE_IN.onTrue(
-            command.IntakeStageNote(Robot.wrist, Robot.intake)
+        Keymap.Intake.INTAKE_IN.whileTrue(
+            command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
+            command.IntakeStageNote(Robot.wrist, Robot.intake))
         ).onFalse(
             command.IntakeStageIdle(Robot.wrist, Robot.intake)
         )
@@ -72,23 +82,25 @@ class OI:
         )
 
         def set_amping():
-            config.amping = True
+            states.amping = True
 
         def set_not_amping():
-            config.amping = False
+            states.amping = False
 
-        Keymap.Elevator.AMP.onTrue(
+        Keymap.Elevator.AMP.whileTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
-            command.Amp(Robot.elevator, Robot.wrist).alongWith(
-                commands2.InstantCommand(lambda: set_amping())
-            )
+            command.Amp(Robot.elevator, Robot.wrist)
         ).onFalse(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
                 command.SetWristIdle(Robot.wrist)
-            ).alongWith(
-                commands2.InstantCommand(lambda: set_not_amping())
             )
+        )
+        
+        Keymap.Elevator.AMP.onTrue(
+            commands2.InstantCommand(lambda: set_amping())
+        ).onFalse(
+            commands2.InstantCommand(lambda: set_not_amping())
         )
 
         Keymap.Shooter.SET_WRIST_SUBWOOFER.onTrue(
@@ -125,24 +137,24 @@ class OI:
         )
 
         def climb_ready():
-            config.ready_to_climb = True
+            states.ready_to_climb = True
 
         def climb_not_ready():
-            config.ready_to_climb = False
+            states.ready_to_climb = False
 
         def start_climbing():
-            config.climbing = True
+            states.climbing = True
 
         def stop_climbing():
-            config.climbing = False
+            states.climbing = False
 
         def climbed():
-            config.climbed = True
+            states.climbed = True
 
         def not_climbed():
-            config.climbed = False
+            states.climbed = False
 
-        Keymap.Climb.CLIMB_UP.and_(lambda: not config.climbing).onTrue(
+        Keymap.Climb.CLIMB_UP.and_(lambda: not states.climbing).onTrue(
             commands2.InstantCommand(lambda: climb_ready()).andThen(
                 commands2.InstantCommand(lambda: start_climbing()).alongWith(
                     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
@@ -150,32 +162,26 @@ class OI:
             )
         )
 
-        # Keymap.Climb.CLIMB_UP.and_(lambda: config.climbing).onTrue(
-        #     commands2.InstantCommand(lambda: stop_climbing()).alongWith(
-        #     command.EnableClimb(Robot.elevator, Robot.wrist, Robot.intake)
-        # )
-        # )
-
-        Keymap.Climb.UNDO_CLIMB_UP.and_(lambda: config.climbing).onTrue(
+        Keymap.Climb.UNDO_CLIMB_UP.and_(lambda: states.climbing).onTrue(
             commands2.InstantCommand(lambda: stop_climbing())
             .alongWith(commands2.InstantCommand(lambda: climb_not_ready()).alongWith(
                 command.UndoClimb(Robot.elevator, Robot.wrist, Robot.intake)
             ))
         )
 
-        Keymap.Climb.CLIMB_DOWN.and_(lambda: config.climbing).onTrue(
+        Keymap.Climb.CLIMB_DOWN.and_(lambda: states.climbing).onTrue(
             command.ClimbDown(Robot.elevator, Robot.wrist).alongWith(
                 commands2.InstantCommand(lambda: climbed())
             )
         )
 
-        Keymap.Climb.TRAP.and_(lambda: config.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
+        Keymap.Climb.TRAP.and_(lambda: states.climbed).onTrue(command.ScoreTrap(Robot.elevator, Robot.wrist))
 
         def set_manual_flywheel():
-            config.flywheel_manual = True
+            states.flywheel_manual = True
 
         def set_auto_flywheel():
-            config.flywheel_manual = False
+            states.flywheel_manual = False
 
         #TODO: MANUAL REVERSE FLYWHEEL
         # Keymap.Shooter.FLYWHEEL_MANUAL_REVERSE.onTrue(

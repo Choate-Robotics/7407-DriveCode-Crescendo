@@ -37,7 +37,7 @@ class TrajectoryCalculator:
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
         self.delta_z = 0
-        self.shoot_angle = 0
+        self.shoot_angle:radians = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
         self.flywheel = flywheel
@@ -49,7 +49,7 @@ class TrajectoryCalculator:
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
 
-    def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
+    def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
         Calculates the angle of the trajectory without air resistance.
         """
@@ -75,8 +75,11 @@ class TrajectoryCalculator:
         
         # Calculate the effective velocity
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
-        v_effective = config.v0_flywheel
+        v_effective = config.v0_flywheel_minimum# + rvx + rvy
+        # v_effective = config.v0_flywheel
+
+        if v_effective == 0:
+            return config.Giraffe.kIdle.wrist_angle
 
         # Calculate the angle with floor velocities
         result_angle = (
@@ -217,6 +220,10 @@ class TrajectoryCalculator:
         Returns the angle of the Robot
         """
         return self.base_rotation2d
+    
+    def get_distance_to_target(self) -> float:
+        
+        return self.distance_to_target
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u

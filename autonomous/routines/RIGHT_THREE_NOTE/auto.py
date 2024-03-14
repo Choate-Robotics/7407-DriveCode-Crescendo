@@ -36,7 +36,7 @@ path_1 = FollowPathCustom(
 )
 
 auto = ParallelCommandGroup(
-    SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel),
+    SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
