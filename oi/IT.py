@@ -121,7 +121,8 @@ class IT:
         )
         
         button.Trigger(
-            lambda: not Robot.wrist.note_in_feeder()
+            lambda: not Robot.wrist.note_in_feeder()\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.amping
         ).onTrue(
             InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.idle))
         )
