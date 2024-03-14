@@ -38,14 +38,13 @@ class SetElevator(SubsystemCommand[Elevator]):
     def __init__(self, subsystem: Elevator, length: float):
         super().__init__(subsystem)
         self.length: float = length
-        self.elevator_moving: bool = False
 
     def initialize(self):
 
         self.length = self.subsystem.limit_length(self.length)
-
+        
         self.subsystem.set_length(self.length, 0)
-        self.elevator_moving = True
+        self.subsystem.elevator_moving = True
 
     def execute(self):
         pass
@@ -63,7 +62,7 @@ class SetElevator(SubsystemCommand[Elevator]):
             ...
             # utils.LocalLogger.debug("Elevator length: " + str(self.subsystem.get_length()), "SetElevator")
 
-        self.elevator_moving = False
+        self.subsystem.elevator_moving = False
         
     
     
@@ -73,21 +72,21 @@ class SetElevatorClimbDown(SubsystemCommand[Elevator]):
     """
     def __init__(self, subsystem: Elevator):
         super().__init__(subsystem)
-        self.elevator_moving: bool = False
 
     def initialize(self):
 
-        self.subsystem.set_length(0, config.elevator_climb_ff)
-        self.elevator_moving = True
+        self.subsystem.set_elevator_climb_down()
+        self.subsystem.elevator_moving = True
 
     def execute(self):
         pass
 
     def isFinished(self):
         # Rounding to make sure it's not too precise (will cause err)
-        return round(self.subsystem.get_length(), 2) == 0
+        return round(self.subsystem.get_length(), 2) <= 0 and self.subsystem.get_elevator_current() > 45
     
     def end(self, interrupted: bool):
+        self.subsystem.stop()
         if interrupted:
             ...
             # utils.LocalLogger.debug("Ending elevator", "SetElevator")
@@ -96,5 +95,5 @@ class SetElevatorClimbDown(SubsystemCommand[Elevator]):
             ...
             # utils.LocalLogger.debug("Elevator length: " + str(self.subsystem.get_length()), "SetElevator")
 
-        self.elevator_moving = False
+        self.subsystem.elevator_moving = False
         

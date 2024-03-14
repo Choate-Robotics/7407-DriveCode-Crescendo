@@ -119,13 +119,6 @@ limelight_led_mode = {
     "force_on": 3,
 }
 
-# CLIMBING
-ready_to_climb: bool = False
-climbing: bool = False
-climbed: bool = False
-
-# AMP
-amping: bool = False
 
 class LimelightPosition:
     init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
@@ -164,8 +157,7 @@ elevator_can_id: int = 10
 elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
-elevator_climb_ff: float = -3.7
-elevator_moving = False
+elevator_climb_ff: float = -1
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
@@ -214,7 +206,7 @@ drivetrain_reversed: bool = False
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
-flywheel_amp_speed: meters = 12
+flywheel_amp_speed: meters = 19.5
 v0_flywheel_minimum: meters_per_second = 18
 v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12
@@ -227,13 +219,14 @@ flywheel_feed_forward = 0.0  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
 
-flywheel_manual: bool = False
 
 # Odometry
 odometry_visible_tags_threshold = 2
-odometry_tag_span_threshold = 0
-odometry_tag_distance_threshold = 4
+odometry_tag_area_threshold = 0
+odometry_vision_deviation_threshold = 0.5
+odometry_tag_distance_threshold:meters = 4
 odometry_two_tag_distance_threshold = 7
+odometry_distance_deviation_threshold:meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
 odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 
@@ -243,10 +236,10 @@ ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
 )
 
 ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
-    0.5, 0.0, .02, -3.7,(-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    100, 0.0, 0, elevator_feed_forward,(-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-WRIST_CONFIG = SparkMaxConfig(.2, 0, 0.003, 0, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+WRIST_CONFIG = SparkMaxConfig(.16, 0, 0.003, .00015, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
