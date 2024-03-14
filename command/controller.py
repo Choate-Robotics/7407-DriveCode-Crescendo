@@ -166,79 +166,6 @@ class Giraffe(commands2.Command):
         commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
 
 
-class GiraffeLock(commands2.Command):
-    """
-    Locks the elevator and wrist to the stage position
-
-    Args:
-        commands2 (elevator): Elevator subsystem
-        commands2 (wrist): Wrist subsystem
-    """
-
-    def __init__(self, elevator: Elevator, wrist: Wrist):
-        self.elevator = elevator
-        self.wrist = wrist
-        self.finished = False
-
-    def finish(self):
-        self.finished = True
-
-    def initialize(self):
-        self.finished = False
-
-        self.elevator.lock()
-
-        self.wrist.lock()
-
-        def wrist_is_over_limit():
-            return self.wrist.get_wrist_angle() > constants.wrist_min_rotation_stage
-
-        def elevator_is_over_limit():
-            return self.elevator.get_length() > constants.elevator_max_length_stage
-
-        commands = []
-        debug_commands = []
-
-        if not elevator_is_over_limit and not wrist_is_over_limit():
-            self.finished = True
-            return  # already down
-
-        if wrist_is_over_limit():
-            commands.append(
-                SetWrist(self.wrist, config.wrist_stage_max)
-            )
-            debug_commands.append(
-                PrintCommand("Setting wrist to stage limit")
-            )
-
-        if elevator_is_over_limit():
-            commands.append(
-                SetElevator(self.elevator, config.elevator_stage_max)
-            )
-            debug_commands.append(
-                PrintCommand("Setting elevator to stage limit")
-            )
-
-        commands.append(
-            InstantCommand(self.finish)
-        )
-
-        commands2.CommandScheduler.schedule(ParallelCommandGroup(
-            *commands,
-            SequentialCommandGroup(
-                *debug_commands
-            )
-        )
-        )
-
-    def isFinished(self) -> bool:
-        return self.finished
-
-    def end(self, interrupted: bool):
-        if interrupted:
-            self.finished = True
-            # potentially put continuous commands here
-
 
 class StageNote(SequentialCommandGroup):
     """
@@ -278,34 +205,6 @@ class IntakeStageIdle(SequentialCommandGroup):
             IntakeIdle(intake),
             InstantCommand(lambda: wrist.stop_feed())
         )
-
-
-# class StageNote(SequentialCommandGroup):
-#     """
-#     Stages a note to the feeder from the intake
-
-#     Args:
-#         SequentialCommandGroup (elevator): Elevator subsystem
-#         SequentialCommandGroup (wrist): Wrist subsystem
-#         SequentialCommandGroup (intake): Intake subsystem
-#     """
-
-#     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake, traj_cal: TrajectoryCalculator):
-#         super().__init__(
-
-
-#             Giraffe(elevator, wrist, config.Giraffe.kIdle),
-#             ParallelCommandGroup(
-#             PassIntakeNote(intake),
-#             FeedIn(wrist)
-#             ),
-#             WaitUntilCommand(lambda: wrist.note_detected()),
-#             IntakeIdle(intake),
-#             # SetWrist(wrist, 20 * degrees_to_radians)
-#             # AimWrist(wrist, traj_cal)
-#             Giraffe(elevator, wrist, config.Giraffe.kIdle, traj_cal),
-#             AimWrist(wrist, traj_cal)
-#         )
 
 
 class AimWristSpeaker(ParallelCommandGroup):
@@ -365,23 +264,6 @@ class ShootAuto(SequentialCommandGroup):
         )
 
 
-class ShootAmp(SequentialCommandGroup):
-    """
-    Shoots a note into the amp
-    """
-
-    def __init__(self, drivetrain: Drivetrain, elevator: Elevator, wrist: Wrist, flywheel: Flywheel):
-        super().__init__(
-            ParallelCommandGroup(
-                SetFlywheelLinearVelocity(flywheel, config.flywheel_amp_speed),
-                Giraffe(elevator, wrist, config.Giraffe.kAmp),
-                PrintCommand('Lock Drivetrain with amp')
-            ).until(
-                lambda: elevator.ready_to_shoot and wrist.ready_to_shoot and drivetrain.ready_to_shoot and flywheel.ready_to_shoot),
-            PassNote(wrist),
-        )
-
-
 class EnableClimb(SequentialCommandGroup):
     """
     Raises the elevator and wrist and deploys tenting to prepare for climb
@@ -397,7 +279,7 @@ class EnableClimb(SequentialCommandGroup):
             SetWrist(wrist, 35 * degrees_to_radians),
             ParallelCommandGroup(
                 SetElevator(elevator, config.Giraffe.kClimbReach.height),       
-                SetWrist(wrist, 25 * degrees_to_radians)
+                SetWrist(wrist, config.Giraffe.kClimbReach.wrist_angle * degrees_to_radians)
             ),
             )
 
@@ -443,7 +325,7 @@ class Amp(ParallelCommandGroup):
     
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
-            SetWrist(wrist, -25 * degrees_to_radians),
+            SetWrist(wrist, config.Giraffe.kAmp.wrist_angle * degrees_to_radians),
             SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )
@@ -472,7 +354,7 @@ class ControllerRumble(InstantCommand):
         
 class ControllerRumbleTimeout(SequentialCommandGroup):
     
-    def __init__(self, controller: Joystick, timeout: float = 0, intensity: float = 1.0):
+    def __init__(self, controller: Joystick, timeout: float = 3, intensity: float = 1.0):
         
         super().__init__(
             ControllerRumble(controller, intensity),

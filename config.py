@@ -290,7 +290,7 @@ class Giraffe:
 
     kAimHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kAim)
 
-    kClimbReach = GiraffePos(constants.elevator_max_length, 10*degrees_to_radians)
+    kClimbReach = GiraffePos(constants.elevator_max_length, 25*degrees_to_radians)
 
     kClimbPullUp = GiraffePos(0, 50*degrees_to_radians)
 
@@ -298,7 +298,7 @@ class Giraffe:
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 30 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, 0 * degrees_to_radians)
+    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, -25 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
 
