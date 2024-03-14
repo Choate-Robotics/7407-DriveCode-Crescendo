@@ -112,8 +112,7 @@ class IT:
 
         # if note in feeder, spin to set shot velocity
         button.Trigger(
-            lambda: Robot.wrist.detect_note_first()\
-                or Robot.wrist.detect_note_second())\
+            lambda: Robot.wrist.note_in_feeder())\
                 .and_(lambda: not robot_states.amping)\
                 .and_(lambda: not robot_states.flywheel_manual)\
             .onTrue(
@@ -127,8 +126,7 @@ class IT:
             )
             
         button.Trigger(
-            lambda: not Robot.wrist.detect_note_first()\
-                and not Robot.wrist.detect_note_second()\
+            lambda: not Robot.wrist.note_in_feeder()\
                 and not robot_states.amping\
                 and not robot_states.flywheel_manual)\
             .debounce(1).onTrue(
