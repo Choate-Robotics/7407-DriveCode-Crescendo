@@ -221,11 +221,18 @@ flywheel_shot_current_threshold = 20
 
 
 # Odometry
-odometry_visible_tags_threshold = 2
-odometry_tag_area_threshold = 0
-odometry_vision_deviation_threshold = 0.5
+odometry_tag_area_threshold = 0.2
+odometry_vision_deviation_threshold:meters = 0.5
 odometry_tag_distance_threshold:meters = 4
-odometry_two_tag_distance_threshold = 7
+odometry_two_tag_distance_threshold:meters = 7
+
+
+odometry_general_standard_deviation = .5
+odometry_general_standard_deviation_omega: radians = 20 * degrees_to_radians
+
+odometry_two_tag_standard_deviation = .7
+odometry_one_tag_standard_deviation_omega: radians = 40 * degrees_to_radians
+
 odometry_distance_deviation_threshold:meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
 odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3

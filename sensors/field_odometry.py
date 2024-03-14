@@ -112,6 +112,8 @@ class FieldOdometry:
 
             self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count, tag_area)
 
+        self.update_network_tables()
+        
         return self.getPose()
 
     def update_odom(self, pose: Pose3d):
@@ -177,21 +179,21 @@ class FieldOdometry:
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float):
 
         distance_deviation = self.getPose().translation().distance(vision_pose.toPose2d().translation())
-        std_dev = 0.5
-        std_dev_omega = abs(math.radians(20))
+        std_dev = config.odometry_general_standard_deviation
+        std_dev_omega = abs(config.odometry_general_standard_deviation_omega)
         if tag_count < 2:
             if distance_to_target > config.odometry_tag_distance_threshold:
-                return
+                return # if the distance to the target is too far, don't add the measurement
             if tag_area < config.odometry_tag_area_threshold:
-                return
+                return # if the tag size is too small in the camera view, don't add the measurement
             if distance_deviation > config.odometry_distance_deviation_threshold:
-                return
+                return # if the vision distance is too far from the odometry distance, don't add the measurement
             std_dev = self.std_formula(distance_to_target / 2)
-            std_dev_omega = abs(math.radians(40))
+            std_dev_omega = abs(config.odometry_one_tag_standard_deviation_omega)
         if tag_count == 2:
-            std_dev = 0.7
+            std_dev = config.odometry_two_tag_standard_deviation
             if distance_to_target > config.odometry_two_tag_distance_threshold:
-                return
+                return # if the distance to the target is too far, don't add the measurement
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
@@ -228,6 +230,12 @@ class FieldOdometry:
                 self.drivetrain.node_positions,
                 est_pose
             )
+
+        return est_pose
+    
+    def update_network_tables(self):
+        
+        est_pose = self.getPose()
 
         self.table.putNumberArray('Estimated Pose', [
             est_pose.translation().X(),
@@ -293,7 +301,6 @@ class FieldOdometry:
             math.degrees(bound_angle(self.drivetrain.odometry_estimator.getEstimatedPosition().rotation().degrees()))
         )
 
-        return est_pose
 
     def resetOdometry(self, pose: Pose2d):
         """
