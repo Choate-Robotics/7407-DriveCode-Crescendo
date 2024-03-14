@@ -158,6 +158,7 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
+elevator_climb_current_limit: float = 45
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
 #helloworld
 # Wrist
