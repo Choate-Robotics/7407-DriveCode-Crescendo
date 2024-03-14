@@ -100,15 +100,19 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         super().__init__(drivetrain)
         self.target_calc = target_calc
         # self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
-        constraints = TrapezoidProfileRadians.Constraints(self.subsystem.max_angular_vel,
-                                                          constants.drivetrain_max_angular_accel)
+        constraints = TrapezoidProfileRadians.Constraints(
+            self.subsystem.max_angular_vel,
+            constants.drivetrain_max_angular_accel
+            )
         self.theta_controller = ProfiledPIDControllerRadians(
             9.1, 0, .03,
             constraints,
-            config.
-            period
+            config.period
             )
-        self.theta_controller.setTolerance(radians(1), radians(3))
+        self.theta_controller.setTolerance(
+            config.drivetrain_aim_tolerance,
+            radians(3)
+            )
 
     def initialize(self) -> None:
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
