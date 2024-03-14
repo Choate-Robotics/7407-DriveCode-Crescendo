@@ -1,6 +1,6 @@
 from __future__ import annotations
 import config
-from utils import LocalLogger
+from utils import LocalLogger, CAN_delay
 
 from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder, SparkMaxAlternateEncoder, REVLibError
 import rev
@@ -71,6 +71,8 @@ class SparkMax(PIDMotor):
             for config in config_others:
                 if isinstance(config, SparkMaxConfig):
                     self._configs.append(config)
+                elif config.DEBUG_MODE:
+                    raise TypeError(f'Invalid config type {type(config)}')
 
         self._logger = LocalLogger(f'SparkMax: {self._can_id}')
 
