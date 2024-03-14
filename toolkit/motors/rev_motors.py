@@ -107,19 +107,19 @@ class SparkMax(PIDMotor):
 
         # self.motor.restoreFactoryDefaults(True)
 
-        time.sleep(0.5) if not TimedRobot.isSimulation() else None
+        CAN_delay(0.5)
 
         # Use the default config
         if self._configs[0] is not None and self._brushless:
             for enum, config in enumerate(self._configs):
-                time.sleep(0.5) if not TimedRobot.isSimulation() else None
+                CAN_delay(0.5)
                 self._set_config(config, enum)
 
         self.motor.setInverted(self._inverted)
         
         
         
-        time.sleep(0.5) if not TimedRobot.isSimulation() else None
+        CAN_delay(0.5)
         self.motor.burnFlash()
 
         self._has_init_run = True
