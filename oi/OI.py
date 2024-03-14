@@ -82,11 +82,11 @@ class OI:
         )
 
         def set_amping():
-            states.amping = True
+            states.flywheel_state = states.FlywheelState.amping
 
         def set_not_amping():
-            states.amping = False
-
+            states.flywheel_state = states.FlywheelState.released
+            
         Keymap.Elevator.AMP.whileTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
             command.Amp(Robot.elevator, Robot.wrist)

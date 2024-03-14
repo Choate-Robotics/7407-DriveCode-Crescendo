@@ -108,28 +108,42 @@ class IT:
         
         
     #     #FLYWHEEL TRIGGERS ----------------
-            
+    
+        def set_flywheel_state(state: robot_states.FlywheelState):
+            if isinstance(state, robot_states.FlywheelState):
+                robot_states.flywheel_state = state
+    
+        button.Trigger(
+            lambda: Robot.wrist.note_in_feeder()\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.amping
+        ).onTrue(
+            InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.shooting))
+        )
+        
+        button.Trigger(
+            lambda: not Robot.wrist.note_in_feeder()
+        ).onTrue(
+            InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.idle))
+        )
 
         # if note in feeder, spin to set shot velocity
         button.Trigger(
-            lambda: Robot.wrist.note_in_feeder())\
-                .and_(lambda: not robot_states.amping)\
-                .and_(lambda: not robot_states.flywheel_manual)\
-            .onTrue(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.shooting
+            ).onTrue(
                 command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
            )
  
-        button.Trigger(lambda: robot_states.amping)\
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.amping
+            )\
             .onTrue(
                 command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 0))
             )
             
         button.Trigger(
-            lambda: not Robot.wrist.note_in_feeder()\
-                and not robot_states.amping\
-                and not robot_states.flywheel_manual)\
-            .debounce(1).onTrue(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.idle
+            ).debounce(1).onTrue(
                 command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
             )
             
