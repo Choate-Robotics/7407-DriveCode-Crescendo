@@ -1,6 +1,6 @@
 from utils import LocalLogger
 
-from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
+from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand, ParallelCommandGroup
 import command
 import config, math, robot_states
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
@@ -64,45 +64,17 @@ class IT:
                 InstantCommand(lambda: Robot.wrist.stop_feed())
             )
         
-        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
+        button.Trigger(lambda: Robot.wrist.note_in_feeder())\
             .onTrue(
-                InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
-                    Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
-                    1
-                )).andThen(
-                    WaitCommand(5).andThen(
-                        InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
-                            Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
-                            0
-                        )
-                        )
-                    )
+                ParallelCommandGroup(
+                    command.ControllerRumbleTimeout(Controllers.DRIVER_CONTROLLER, config.driver_rumble_time, config.driver_rumble_intensity),
+                    command.ControllerRumbleTimeout(Controllers.OPERATOR_CONTROLLER, config.operator_rumble_time, config.operator_rumble_intensity)
                 )
             ).onFalse(
-                InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
-                    Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
-                    0
-                ))
-            )
-        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second())\
-            .onTrue(
-                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-                    1
-                )).andThen(
-                    WaitCommand(5).andThen(
-                        InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-                            Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-                            0
-                        )
-                        )
-                    )
+                ParallelCommandGroup(
+                command.ControllerRumble(Controllers.DRIVER_CONTROLLER, 0),
+                command.ControllerRumble(Controllers.OPERATOR_CONTROLLER, 0)
                 )
-            ).onFalse(
-                InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
-                    Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
-                    0
-                ))
             )
     #     #FEEDER TRIGGERS ----------------
         

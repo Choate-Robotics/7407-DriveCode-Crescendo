@@ -12,6 +12,7 @@ from commands2 import WaitUntilCommand, WaitCommand, ParallelCommandGroup, Seque
     PrintCommand, ParallelDeadlineGroup, RunCommand, ParallelRaceGroup
 from typing import Literal
 from units.SI import degrees_to_radians, inches_to_meters
+from wpilib import Joystick
 
 
 class Giraffe(commands2.Command):
@@ -459,4 +460,22 @@ class EmergencyManuver(SequentialCommandGroup):
             DeployTenting(intake),
             UnDeployTenting(intake),
             SetWrist(wrist, config.staging_angle)
+        )
+        
+class ControllerRumble(InstantCommand):
+    
+    def __init__(self, controller: Joystick, intensity: float = 1.0):
+        super().__init__(lambda: controller.setRumble(
+            controller.RumbleType.kBothRumble,
+            intensity),
+        )
+        
+class ControllerRumbleTimeout(SequentialCommandGroup):
+    
+    def __init__(self, controller: Joystick, timeout: float = 0, intensity: float = 1.0):
+        
+        super().__init__(
+            ControllerRumble(controller, intensity),
+            WaitCommand(timeout),
+            ControllerRumble(controller, 0)
         )

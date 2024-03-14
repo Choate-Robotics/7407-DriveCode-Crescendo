@@ -321,3 +321,9 @@ tol = tolerance of error in distance to target (m)
 
 # Gyro
 gyro_id = 29
+
+driver_rumble_intensity:float = 1.0
+driver_rumble_time:float= 5
+
+operator_rumble_intensity:float = 1.0
+operator_rumble_time:float= 5
