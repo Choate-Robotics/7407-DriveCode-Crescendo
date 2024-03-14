@@ -83,37 +83,15 @@ class _Robot(wpilib.TimedRobot):
                 time.sleep(0.2)
 
 
-        # try:
-        #     init_subsystems()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('subsystem init', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(init_subsystems)
 
         def init_sensors():
-            sensors: list[Sensors] = list(
-                {k: v for k, v in Sensors.__dict__.items() if isinstance(v, Sensors) and hasattr(v, 'init')}.values()
-            )
 
-            # for sensor in sensors:
-            #     sensor.init()
             Sensors.limelight_front.init()
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.calculations.init()
 
-        # try:
-        #     init_sensors()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('sensor init', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(init_sensors)
 
@@ -122,11 +100,6 @@ class _Robot(wpilib.TimedRobot):
         Robot.wrist.zero_wrist()
 
     def robotPeriodic(self):
-
-        # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-        #     config.active_team = config.Team.BLUE
-        # else:
-        #     config.active_team = config.Team.RED
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
@@ -140,51 +113,13 @@ class _Robot(wpilib.TimedRobot):
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
-        # try:
-        #     self.scheduler.run()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('command scheduler', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(self.scheduler.run)
-
-        # try:
-        #     Sensors.limelight_back.update()
-        #     Sensors.limelight_front.update()
-        #     Sensors.limelight_intake.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('limelight update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Sensors.limelight_back.update)
         self.handle(Sensors.limelight_front.update)
         self.handle(Sensors.limelight_intake.update)
 
-        # try:
-        #     Field.odometry.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(Field.odometry.update)
-
-        # try:
-        #     Field.calculations.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Field.calculations.update)
 
@@ -228,18 +163,7 @@ class _Robot(wpilib.TimedRobot):
         )
         )
         self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
-        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
         self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
-        # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3)).andThen(command.SetWrist(Robot.wrist, radians(55))))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(-20)))
-
-        # self.scheduler.schedule()
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
-        # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
-        # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length).andThen(command.SetElevator(Robot.elevator, 0)))
 
     def teleopPeriodic(self):
         pass
