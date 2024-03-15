@@ -103,9 +103,9 @@ class TrajectoryCalculator:
         result_angle = (
             0.5 * np.arcsin(
                 np.sin(phi0)
-                + constants.g
+                + (constants.g
                 * distance_to_target
-                * np.cos(phi0)
+                * np.cos(phi0))
                 / (v_effective ** 2)
             )
             + 0.5 * phi0
