@@ -1,4 +1,5 @@
 # Imports
+from __future__ import annotations
 import math
 from wpimath.geometry import Rotation2d, Translation2d
 
@@ -127,6 +128,13 @@ class FieldPos:
         source_x = field_length - 86.1 * inches_to_meters / 2
         source_y = 50.75 * inches_to_meters
         rotation = Rotation2d(math.radians(-240))
+        
+    class Waypoints:
+        
+        hoard_x = 72.6 * inches_to_meters
+        hoard_y = field_width
+        hoard_z = 0
+        hoard_rotation = 0
 
 
 # Elevator

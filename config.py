@@ -219,6 +219,8 @@ flywheel_feed_forward = 0.0  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
 
+# Ballistic Trajectory
+lob_trajectory_standard_height: meters = 2.5
 
 # Odometry
 odometry_visible_tags_threshold = 2

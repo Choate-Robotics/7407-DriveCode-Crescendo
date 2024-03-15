@@ -494,7 +494,16 @@ class POI:
                 )
 
         class Waypoints:
-            pass
+            
+            kHoard = POIPose(
+                Pose2d(
+                    Translation2d(
+                        constants.FieldPos.Waypoints.hoard_x,
+                        constants.FieldPos.Waypoints.hoard_y,
+                    ),
+                    Rotation2d(constants.FieldPos.Waypoints.hoard_rotation),
+                )
+            )
 
     def __init__(self):
         self.nt = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")

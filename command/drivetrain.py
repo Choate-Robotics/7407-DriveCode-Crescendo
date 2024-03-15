@@ -255,3 +255,70 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
 
     def runsWhenDisabled(self) -> bool:
         return False
+
+
+class DriveSwerveHoldRotationIndef(SubsystemCommand[Drivetrain]):
+    """
+    Aim drivetrain at speaker based on shooter calculations
+    """
+    driver_centric = False
+    driver_centric_reversed = True
+
+    def __init__(self, drivetrain, angle: radians, max_angular_vel: float | None = None):
+        super().__init__(drivetrain)
+        self.target_angle = angle
+        # self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
+        constraints = TrapezoidProfileRadians.Constraints(
+            self.subsystem.max_angular_vel if max_angular_vel is None else max_angular_vel,
+            constants.drivetrain_max_angular_accel)
+        self.theta_controller = ProfiledPIDControllerRadians(
+            9.1, 0, .03,
+            constraints,
+            config.
+            period
+            )
+        self.theta_controller.setTolerance(radians(1), radians(3))
+
+    def initialize(self) -> None:
+        self.theta_controller.enableContinuousInput(radians(-180), radians(180))
+        self.theta_controller.reset(
+            self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(),
+            self.subsystem.chassis_speeds.omega
+        )
+
+
+    def execute(self) -> None:
+        dx, dy = (
+            self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
+            self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
+        )
+
+        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), self.target_angle)
+        
+
+        dx = curve(dx)
+        dy = curve(dy)
+
+        dx *= states.drivetrain_controlled_vel
+        dy *= -states.drivetrain_controlled_vel
+        # d_theta *= self.subsystem.max_angular_vel
+
+        if config.driver_centric:
+            self.subsystem.set_driver_centric((dy, -dx), -d_theta)
+        elif self.driver_centric_reversed:
+            self.subsystem.set_driver_centric((-dy, dx), d_theta)
+        else:
+            self.subsystem.set_robot_centric((dy, -dx), d_theta)
+
+    def end(self, interrupted: bool) -> None:
+        self.subsystem.ready_to_shoot = False
+        self.subsystem.n_front_left.set_motor_velocity(0)
+        self.subsystem.n_front_right.set_motor_velocity(0)
+        self.subsystem.n_back_left.set_motor_velocity(0)
+        self.subsystem.n_back_right.set_motor_velocity(0)
+
+    def isFinished(self) -> bool:
+        return False
+
+    def runsWhenDisabled(self) -> bool:
+        return False
