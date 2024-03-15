@@ -168,13 +168,13 @@ class TrajectoryCalculator:
     
     def get_rotation_to_speaker_moving(self):
         speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
-        t_total = self.get_distance_to_target() / (self.v0_effective * np.cos(self.get_theta()))  if self.v0_effective != 0 else 0
+        t_total = self.get_distance_to_target() / (self.v0_effective * np.cos(self.get_theta()))  if self.v0_effective > 0 else 0
         
         
         rvels = self.get_drivetrain_speeds_field_origin()
         
         robot_pose_2d = self.odometry.getPose()
-        robot_pose_2d_w_speeds = robot_pose_2d + Transform2d(rvels.vx * t_total, rvels.vy * t_total, rvels.omega * t_total)
+        robot_pose_2d_w_speeds = robot_pose_2d + Transform2d(rvels.vx * t_total, rvels.vy * t_total, 0)
         robot_to_speaker = speaker_translation - robot_pose_2d_w_speeds.translation()
         return robot_to_speaker.angle()
 
