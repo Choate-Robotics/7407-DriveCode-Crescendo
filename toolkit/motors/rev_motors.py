@@ -333,33 +333,33 @@ class SparkMax(PIDMotor):
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
         
-    def optimize_sparkmax_analog_sensor(self):
+    def optimize_sparkmax_analog_sensor(self, ms:int=20):
         self.maximize_frame_period_rev(RevPeriodicFrames.k4())
         self.maximize_frame_period_rev(RevPeriodicFrames.k5())
         self.maximize_frame_period_rev(RevPeriodicFrames.k6())
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
-        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k3(), 20)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k3(), ms)
         
 
-    def optimize_sparkmax_absolute_encoder(self):
+    def optimize_sparkmax_absolute_encoder(self, ms:int=50):
         self.maximize_frame_period_rev(RevPeriodicFrames.k3())
         self.maximize_frame_period_rev(RevPeriodicFrames.k4())
         self.maximize_frame_period_rev(RevPeriodicFrames.k6())
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
-        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5(), 50)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5(), ms)
         
-    def optimize_sparkmax_absolute_encoder_all(self):
+    def optimize_sparkmax_absolute_encoder_all(self, ms:int=100):
         self.maximize_frame_period_rev(RevPeriodicFrames.k3())
         self.maximize_frame_period_rev(RevPeriodicFrames.k4())
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
         self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
-        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5(), 100)
-        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k6(), 100)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5(), ms)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k6(), ms)
         
     def optimize_sparkmax_no_position(self):
         self.maximize_frame_period_rev(RevPeriodicFrames.k2())
