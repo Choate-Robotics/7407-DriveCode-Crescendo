@@ -5,6 +5,7 @@ import config
 from toolkit.motor import PIDMotor
 from units.SI import rotations, rotations_per_second
 from utils import LocalLogger
+from wpilib import TimedRobot
 radians_per_second_squared = float
 
 rotations_per_second_squared = float
@@ -92,6 +93,8 @@ class TalonFX(PIDMotor):
     _d_o: controls.DutyCycleOut
 
     _foc: bool
+    
+    _initialized: bool
 
     _inverted: bool
 
@@ -101,8 +104,14 @@ class TalonFX(PIDMotor):
         self._can_id = can_id
         self._talon_config = config
         self._logger = LocalLogger(f'TalonFX: {can_id}')
+        self._initialized = False
 
     def init(self):
+        
+        if self._initialized:
+            self._logger.warn('already initialized')
+            return
+        
         self._logger.setup('initializing')
         self._motor = hardware.TalonFX(self._can_id, 'rio')
         self._config = self._motor.configurator
@@ -110,9 +119,9 @@ class TalonFX(PIDMotor):
         self._motor_vel = self._motor.get_velocity()
         self._motor_current = self._motor.get_torque_current()
         if self._talon_config is not None:
-            ...
             self._talon_config._apply_settings(self._motor, self._inverted)
         self.__setup_controls()
+        self._initialized = True
         self._logger.complete('initialized')
 
     def __setup_controls(self):
@@ -121,30 +130,32 @@ class TalonFX(PIDMotor):
         self._d_o = controls.DutyCycleOut(0)
         
     def error_check(self, status: StatusCode, message: str = ''):
+        if TimedRobot.isSimulation():
+            return
         if status != StatusCode.OK:
             self._logger.error(f'error: {status} {message}')
-        if config.DEBUG_MODE:
-            raise RuntimeError(f'error: {status} {message}')
+            if config.DEBUG_MODE:
+                raise RuntimeError(f'error: {status} {message}')
 
     def get_sensor_position(self) -> rotations:
         self._motor_pos.refresh()
         return self._motor_pos.value
 
     def set_target_position(self, pos: rotations, arbFF: float = 0.0):
-        self.error_check(self._motor.set_control(self._mm_p_v.with_position(pos)))
+        self.error_check(self._motor.set_control(self._mm_p_v.with_position(pos)), f'target position: {pos}, arbFF: {arbFF}')
 
     def set_sensor_position(self, pos: rotations):
-        self.error_check(self._motor.set_position(pos))
+        self.error_check(self._motor.set_position(pos), f'sensor position: {pos}')
 
     def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0):
-        self.error_check(self._motor.set_control(self._mm_v_v.with_velocity(vel)))
+        self.error_check(self._motor.set_control(self._mm_v_v.with_velocity(vel)), f'target velocity: {vel}, accel: {accel}')
 
 
     def set_raw_output(self, x: float):
-        self.error_check(self._motor.set_control(self._d_o.with_output(x)))
+        self.error_check(self._motor.set_control(self._d_o.with_output(x)), f'raw output: {x}')
 
     def follow(self, master: TalonFX, inverted: bool = False) -> StatusCode.OK:
-        self.error_check(self._motor.set_control(controls.Follower(master._can_id, inverted)))
+        self.error_check(self._motor.set_control(controls.Follower(master._can_id, inverted)), f'following {master._can_id} inverted: {inverted}')
 
     def get_sensor_velocity(self) -> rotations_per_second:
         self._motor_vel.refresh()
