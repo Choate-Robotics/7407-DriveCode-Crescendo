@@ -77,38 +77,39 @@ def maximize_frame_period_rev(s: SparkMax, frame: RevPeriodicFrames):
 
 
 def optimize_normal_sparkmax(s: SparkMax):
-    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0, 10)
-    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1, 20)
-    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2, 20)
     maximize_frame_period_rev(s, RevPeriodicFrames.k3)
     maximize_frame_period_rev(s, RevPeriodicFrames.k4)
     maximize_frame_period_rev(s, RevPeriodicFrames.k5)
     maximize_frame_period_rev(s, RevPeriodicFrames.k6)
+    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0, 10)
+    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1, 20)
+    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2, 20)
     
 
 def optimize_sparkmax_absolute_encoder(s: SparkMax):
+    maximize_frame_period_rev(s, RevPeriodicFrames.k3)
+    maximize_frame_period_rev(s, RevPeriodicFrames.k4)
+    maximize_frame_period_rev(s, RevPeriodicFrames.k6)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0, 10)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1, 15)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2, 15)
-    maximize_frame_period_rev(s, RevPeriodicFrames.k3)
-    maximize_frame_period_rev(s, RevPeriodicFrames.k4)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5, 100)
-    maximize_frame_period_rev(s, RevPeriodicFrames.k6)
     
 def optimize_sparkmax_absolute_encoder_all(s: SparkMax):
+    maximize_frame_period_rev(s, RevPeriodicFrames.k3)
+    maximize_frame_period_rev(s, RevPeriodicFrames.k4)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0, 10)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1, 15)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2, 15)
-    maximize_frame_period_rev(s, RevPeriodicFrames.k3)
-    maximize_frame_period_rev(s, RevPeriodicFrames.k4)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5, 100)
     s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k6, 100)
     
 def optimize_sparkmax_no_position(s: SparkMax):
-    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0, 10)
-    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1, 15)
     maximize_frame_period_rev(s, RevPeriodicFrames.k2)
     maximize_frame_period_rev(s, RevPeriodicFrames.k3)
     maximize_frame_period_rev(s, RevPeriodicFrames.k4)
     maximize_frame_period_rev(s, RevPeriodicFrames.k5)
     maximize_frame_period_rev(s, RevPeriodicFrames.k6)
+    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0, 10)
+    s.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1, 15)
+    
