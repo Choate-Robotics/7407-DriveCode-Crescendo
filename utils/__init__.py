@@ -1,2 +1,3 @@
 from utils.local_logger import LocalLogger
 from utils.POI import POI, POIPose
+from utils.can_optimizations import optimize_normal_sparkmax, optimize_sparkmax_absolute_encoder, optimize_sparkmax_no_position
