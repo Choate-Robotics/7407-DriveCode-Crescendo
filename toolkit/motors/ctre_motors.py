@@ -92,12 +92,15 @@ class TalonFX(PIDMotor):
     _foc: bool
 
     _inverted: bool
+    
+    _optimized: bool
 
-    def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None):
+    def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None, optimize: bool = True):
         self._inverted = inverted
         self._foc = foc
         self._can_id = can_id
         self._talon_config = config
+        self._optimized = optimize
 
     def init(self):
         print('Initializing TalonFX', self._can_id)
@@ -110,6 +113,10 @@ class TalonFX(PIDMotor):
             ...
             self._talon_config._apply_settings(self._motor, self._inverted)
         self.__setup_controls()
+        
+        if self._optimized:
+            if self._motor.optimize_bus_utilization() == StatusCode.OK:
+                print('talon optimized')
 
     def __setup_controls(self):
         self._mm_v_v = controls.MotionMagicVelocityVoltage(0)
