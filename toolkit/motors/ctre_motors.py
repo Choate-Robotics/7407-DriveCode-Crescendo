@@ -110,8 +110,8 @@ class TalonFX(PIDMotor):
         self._motor_vel = self._motor.get_velocity()
         self._motor_current = self._motor.get_torque_current()
         if self._talon_config is not None:
-            ...
             self._talon_config._apply_settings(self._motor, self._inverted)
+            
         self.__setup_controls()
         
         if self._optimized:
