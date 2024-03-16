@@ -143,32 +143,13 @@ class SparkMax(PIDMotor):
 
         self._set_config(self._configs[config_index], config_index) if self._brushless else None
 
-    def error_check(self, error: REVLibError):
+    def error_check(self, error: REVLibError, message:str=''):
         if TimedRobot.isSimulation():
             return
         if error != REVLibError.kOk:
-            match error:
-                case REVLibError.kInvalid:
-                    self._logger.error("Invalid")
-                case REVLibError.kCANDisconnected:
-                    self._logger.error("CAN Disconnected")
-                case REVLibError.kInvalidCANId:
-                    self._logger.error("Invalid CAN ID")
-                case REVLibError.kSetpointOutOfRange:
-                    self._logger.error("Setpoint Out of Range")
-                case REVLibError.kHALError:
-                    self._logger.error("HAL Error")
-                case REVLibError.kError:
-                    self._logger.error("General Error")
-                case REVLibError.kTimeout:
-                    self._logger.error("Timeout")
-                case _:
-                    self._logger.error(f'Uncommon Error {error}')
+            self._logger.error(f'Error: {error} {message}')
             if config.DEBUG_MODE:
-                if error == REVLibError.kHALError:
-                    print(f'SparkMax Error {self._can_id}: {error}')
-                    return
-                raise RuntimeError(f'SparkMax Error: {error}')
+                raise RuntimeError(f'Error: {error}')
 
     def abs_encoder(self):
         if self._abs_encoder is None:
@@ -203,7 +184,7 @@ class SparkMax(PIDMotor):
             pos (float): The target position of the motor controller in rotations
         """
         result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff, pidSlot=slot)
-        self.error_check(result)
+        self.error_check(result, f'target position: {pos}, arbff: {arbff}, PID slot: {slot}')
 
     def set_target_velocity(self, vel: rotations_per_second):  # Rotations per minute??
         """
@@ -213,7 +194,7 @@ class SparkMax(PIDMotor):
             vel (float): The target velocity of the motor controller in rotations per second
         """
         result = self.pid_controller.setReference(vel, CANSparkMax.ControlType.kVelocity)
-        self.error_check(result)
+        self.error_check(result, f'target velocity: {vel}')
 
     def set_target_voltage(self, voltage: float):
         """
@@ -223,7 +204,7 @@ class SparkMax(PIDMotor):
             voltage (float): The target voltage of the motor controller in volts
         """
         result = self.pid_controller.setReference(voltage, CANSparkMax.ControlType.kVoltage)
-        self.error_check(result)
+        self.error_check(result, f'target voltage: {voltage}')
 
     def get_sensor_position(self) -> rotations:
         """
@@ -242,7 +223,7 @@ class SparkMax(PIDMotor):
             pos (rotations): The sensor position of the motor controller in rotations
         """
         result = self.encoder.setPosition(pos)
-        self.error_check(result)
+        self.error_check(result, f'set sensor position: {pos}')
 
     def get_sensor_velocity(self) -> rotations_per_second:
         """
@@ -255,21 +236,33 @@ class SparkMax(PIDMotor):
 
     def follow(self, master: SparkMax, inverted: bool = False) -> None:
         result = self.motor.follow(master.motor, inverted)
-        self.error_check(result)
+        self.error_check(result, f'follow master: {master._can_id}, inverted: {inverted}')
 
 
     def _set_config(self, config: SparkMaxConfig, slot: int = 0):
         if config is None:
             return
         if config.k_P is not None:
-            self.error_check(self.pid_controller.setP(config.k_P, slot))
+            self.error_check(
+                self.pid_controller.setP(config.k_P, slot),
+                f'kP: {config.k_P}, slot: {slot}')
         if config.k_I is not None:
-            self.error_check(self.pid_controller.setI(config.k_I, slot))
+            self.error_check(
+                self.pid_controller.setI(config.k_I, slot),
+                f'kI: {config.k_I}, slot: {slot}')
         if config.k_D is not None:
-            self.error_check(self.pid_controller.setD(config.k_D, slot))
+            self.error_check(
+                self.pid_controller.setD(config.k_D, slot),
+                f'kD: {config.k_D}, slot: {slot}')
         if config.k_F is not None:
-            self.error_check(self.pid_controller.setFF(config.k_F, slot))
+            self.error_check(
+                self.pid_controller.setFF(config.k_F, slot),
+                f'kF: {config.k_F}, slot: {slot}')
         if config.output_range is not None:
-            self.error_check(self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1], slot))
+            self.error_check(
+                self.pid_controller.setOutputRange(config.output_range[0], config.output_range[1], slot),
+                f'output range: {config.output_range}, slot: {slot}')
         if config.idle_mode is not None:
-            self.error_check(self.motor.setIdleMode(config.idle_mode))
+            self.error_check(
+                self.motor.setIdleMode(config.idle_mode),
+                f'idle mode: {config.idle_mode}')
