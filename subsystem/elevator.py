@@ -7,7 +7,7 @@ import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
 import robot_states as states
-from utils import optimize_normal_sparkmax, optimize_sparkmax_absolute_encoder
+
 class Elevator(Subsystem):
 
     def __init__(self) -> None:

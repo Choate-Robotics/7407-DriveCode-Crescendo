@@ -9,7 +9,6 @@ from toolkit.subsystem import Subsystem
 from toolkit.utils.toolkit_math import bounded_angle_diff
 from units.SI import radians
 from wpilib import DigitalInput
-from utils import optimize_sparkmax_no_position, optimize_sparkmax_absolute_encoder
 
 class Wrist(Subsystem):
     def __init__(self):

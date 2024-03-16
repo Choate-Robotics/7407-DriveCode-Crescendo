@@ -4,7 +4,6 @@ from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
 import ntcore
-from utils import optimize_sparkmax_no_position, optimize_sparkmax_analog_sensor
 
 class Intake(Subsystem):
 
