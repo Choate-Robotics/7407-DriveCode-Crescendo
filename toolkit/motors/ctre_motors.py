@@ -115,7 +115,7 @@ class TalonFX(PIDMotor):
         self.__setup_controls()
         
         if self._optimized:
-            if self._motor.optimize_bus_utilization() == StatusCode.OK:
+            if self.optimize_normal_operation() == StatusCode.OK:
                 print('talon optimized')
 
     def __setup_controls(self):
@@ -152,3 +152,9 @@ class TalonFX(PIDMotor):
     def get_motor_current(self) -> float:
         self._motor_current.refresh()
         return self._motor_current.value
+    
+    def optimize_normal_operation(self) -> StatusCode.OK:
+        self._motor_pos.set_update_frequency(50)
+        self._motor_vel.set_update_frequency(50)
+        self._motor_current.set_update_frequency(50)
+        return self._motor.optimize_bus_utilization()

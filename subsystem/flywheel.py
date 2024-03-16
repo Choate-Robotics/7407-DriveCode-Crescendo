@@ -118,8 +118,8 @@ class Flywheel(Subsystem):
         self.motor_1.init()
         self.motor_2.init()
         
-        optimize_sparkmax_no_position(self.motor_1.motor)
-        optimize_sparkmax_no_position(self.motor_2.motor)
+        self.motor_1.optimize_sparkmax_no_position()
+        self.motor_2.optimize_sparkmax_no_position()
         
         self.motor_1.motor.setSmartCurrentLimit(200)
         self.motor_2.motor.setSmartCurrentLimit(200)

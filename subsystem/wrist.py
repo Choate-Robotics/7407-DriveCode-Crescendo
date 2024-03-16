@@ -35,10 +35,10 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
-        optimize_sparkmax_absolute_encoder(self.wrist_motor.motor)
+        self.wrist_motor.optimize_sparkmax_absolute_encoder()
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
-        optimize_sparkmax_no_position(self.feed_motor.motor)
+        self.feed_motor.optimize_sparkmax_no_position()
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
         self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
 
