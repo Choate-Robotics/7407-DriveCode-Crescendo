@@ -133,9 +133,9 @@ class TalonFX(PIDMotor):
         if TimedRobot.isSimulation():
             return
         if status != StatusCode.OK:
-            self._logger.error(f'error: {status} {message}')
+            self._logger.error(f'Error: {status} {message}')
             if config.DEBUG_MODE:
-                raise RuntimeError(f'error: {status} {message}')
+                raise RuntimeError(f'Error: {status} {message}')
 
     def get_sensor_position(self) -> rotations:
         self._motor_pos.refresh()
