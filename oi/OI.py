@@ -60,6 +60,15 @@ class OI:
         ).onFalse(
             command.IntakeIdle(Robot.intake)
         )
+        
+        Keymap.Intake.AUTO_INTAKE.onTrue(
+            command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake)
+        ).onFalse(
+            commands2.ParallelCommandGroup(
+                command.IntakeStageIdle(Robot.wrist, Robot.intake),
+                command.DriveSwerveCustom(Robot.drivetrain)
+            )
+        )
 
         Keymap.Elevator.ELEVATOR_HIGH.onTrue(
             # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)

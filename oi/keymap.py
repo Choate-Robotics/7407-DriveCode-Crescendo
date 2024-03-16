@@ -63,6 +63,9 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.4
         )
         
+        AUTO_INTAKE = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
+        )
         
         
     class Shooter:
