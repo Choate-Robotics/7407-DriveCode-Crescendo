@@ -234,7 +234,7 @@ odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
 object_detection_ty = 0
 object_detection_ty_threshold = 2
 object_detection_tx = 0
-object_detection_tx_threshold = 2
+object_detection_tx_threshold = 4
 object_detection_drivetrain_speed_dx = .5
 object_detection_drivetrain_speed_dy = .5
 

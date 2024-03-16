@@ -278,8 +278,8 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.limelight.set_pipeline_mode(config.LimelightPipeline.neural)
         self.v_pid.reset()
         self.h_pid.reset()
-        self.v_pid.setTolerance(4)
-        self.h_pid.setTolerance(2)
+        self.v_pid.setTolerance(config.object_detection_tx_threshold)
+        self.h_pid.setTolerance(config.object_detection_ty_threshold)
         
     def execute(self):
         if self.limelight.get_pipeline_mode() != config.LimelightPipeline.neural:
