@@ -153,8 +153,16 @@ class TalonFX(PIDMotor):
         self._motor_current.refresh()
         return self._motor_current.value
     
-    def optimize_normal_operation(self) -> StatusCode.OK:
-        self._motor_pos.set_update_frequency(50)
-        self._motor_vel.set_update_frequency(50)
-        self._motor_current.set_update_frequency(50)
+    def optimize_normal_operation(self, ms:int=25) -> StatusCode.OK:
+        """removes every status signal except for motor position, current, and velocty to optimize bus utilization
+
+        Args: 
+            ms: (int, optional) the update frequency of the status signals (default is 25ms)
+
+        Returns:
+            StatusCode.OK: if the talon was optimized
+        """
+        self._motor_pos.set_update_frequency(ms)
+        self._motor_vel.set_update_frequency(ms)
+        self._motor_current.set_update_frequency(ms)
         return self._motor.optimize_bus_utilization()
