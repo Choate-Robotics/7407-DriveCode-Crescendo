@@ -149,7 +149,7 @@ class SparkMax(PIDMotor):
         if error != REVLibError.kOk:
             self._logger.error(f'Error: {error} {message}')
             if config.DEBUG_MODE:
-                raise RuntimeError(f'Error: {error}')
+                raise RuntimeError(f'Error: {error} {message}')
 
     def abs_encoder(self):
         if self._abs_encoder is None:
