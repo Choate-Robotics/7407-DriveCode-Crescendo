@@ -7,7 +7,7 @@ import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
 import robot_states as states
-
+from utils import optimize_normal_sparkmax, optimize_sparkmax_absolute_encoder
 class Elevator(Subsystem):
 
     def __init__(self) -> None:
@@ -29,7 +29,12 @@ class Elevator(Subsystem):
 
     def init(self) -> None:
         self.motor_extend.init()
+        
+        optimize_normal_sparkmax(self.motor_extend)
+        
         self.motor_extend_follower.init()
+
+        optimize_sparkmax_absolute_encoder(self.motor_extend_follower)
 
         # Set the motor_extend encoder to the motor's absolute encoder
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()

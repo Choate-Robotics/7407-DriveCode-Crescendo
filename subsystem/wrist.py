@@ -9,7 +9,7 @@ from toolkit.subsystem import Subsystem
 from toolkit.utils.toolkit_math import bounded_angle_diff
 from units.SI import radians
 from wpilib import DigitalInput
-
+from utils import optimize_sparkmax_no_position, optimize_sparkmax_absolute_encoder
 
 class Wrist(Subsystem):
     def __init__(self):
@@ -35,17 +35,10 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
-        # self.wrist_motor.motor.restoreFactoryDefaults(True)
-        # self.wrist_motor.motor.setClosedLoopRampRate(config.wrist_time_to_max_vel)
-        # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.abs_encoder())
-        # self.wrist_motor.pid_controller.setFeedbackDevice(self.wrist_motor.encoder)
-        
-        # self.wrist_motor.pid_controller.setPositionPIDWrappingEnabled(False)
-        # self.wrist_motor.pid_controller.setPositionPIDWrappingMinInput(self.radians_to_abs(constants.wrist_max_rotation))
-        # self.wrist_motor.pid_controller.setPositionPIDWrappingMaxInput(self.radians_to_abs(constants.wrist_min_rotation))
-        # self.wrist_motor.motor.burnFlash()
+        optimize_sparkmax_absolute_encoder(self.wrist_motor)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
+        optimize_sparkmax_no_position(self.feed_motor)
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
         self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
 

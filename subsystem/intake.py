@@ -4,7 +4,7 @@ from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
 import ntcore
-
+from utils import optimize_sparkmax_no_position, optimize_sparkmax_analog_sensor
 
 class Intake(Subsystem):
 
@@ -37,8 +37,11 @@ class Intake(Subsystem):
 
     def init(self):
         self.inner_motor.init()
+        optimize_sparkmax_no_position(self.inner_motor)
         self.outer_motor.init()
+        optimize_sparkmax_analog_sensor(self.outer_motor)
         self.deploy_motor.init()
+        optimize_sparkmax_no_position(self.deploy_motor)
         self.distance_sensor = self.outer_motor.get_analog()
 
     def set_inner_velocity(self, vel: float):
