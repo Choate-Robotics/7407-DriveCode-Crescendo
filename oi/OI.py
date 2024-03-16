@@ -62,7 +62,7 @@ class OI:
         )
         
         Keymap.Intake.AUTO_INTAKE.onTrue(
-            command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake)
+            command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake)
         ).onFalse(
             commands2.ParallelCommandGroup(
                 command.IntakeStageIdle(Robot.wrist, Robot.intake),
