@@ -37,11 +37,11 @@ class Intake(Subsystem):
 
     def init(self):
         self.inner_motor.init()
-        optimize_sparkmax_no_position(self.inner_motor)
+        optimize_sparkmax_no_position(self.inner_motor.motor)
         self.outer_motor.init()
-        optimize_sparkmax_analog_sensor(self.outer_motor)
+        optimize_sparkmax_analog_sensor(self.outer_motor.motor)
         self.deploy_motor.init()
-        optimize_sparkmax_no_position(self.deploy_motor)
+        optimize_sparkmax_no_position(self.deploy_motor.motor)
         self.distance_sensor = self.outer_motor.get_analog()
 
     def set_inner_velocity(self, vel: float):

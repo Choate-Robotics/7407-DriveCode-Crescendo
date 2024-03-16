@@ -30,11 +30,11 @@ class Elevator(Subsystem):
     def init(self) -> None:
         self.motor_extend.init()
         
-        optimize_normal_sparkmax(self.motor_extend)
+        optimize_normal_sparkmax(self.motor_extend.motor)
         
         self.motor_extend_follower.init()
 
-        optimize_sparkmax_absolute_encoder(self.motor_extend_follower)
+        optimize_sparkmax_absolute_encoder(self.motor_extend_follower.motor)
 
         # Set the motor_extend encoder to the motor's absolute encoder
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
