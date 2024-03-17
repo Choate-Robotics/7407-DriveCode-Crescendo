@@ -34,7 +34,7 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
-        self.wrist_motor.optimize_sparkmax_absolute_encoder()
+        self.wrist_motor.optimize_sparkmax_absolute_encoder(30)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
         self.feed_motor.optimize_sparkmax_no_position()
@@ -98,15 +98,13 @@ class Wrist(Subsystem):
         Gets the wrist rotation in radians
         :return:
         """
-        return (
-                (self.wrist_motor.get_sensor_position() / constants.wrist_gear_ratio)
-                * pi
-                * 2
-        )
-        
         # return (
-        #     (self.wrist_abs_encoder.getPosition())
+        #         (self.wrist_motor.get_sensor_position() / constants.wrist_gear_ratio)
+        #         * pi
+        #         * 2
         # )
+        
+        return self.get_wrist_abs_angle()
 
     def note_detected(self) -> bool:
         return not self.beam_break_second.get()
