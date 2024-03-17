@@ -51,16 +51,14 @@ class TrajectoryCalculator:
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
         
         
-    def get_drivetrain_speeds_speaker_origin(self):
+    def get_drivetrain_speeds_speaker_distance(self):
         
-        vels = self.odometry.drivetrain.chassis_speeds
+        rvx = self.get_drivetrain_speeds_field_origin().vx
         
-        drivetrain_angle = self.get_rotation_to_speaker()
+        rvs = rvx * np.cos(self.get_rotation_to_speaker().radians())
         
         
-        vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(vels, drivetrain_angle)
-        
-        return vels
+        return rvs
     
     def get_drivetrain_speeds_field_origin(self):
         vels = self.odometry.drivetrain.chassis_speeds       
@@ -76,9 +74,8 @@ class TrajectoryCalculator:
 
         
         
-        rvx = self.get_drivetrain_speeds_field_origin().vx
         
-        rvs = rvx * np.cos(self.get_rotation_to_speaker().radians())
+        rvs = self.get_drivetrain_speeds_speaker_distance()
         
 
         # Calculate the horizontal angle without considering velocities
@@ -203,11 +200,9 @@ class TrajectoryCalculator:
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
         self.table.putNumber('delta z', self.delta_z)
         self.table.putNumber('v effective', self.v0_effective)
-        self.table.putNumberArray('drivetrain speeds speaker', [
-            self.get_drivetrain_speeds_speaker_origin().vx,
-            self.get_drivetrain_speeds_speaker_origin().vy,
-            self.get_drivetrain_speeds_speaker_origin().omega
-        ])
+        self.table.putNumber('drivetrain speeds speaker distance', 
+            self.get_drivetrain_speeds_speaker_distance(),
+            )
         self.table.putNumberArray('drivetrain speeds field', [
             self.get_drivetrain_speeds_field_origin().vx,
             self.get_drivetrain_speeds_field_origin().vy,
