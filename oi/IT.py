@@ -2,7 +2,7 @@ from utils import LocalLogger
 
 from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGroup, InstantCommand, PrintCommand
 import command
-import config, math
+import config, math, robot_states
 from wpimath.geometry import Pose3d, Rotation3d, Transform3d
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
 from utils import LocalLogger
@@ -56,7 +56,7 @@ class IT:
         #     command.SetWristIdle(Robot.wrist))
         # )
         
-        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second()).and_(lambda: not config.climbed)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second()).and_(lambda: not robot_states.climbed)\
             .onTrue(
                 InstantCommand(lambda: Robot.wrist.set_feed_voltage(config.feeder_voltage_crawl))
             )\
@@ -69,7 +69,15 @@ class IT:
                 InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
                     Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
                     1
-                ))
+                )).andThen(
+                    WaitCommand(5).andThen(
+                        InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
+                            Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
+                            0
+                        )
+                        )
+                    )
+                )
             ).onFalse(
                 InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
                     Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
@@ -81,7 +89,15 @@ class IT:
                 InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
                     Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
                     1
-                ))
+                )).andThen(
+                    WaitCommand(5).andThen(
+                        InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
+                            Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
+                            0
+                        )
+                        )
+                    )
+                )
             ).onFalse(
                 InstantCommand(lambda: Controllers.OPERATOR_CONTROLLER.setRumble(
                     Controllers.OPERATOR_CONTROLLER.RumbleType.kBothRumble,
@@ -95,20 +111,27 @@ class IT:
             
 
         # if note in feeder, spin to set shot velocity
-        button.Trigger(lambda: Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second()).and_(lambda: not config.amping).and_(lambda: not config.flywheel_manual)\
-            .whileTrue(
+        button.Trigger(
+            lambda: Robot.wrist.note_in_feeder())\
+                .and_(lambda: not robot_states.amping)\
+                .and_(lambda: not robot_states.flywheel_manual)\
+            .onTrue(
                 command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
                 # command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.v0_flywheel - 1, config.v0_flywheel + 1))
-           ).debounce(1, Debouncer.DebounceType.kFalling).onFalse(
-
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
-            )
+           )
  
-        button.Trigger(lambda: config.amping)\
+        button.Trigger(lambda: robot_states.amping)\
             .onTrue(
-                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 4))
+                command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 0))
             )
             
+        button.Trigger(
+            lambda: not Robot.wrist.note_in_feeder()\
+                and not robot_states.amping\
+                and not robot_states.flywheel_manual)\
+            .debounce(1).onTrue(
+                command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+            )
             
     #     #FLYWHEEL TRIGGERS ----------------
         

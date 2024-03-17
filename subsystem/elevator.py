@@ -6,7 +6,7 @@ from units.SI import meters
 import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
-
+import robot_states as states
 
 class Elevator(Subsystem):
 
@@ -14,12 +14,12 @@ class Elevator(Subsystem):
         super().__init__()
         # Absolute encoder
         self.motor_extend: SparkMax = SparkMax(
-            config.elevator_can_id, config=config.ELEVATOR_CONFIG, inverted=False
+            config.elevator_can_id, config=config.ELEVATOR_CONFIG, inverted=False, config_others=[config.ELEVATOR_CLIMB_CONFIG]
         )
         self.motor_extend_encoder = None
 
         self.motor_extend_follower: SparkMax = SparkMax(
-            config.elevator_can_id_2, config=config.ELEVATOR_CONFIG, inverted=True
+            config.elevator_can_id_2, config=config.ELEVATOR_CONFIG, inverted=True, config_others=[config.ELEVATOR_CLIMB_CONFIG]
         )
 
         self.zeroed: bool = False
@@ -29,7 +29,10 @@ class Elevator(Subsystem):
 
     def init(self) -> None:
         self.motor_extend.init()
+        self.motor_extend.optimize_normal_sparkmax()
+        
         self.motor_extend_follower.init()
+        self.motor_extend_follower.optimize_sparkmax_absolute_encoder()
 
         # Set the motor_extend encoder to the motor's absolute encoder
         self.motor_extend_encoder = self.motor_extend_follower.get_absolute_encoder()
@@ -77,6 +80,18 @@ class Elevator(Subsystem):
         self.motor_extend.set_target_position(
             self.length_to_rotations(length), arbff
         )
+        
+        
+    def set_elevator_climb_down(self) -> None:
+        """
+        Climb down with feed forward
+        """
+        
+        self.motor_extend.set_raw_output(-.5)
+        
+    def get_elevator_current(self) -> float:
+        
+        return self.motor_extend.motor.getOutputCurrent()
 
     def get_length(self) -> float:
         """
@@ -155,3 +170,8 @@ class Elevator(Subsystem):
         table.putNumber('elevator target height', self.target_length)
         table.putNumber('elevator motor lead applied output', self.motor_extend.motor.getAppliedOutput())
         table.putNumber('elevator motor follow applied output', self.motor_extend_follower.motor.getAppliedOutput())
+        table.putNumber('elevator current', self.motor_extend.motor.getOutputCurrent())
+        
+        # set drivetrain control speed
+        states.drivetrain_controlled_vel = constants.drivetrain_max_vel * max((1 - (self.get_length() / constants.elevator_max_length)), .25)
+        states.drivetrain_controlled_angular_vel = constants.drivetrain_max_angular_vel * max((1 - (self.get_length() / constants.elevator_max_length)), .5)
