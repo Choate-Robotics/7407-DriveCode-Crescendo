@@ -92,12 +92,15 @@ class TalonFX(PIDMotor):
     _foc: bool
 
     _inverted: bool
+    
+    _optimized: bool
 
-    def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None):
+    def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None, optimize: bool = True):
         self._inverted = inverted
         self._foc = foc
         self._can_id = can_id
         self._talon_config = config
+        self._optimized = optimize
 
     def init(self):
         print('Initializing TalonFX', self._can_id)
@@ -107,9 +110,13 @@ class TalonFX(PIDMotor):
         self._motor_vel = self._motor.get_velocity()
         self._motor_current = self._motor.get_torque_current()
         if self._talon_config is not None:
-            ...
             self._talon_config._apply_settings(self._motor, self._inverted)
+            
         self.__setup_controls()
+        
+        if self._optimized:
+            if self.optimize_normal_operation() == StatusCode.OK:
+                print('talon optimized')
 
     def __setup_controls(self):
         self._mm_v_v = controls.MotionMagicVelocityVoltage(0)
@@ -145,3 +152,17 @@ class TalonFX(PIDMotor):
     def get_motor_current(self) -> float:
         self._motor_current.refresh()
         return self._motor_current.value
+    
+    def optimize_normal_operation(self, ms:int=25) -> StatusCode.OK:
+        """removes every status signal except for motor position, current, and velocty to optimize bus utilization
+
+        Args: 
+            ms: (int, optional) the update frequency of the status signals (default is 25ms)
+
+        Returns:
+            StatusCode.OK: if the talon was optimized
+        """
+        self._motor_pos.set_update_frequency(ms)
+        self._motor_vel.set_update_frequency(ms)
+        self._motor_current.set_update_frequency(ms)
+        return self._motor.optimize_bus_utilization()
