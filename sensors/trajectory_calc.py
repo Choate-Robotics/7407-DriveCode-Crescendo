@@ -1,19 +1,21 @@
 # import math
 # import time
 
+from math import degrees, isnan, radians
+
+import ntcore
+
 # import matplotlib.pyplot as plt
 # import ntcore
 import numpy as np
-from math import degrees, radians, isnan
-import config, ntcore
+from wpimath.geometry import Rotation2d, Translation2d, Translation3d
+
+import config
 import constants
 from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
-from wpimath.geometry import Rotation2d, Translation3d, Translation2d
-
-
 
 # from scipy.integrate import solve_ivp
 # from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d
@@ -37,11 +39,13 @@ class TrajectoryCalculator:
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
         self.delta_z = 0
-        self.shoot_angle:radians = 0
+        self.shoot_angle: radians = 0
         self.base_rotation2d = Rotation2d(0)
         self.elevator = elevator
         self.flywheel = flywheel
-        self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable(
+            "shot calculations"
+        )
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
 
@@ -54,28 +58,29 @@ class TrajectoryCalculator:
         Calculates the angle of the trajectory without air resistance.
         """
 
-        vels = self.odometry.drivetrain.chassis_speeds
-        
-        drivetrain_angle = self.get_rotation_to_speaker()
-        
-        
-        vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(vels, drivetrain_angle)
-        
-        rvx, rvy, rvo = (
-            vels.vx, vels.vy, vels.omega
-        )
-        
+        # vels = self.odometry.drivetrain.chassis_speeds
+
+        # drivetrain_angle = self.get_rotation_to_speaker()
+
+        # vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(
+        #     vels, drivetrain_angle
+        # )
+
+        # rvx, rvy, rvo = (vels.vx, vels.vy, vels.omega)
 
         # Calculate the horizontal angle without considering velocities
-        phi0 = np.arctan(delta_z / distance_to_target) if distance_to_target != 0 else np.radians(90)
-
+        phi0 = (
+            np.arctan(delta_z / distance_to_target)
+            if distance_to_target != 0
+            else np.radians(90)
+        )
 
         # Calculate the impact of floor velocities on the trajectory
 
-        
         # Calculate the effective velocity
-        # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        v_effective = config.v0_flywheel_minimum# + rvx + rvy
+        # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) +
+        # rvy * np.sin(drivetrain_angle.radians())
+        v_effective = config.v0_flywheel_minimum + distance_to_target  # + rvx + rvy
         # v_effective = config.v0_flywheel
 
         if v_effective == 0:
@@ -83,16 +88,16 @@ class TrajectoryCalculator:
 
         # Calculate the angle with floor velocities
         result_angle = (
-            0.5 * np.arcsin(
+            0.5
+            * np.arcsin(
                 np.sin(phi0)
-                + constants.g
-                * distance_to_target
-                * np.cos(phi0)
-                / (v_effective ** 2)
+                + constants.g * distance_to_target * np.cos(phi0) / (v_effective**2)
             )
             + 0.5 * phi0
-        )
-        
+        ) + radians(
+            -0.03 * distance_to_target**2 - 1.1 * distance_to_target + 1.71
+        )  # This is the offset for the shooter angle found by experimentation
+
         if isnan(result_angle):
             result_angle = config.Giraffe.kIdle.wrist_angle
 
@@ -103,16 +108,17 @@ class TrajectoryCalculator:
         function runs sim to calculate a final angle with air resistance considered
         :return: target angle
         """
-        if type(self.speaker) == Translation3d:
+        if type(self.speaker) is Translation3d:
             self.speaker = self.speaker.toTranslation2d()
 
         self.distance_to_target = (
-            self.odometry.getPose().translation().distance(self.speaker) - constants.shooter_offset_y
+            self.odometry.getPose().translation().distance(self.speaker)
+            - constants.shooter_offset_y
         )
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
-                self.speaker_z - self.elevator.get_length() - constants.shooter_height
+            self.speaker_z - self.elevator.get_length() - constants.shooter_height
         )
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
@@ -137,13 +143,15 @@ class TrajectoryCalculator:
                     self.shoot_angle = theta_2
                     return theta_2
                 correction_angle = z_goal_error * z_to_angle_conversion
-                
+
     def get_rotation_to_speaker(self):
         """
         returns rotation of base to face target
         :return: base target angle
         """
-        speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        speaker_translation: Translation2d = (
+            POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        )
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
@@ -167,11 +175,11 @@ class TrajectoryCalculator:
         self.update_tables()
 
     def update_tables(self):
-        self.table.putNumber('wrist angle', degrees(self.get_theta()))
-        self.table.putNumber('distance to target', self.distance_to_target)
-        self.table.putNumber('bot angle', self.get_bot_theta().degrees())
-        self.table.putNumber('delta z', self.delta_z)
-        
+        self.table.putNumber("wrist angle", degrees(self.get_theta()))
+        self.table.putNumber("distance to target", self.distance_to_target)
+        self.table.putNumber("bot angle", self.get_bot_theta().degrees())
+        self.table.putNumber("delta z", self.delta_z)
+
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
             # We've hit the target if the distance to target is 0.
@@ -220,9 +228,8 @@ class TrajectoryCalculator:
         Returns the angle of the Robot
         """
         return self.base_rotation2d
-    
+
     def get_distance_to_target(self) -> float:
-        
         return self.distance_to_target
 
     def deriv(self, t, u):
