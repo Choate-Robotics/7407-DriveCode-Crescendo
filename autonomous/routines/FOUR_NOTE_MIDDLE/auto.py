@@ -1,5 +1,5 @@
 from command.autonomous.custom_pathing import FollowPathCustom
-from command.autonomous.trajectory import CustomTrajectory
+from command.autonomous.trajectory import CustomTrajectory, PoseType
 from robot_systems import Robot, Field
 from utils import POIPose
 from command import *
