@@ -16,6 +16,7 @@ from toolkit.utils.toolkit_math import bounded_angle_diff
 from math import radians
 from wpimath.units import seconds
 import robot_states as states
+import ntcore
 
 
 def curve_abs(x):
@@ -109,6 +110,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             period
             )
         self.theta_controller.setTolerance(radians(1), radians(3))
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
@@ -117,20 +119,23 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.chassis_speeds.omega
         )
         if config.drivetrain_rotation_enable_tuner:
-            wpilib.SmartDashboard.putNumber('drivetrain_rotation_P', config.drivetrain_rotation_P)
-            wpilib.SmartDashboard.putNumber('drivetrain_rotation_I', config.drivetrain_rotation_I)
-            wpilib.SmartDashboard.putNumber('drivetrain_rotation_D', config.drivetrain_rotation_D)
-            wpilib.SmartDashboard.putNumber('drivetrain_rotation_tolerance', 1)
-            wpilib.SmartDashboard.putNumber('drivetrain_velocity_tolerance', 3)
+            self.table.putNumber('P', config.drivetrain_rotation_P)
+            self.table.putNumber('I', config.drivetrain_rotation_I)
+            self.table.putNumber('D', config.drivetrain_rotation_D)
+            self.table.putNumber('tolerance', 1)
+            self.table.putNumber('velocity tolerance', 3)
 
 
     def execute(self) -> None:
         
         if config.drivetrain_rotation_enable_tuner:
-            self.theta_controller.setP(wpilib.SmartDashboard.getNumber('drivetrain_rotation_P', config.drivetrain_rotation_P))
-            self.theta_controller.setI(wpilib.SmartDashboard.getNumber('drivetrain_rotation_I', config.drivetrain_rotation_I))
-            self.theta_controller.setD(wpilib.SmartDashboard.getNumber('drivetrain_rotation_D', config.drivetrain_rotation_D))
-            self.theta_controller.setTolerance(radians(wpilib.SmartDashboard.getNumber('drivetrain_rotation_tolerance', 1)), radians(wpilib.SmartDashboard.getNumber('drivetrain_velocity_tolerance', 3)))
+            config.drivetrain_rotation_P = self.table.getNumber('P', config.drivetrain_rotation_P)
+            config.drivetrain_rotation_I = self.table.getNumber('I', config.drivetrain_rotation_I)
+            config.drivetrain_rotation_D = self.table.getNumber('D', config.drivetrain_rotation_D)
+            self.theta_controller.setP(config.drivetrain_rotation_P)
+            self.theta_controller.setI(config.drivetrain_rotation_I)
+            self.theta_controller.setD(config.drivetrain_rotation_D)
+            self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 1)), radians(self.table.getNumber('velocity tolerance', 3)))
         
         dx, dy = (
             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
