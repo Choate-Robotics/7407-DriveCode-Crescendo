@@ -205,7 +205,7 @@ drivetrain_reversed: bool = False
 drivetrain_rotation_P: float = 9.1
 drivetrain_rotation_I: float = 0.0
 drivetrain_rotation_D: float = 0.03
-drivetrain_rotation_enable_tuner: bool = False
+drivetrain_rotation_enable_tuner: bool = True
 
 # Flywheel
 flywheel_id_1 = 19
