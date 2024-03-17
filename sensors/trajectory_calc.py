@@ -11,7 +11,7 @@ from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
-from wpimath.geometry import Rotation2d, Translation3d, Translation2d
+from wpimath.geometry import Rotation2d, Translation3d, Translation2d, Transform2d
 
 
 
@@ -44,26 +44,38 @@ class TrajectoryCalculator:
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
+        self.v0_effective = 0
 
     def init(self):
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
+        
+        
+    def get_drivetrain_speeds_speaker_distance(self):
+        
+        rvx = self.get_drivetrain_speeds_field_origin().vx
+        
+        rvs = rvx * np.cos(self.get_rotation_to_speaker().radians())
+        
+        
+        return rvs
+    
+    def get_drivetrain_speeds_field_origin(self):
+        vels = self.odometry.drivetrain.chassis_speeds       
+        
+        vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(vels, self.odometry.getPose().rotation())
+        
+        return vels
 
-    def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
+    def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> float:
         """
         Calculates the angle of the trajectory without air resistance.
         """
 
-        vels = self.odometry.drivetrain.chassis_speeds
-        
-        drivetrain_angle = self.get_rotation_to_speaker()
         
         
-        vels = self.odometry.drivetrain.chassis_speeds.fromRobotRelativeSpeeds(vels, drivetrain_angle)
         
-        rvx, rvy, rvo = (
-            vels.vx, vels.vy, vels.omega
-        )
+        rvs = self.get_drivetrain_speeds_speaker_distance()
         
 
         # Calculate the horizontal angle without considering velocities
@@ -75,8 +87,11 @@ class TrajectoryCalculator:
         
         # Calculate the effective velocity
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        v_effective = config.v0_flywheel_minimum# + rvx + rvy
+        # v_effective = self.flywheel.get_velocity_linear()# + rvx + rvy
         # v_effective = config.v0_flywheel
+        v_effective = self.flywheel.get_velocity_linear() + (rvs * np.cos(phi0))
+        self.v0_effective = v_effective
+
 
         if v_effective == 0:
             return config.Giraffe.kIdle.wrist_angle
@@ -85,9 +100,9 @@ class TrajectoryCalculator:
         result_angle = (
             0.5 * np.arcsin(
                 np.sin(phi0)
-                + constants.g
+                + (constants.g
                 * distance_to_target
-                * np.cos(phi0)
+                * np.cos(phi0))
                 / (v_effective ** 2)
             )
             + 0.5 * phi0
@@ -147,13 +162,26 @@ class TrajectoryCalculator:
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
+    
+    def get_rotation_to_speaker_moving(self):
+        speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        t_total = self.get_distance_to_target() / (self.v0_effective * np.cos(self.get_theta()))  if self.v0_effective > 0 else 0
+        
+        
+        rvels = self.get_drivetrain_speeds_field_origin()
+        
+        robot_pose_2d = self.odometry.getPose()
+        robot_pose_2d_w_speeds = robot_pose_2d + Transform2d(rvels.vx * t_total, rvels.vy * t_total, 0)
+        robot_to_speaker = speaker_translation - robot_pose_2d_w_speeds.translation()
+        return robot_to_speaker.angle()
 
     def update_base(self):
         """
         updates rotation of base to score shot
         :return: base target angle
         """
-        self.base_rotation2d = self.get_rotation_to_speaker()
+        # self.base_rotation2d = self.get_rotation_to_speaker()
+        self.base_rotation2d = self.get_rotation_to_speaker_moving()
         return self.base_rotation2d
 
     def update(self):
@@ -171,6 +199,15 @@ class TrajectoryCalculator:
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
         self.table.putNumber('delta z', self.delta_z)
+        self.table.putNumber('v effective', self.v0_effective)
+        self.table.putNumber('drivetrain speeds speaker distance', 
+            self.get_drivetrain_speeds_speaker_distance(),
+            )
+        self.table.putNumberArray('drivetrain speeds field', [
+            self.get_drivetrain_speeds_field_origin().vx,
+            self.get_drivetrain_speeds_field_origin().vy,
+            self.get_drivetrain_speeds_field_origin().omega
+        ])
         
     def run_sim(self, shooter_theta):
         def hit_target(t, u):

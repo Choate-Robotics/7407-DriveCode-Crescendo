@@ -90,7 +90,7 @@ class FieldPos:
 
         speaker_z = speaker_z_top  #(speaker_z_top + speaker_z_bottom) / 2
 
-        speaker_x = speaker_depth / 2.5
+        speaker_x = speaker_depth / 1.5
 
         amp_y = field_width
 
