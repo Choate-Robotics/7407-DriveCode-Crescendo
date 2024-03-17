@@ -13,7 +13,6 @@ from toolkit.motors.rev_motors import SparkMax
 
 from units.SI import radians_per_second, meters_per_second, radians
 
-
 class Flywheel(Subsystem):
 
     def __init__(self):
@@ -117,6 +116,10 @@ class Flywheel(Subsystem):
     def init(self) -> None:
         self.motor_1.init()
         self.motor_2.init()
+        
+        self.motor_1.optimize_sparkmax_no_position()
+        self.motor_2.optimize_sparkmax_no_position()
+        
         self.motor_1.motor.setSmartCurrentLimit(200)
         self.motor_2.motor.setSmartCurrentLimit(200)
         
