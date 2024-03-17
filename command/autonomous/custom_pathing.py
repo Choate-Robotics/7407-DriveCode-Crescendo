@@ -18,9 +18,11 @@ from robot_systems import Sensors, Field
 from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
-
-from command.autonomous.trajectory import CustomTrajectory
-
+from command import AutoPickupNote
+from command.autonomous.trajectory import CustomTrajectory, CustomTrajectoryAutoIntake
+from commands2 import ParallelCommandGroup, ParallelRaceGroup, ParallelDeadlineGroup, SequentialCommandGroup
+from subsystem import Wrist, Intake
+from sensors import Limelight
 
 class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     """
@@ -128,6 +130,14 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     def runsWhenDisabled(self) -> bool:
         return False
 
+
+class FollowPathToAutoPickup(SequentialCommandGroup):
+    
+    def __init__(trajectory: CustomTrajectoryAutoIntake, drivetrain: SwerveDrivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
+        super().__init__(
+            FollowPathCustom(drivetrain, trajectory.get_base()),
+            AutoPickupNote(drivetrain, wrist, intake)
+        )
 
 
 # Not working code, moving to drivetrain command
