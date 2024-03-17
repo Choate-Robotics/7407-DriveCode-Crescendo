@@ -20,15 +20,8 @@ from typing import Literal
 
 comp_bot: DigitalInput = DigitalInput(
     2
-)  # if true, we are using the practice bot (we will put a jumper on the DIO port)
+)  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-# from units.SI import (
-#     inches_to_meters,
-#     meters,
-#     meters_per_second,
-#     meters_per_second_squared,
-#     radians,
-# )
 
 DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION

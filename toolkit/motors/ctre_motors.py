@@ -66,7 +66,7 @@ class TalonConfig:
         if res != StatusCode.OK:
             print(res)
             print('error! config not applying')
-            raise RuntimeError
+            raise RuntimeError(f'error! config not applying| {res}')
         else:
             print('talon configured')
 
