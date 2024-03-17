@@ -136,6 +136,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
             self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 1)), radians(self.table.getNumber('velocity tolerance', 3)))
+            
+            # put graphs
         
         dx, dy = (
             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
@@ -143,13 +145,18 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         )
 
         target_angle = self.target_calc.get_bot_theta()
-        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle.radians())
+        current = bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians())
+        d_theta = self.theta_controller.calculate(current, target_angle.radians())
+        if config.drivetrain_rotation_enable_tuner:
+            self.table.putNumber('target angle', target_angle.radians())
+            self.table.putNumber('current angle', current)
+            self.table.putNumber('error', self.theta_controller.getPositionError())
+            self.table.putNumber('velocity error', self.theta_controller.getVelocityError())
         
         if self.theta_controller.atSetpoint():
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
-
         dx = curve(dx)
         dy = curve(dy)
 
