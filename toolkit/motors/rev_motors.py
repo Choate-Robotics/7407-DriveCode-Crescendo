@@ -34,6 +34,66 @@ class SparkMaxConfig:
         self.output_range = output_range
         self.idle_mode = idle_mode
 
+class RevPeriodicFrames:
+    
+
+    def k0():
+        '''
+        Applied Output, Faults, Sticky Faults, isFollower
+        
+        Default Period: 10ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus0
+    
+
+    def k1():
+        '''
+        Motor Velocity, Motor Current, Motor Voltage, Motor Temperature
+        
+        Default Period: 20ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus1
+    
+    def k2():
+        '''
+        Motor Position
+        
+        Default Period: 20ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus2
+    
+    def k3():
+        '''
+        Analog Sensor Voltage, Analog Sensor Position, Analog Sensor Velocity
+        
+        Default Period: 50ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus3
+
+    def k4():
+        '''
+        Alternate Encoder Position, Alternate Encoder Velocity
+        
+        Default Period: 20ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus4
+    
+    def k5():
+        '''
+        Duty Cycle Absolute Encoder Position, Duty Cycle Absolute Encoder Angle
+        
+        Default Period: 200ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus5
+    
+    def k6():
+        '''
+        Duty Cycle Absolute Encoder Velocity, Duty Cycle Absolute Encoder Frequency
+        
+        Default Period: 200ms
+        '''
+        return CANSparkMax.PeriodicFrame.kStatus6
+    
 
 class SparkMax(PIDMotor):
     """
@@ -48,6 +108,9 @@ class SparkMax(PIDMotor):
     _abs_encoder = None
     _get_analog = None
     _is_init: bool
+    _max_period_rev = 32767
+
+    _optimized_basic_period_rev = 15
 
     def __init__(self, can_id: int, inverted: bool = False, brushless: bool = True, config: SparkMaxConfig = None, config_others: list[SparkMaxConfig] = None):
         """
@@ -119,6 +182,8 @@ class SparkMax(PIDMotor):
         
         time.sleep(0.5) if not TimedRobot.isSimulation() else None
         self.motor.burnFlash()
+        
+        time.sleep(0.25) if not TimedRobot.isSimulation() else None
 
         self._has_init_run = True
         self._logger.complete("Initialized")
@@ -254,6 +319,78 @@ class SparkMax(PIDMotor):
     def follow(self, master: SparkMax, inverted: bool = False) -> None:
         result = self.motor.follow(master.motor, inverted)
         self.error_check(result)
+
+
+    def maximize_frame_period_rev(self, frame: RevPeriodicFrames):
+        self.motor.setPeriodicFramePeriod(frame, self._max_period_rev)
+
+    def optimize_normal_sparkmax(self):
+        """Removes Analog Sensor, Absolute Encoder, and Alternate Encoder frames
+        """
+        self.maximize_frame_period_rev(RevPeriodicFrames.k3())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k4())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k5())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k6())
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
+        
+    def optimize_sparkmax_analog_sensor(self, ms:int=20):
+        """Removes Alternate Encoder, and Duty Cycle Absolute Encoder frames
+
+        Args:
+            ms (int, optional): analog sensor frame period. Defaults to 20.
+        """
+        self.maximize_frame_period_rev(RevPeriodicFrames.k4())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k5())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k6())
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k3(), ms)
+        
+
+    def optimize_sparkmax_absolute_encoder(self, ms:int=50):
+        """Removes Analog Sensor, Alternate Encoder, and Absolute Encoder Frequency frames
+
+        Args:
+            ms (int, optional): absolute encoder frame period. Defaults to 50.
+        """
+        self.maximize_frame_period_rev(RevPeriodicFrames.k3())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k4())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k6())
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5(), ms)
+        
+    def optimize_sparkmax_absolute_encoder_all(self, ms:int=100):
+        """Removes Analog Sensor and Alternate Encoder frames. Enables all Absolute Encoder frames
+        
+            This will probably never be used, but it's here just in case
+
+        Args:
+            ms (int, optional): absolute encoder frame period. Defaults to 100.
+        """
+        self.maximize_frame_period_rev(RevPeriodicFrames.k3())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k4())
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k2(), self._optimized_basic_period_rev)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k5(), ms)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k6(), ms)
+        
+    def optimize_sparkmax_no_position(self):
+        """Removes Motor Position, Analog Sensor, Alternate Encoder, and Duty Cycle Absolute Encoder frames
+        """
+        self.maximize_frame_period_rev(RevPeriodicFrames.k2())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k3())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k4())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k5())
+        self.maximize_frame_period_rev(RevPeriodicFrames.k6())
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k0(), 10)
+        self.motor.setPeriodicFramePeriod(RevPeriodicFrames.k1(), self._optimized_basic_period_rev)
+        
 
 
     def _set_config(self, config: SparkMaxConfig, slot: int = 0):
