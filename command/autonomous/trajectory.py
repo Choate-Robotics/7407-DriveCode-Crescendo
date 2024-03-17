@@ -56,7 +56,9 @@ class CustomTrajectory:
         
         # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
         
-        active_start_pose, active_waypoints, active_end_pose = self.start_pose,[], self.end_pose
+        waypoints: list[Translation2d] = []
+        
+        active_start_pose, active_waypoints, active_end_pose = self.start_pose,waypoints, self.end_pose
         
         if isinstance(self.start_pose, POIPose):
             active_start_pose = self.start_pose.get()
@@ -69,7 +71,7 @@ class CustomTrajectory:
             
         for i, waypoint in enumerate(self.waypoints):
             if isinstance(waypoint, POIPose):
-                active_waypoints = waypoint.get().translation()
+                active_waypoints += [waypoint.get().translation()]
 
         if isinstance(self.end_pose, POIPose):
             active_end_pose = self.end_pose.get()
