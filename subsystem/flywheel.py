@@ -27,64 +27,64 @@ class Flywheel(Subsystem):
             config=config.FLYWHEEL_CONFIG
         )
 
-        self.flywheel_MOI = (constants.flywheel_mass / 2) * (constants.flywheel_radius_outer ** 2)
+        # self.flywheel_MOI = (constants.flywheel_mass / 2) * (constants.flywheel_radius_outer ** 2)
         
-        self.shaft_MOI = (constants.flywheel_shaft_mass / 2) * (constants.flywheel_shaft_radius ** 2)
+        # self.shaft_MOI = (constants.flywheel_shaft_mass / 2) * (constants.flywheel_shaft_radius ** 2)
         
-        self.total_MOI = self.flywheel_MOI + self.shaft_MOI
+        # self.total_MOI = .001284
 
-        self.flywheel_plant_top = LinearSystemId().flywheelSystem(
-            DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
-        )
+        # self.flywheel_plant_top = LinearSystemId().flywheelSystem(
+        #     DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
+        # )
         
-        self.flywheel_plant_bottom = LinearSystemId().flywheelSystem(
-            DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
-        )
+        # self.flywheel_plant_bottom = LinearSystemId().flywheelSystem(
+        #     DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
+        # )
         
-        self.flywheel_observer_top = KalmanFilter_1_1_1(
-            self.flywheel_plant_top,
-            [3.0],  # how accurate we think our model is
-            [0.02],  # how accurate we think our encoder data is
-            config.period
-        )
+        # self.flywheel_observer_top = KalmanFilter_1_1_1(
+        #     self.flywheel_plant_top,
+        #     [3.0],  # how accurate we think our model is
+        #     [0.01],  # how accurate we think our encoder data is
+        #     config.period
+        # )
         
-        self.flywheel_observer_bottom = KalmanFilter_1_1_1(
-            self.flywheel_plant_bottom,
-            [3.0],  # how accurate we think our model is
-            [0.02],  # how accurate we think our encoder data is
-            config.period
-        )
+        # self.flywheel_observer_bottom = KalmanFilter_1_1_1(
+        #     self.flywheel_plant_bottom,
+        #     [3.0],  # how accurate we think our model is
+        #     [0.01],  # how accurate we think our encoder data is
+        #     config.period
+        # )
         
-        self.flywheel_controller_top = LinearQuadraticRegulator_1_1(
-            self.flywheel_plant_top,
-            [0.15],  # velocity error tolerance
-            [12.0],  # control effort tolerance
-            config.period
-        )
+        # self.flywheel_controller_top = LinearQuadraticRegulator_1_1(
+        #     self.flywheel_plant_top,
+        #     [1.5],  # velocity error tolerance
+        #     [12.0],  # control effort tolerance
+        #     config.period
+        # )
         
-        self.flywheel_controller_bottom = LinearQuadraticRegulator_1_1(
-            self.flywheel_plant_bottom,
-            [0.15],  # velocity error tolerance
-            [12.0],  # control effort tolerance
-            config.period
-        )
+        # self.flywheel_controller_bottom = LinearQuadraticRegulator_1_1(
+        #     self.flywheel_plant_bottom,
+        #     [1.5],  # velocity error tolerance
+        #     [12.0],  # control effort tolerance
+        #     config.period
+        # )
         
-        self.flywheel_controller_top.latencyCompensate(self.flywheel_plant_top, config.period, 0.025)
-        self.flywheel_controller_bottom.latencyCompensate(self.flywheel_plant_bottom, config.period, 0.025)
-        self.top_flywheel_state = LinearSystemLoop_1_1_1(
-            self.flywheel_plant_top,
-            self.flywheel_controller_top,
-            self.flywheel_observer_top,
-            12.0,
-            config.period
-        )
-        self.bottom_flywheel_state = LinearSystemLoop_1_1_1(
-            self.flywheel_plant_bottom,
-            self.flywheel_controller_bottom,
-            self.flywheel_observer_bottom,
-            12.0,
-            config.period
-        )
+        # self.flywheel_controller_top.latencyCompensate(self.flywheel_plant_top, config.period, 0.025)
+        # self.flywheel_controller_bottom.latencyCompensate(self.flywheel_plant_bottom, config.period, 0.025)
+        # self.top_flywheel_state = LinearSystemLoop_1_1_1(
+        #     self.flywheel_plant_top,
+        #     self.flywheel_controller_top,
+        #     self.flywheel_observer_top,
+        #     12.0,
+        #     config.period
+        # )
+        # self.bottom_flywheel_state = LinearSystemLoop_1_1_1(
+        #     self.flywheel_plant_bottom,
+        #     self.flywheel_controller_bottom,
+        #     self.flywheel_observer_bottom,
+        #     12.0,
+        #     config.period
+        # )
 
         self.ready_to_shoot: bool = False
         self.initialized: bool = False
@@ -129,6 +129,8 @@ class Flywheel(Subsystem):
         self.motor_1.motor.burnFlash()
 
         self.initialized = True
+        self.flywheel_top_target = 0
+        self.flywheel_bottom_target = 0
 
     def note_shot(self) -> bool:
         return self.get_current(1) > config.flywheel_shot_current_threshold \
@@ -136,12 +138,22 @@ class Flywheel(Subsystem):
 
     def set_velocity(self, angular_velocity: radians_per_second, motor=0) -> None:
         if motor == 1:
-            self.top_flywheel_state.setNextR([angular_velocity])
+            # self.top_flywheel_state.setNextR([angular_velocity])
+            self.flywheel_top_target = angular_velocity
+            self.motor_1.set_target_velocity(self.angular_velocity_to_rpm(angular_velocity), 0)
         elif motor == 2:
-            self.bottom_flywheel_state.setNextR([angular_velocity])
+            # self.bottom_flywheel_state.setNextR([angular_velocity])
+            self.flywheel_bottom_target = angular_velocity
+            self.motor_2.set_target_velocity(self.angular_velocity_to_rpm(angular_velocity), 0)
         else:
-            self.top_flywheel_state.setNextR([angular_velocity])
-            self.bottom_flywheel_state.setNextR([angular_velocity])
+            # self.top_flywheel_state.setNextR([angular_velocity])
+            self.flywheel_top_target = angular_velocity
+            self.flywheel_bottom_target = angular_velocity
+            self.motor_1.set_target_velocity(self.angular_velocity_to_rpm(angular_velocity), 0)
+            
+            # self.bottom_flywheel_state.setNextR([angular_velocity])
+            self.motor_2.set_target_velocity(self.angular_velocity_to_rpm(angular_velocity), 0)
+            
 
     def set_velocity_linear(self, linear_velocity: meters_per_second, motor=0) -> None:
         angular_velocity = linear_velocity / constants.flywheel_radius_outer
@@ -233,19 +245,19 @@ class Flywheel(Subsystem):
 
     def periodic(self):
 
-        # Correct the state estimate with the encoder and voltage
-        self.top_flywheel_state.correct([self.get_velocity(1)])
-        self.bottom_flywheel_state.correct([self.get_velocity(2)])
+        # # Correct the state estimate with the encoder and voltage
+        # self.top_flywheel_state.correct([self.get_velocity(1)])
+        # self.bottom_flywheel_state.correct([self.get_velocity(2)])
 
-        # Update our LQR to generate new voltage commands and use the voltage
-        self.top_flywheel_state.predict(config.period)
-        self.bottom_flywheel_state.predict(config.period)
+        # # Update our LQR to generate new voltage commands and use the voltage
+        # self.top_flywheel_state.predict(config.period)
+        # self.bottom_flywheel_state.predict(config.period)
 
-        # # Set the next setpoint for the flywheel
-        self.set_voltage(self.top_flywheel_state.U(0), 1)
-        self.set_voltage(self.bottom_flywheel_state.U(0), 2)
+        # # # Set the next setpoint for the flywheel
+        # self.set_voltage(self.top_flywheel_state.U(0), 1)
+        # self.set_voltage(self.bottom_flywheel_state.U(0), 2)
 
-        if self.within_velocity_linear(self.angular_velocity_to_linear_velocity(self.top_flywheel_state.nextR(0)), config.flywheel_shot_tolerance):
+        if self.within_velocity_linear(self.angular_velocity_to_linear_velocity(self.flywheel_top_target), config.flywheel_shot_tolerance):
             self.ready_to_shoot = True
         else:
             self.ready_to_shoot = False
@@ -255,8 +267,9 @@ class Flywheel(Subsystem):
         table.putNumber('flywheel bottom velocity', self.get_velocity_linear(2))
         table.putBoolean('ready to shoot', self.ready_to_shoot)
         table.putBoolean('note shot', self.note_shot())
-        table.putNumber('flywheel top target', self.angular_velocity_to_linear_velocity(self.top_flywheel_state.nextR(0)))
-        table.putNumber('flywheel bottom target', self.angular_velocity_to_linear_velocity(self.bottom_flywheel_state.nextR(0)))
+        table.putNumber('flywheel top velocity rpm', self.motor_1.get_sensor_velocity())
+        table.putNumber('flywheel top target', self.angular_velocity_to_linear_velocity(self.flywheel_top_target))
+        table.putNumber('flywheel bottom target', self.angular_velocity_to_linear_velocity(self.flywheel_bottom_target))
         table.putNumber('flywheel top voltage', self.get_voltage(1))
         table.putNumber('flywheel bottom voltage', self.get_voltage(2))
         table.putNumber('flywheel top current', self.get_current(1))

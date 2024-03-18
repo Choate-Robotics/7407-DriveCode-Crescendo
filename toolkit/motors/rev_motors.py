@@ -268,14 +268,14 @@ class SparkMax(PIDMotor):
         result = self.pid_controller.setReference(pos, CANSparkMax.ControlType.kPosition, arbFeedforward=arbff, pidSlot=slot)
         self.error_check(result)
 
-    def set_target_velocity(self, vel: rotations_per_second):  # Rotations per minute??
+    def set_target_velocity(self, vel: rotations_per_second, arbff: float = 0):  # Rotations per minute??
         """
         Sets the target velocity of the motor controller in rotations per second
 
         Args:
             vel (float): The target velocity of the motor controller in rotations per second
         """
-        result = self.pid_controller.setReference(vel, CANSparkMax.ControlType.kVelocity)
+        result = self.pid_controller.setReference(vel, CANSparkMax.ControlType.kVelocity, arbFeedforward=arbff)
         self.error_check(result)
 
     def set_target_voltage(self, voltage: float):

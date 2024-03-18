@@ -115,7 +115,7 @@ class AimWrist(SubsystemCommand[Wrist]):
         
         self.subsystem.set_wrist_angle(self.traj_calc.get_theta())
 
-        if self.subsystem.is_at_angle(self.traj_calc.get_theta()):
+        if self.subsystem.is_at_angle(self.traj_calc.get_theta(), math.radians(.5)):
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
