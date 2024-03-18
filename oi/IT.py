@@ -69,15 +69,16 @@ class IT:
                 InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
                     Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
                     1
-                )).andThen(
-                    WaitCommand(5).andThen(
-                        InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
-                            Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
-                            0
-                        )
-                        )
-                    )
-                )
+                ))\
+                #     .andThen(
+                #     WaitCommand(5).andThen(
+                #         InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
+                #             Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
+                #             0
+                #         )
+                #         )
+                #     )
+                # )
             ).onFalse(
                 InstantCommand(lambda: Controllers.DRIVER_CONTROLLER.setRumble(
                     Controllers.DRIVER_CONTROLLER.RumbleType.kBothRumble,
