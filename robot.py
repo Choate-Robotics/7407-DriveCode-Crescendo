@@ -127,53 +127,31 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
 
-
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
             constants.FieldPos.Scoring.speaker_y = (218.42 * inches_to_meters + 0.2) - 4 * inches_to_meters
-
+        
         Field.POI.setNTValues()
-
+        
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
-
-
+        
         self.handle(self.scheduler.run)
-
-
+        
         self.handle(Sensors.limelight_back.update)
         self.handle(Sensors.limelight_front.update)
         self.handle(Sensors.limelight_intake.update)
-
-
+        
         self.handle(Field.odometry.update)
-
-
-
+        
         self.handle(Field.calculations.update)
-
+        
         self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
         if not self.isSimulation():
             self.nt.getTable('swerve').putBoolean('comp bot', config.comp_bot.get())
-
-        # self.nt.getTable('swerve').putNumber('abs front right', Robot.drivetrain.get_abs()[1])
-        # self.nt.getTable('swerve').putNumber('front right rotation',
-        #                                      Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi))
-        # self.nt.getTable('swerve').putNumber('front right rotation error',
-        #                                      (Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi)) -
-        #                                      Robot.drivetrain.get_abs()[1])
-
-        # print(config.elevator_zeroed_pos)
-        # print(Robot.wrist.distance_sensor.getVoltage())
-        # print(Robot.intake.distance_sensor.getVoltage())
-        # print(DigitalInput(0).get())
-
-        # self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
-        # self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
-        # print(config.WRIST_CONFIG.k_P)
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
@@ -190,7 +168,7 @@ class _Robot(wpilib.TimedRobot):
         IT.map_systems()
 
         self.scheduler.schedule(commands2.SequentialCommandGroup(
-            # command.DrivetrainZero(Robot.drivetrain),
+            command.DrivetrainZero(Robot.drivetrain),
             command.DriveSwerveCustom(Robot.drivetrain),
         )
         )
