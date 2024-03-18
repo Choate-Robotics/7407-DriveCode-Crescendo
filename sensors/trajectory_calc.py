@@ -75,7 +75,7 @@ class TrajectoryCalculator:
         
         # Calculate the effective velocity
         # v_effective = self.flywheel.get_velocity_linear() + rvx * np.cos(drivetrain_angle.radians()) + rvy * np.cos(drivetrain_angle.radians())
-        v_effective = config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar# + rvx + rvy
+        v_effective = self.get_flywheel_speed(distance_to_target)# + rvx + rvy
         # v_effective = config.v0_flywheel
 
         if v_effective == 0:
@@ -97,6 +97,9 @@ class TrajectoryCalculator:
             result_angle = config.Giraffe.kIdle.wrist_angle
 
         return result_angle
+    
+    def get_flywheel_speed(self, distance_to_target: float) -> float:
+        return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
     def update_shooter(self):
         """
