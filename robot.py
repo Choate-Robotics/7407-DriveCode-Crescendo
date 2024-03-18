@@ -26,6 +26,10 @@ class _Robot(wpilib.TimedRobot):
         super().__init__()
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
+        
+        # Updates networktables at 100hz (dont use unless graphing PID values)
+        self.nt.flush()
+        
         self.scheduler = commands2.CommandScheduler.getInstance()
 
     def handle(self, func, *args, **kwargs):
