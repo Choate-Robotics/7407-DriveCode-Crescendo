@@ -29,14 +29,14 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Shooter.AIM.and_(lambda: states.amping)\
+        Keymap.Shooter.AMP\
             .and_(lambda: config.active_team == config.Team.RED).whileTrue(
                 command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(-90))
             ).onFalse(
                 command.DriveSwerveCustom(Robot.drivetrain)
             )
             
-        Keymap.Shooter.AIM.and_(lambda: states.amping)\
+        Keymap.Shooter.AMP\
             .and_(lambda: config.active_team == config.Team.BLUE).whileTrue(
                 command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(90))
             ).onFalse(
@@ -44,6 +44,7 @@ class OI:
             )
         
         Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
+            .and_(lambda: not states.amping)\
             .whileTrue(
                 command.AimWrist(Robot.wrist, Field.calculations)
             ).onFalse(
