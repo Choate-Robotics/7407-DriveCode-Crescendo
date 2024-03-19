@@ -1,20 +1,22 @@
-from autonomous.auto_routine import AutoRoutine
-from commands2 import (
+# import math
+
+from commands2 import (  # ParallelCommandGroup,; WaitCommand,
     InstantCommand,
     SequentialCommandGroup,
 )
 from wpimath.geometry import Pose2d
 
-from autonomous.routines.DRIVE_STRAIGHT.coords import (
-    initial,
-)
+# import config
+from autonomous.auto_routine import AutoRoutine
+from autonomous.routines.ROTATE.coords import initial, start_rotating
+
+# from command import *
+from command.autonomous.custom_pathing import FollowPathCustom
+from command.autonomous.trajectory import CustomTrajectory, PoseType
 from robot_systems import Robot
-from units.SI import meters_per_second, meters_per_second_squared
 
-import math
-
-max_vel: meters_per_second = 3
-max_accel: meters_per_second_squared = 2
+# max_vel: meters_per_second = 3
+# max_accel: meters_per_second_squared = 2
 
 
 # path_1 = RotateInPlace(
@@ -22,9 +24,24 @@ max_accel: meters_per_second_squared = 2
 #     theta_f=math.pi/2
 # )
 #
-# auto = SequentialCommandGroup(
-#     path_1,
-#     InstantCommand(lambda: print("Done")),
-# )
+auto = SequentialCommandGroup(
+    start_rotating,
+    InstantCommand(lambda: print("Done")),
+)
+path_1 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        # start_pose=POIPose(Pose2d(*get_first_note[0])),
+        start_pose=PoseType.current,
+        waypoints=[],
+        end_pose=start_rotating[2],
+        max_velocity=5,
+        max_accel=2,
+        start_velocity=0,
+        end_velocity=0,
+        rev=True,
+    ),
+)
 
-# routine = AutoRoutine(Pose2d(*initial), auto, blue_team=blue_team)
+auto = SequentialCommandGroup(path_1, InstantCommand(lambda: print("Done")))
+routine = AutoRoutine(Pose2d(*initial), auto)
