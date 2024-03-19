@@ -32,6 +32,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     :type trajectory: CustomTrajectory
     :param period: The period of the controller, defaults to 0.02
     :type period: float, optional
+    :param theta_f: Desired angle in radians of the robot at the end of the trajectory
+    :type theta_f: float
     """
 
     def __init__(
@@ -39,6 +41,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             subsystem: SwerveDrivetrain,
             trajectory: CustomTrajectory,
             period: float = config.period,
+            theta_f: float = 0
     ):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
@@ -46,9 +49,9 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             PIDController(8, 0, 0, period),
             PIDController(8, 0, 0, period),
             ProfiledPIDControllerRadians(
-                0.05,
+                3,
                 0,
-                0.02,
+                0,
                 TrapezoidProfileRadians.Constraints(
                     subsystem.max_angular_vel, subsystem.max_angular_vel / 0.001  # .001
                 ),
@@ -58,7 +61,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.start_time = 0
         self.t = 0
         self.theta_i: float | None = None
-        self.theta_f: float | None = None
+        self.theta_f: float = theta_f
         self.theta_diff: float | None = None
         self.omega: float | None = None
         
@@ -70,7 +73,6 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
         self.start_time = time.perf_counter()
         self.theta_i = Field.odometry.getPose().rotation().radians()
-        self.theta_f = self.end_pose.rotation().radians()
         self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
         # self.omega = self.theta_diff / self.duration
         self.finished = False
@@ -100,16 +102,21 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         if (
                 abs(relative.x) < 0.03
                 and abs(relative.y) < 0.03
-                and abs(relative.rotation().degrees()) < 2
+                and abs(bounded_angle_diff(self.theta_f - self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians())) < 2
                 or self.t > self.duration
         ):
             self.t = self.duration
             self.finished = True
 
         goal = self.trajectory.sample(self.t)
-        # goal_theta = self.theta_i + self.omega * self.t
+        goal_theta = self.theta_i + self.t/self.duration*self.theta_diff
+        table = ntcore.NetworkTableInstance.getDefault().getTable('Auto')
+        table.putNumber("theta_i", self.theta_i)
+        table.putNumber("theta_f", self.theta_f)
+        table.putNumber("theta_diff", self.theta_diff)
+        table.putNumber("goal_theta", goal_theta)
         speeds = self.controller.calculate(
-            Field.odometry.getPose(), goal, goal.pose.rotation()
+            Field.odometry.getPose(), goal, Rotation2d(goal_theta)
         )
 
 

@@ -1,5 +1,6 @@
+import math
 from command.autonomous.custom_pathing import FollowPathCustom
-from command.autonomous.trajectory import CustomTrajectory
+from command.autonomous.trajectory import CustomTrajectory, PoseType
 from robot_systems import Robot
 
 from commands2 import (
@@ -31,12 +32,14 @@ path_1 = FollowPathCustom(
         rev=False,
     ),
     period=0.03,
+    theta_f=math.radians(90)
 )
 
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=Pose2d(*drive_left[0]),
+        # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in drive_left[1]],
         end_pose=Pose2d(*drive_left[2]),
         max_velocity=1.5,
@@ -46,12 +49,14 @@ path_2 = FollowPathCustom(
         rev=False,
     ),
     period=0.03,
+    theta_f=math.radians(180)
 )
 
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=Pose2d(*drive_back[0]),
+        # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in drive_back[1]],
         end_pose=Pose2d(*drive_back[2]),
         max_velocity=1.5,
@@ -61,12 +66,14 @@ path_3 = FollowPathCustom(
         rev=True,
     ),
     period=0.03,
+    theta_f=math.radians(-90)
 )
 
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=Pose2d(*drive_right[0]),
+        # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in drive_right[1]],
         end_pose=Pose2d(*drive_right[2]),
         max_velocity=1.5,
@@ -76,6 +83,7 @@ path_4 = FollowPathCustom(
         rev=True,
     ),
     period=0.03,
+    theta_f=math.radians(0)
 )
 
 auto = SequentialCommandGroup(

@@ -56,6 +56,7 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
         self.auto_selection.addOption("Four Note Middle", autonomous.four_note_middle)
+        self.auto_selection.addOption("SQUARE of death", autonomous.square)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
@@ -120,6 +121,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.complete("Robot initialized")
 
         Robot.wrist.zero_wrist()
+        Field.odometry.disable()
 
     def robotPeriodic(self):
 
