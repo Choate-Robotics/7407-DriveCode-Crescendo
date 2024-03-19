@@ -12,7 +12,7 @@ from autonomous.routines.ROTATE.coords import initial, start_rotating
 
 # from command import *
 from command.autonomous.custom_pathing import FollowPathCustom
-from command.autonomous.trajectory import CustomTrajectory, PoseType
+from command.autonomous.trajectory import CustomTrajectory
 from robot_systems import Robot
 
 # max_vel: meters_per_second = 3
@@ -32,7 +32,7 @@ path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         # start_pose=POIPose(Pose2d(*get_first_note[0])),
-        start_pose=PoseType.current,
+        start_pose=initial,
         waypoints=[],
         end_pose=start_rotating[2],
         max_velocity=5,
