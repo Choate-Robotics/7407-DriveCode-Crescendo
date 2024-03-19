@@ -36,7 +36,7 @@ class _Robot(wpilib.TimedRobot):
         self.nt = ntcore.NetworkTableInstance.getDefault()
 
         # Updates networktables at 100hz (dont use unless graphing PID values)
-        self.nt.flush()
+        # self.nt.flush()
 
         self.scheduler = commands2.CommandScheduler.getInstance()
 
