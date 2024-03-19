@@ -59,8 +59,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        self.auto_selection.setDefaultOption("Rotate", autonomous.rotate)
-        self.auto_selection.addOption("Two Notes", autonomous.two_note)
+        self.auto_selection.setDefaultOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Left Four Notes", autonomous.left_four_note)

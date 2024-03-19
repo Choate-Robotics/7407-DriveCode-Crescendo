@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from phoenix6 import hardware, configs, signals, controls, StatusCode, StatusSignal
+from phoenix6 import StatusCode, StatusSignal, configs, controls, hardware, signals
 
 from toolkit.motor import PIDMotor
 from units.SI import rotations, rotations_per_second
@@ -20,19 +20,30 @@ class TalonConfig:
     break_mode: bool
     output_range: tuple[float, float]
 
-    def __init__(self, kP: float, kI: float, kD: float, kF: float, kA: float, current_limit: int = 80,
-                 brake_mode: bool = True, output_range: tuple[float, float] = (-1, 1)):
+    def __init__(
+        self,
+        kP: float,
+        kI: float,
+        kD: float,
+        kF: float,
+        kA: float,
+        current_limit: int = 80,
+        brake_mode: bool = True,
+        output_range: tuple[float, float] = (-1, 1),
+        kV: float = 0,
+    ):
         self.kP = kP
         self.kI = kI
         self.kD = kD
         self.kF = kF
         self.kA = kA
+        self.kV = kV
         self.current_limit = current_limit
         self.brake_mode = brake_mode
         self.output_range = output_range
 
     def _apply_settings(self, motor: hardware.TalonFX, inverted: bool = False):
-        print('applying settings to Talon')
+        print("applying settings to Talon")
         talon_config = configs.TalonFXConfiguration()
 
         # PID
@@ -42,19 +53,29 @@ class TalonConfig:
         pid.k_d = self.kD
         pid.k_s = self.kF
         pid.k_a = self.kA
+        pid.k_v = self.kV
 
         # current limits
         current_limits_config = talon_config.current_limits
         current_limits_config.stator_current_limit = self.current_limit
-        current_limits_config.stator_current_limit_enable = True if self.current_limit > 0 else False
+        current_limits_config.stator_current_limit_enable = (
+            True if self.current_limit > 0 else False
+        )
         current_limits_config.supply_time_threshold = 1
         # current_limits_config.
 
-
         # brake mode
         brake_mode_config = talon_config.motor_output
-        brake_mode_config.neutral_mode = signals.NeutralModeValue.BRAKE if self.brake_mode else signals.NeutralModeValue.COAST
-        brake_mode_config.inverted = signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE if inverted else signals.InvertedValue.CLOCKWISE_POSITIVE
+        brake_mode_config.neutral_mode = (
+            signals.NeutralModeValue.BRAKE
+            if self.brake_mode
+            else signals.NeutralModeValue.COAST
+        )
+        brake_mode_config.inverted = (
+            signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+            if inverted
+            else signals.InvertedValue.CLOCKWISE_POSITIVE
+        )
 
         # motion magic
         magic = talon_config.motion_magic
@@ -64,10 +85,10 @@ class TalonConfig:
         res = motor.configurator.apply(talon_config)
         if res != StatusCode.OK:
             print(res)
-            print('error! config not applying')
-            raise RuntimeError(f'Talon config not applying {res}')
+            print("error! config not applying")
+            raise RuntimeError(f"Talon config not applying {res}")
         else:
-            print('talon configured')
+            print("talon configured")
 
 
 class TalonFX(PIDMotor):
@@ -92,10 +113,17 @@ class TalonFX(PIDMotor):
     _foc: bool
 
     _inverted: bool
-    
+
     _optimized: bool
 
-    def __init__(self, can_id: int, foc: bool = True, inverted: bool = False, config: TalonConfig = None, optimize: bool = True):
+    def __init__(
+        self,
+        can_id: int,
+        foc: bool = True,
+        inverted: bool = False,
+        config: TalonConfig = None,
+        optimize: bool = True,
+    ):
         self._inverted = inverted
         self._foc = foc
         self._can_id = can_id
@@ -103,20 +131,20 @@ class TalonFX(PIDMotor):
         self._optimized = optimize
 
     def init(self):
-        print('Initializing TalonFX', self._can_id)
-        self._motor = hardware.TalonFX(self._can_id, 'rio')
+        print("Initializing TalonFX", self._can_id)
+        self._motor = hardware.TalonFX(self._can_id, "rio")
         self._config = self._motor.configurator
         self._motor_pos = self._motor.get_position()
         self._motor_vel = self._motor.get_velocity()
         self._motor_current = self._motor.get_torque_current()
         if self._talon_config is not None:
             self._talon_config._apply_settings(self._motor, self._inverted)
-            
+
         self.__setup_controls()
-        
+
         if self._optimized:
             if self.optimize_normal_operation() == StatusCode.OK:
-                print('talon optimized')
+                print("talon optimized")
 
     def __setup_controls(self):
         self._mm_v_v = controls.MotionMagicVelocityVoltage(0)
@@ -133,7 +161,9 @@ class TalonFX(PIDMotor):
     def set_sensor_position(self, pos: rotations) -> StatusCode.OK:
         return self._motor.set_position(pos)
 
-    def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0) -> StatusCode.OK:
+    def set_target_velocity(
+        self, vel: rotations_per_second, accel: rotations_per_second_squared = 0
+    ) -> StatusCode.OK:
         # print('going', vel, 'rotations per second')
         return self._motor.set_control(self._mm_v_v.with_velocity(vel))
         # return self._motor.set_control(controls.VoltageOut(vel))
@@ -152,11 +182,11 @@ class TalonFX(PIDMotor):
     def get_motor_current(self) -> float:
         self._motor_current.refresh()
         return self._motor_current.value
-    
-    def optimize_normal_operation(self, ms:int=25) -> StatusCode.OK:
+
+    def optimize_normal_operation(self, ms: int = 25) -> StatusCode.OK:
         """removes every status signal except for motor position, current, and velocty to optimize bus utilization
 
-        Args: 
+        Args:
             ms: (int, optional) the update frequency of the status signals (default is 25ms)
 
         Returns:

@@ -273,6 +273,7 @@ WRIST_CONFIG = SparkMaxConfig(
     0.2, 0, 10, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
+
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 INNER_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -281,13 +282,17 @@ OUTER_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBra
 
 DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
-FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.0005,
-    0.0,
-    0.0003,
-    flywheel_feed_forward,
-    idle_mode=rev.CANSparkMax.IdleMode.kCoast,
+# FLYWHEEL_CONFIG = SparkMaxConfig(
+#     0.0005,
+#     0.0,
+#     0.0003,
+#     flywheel_feed_forward,
+#     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
+# )
+FLYWHEEL_CONFIG = TalonConfig(
+    0.5, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
+
 
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
