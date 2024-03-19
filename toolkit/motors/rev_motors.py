@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time  # noqa
 
-import LocalLogger  # noqa
+from utils import LocalLogger  # noqa
 import rev
 from rev import CANSparkMax, REVLibError, SparkMaxPIDController, SparkMaxRelativeEncoder
 from wpilib import TimedRobot

@@ -318,7 +318,7 @@ class DriveSwerveHoldRotationIndef(SubsystemCommand[Drivetrain]):
         )
 
         target_angle = self.target_calc
-        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle.radians())
+        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle)
 
         dx = curve(dx)
         dy = curve(dy)

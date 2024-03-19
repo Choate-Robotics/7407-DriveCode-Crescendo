@@ -31,14 +31,14 @@ class OI:
         
         Keymap.Shooter.AIM.and_(lambda: states.amping)\
             .and_(lambda: config.active_team == config.Team.RED).whileTrue(
-                command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(90))
+                command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(-90))
             ).onFalse(
                 command.DriveSwerveCustom(Robot.drivetrain)
             )
             
         Keymap.Shooter.AIM.and_(lambda: states.amping)\
             .and_(lambda: config.active_team == config.Team.BLUE).whileTrue(
-                command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(-90))
+                command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(90))
             ).onFalse(
                 command.DriveSwerveCustom(Robot.drivetrain)
             )
