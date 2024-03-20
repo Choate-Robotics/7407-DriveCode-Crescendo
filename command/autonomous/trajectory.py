@@ -1,5 +1,9 @@
+from enum import Enum
+
 from wpimath.geometry import Pose2d, Translation2d
 from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
+
+# import config
 from robot_systems import Field
 from utils import POIPose
 import config
@@ -40,7 +44,11 @@ class CustomTrajectory:
         start_velocity: float = 0,
         end_velocity: float = 0,
         rev: bool = False,
-        obstacles: list[POIPose] = [Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost, Field.POI.Coordinates.Structures.Obstacles.kStageRightPost, Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost]
+        obstacles: list[POIPose] = [
+            Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost,
+            Field.POI.Coordinates.Structures.Obstacles.kStageRightPost,
+            Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost,
+        ],
     ):
         self.start_pose = start_pose
         self.waypoints = waypoints
@@ -51,9 +59,8 @@ class CustomTrajectory:
         self.end_velocity = end_velocity
         self.rev = rev
         self.obstacles = obstacles
-        
+
     def generate(self):
-        
         # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
         
         waypoints: list[Translation2d] = []
@@ -85,8 +92,7 @@ class CustomTrajectory:
         config.setStartVelocity(self.start_velocity)
         config.setEndVelocity(self.end_velocity)
         config.setReversed(self.rev)
-        
-        
+
         self.trajectory = TrajectoryGenerator.generateTrajectory(
             start=active_start_pose,
             interiorWaypoints=active_waypoints,
