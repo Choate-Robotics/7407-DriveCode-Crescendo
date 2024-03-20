@@ -220,6 +220,8 @@ drivetrain_reversed: bool = False
 drivetrain_rotation_P: float = 10
 drivetrain_rotation_I: float = 0.0
 drivetrain_rotation_D: float = 0.1
+drivetrain_aiming_max_angular_speed: radians = constants.drivetrain_max_angular_vel
+drivetrain_aiming_max_angular_accel: radians = constants.drivetrain_max_angular_accel
 drivetrain_aiming_offset: degrees = 0.0 # degrees
 drivetrain_rotation_enable_tuner: bool = True
 
