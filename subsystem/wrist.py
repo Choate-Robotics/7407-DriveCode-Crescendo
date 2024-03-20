@@ -219,7 +219,7 @@ class Wrist(Subsystem):
         self.table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
         # table.putNumber('wrist abs raw', self.wrist_abs_encoder.getPosition())
         self.table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
-        self.table.putBoolean('note in feeder', self.note_staged)
+        self.table.putBoolean('note in feeder', self.note_in_feeder())
         self.table.putBoolean('note detected', self.note_detected())
         self.table.putBoolean('wrist zeroed', self.wrist_zeroed)
         self.table.putBoolean('ready to shoot', self.ready_to_shoot)
