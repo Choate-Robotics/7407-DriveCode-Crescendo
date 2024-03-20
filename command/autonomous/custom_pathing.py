@@ -132,7 +132,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         dtheta = self.theta_controller.calculate(Field.odometry.getPose().rotation().radians(), self.theta_f)
 
 
-        self.subsystem.set_driver_centric((dx, dy), -dtheta)
+        self.subsystem.set_driver_centric((-dx, -dy), -dtheta)
 
     def isFinished(self) -> bool:
         return self.finished

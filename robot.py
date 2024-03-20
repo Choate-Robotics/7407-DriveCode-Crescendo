@@ -137,7 +137,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.complete("Robot initialized")
 
         Robot.wrist.zero_wrist()
-        Field.odometry.disable()
+        # Field.odometry.disable()
 
     def robotPeriodic(self):
         if self.team_selection.getSelected() == config.Team.BLUE:
