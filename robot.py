@@ -1,23 +1,31 @@
+import math  # noqa
+import time
+from math import degrees, pi, radians  # noqa
+
 import commands2
-from toolkit.subsystem import Subsystem
 import ntcore
 import wpilib
+from wpilib import SmartDashboard  # noqa
+from wpimath.geometry import Pose2d, Rotation2d  # noqa
+
+import autonomous
 import command
 import config
 import constants
-from robot_systems import Robot, Pneumatics, Sensors, LEDs, PowerDistribution, Field
-import sensors
-import subsystem
+import sensors  # noqa
+import subsystem  # noqa
 import utils
-from oi.OI import OI
 from oi.IT import IT
-from wpilib import SmartDashboard
-import autonomous
-import math
-from math import degrees, radians, pi
-import time
-from wpimath.geometry import Rotation2d, Pose2d
-
+from oi.OI import OI
+from robot_systems import (  # noqa
+    Field,
+    LEDs,
+    Pneumatics,
+    PowerDistribution,
+    Robot,
+    Sensors,
+)
+from toolkit.subsystem import Subsystem
 from units.SI import inches_to_meters
 
 
@@ -26,6 +34,10 @@ class _Robot(wpilib.TimedRobot):
         super().__init__()
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
+
+        # Updates networktables at 100hz (dont use unless graphing PID values)
+        # self.nt.flush()
+
         self.scheduler = commands2.CommandScheduler.getInstance()
 
     def handle(self, func, *args, **kwargs):
@@ -33,7 +45,7 @@ class _Robot(wpilib.TimedRobot):
             func(*args, **kwargs)
         except Exception as e:
             self.log.error(str(e))
-            self.nt.getTable('errors').putString(func.__name__, str(e))
+            self.nt.getTable("errors").putString(func.__name__, str(e))
 
             if config.DEBUG_MODE:
                 raise e
@@ -76,12 +88,11 @@ class _Robot(wpilib.TimedRobot):
                 Robot.intake,
                 Robot.flywheel,
             ]
-            
+
             time.sleep(0.2)
-            for subsystem in subsystems:
+            for subsystem in subsystems:  # noqa
                 subsystem.init()
                 time.sleep(0.2)
-
 
         # try:
         #     init_subsystems()
@@ -95,8 +106,12 @@ class _Robot(wpilib.TimedRobot):
         self.handle(init_subsystems)
 
         def init_sensors():
-            sensors: list[Sensors] = list(
-                {k: v for k, v in Sensors.__dict__.items() if isinstance(v, Sensors) and hasattr(v, 'init')}.values()
+            sensors: list[Sensors] = list(  # noqa
+                {
+                    k: v
+                    for k, v in Sensors.__dict__.items()
+                    if isinstance(v, Sensors) and hasattr(v, "init")
+                }.values()
             )
 
             # for sensor in sensors:
@@ -116,97 +131,44 @@ class _Robot(wpilib.TimedRobot):
         #         raise e
 
         self.handle(init_sensors)
+        Field.calculations.tuning = True
 
         self.log.complete("Robot initialized")
 
         Robot.wrist.zero_wrist()
 
     def robotPeriodic(self):
-
-        # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-        #     config.active_team = config.Team.BLUE
-        # else:
-        #     config.active_team = config.Team.RED
-
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
-            constants.FieldPos.Scoring.speaker_y = (218.42 * inches_to_meters + 0.2) - 4 * inches_to_meters
+            # AT HARTFORD
+            # constants.FieldPos.Scoring.speaker_y = (
+            #     218.42 * inches_to_meters + 0.2
+            # ) - 4 * inches_to_meters
+            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
 
         Field.POI.setNTValues()
 
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
-        # try:
-        #     self.scheduler.run()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('command scheduler', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(self.scheduler.run)
-
-        # try:
-        #     Sensors.limelight_back.update()
-        #     Sensors.limelight_front.update()
-        #     Sensors.limelight_intake.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('limelight update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Sensors.limelight_back.update)
         self.handle(Sensors.limelight_front.update)
         self.handle(Sensors.limelight_intake.update)
 
-        # try:
-        #     Field.odometry.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(Field.odometry.update)
-
-        # try:
-        #     Field.calculations.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Field.calculations.update)
 
-        self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
+        self.nt.getTable("swerve").putNumberArray(
+            "abs encoders", Robot.drivetrain.get_abs()
+        )
         if not self.isSimulation():
-            self.nt.getTable('swerve').putBoolean('comp bot', config.comp_bot.get())
-
-        self.nt.getTable('swerve').putNumber('abs front right', Robot.drivetrain.get_abs()[1])
-        self.nt.getTable('swerve').putNumber('front right rotation',
-                                             Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi))
-        self.nt.getTable('swerve').putNumber('front right rotation error',
-                                             (Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi)) -
-                                             Robot.drivetrain.get_abs()[1])
-
-        # print(config.elevator_zeroed_pos)
-        # print(Robot.wrist.distance_sensor.getVoltage())
-        # print(Robot.intake.distance_sensor.getVoltage())
-        # print(DigitalInput(0).get())
-
-        self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
-        self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
-        # print(config.WRIST_CONFIG.k_P)
+            self.nt.getTable("swerve").putBoolean("comp bot", config.comp_bot.get())
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
@@ -214,6 +176,7 @@ class _Robot(wpilib.TimedRobot):
         Field.odometry.set_std_tele()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
+        Robot.wrist.update_wrist_pid()
 
         # Initialize Operator Interface
         OI.init()
@@ -221,25 +184,38 @@ class _Robot(wpilib.TimedRobot):
 
         IT.init()
         IT.map_systems()
+        
 
-        self.scheduler.schedule(commands2.SequentialCommandGroup(
-            # command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveCustom(Robot.drivetrain),
+        
+        
+
+        self.scheduler.schedule(
+            commands2.SequentialCommandGroup(
+                command.DrivetrainZero(Robot.drivetrain),
+                command.DriveSwerveCustom(Robot.drivetrain),
+            )
         )
+        self.scheduler.schedule(
+            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
-        self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
         # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
+        self.scheduler.schedule(
+            command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+        )
         # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3)).andThen(command.SetWrist(Robot.wrist, radians(55))))
+        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3))
+        # .andThen(command.SetWrist(Robot.wrist, radians(55))))
         # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(-20)))
 
         # self.scheduler.schedule()
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim)
+        # .andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
+        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist,
+        # config.Giraffe.kAimLow, Field.calculations))
         # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
         # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
-        # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length).andThen(command.SetElevator(Robot.elevator, 0)))
+        # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length)
+        # .andThen(command.SetElevator(Robot.elevator, 0)))
 
     def teleopPeriodic(self):
         pass
@@ -266,7 +242,6 @@ class _Robot(wpilib.TimedRobot):
         # Robot.drivetrain.n_back_right.zero()
         ...
 
-
         # Robot.drivetrain.gyro.reset_angle(radians(180))
         #
         # new_pose = Robot.drivetrain.odometry.getPose()
@@ -282,7 +257,6 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def disabledInit(self) -> None:
-
         self.log.info("Robot disabled")
 
     def disabledPeriodic(self) -> None:
