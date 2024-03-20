@@ -161,6 +161,7 @@ class IT:
             lambda: Robot.wrist.ready_to_shoot
             and Robot.drivetrain.ready_to_shoot
             and Robot.flywheel.ready_to_shoot
+            and not Robot.elevator.elevator_moving
         ).debounce(0.005).onTrue(command.Shoot(Robot.wrist))
         # SHOOTER TRIGGERS ----------------
 
