@@ -5,7 +5,8 @@ from robot_systems import Robot
 
 from commands2 import (
     InstantCommand,
-    SequentialCommandGroup
+    SequentialCommandGroup,
+    WaitCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -25,8 +26,8 @@ path_1 = FollowPathCustom(
         start_pose=Pose2d(*drive_forward[0]),
         waypoints=[Translation2d(*coord) for coord in drive_forward[1]],
         end_pose=Pose2d(*drive_forward[2]),
-        max_velocity=1.5,
-        max_accel=0.4,
+        max_velocity=5,
+        max_accel=1,
         start_velocity=0,
         end_velocity=0,
         rev=False,
@@ -42,8 +43,8 @@ path_2 = FollowPathCustom(
         # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in drive_left[1]],
         end_pose=Pose2d(*drive_left[2]),
-        max_velocity=1.5,
-        max_accel=0.4,
+        max_velocity=5,
+        max_accel=1,
         start_velocity=0,
         end_velocity=0,
         rev=False,
@@ -59,8 +60,8 @@ path_3 = FollowPathCustom(
         # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in drive_back[1]],
         end_pose=Pose2d(*drive_back[2]),
-        max_velocity=1.5,
-        max_accel=0.4,
+        max_velocity=5,
+        max_accel=1,
         start_velocity=0,
         end_velocity=0,
         rev=True,
@@ -76,8 +77,8 @@ path_4 = FollowPathCustom(
         # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in drive_right[1]],
         end_pose=Pose2d(*drive_right[2]),
-        max_velocity=1.5,
-        max_accel=0.4,
+        max_velocity=5,
+        max_accel=1,
         start_velocity=0,
         end_velocity=0,
         rev=True,

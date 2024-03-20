@@ -100,3 +100,6 @@ class CustomTrajectory:
             config=config,
         )
         return self.trajectory
+    
+    # def get_final_rotation(self)
+    

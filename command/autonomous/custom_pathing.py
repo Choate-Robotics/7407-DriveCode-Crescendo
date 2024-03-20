@@ -41,23 +41,26 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             subsystem: SwerveDrivetrain,
             trajectory: CustomTrajectory,
             period: float = config.period,
-            theta_f: float = 0
+            theta_f: float = None
     ):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
-        self.controller = HolonomicDriveController(
-            PIDController(8, 0, 0, period),
-            PIDController(8, 0, 0, period),
-            ProfiledPIDControllerRadians(
-                3,
-                0,
-                0,
-                TrapezoidProfileRadians.Constraints(
-                    subsystem.max_angular_vel, subsystem.max_angular_vel / 0.001  # .001
-                ),
-                period,
-            ),
+        self.x_controller = PIDController(8, 0, 0, period)
+        self.y_controller = PIDController(8, 0, 0, period)
+        constraints = TrapezoidProfileRadians.Constraints(config.drivetrain_aiming_max_angular_speed,
+                                                          config.drivetrain_aiming_max_angular_accel)
+        self.theta_controller = ProfiledPIDControllerRadians(
+            5,
+            0,
+            0.08,
+            constraints,
+            config.period
         )
+        # self.controller = HolonomicDriveController(
+        #     PIDController(8, 0, 0, period),
+        #     PIDController(8, 0, 0, period),
+        #     self.theta_controller
+        # )
         self.start_time = 0
         self.t = 0
         self.theta_i: float | None = None
@@ -68,14 +71,19 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.finished: bool = False
 
     def initialize(self) -> None:
+        self.x_controller.reset()
+        self.y_controller.reset()
+        self.theta_controller.reset(Field.odometry.getPose().rotation().radians(), 0)
         self.trajectory = self.trajectory_c.generate()
         self.duration = self.trajectory.totalTime()
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
         self.start_time = time.perf_counter()
         self.theta_i = Field.odometry.getPose().rotation().radians()
+        if self.theta_f == None:
+            self.theta_f = self.end_pose.rotation().radians()
         self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
-        # self.omega = self.theta_diff / self.duration
         self.finished = False
+        self.theta_controller.enableContinuousInput(math.radians(-180), math.radians(180))
 
         traj_path = []
         for i in range(len(self.trajectory.states())):
@@ -98,29 +106,33 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         relative = self.end_pose.relativeTo(
             self.subsystem.odometry_estimator.getEstimatedPosition()
         )
-
+        goal_reached: bool = True if (abs(bounded_angle_diff(self.theta_f, self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians())) < math.radians(1)) else False
         if (
                 abs(relative.x) < 0.03
                 and abs(relative.y) < 0.03
-                and abs(bounded_angle_diff(self.theta_f - self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians())) < 2
+                and goal_reached
                 or self.t > self.duration
         ):
             self.t = self.duration
             self.finished = True
 
         goal = self.trajectory.sample(self.t)
-        goal_theta = self.theta_i + self.t/self.duration*self.theta_diff
+        # goal_theta = self.theta_i + (self.t/self.duration)*self.theta_diff if not goal_reached else self.theta_f
         table = ntcore.NetworkTableInstance.getDefault().getTable('Auto')
-        table.putNumber("theta_i", self.theta_i)
-        table.putNumber("theta_f", self.theta_f)
-        table.putNumber("theta_diff", self.theta_diff)
-        table.putNumber("goal_theta", goal_theta)
-        speeds = self.controller.calculate(
-            Field.odometry.getPose(), goal, Rotation2d(goal_theta)
-        )
+        table.putBoolean("goal reached", goal_reached)
+        # table.putNumber("theta_i", math.degrees(self.theta_i))
+        # table.putNumber("theta_f", math.degrees(self.theta_f))
+        # table.putNumber("theta_diff", math.degrees(self.theta_diff))
+        # table.putNumber("goal_theta", math.degrees(goal_theta))
+        # table.putNumber("time", self.t)
+        # table.putNumber("duration", self.duration)
+
+        dx = self.x_controller.calculate(Field.odometry.getPose().X(), goal.pose.X())
+        dy = self.y_controller.calculate(Field.odometry.getPose().Y(), goal.pose.Y())
+        dtheta = self.theta_controller.calculate(Field.odometry.getPose().rotation().radians(), self.theta_f)
 
 
-        self.subsystem.set_driver_centric((speeds.vx, speeds.vy), speeds.omega)
+        self.subsystem.set_driver_centric((dx, dy), -dtheta)
 
     def isFinished(self) -> bool:
         return self.finished
