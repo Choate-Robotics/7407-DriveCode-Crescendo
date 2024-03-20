@@ -124,6 +124,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('D', config.drivetrain_rotation_D)
             self.table.putNumber('tolerance', 1)
             self.table.putNumber('velocity tolerance', 2)
+            self.table.putNumber('drivetrain offset', config.drivetrain_aiming_offset)
 
 
     def execute(self) -> None:
@@ -136,7 +137,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
             self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 1)), radians(self.table.getNumber('velocity tolerance', 2)))
-            
+            config.drivetrain_aiming_offset = self.table.getNumber('drivetrain offset', config.drivetrain_aiming_offset)
             # put graphs
         
         dx, dy = (
@@ -145,7 +146,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         )
 
         target_angle = self.target_calc.get_bot_theta()
-        current = bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians())
+        current = bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()) - radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('target angle', target_angle.radians())

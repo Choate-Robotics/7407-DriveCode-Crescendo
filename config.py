@@ -17,6 +17,7 @@ from units.SI import (
     meters,
     meters_per_second,
     radians,
+    degrees
 )
 
 # from typing import Literal
@@ -219,6 +220,7 @@ drivetrain_reversed: bool = False
 drivetrain_rotation_P: float = 10
 drivetrain_rotation_I: float = 0.0
 drivetrain_rotation_D: float = 0.1
+drivetrain_aiming_offset: degrees = 0.0 # degrees
 drivetrain_rotation_enable_tuner: bool = True
 
 # Flywheel
