@@ -224,6 +224,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.info("Autonomous initialized")
         Field.odometry.set_std_auto()
         Field.calculations.init()
+        Robot.drivetrain.gyro.reset_angle()
         Robot.drivetrain.n_front_left.zero()
         Robot.drivetrain.n_front_right.zero()
         Robot.drivetrain.n_back_left.zero()
@@ -235,11 +236,11 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def autonomousExit(self):
-        # Robot.drivetrain.gyro.reset_angle(radians(-180))
-        # Robot.drivetrain.n_front_left.zero()
-        # Robot.drivetrain.n_front_right.zero()
-        # Robot.drivetrain.n_back_left.zero()
-        # Robot.drivetrain.n_back_right.zero()
+        Robot.drivetrain.gyro.reset_angle(radians(180))
+        Robot.drivetrain.n_front_left.zero()
+        Robot.drivetrain.n_front_right.zero()
+        Robot.drivetrain.n_back_left.zero()
+        Robot.drivetrain.n_back_right.zero()
         ...
 
         # Robot.drivetrain.gyro.reset_angle(radians(180))

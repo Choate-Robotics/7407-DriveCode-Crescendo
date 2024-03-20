@@ -42,7 +42,7 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
     Main drive command
     """
     driver_centric = False
-    driver_centric_reversed = False
+    driver_centric_reversed = True
 
     def initialize(self) -> None:
         pass
@@ -51,7 +51,7 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         dx, dy, d_theta = (
             self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
             self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
-            -self.subsystem.axis_rotation.value,
+            self.subsystem.axis_rotation.value,
         )
 
         if abs(d_theta) < 0.11:
@@ -64,16 +64,14 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         # dx *= self.subsystem.max_vel
         dx *= states.drivetrain_controlled_vel
         # dy *= -self.subsystem.max_vel
-        dy *= -states.drivetrain_controlled_vel
+        dy *= states.drivetrain_controlled_vel
         
         # d_theta *= self.subsystem.max_angular_vel
         d_theta *= states.drivetrain_controlled_angular_vel
         
 
         if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, -dx), -d_theta)
-        elif self.driver_centric_reversed:
-            self.subsystem.set_driver_centric((-dy, dx), d_theta)
+            self.subsystem.set_driver_centric((dy, dx), d_theta)
         else:
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
@@ -174,13 +172,11 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         dy = curve(dy)
 
         dx *= states.drivetrain_controlled_vel
-        dy *= -states.drivetrain_controlled_vel
+        dy *= states.drivetrain_controlled_vel
         # d_theta *= self.subsystem.max_angular_vel
 
         if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, -dx), -d_theta)
-        elif self.driver_centric_reversed:
-            self.subsystem.set_driver_centric((-dy, dx), d_theta)
+            self.subsystem.set_driver_centric((dy, dx), -d_theta)
         else:
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
@@ -337,12 +333,10 @@ class DriveSwerveHoldRotationIndef(SubsystemCommand[Drivetrain]):
         dy = curve(dy)
 
         dx *= states.drivetrain_controlled_vel
-        dy *= -states.drivetrain_controlled_vel
+        dy *= states.drivetrain_controlled_vel
 
         if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, -dx), -d_theta)
-        elif self.driver_centric_reversed:
-            self.subsystem.set_driver_centric((-dy, dx), d_theta)
+            self.subsystem.set_driver_centric((dy, dx), -d_theta)
         else:
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
