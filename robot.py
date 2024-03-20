@@ -175,6 +175,7 @@ class _Robot(wpilib.TimedRobot):
         Field.odometry.set_std_tele()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
+        Robot.wrist.update_wrist_pid()
 
         # Initialize Operator Interface
         OI.init()
@@ -182,6 +183,10 @@ class _Robot(wpilib.TimedRobot):
 
         IT.init()
         IT.map_systems()
+        
+
+        
+        
 
         self.scheduler.schedule(
             commands2.SequentialCommandGroup(

@@ -443,7 +443,10 @@ class EnableClimb(SequentialCommandGroup):
             ParallelCommandGroup(
                 SetWrist(wrist, -38 * degrees_to_radians),  # noqa
                 SetElevator(elevator, config.Giraffe.kClimbReach.height / 3),  # noqa
-                DeployTenting(intake),  # noqa
+                SequentialCommandGroup(
+                    WaitUntilCommand(lambda: wrist.get_wrist_angle() < 20 * degrees_to_radians),  # noqa
+                    DeployTenting(intake), 
+                    )# noqa
             ),
             SetWrist(wrist, 35 * degrees_to_radians),  # noqa
             ParallelCommandGroup(

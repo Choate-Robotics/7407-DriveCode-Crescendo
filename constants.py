@@ -154,7 +154,8 @@ limelight_elevator_angle = 25 * degrees_to_radians
 limelight_back_yaw = 180 * degrees_to_radians
 
 # WRIST
-wrist_gear_ratio: float = 48  # REAL VALUE: 48:1 gear ratio muahhaha
+wrist_refrence_frame: float = 95.95 / 100
+wrist_gear_ratio: float = 48 * wrist_refrence_frame  # REAL VALUE: 48:1 gear ratio muahhaha
 
 # Flywheel
 flywheel_mass = 0.85  # kilograms

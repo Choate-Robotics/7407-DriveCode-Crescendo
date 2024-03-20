@@ -179,7 +179,8 @@ wrist_motor_id = 2
 wrist_time_to_max_vel = 0.0
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
-wrist_flat_ff = -0.32  # used to be -0.9
+wrist_max_ff = -0.32  # used to be -0.9
+wrist_ff_offset = 14.3 * degrees_to_radians
 stage_timeout = 5
 wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = 0.2
@@ -270,7 +271,7 @@ ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
 )
 # P=.2, I=0, D=0.003
 WRIST_CONFIG = SparkMaxConfig(
-    0.2, 0, 10, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 
