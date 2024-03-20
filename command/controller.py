@@ -441,7 +441,7 @@ class EnableClimb(SequentialCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist, intake: Intake):
         super().__init__(
             ParallelCommandGroup(
-                SetWrist(wrist, -38 * degrees_to_radians),  # noqa
+                SetWrist(wrist, -44 * degrees_to_radians),  # noqa
                 SetElevator(elevator, config.Giraffe.kClimbReach.height / 3),  # noqa
                 SequentialCommandGroup(
                     WaitUntilCommand(lambda: wrist.get_wrist_angle() < 20 * degrees_to_radians),  # noqa
