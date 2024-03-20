@@ -42,7 +42,7 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
     Main drive command
     """
     driver_centric = False
-    driver_centric_reversed = True
+    driver_centric_reversed = False
 
     def initialize(self) -> None:
         pass
