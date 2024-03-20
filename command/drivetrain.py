@@ -116,7 +116,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
         self.theta_controller.reset(
             self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(),
-            self.subsystem.chassis_speeds.omega
+            0#self.subsystem.chassis_speeds.omega
         )
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('P', config.drivetrain_rotation_P)
@@ -158,7 +158,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         )
 
         target_angle = self.target_calc.get_bot_theta()
-        current = bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()) - radians(config.drivetrain_aiming_offset)
+        current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians() - radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('target angle', target_angle.radians())

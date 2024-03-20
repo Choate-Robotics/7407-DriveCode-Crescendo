@@ -44,10 +44,15 @@ class TrajectoryCalculator:
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
+        self.tuning = False
 
     def init(self):
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
+        if self.tuning:
+            self.table.putNumber('flywheel distance scalar', config.flywheel_distance_scalar)
+            self.table.putNumber('flywheel minimum value', config.v0_flywheel_minimum)
+            self.table.putNumber('flywheel maximum value', config.v0_flywheel_maximum)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -99,6 +104,11 @@ class TrajectoryCalculator:
         return result_angle
     
     def get_flywheel_speed(self, distance_to_target: float) -> float:
+        # if self.tuning:
+        #     config.flywheel_distance_scalar = self.table.getNumber('flywheel distance scalar', config.flywheel_distance_scalar)
+        #     config.v0_flywheel_minimum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_minimum)
+        #     config.v0_flywheel_maximum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_maximum)
+        
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
     def update_shooter(self):

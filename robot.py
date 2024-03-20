@@ -131,6 +131,7 @@ class _Robot(wpilib.TimedRobot):
         #         raise e
 
         self.handle(init_sensors)
+        Field.calculations.tuning = True
 
         self.log.complete("Robot initialized")
 
