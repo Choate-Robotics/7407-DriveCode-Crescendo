@@ -25,15 +25,8 @@ from units.SI import (
 
 comp_bot: DigitalInput = DigitalInput(
     2
-)  # if true, we are using the practice bot (we will put a jumper on the DIO port)
+)  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-# from units.SI import (
-#     inches_to_meters,
-#     meters,
-#     meters_per_second,
-#     meters_per_second_squared,
-#     radians,
-# )
 
 DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
@@ -172,8 +165,9 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
-# helloworld
+elevator_climb_current_limit: float = 45
+elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
+#helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
@@ -187,7 +181,7 @@ wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = 0.2
 feeder_voltage_feed = 8
 feeder_voltage_trap = 14
-feeder_voltage_crawl = 4.3
+feeder_voltage_crawl = 4.15
 feeder_pass_velocity = 0.5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = 0.65
@@ -349,7 +343,7 @@ class Giraffe:
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 30 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, 0 * degrees_to_radians)
+    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, -25 * degrees_to_radians)
 
     kElevatorHigh = GiraffePos(
         constants.elevator_max_length, GiraffePos.Special.kCurrentAngle
@@ -376,3 +370,9 @@ class Giraffe:
 
 # Gyro
 gyro_id = 29
+
+driver_rumble_intensity:float = 1.0
+driver_rumble_time:float= 5
+
+operator_rumble_intensity:float = 1.0
+operator_rumble_time:float= 5

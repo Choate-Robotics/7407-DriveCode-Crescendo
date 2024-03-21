@@ -27,6 +27,7 @@ from robot_systems import (  # noqa
 )
 from toolkit.subsystem import Subsystem
 from units.SI import inches_to_meters
+from utils import CAN_delay
 
 
 class _Robot(wpilib.TimedRobot):
@@ -89,46 +90,21 @@ class _Robot(wpilib.TimedRobot):
                 Robot.flywheel,
             ]
 
-            time.sleep(0.2)
+            CAN_delay(0.2)
             for subsystem in subsystems:  # noqa
                 subsystem.init()
-                time.sleep(0.2)
+                CAN_delay(0.2)
 
-        # try:
-        #     init_subsystems()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('subsystem init', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(init_subsystems)
 
         def init_sensors():
-            sensors: list[Sensors] = list(  # noqa
-                {
-                    k: v
-                    for k, v in Sensors.__dict__.items()
-                    if isinstance(v, Sensors) and hasattr(v, "init")
-                }.values()
-            )
 
-            # for sensor in sensors:
-            #     sensor.init()
             Sensors.limelight_front.init()
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.calculations.init()
 
-        # try:
-        #     init_sensors()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('sensor init', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(init_sensors)
         Field.calculations.tuning = True
@@ -198,24 +174,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(
             command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
-        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(
-            command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
-        )
-        # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3))
-        # .andThen(command.SetWrist(Robot.wrist, radians(55))))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(-20)))
-
-        # self.scheduler.schedule()
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim)
-        # .andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist,
-        # config.Giraffe.kAimLow, Field.calculations))
-        # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
-        # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length)
-        # .andThen(command.SetElevator(Robot.elevator, 0)))
+        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
 
     def teleopPeriodic(self):
         pass
