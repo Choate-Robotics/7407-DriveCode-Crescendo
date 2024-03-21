@@ -392,7 +392,7 @@ class ScoreTrap(SequentialCommandGroup):
 class Amp(ParallelCommandGroup):
     def __init__(self, elevator: Elevator, wrist: Wrist):
         super().__init__(
-            SetWrist(wrist, config.Giraffe.kAmp.wrist_angle * degrees_to_radians),
+            SetWrist(wrist, config.Giraffe.kAmp.wrist_angle),
             SetElevator(elevator, config.Giraffe.kAmp.height),
             # SetFlywheelVelocityIndependent(flywheel, (config.flywheel_amp_speed, config.flywheel_amp_speed/4))
         )
