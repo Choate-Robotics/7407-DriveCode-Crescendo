@@ -85,56 +85,54 @@ auto = ParallelCommandGroup(
     SequentialCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
-        path_1,
-        path_2,
 
-        # # Shoot first note preload and deploy intake
-        # ParallelCommandGroup(
-        #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        #     DeployIntake(Robot.intake)
-        # ),
-        # SetWristIdle(Robot.wrist).withTimeout(2),
-        # # Get second note
-        # ParallelCommandGroup(
-        #     path_1,
-        #     IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
-        # ),
+        # Shoot first note preload and deploy intake
+        ParallelCommandGroup(
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            DeployIntake(Robot.intake)
+        ),
+        SetWristIdle(Robot.wrist).withTimeout(2),
+        # Get second note
+        ParallelCommandGroup(
+            path_1,
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+        ),
 
-        # # Shoot second note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-        #     SetWristIdle(Robot.wrist).withTimeout(2),
-        # ),
+        # Shoot second note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        ParallelCommandGroup(
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+            SetWristIdle(Robot.wrist).withTimeout(2),
+        ),
 
-        # # Get third note
-        # ParallelCommandGroup(
-        #     path_2,
-        #     IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
-        # ),
+        # Get third note
+        ParallelCommandGroup(
+            path_2,
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+        ),
 
-        # # Shoot third note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # SetWristIdle(Robot.wrist).withTimeout(2),
-        # # Get fourth note
-        # ParallelCommandGroup(
-        #     path_3,
-        #     IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+        # Shoot third note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        SetWristIdle(Robot.wrist).withTimeout(2),
+        # Get fourth note
+        ParallelCommandGroup(
+            path_3,
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
             
-        # ),
+        ),
 
-        # # Shoot fourth note
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # Shoot fourth note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-        # ParallelCommandGroup(
-        #     DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
-        #     SetWristIdle(Robot.wrist).withTimeout(2),
-        # ),
+        ParallelCommandGroup(
+            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
+            SetWristIdle(Robot.wrist).withTimeout(2),
+        ),
 
-        # ParallelCommandGroup(
-        #     path_4,
-        #     IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
-        # )
+        ParallelCommandGroup(
+            path_4,
+            IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(config.auto_intake_note_deadline)
+        )
     )
 )
 
