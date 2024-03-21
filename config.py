@@ -63,12 +63,11 @@ odometry_debounce: float = 0.1  # TODO: PLACEHOLDER
 stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
 
 
-#STATE VARIABLES -- PLEASE DO NOT CHANGE
-
-
-
-
 # Leds
+leds_id = 0
+leds_size = 27
+
+
 def KRainbow():
     return {"type": 2}
 
@@ -94,6 +93,18 @@ class Type:
             "typeB": typeB,
             "speed": speed,
         }
+
+    def __getitem__(self, item):
+        if item == 1:
+            return self.KStatic
+        elif item == 3:
+            return self.KTrack
+        elif item == 4:
+            return self.KBlink
+        elif item == 5:
+            return self.KLadder
+        else:
+            raise KeyError(f"Type {item} is not supported.")
 
 
 # TEAM
@@ -127,6 +138,7 @@ class LimelightPosition:
                                 Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
     fixed_intake = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
 
+
 # Intake
 inner_intake_id = 13
 outer_intake_back_id = 17
@@ -158,7 +170,7 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
+elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
 #helloworld
 # Wrist
 wrist_zeroed_pos = 0.0
@@ -219,24 +231,23 @@ flywheel_feed_forward = 0.0  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = .5
 flywheel_shot_current_threshold = 20
 
-
 # Odometry
 odometry_visible_tags_threshold = 2
 odometry_tag_area_threshold = 0
 odometry_vision_deviation_threshold = 0.5
-odometry_tag_distance_threshold:meters = 4
+odometry_tag_distance_threshold: meters = 4
 odometry_two_tag_distance_threshold = 7
-odometry_distance_deviation_threshold:meters = 0.5
-odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
-odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
+odometry_distance_deviation_threshold: meters = 0.5
+odometry_std_auto_formula = lambda x: abs(x ** 2) / 2.5
+odometry_std_tele_formula = lambda x: abs(x ** 1.3) / 1.3
 
 # Configs 
-ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
+ELEVATOR_CONFIG = SparkMaxConfig(  # -.65, 1
     0.2, 0.0, 0.08, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
-    100, 0.0, 0, elevator_feed_forward,(-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    100, 0.0, 0, elevator_feed_forward, (-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 WRIST_CONFIG = SparkMaxConfig(.16, 0, 0.003, .00015, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -263,7 +274,7 @@ MOVE_CONFIG = TalonConfig(
 
 # Giraffe
 
-staging_angle:radians = 60 * degrees_to_radians
+staging_angle: radians = 60 * degrees_to_radians
 
 
 class Giraffe:
@@ -289,9 +300,9 @@ class Giraffe:
 
     kAimHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kAim)
 
-    kClimbReach = GiraffePos(constants.elevator_max_length, 10*degrees_to_radians)
+    kClimbReach = GiraffePos(constants.elevator_max_length, 10 * degrees_to_radians)
 
-    kClimbPullUp = GiraffePos(0, 50*degrees_to_radians)
+    kClimbPullUp = GiraffePos(0, 50 * degrees_to_radians)
 
     kTestFF = GiraffePos(0, 20 * degrees_to_radians)
 
