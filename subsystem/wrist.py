@@ -34,12 +34,37 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
-        self.wrist_motor.optimize_sparkmax_absolute_encoder()
+        self.table = ntcore.NetworkTableInstance.getDefault().getTable('wrist')
+        self.wrist_motor.optimize_sparkmax_absolute_encoder(30)
+        # self.wrist_motor.pid_controller.setIMaxAccum(.00)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()
         self.feed_motor.init()
         self.feed_motor.optimize_sparkmax_no_position()
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
         self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
+        self.table.getSubTable('wrist motor').putNumber('P', config.WRIST_CONFIG.k_P)
+        self.table.getSubTable('wrist motor').putNumber('I', config.WRIST_CONFIG.k_I)
+        self.table.getSubTable('wrist motor').putNumber('D', config.WRIST_CONFIG.k_D)
+        
+        
+        
+    def update_wrist_pid(self):
+        
+        WP = self.table.getSubTable('wrist motor').getNumber('P', config.WRIST_CONFIG.k_P)
+        WI = self.table.getSubTable('wrist motor').getNumber('I', config.WRIST_CONFIG.k_I)
+        WD = self.table.getSubTable('wrist motor').getNumber('D', config.WRIST_CONFIG.k_D)
+        
+        self.wrist_motor.pid_controller.setP(
+            WP
+        )
+        
+        self.wrist_motor.pid_controller.setI(
+            WI
+        )
+        
+        self.wrist_motor.pid_controller.setD(
+            WD
+        )
 
     def limit_angle(self, angle: radians) -> radians:
         if self.locked and angle <= constants.wrist_min_rotation_stage:
@@ -85,13 +110,14 @@ class Wrist(Subsystem):
 
         current_angle = self.get_wrist_angle()
 
-        ff = config.wrist_flat_ff * math.cos(angle) #* (1 if angle < current_angle else -1)
+        ff = config.wrist_max_ff * math.cos(angle - config.wrist_ff_offset) #* (1 if angle < current_angle else -1)
 
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
                 (angle / (pi * 2)) * constants.wrist_gear_ratio,
                 ff# if angle < current_angle else 0
             )
+            
 
     def get_wrist_angle(self):
         """
@@ -104,9 +130,7 @@ class Wrist(Subsystem):
                 * 2
         )
         
-        # return (
-        #     (self.wrist_abs_encoder.getPosition())
-        # )
+        # return self.get_wrist_abs_angle()
 
     def note_detected(self) -> bool:
         return not self.beam_break_second.get()
@@ -189,23 +213,23 @@ class Wrist(Subsystem):
 
     def periodic(self) -> None:
         # self.zero_wrist()
-        table = ntcore.NetworkTableInstance.getDefault().getTable('wrist')
+        
 
         # table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
-        table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
+        self.table.putNumber('wrist abs angle', math.degrees(self.get_wrist_abs_angle()))
         # table.putNumber('wrist abs raw', self.wrist_abs_encoder.getPosition())
-        table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
-        table.putBoolean('note in feeder', self.note_staged)
-        table.putBoolean('note detected', self.note_detected())
-        table.putBoolean('wrist zeroed', self.wrist_zeroed)
-        table.putBoolean('ready to shoot', self.ready_to_shoot)
-        table.putBoolean('first beam break', not self.beam_break_first.get())
-        table.putBoolean('second beam break', not self.beam_break_second.get())
-        table.putBoolean('rotation disabled', self.rotation_disabled)
-        table.putBoolean('feed disabled', self.feed_disabled)
-        table.putBoolean('locked', self.locked)
-        table.putNumber('target angle', math.degrees(self.target_angle))
-        table.putNumber('target angle raw', self.radians_to_abs(self.target_angle))
-        table.putBoolean('wrist moving', self.wrist_moving)
-        table.putNumber('wrist current', self.wrist_motor.motor.getOutputCurrent())
-        table.putNumber('wrist applied output', self.wrist_motor.motor.getAppliedOutput())
+        self.table.putNumber('wrist angle', math.degrees(self.get_wrist_angle()))
+        self.table.putBoolean('note in feeder', self.note_in_feeder())
+        self.table.putBoolean('note detected', self.note_detected())
+        self.table.putBoolean('wrist zeroed', self.wrist_zeroed)
+        self.table.putBoolean('ready to shoot', self.ready_to_shoot)
+        self.table.putBoolean('first beam break', not self.beam_break_first.get())
+        self.table.putBoolean('second beam break', not self.beam_break_second.get())
+        self.table.putBoolean('rotation disabled', self.rotation_disabled)
+        self.table.putBoolean('feed disabled', self.feed_disabled)
+        self.table.putBoolean('locked', self.locked)
+        self.table.putNumber('target angle', math.degrees(self.target_angle))
+        self.table.putNumber('target angle raw', self.radians_to_abs(self.target_angle))
+        self.table.putBoolean('wrist moving', self.wrist_moving)
+        self.table.putNumber('wrist current', self.wrist_motor.motor.getOutputCurrent())
+        self.table.putNumber('wrist applied output', self.wrist_motor.motor.getAppliedOutput())

@@ -494,6 +494,9 @@ class POI:
                 )
 
         class Waypoints:
+            # kMidlineAutoScoringLocation = POIPose(
+
+            # )
             pass
 
     def __init__(self):
