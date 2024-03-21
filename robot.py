@@ -27,6 +27,7 @@ from robot_systems import (  # noqa
 )
 from toolkit.subsystem import Subsystem
 from units.SI import inches_to_meters
+from utils import CAN_delay
 
 
 class _Robot(wpilib.TimedRobot):
@@ -89,10 +90,10 @@ class _Robot(wpilib.TimedRobot):
                 Robot.flywheel,
             ]
 
-            time.sleep(0.2)
+            CAN_delay(0.2)
             for subsystem in subsystems:  # noqa
                 subsystem.init()
-                time.sleep(0.2)
+                CAN_delay(0.2)
 
 
         self.handle(init_subsystems)

@@ -59,7 +59,7 @@ class IT:
         button.Trigger(lambda: Robot.wrist.note_in_feeder())\
             .onTrue(
                 ParallelCommandGroup(
-                    command.ControllerRumble(Controllers.DRIVER_CONTROLLER, config.driver_rumble_time, config.driver_rumble_intensity),
+                    command.ControllerRumble(Controllers.DRIVER_CONTROLLER, config.driver_rumble_intensity),
                     command.ControllerRumbleTimeout(Controllers.OPERATOR_CONTROLLER, config.operator_rumble_time, config.operator_rumble_intensity)
                 )
             ).onFalse(
