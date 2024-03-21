@@ -10,7 +10,7 @@ coord = (meters, meters, radians)
 waypoints = (meters, meters)
 path = (coord, waypoints, coord)
 
-initial = Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoStart
+initial = (1.9 - drivetrain_length_with_bumpers/2, 2.92, math.radians(-180))
 
 shoot_first_note = (
     initial,
@@ -20,26 +20,27 @@ shoot_first_note = (
 
 get_second_note = (
     shoot_first_note[2].withRotation(-155),
-    [],
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0)),],
     Field.POI.Coordinates.Notes.MidLine.kFarRight
 )
 
 shoot_second_note = (
     get_second_note[2],
-    [],
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0)),],
     Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-155)
 )
 
 get_third_note = (
-    shoot_second_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1, 0))],
+    shoot_second_note[2].withRotation(-135),
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0)),
+     Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d(-1, 0))],
     Field.POI.Coordinates.Notes.MidLine.kMidRight
 )
 
 shoot_third_note = (
     get_third_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1, 0))],
-    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-155)
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0))],
+    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-135)
 )
 
 get_fourth_note = (

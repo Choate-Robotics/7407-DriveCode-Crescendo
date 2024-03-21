@@ -20,6 +20,14 @@ from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
 
 from command.autonomous.trajectory import CustomTrajectory
+from enum import Enum
+
+from robot_systems import Field
+
+class AngleType(Enum):
+
+    path = 0
+    calculate = 1
 
 
 class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
@@ -41,7 +49,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             subsystem: SwerveDrivetrain,
             trajectory: CustomTrajectory,
             period: float = config.period,
-            theta_f: float = None
+            theta_f = AngleType.path
     ):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
@@ -67,7 +75,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.theta_f: float = theta_f
         self.theta_diff: float | None = None
         self.omega: float | None = None
-        
+        self.use_calculations: bool = False
         self.finished: bool = False
 
     def initialize(self) -> None:
@@ -79,9 +87,12 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
         self.start_time = time.perf_counter()
         self.theta_i = Field.odometry.getPose().rotation().radians()
-        if self.theta_f == None:
+        if self.theta_f == AngleType.path:
             self.theta_f = self.end_pose.rotation().radians()
-        self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
+        elif self.theta_f == AngleType.calculate:
+            self.use_calculations = True
+
+        # self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
         self.finished = False
         self.theta_controller.enableContinuousInput(math.radians(-180), math.radians(180))
 
@@ -102,6 +113,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
 
     def execute(self) -> None:
         self.t = time.perf_counter() - self.start_time
+        if self.use_calculations:
+            self.theta_f = Field.calculations.get_bot_theta().radians()
 
         relative = self.end_pose.relativeTo(
             self.subsystem.odometry_estimator.getEstimatedPosition()
