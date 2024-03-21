@@ -63,7 +63,7 @@ def test_set_length(test_input, elevator: Elevator):
         (0),
     ],
 )
-@pytest.mark.skip("need to fix, not enough time")
+# @pytest.mark.skip("need to fix, not enough time")
 def test_get_elevator_abs(elevator_abs, elevator: Elevator, monkeypatch: MonkeyPatch):
     monkeypatch.setattr(
         elevator.motor_extend_encoder, "getPosition", lambda: elevator_abs
@@ -71,7 +71,7 @@ def test_get_elevator_abs(elevator_abs, elevator: Elevator, monkeypatch: MonkeyP
     # elevator.motor_extend_encoder.getPosition.return_value = elevator_abs
     assert (
         elevator.get_elevator_abs()
-        == (elevator_abs - config.elevator_zeroed_pos) * constants.elevator_max_length
+        == max((elevator_abs - config.elevator_zeroed_pos) * constants.elevator_max_length, 0)
     )
     # Temp
 

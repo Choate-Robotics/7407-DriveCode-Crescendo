@@ -104,10 +104,10 @@ class TrajectoryCalculator:
         return result_angle
     
     def get_flywheel_speed(self, distance_to_target: float) -> float:
-        # if self.tuning:
-        #     config.flywheel_distance_scalar = self.table.getNumber('flywheel distance scalar', config.flywheel_distance_scalar)
-        #     config.v0_flywheel_minimum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_minimum)
-        #     config.v0_flywheel_maximum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_maximum)
+        if self.tuning:
+            config.flywheel_distance_scalar = self.table.getNumber('flywheel distance scalar', config.flywheel_distance_scalar)
+            config.v0_flywheel_minimum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_minimum)
+            config.v0_flywheel_maximum = self.table.getNumber('flywheel maximum value', config.v0_flywheel_maximum)
         
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
