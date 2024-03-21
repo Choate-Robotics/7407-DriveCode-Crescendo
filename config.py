@@ -18,7 +18,8 @@ from units.SI import (
     meters,
     meters_per_second,
     radians,
-    degrees
+    degrees,
+    inches
 )
 
 comp_bot: DigitalInput = DigitalInput(
@@ -232,8 +233,13 @@ drivetrain_rotation_I: float = 0.0
 drivetrain_rotation_D: float = 0.08
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
-drivetrain_aiming_offset: degrees = 2.0 # degrees
+
 drivetrain_rotation_enable_tuner: bool = True
+
+#Shooting
+drivetrain_aiming_offset: degrees = 2.0 # degrees
+shot_height_offset: inches = 2.0 # inches 
+
 
 # Flywheel
 flywheel_id_1 = 19
