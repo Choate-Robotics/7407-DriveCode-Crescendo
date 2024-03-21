@@ -6,9 +6,11 @@ from wpimath.trajectory import TrajectoryConfig, TrajectoryGenerator
 # import config
 from robot_systems import Field
 from utils import POIPose
-
+import config
+from enum import Enum
 
 class PoseType(Enum):
+    
     current = 0
 
 
@@ -34,7 +36,7 @@ class CustomTrajectory:
 
     def __init__(
         self,
-        start_pose: Pose2d | POIPose,
+        start_pose: Pose2d | POIPose | PoseType,
         waypoints: list[Translation2d] | list[POIPose],
         end_pose: Pose2d | POIPose,
         max_velocity: float,
@@ -60,31 +62,44 @@ class CustomTrajectory:
 
     def generate(self):
         # self.waypoints = avoid_obstacles(self.start_pose, self.end_pose, self.obstacles)
-
-        # temp_start_pose, temp_end_pose = self.start_pose, self.end_pose
-
+        
+        waypoints: list[Translation2d] = []
+        
+        active_start_pose, active_waypoints, active_end_pose = self.start_pose, waypoints, self.end_pose
+        
         if isinstance(self.start_pose, POIPose):
-            self.start_pose = self.start_pose.get()
-
+            active_start_pose = self.start_pose.get()
+            
+        if isinstance(self.start_pose, PoseType):
+            if self.start_pose == PoseType.current:
+                active_start_pose = Field.odometry.getPose()
+            else:
+                raise ValueError('Invalid PoseType')
+            
         for i, waypoint in enumerate(self.waypoints):
             if isinstance(waypoint, POIPose):
-                self.waypoints[i] = waypoint.get().translation()
+                active_waypoints += [waypoint.get().translation()]
+            elif isinstance(waypoint, Translation2d):
+                active_waypoints += [waypoint]
 
         if isinstance(self.end_pose, POIPose):
-            self.end_pose = self.end_pose.get()
-
-        config_t = TrajectoryConfig(
+            active_end_pose = self.end_pose.get()
+        
+        config = TrajectoryConfig(
             self.max_velocity,
             self.max_accel,
         )
-        config_t.setStartVelocity(self.start_velocity)
-        config_t.setEndVelocity(self.end_velocity)
-        config_t.setReversed(self.rev)
+        config.setStartVelocity(self.start_velocity)
+        config.setEndVelocity(self.end_velocity)
+        config.setReversed(self.rev)
 
         self.trajectory = TrajectoryGenerator.generateTrajectory(
-            start=self.start_pose,
-            interiorWaypoints=self.waypoints,
-            end=self.end_pose,
-            config=config_t,
+            start=active_start_pose,
+            interiorWaypoints=active_waypoints,
+            end=active_end_pose,
+            config=config,
         )
         return self.trajectory
+    
+    # def get_final_rotation(self)
+    
