@@ -1,6 +1,5 @@
-from wpilib import AddressableLED, PowerDistribution
+from wpilib import AddressableLED, PowerDistribution, SmartDashboard
 import math, config
-
 
 class ALeds:
     m_led: AddressableLED
@@ -24,6 +23,8 @@ class ALeds:
         self.m_ledBuffer = self.m_led.LEDData()
         self.led_data = [self.m_ledBuffer for i in range(self.size)]
         self.m_led.setData(self.led_data)
+
+        SmartDashboard.putBoolean("LEDs Initialized", True)
 
     def enable(self):
         self.m_led.start()
@@ -57,7 +58,7 @@ class ALeds:
         self.last_speed = self.speed
         self.last_brightness = self.brightness
 
-    def reset_LED(self, type: config.Type, brightness: float = 1.0, speed: int = 5):
+    def set_LED(self, type, brightness: float = 1.0, speed: int = 5):
         self.store_current()
         self.active_mode = type
         self.speed = speed
@@ -68,7 +69,7 @@ class ALeds:
         self.speed = self.last_speed
         self.brightness = self.last_brightness
 
-    def match(self, type: config.Type):
+    def match(self, type: config.LEDType):
         res = self.get_led_data()
         match type['type']:
             case 1:
@@ -107,7 +108,7 @@ class ALeds:
         for i in range(self.size):
             # Calculate the hue - hue is easier for rainbows because the color
             # shape is a circle so only one value needs to precess
-            hue = math.floor(self.m_rainbowFirstPixelHue + (i * 180 / self.size) % 180)
+            hue = math.floor((self.m_rainbowFirstPixelHue + (i * 180 / self.size)) % 180)
             # Set the value
             rainbow[i].setHSV(hue, 255, 128)
 
@@ -149,7 +150,7 @@ class ALeds:
 
         return blink
 
-    def _setLadder(self, typeA: config.Type, typeB: config.Type, percent: float, speed: int):
+    def _setLadder(self, typeA: config.LEDType, typeB: config.LEDType, percent: float, speed: int):
 
         if percent < 0:
             percent = 0

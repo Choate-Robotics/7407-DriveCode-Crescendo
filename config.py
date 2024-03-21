@@ -1,6 +1,7 @@
 # from dataclasses import dataclass
 from enum import Enum
 
+import wpilib
 from wpilib import AnalogEncoder, DigitalInput
 from wpimath.geometry import Pose3d, Rotation3d
 
@@ -62,19 +63,19 @@ elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
 odometry_debounce: float = 0.1  # TODO: PLACEHOLDER
 stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
 
-
 # Leds
 leds_id = 0
-leds_size = 27
+leds_size = 28
 
 
-def KRainbow():
-    return {"type": 2}
-
-
-class Type:
+class LEDType:
     def KStatic(r, g, b):
         return {"type": 1, "color": {"r": r, "g": g, "b": b}}
+
+    def KRainbow():
+        return {
+            'type': 2
+        }
 
     def KTrack(r1, g1, b1, r2, g2, b2):
         return {
@@ -105,6 +106,12 @@ class Type:
             return self.KLadder
         else:
             raise KeyError(f"Type {item} is not supported.")
+
+
+active_leds: tuple[LEDType, float, float] = (LEDType.KStatic(0, 0, 255), 1, 5)
+
+
+
 
 
 # TEAM

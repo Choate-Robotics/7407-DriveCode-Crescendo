@@ -4,7 +4,7 @@ import commands2
 import command, config, constants
 from robot_systems import Robot, Sensors, Field
 from oi.keymap import Keymap
-from math import radians
+import wpilib
 import robot_states as states
 log = LocalLogger("OI")
 

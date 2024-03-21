@@ -105,6 +105,8 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.calculations.init()
+            LEDs.leds.init()
+            LEDs.leds.enable()
 
         # try:
         #     init_sensors()
@@ -122,6 +124,16 @@ class _Robot(wpilib.TimedRobot):
         Robot.wrist.zero_wrist()
 
     def robotPeriodic(self):
+        # Leds
+        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.get_outer_current() > 0:
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        else:
+            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
+
+        LEDs.leds.set_LED(*config.active_leds)
+        LEDs.leds.cycle()
 
         # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
         #     config.active_team = config.Team.BLUE
@@ -215,6 +227,9 @@ class _Robot(wpilib.TimedRobot):
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
 
+        # Leds
+        config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+
         # Initialize Operator Interface
         OI.init()
         OI.map_controls()
@@ -242,7 +257,14 @@ class _Robot(wpilib.TimedRobot):
         # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length).andThen(command.SetElevator(Robot.elevator, 0)))
 
     def teleopPeriodic(self):
-        pass
+        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.get_outer_current() > 0:
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        else:
+            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
+        LEDs.leds.set_LED(*config.active_leds)
+        LEDs.leds.cycle()
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
