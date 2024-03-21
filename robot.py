@@ -59,16 +59,16 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        self.auto_selection.setDefaultOption("Two Notes", autonomous.two_note)
+        self.auto_selection.setDefaultOption("Four Note Middle", autonomous.four_note_middle)
+        # self.auto_selection.addOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Left Four Notes", autonomous.left_four_note)
-        self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
-        self.auto_selection.addOption("Five Notes", autonomous.five_note)
-        self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
-        self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
-        self.auto_selection.addOption("Four Note Middle", autonomous.four_note_middle)
-        self.auto_selection.addOption("SQUARE of death", autonomous.square)
+        # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
+        # self.auto_selection.addOption("Five Notes", autonomous.five_note)
+        # self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
+        # self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
+        # self.auto_selection.addOption("SQUARE of death", autonomous.square)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
