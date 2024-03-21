@@ -87,6 +87,11 @@ class Keymap:
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.R_3
         )
         
+        AMP = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.RB
+        )
+        
+        
         # AIM = commands2.button.Trigger(
         #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.5
         # )
@@ -118,7 +123,7 @@ class Keymap:
         )
         
         CLIMB_DOWN = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.START
         )
         
         TRAP =  commands2.button.Trigger(
