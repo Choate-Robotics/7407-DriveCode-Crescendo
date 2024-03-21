@@ -40,20 +40,6 @@ class OI:
                 command.DriveSwerveCustom(Robot.drivetrain)
             )
         
-        # Keymap.Shooter.AMP\
-        #     .and_(lambda: config.active_team == config.Team.RED).whileTrue(
-        #         command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(-90))
-        #     ).onFalse(
-        #         command.DriveSwerveCustom(Robot.drivetrain)
-        #     )
-            
-        # Keymap.Shooter.AMP\
-        #     .and_(lambda: config.active_team == config.Team.BLUE).whileTrue(
-        #         command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(90))
-        #     ).onFalse(
-        #         command.DriveSwerveCustom(Robot.drivetrain)
-        #     )
-        
         Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
             .and_(lambda: not states.flywheel_state == states.FlywheelState.amping)\
             .whileTrue(
@@ -67,12 +53,6 @@ class OI:
         Keymap.Drivetrain.X_MODE.onTrue(
             commands2.InstantCommand(lambda: Robot.drivetrain.x_mode())
         )
-
-        # Keymap.Intake.INTAKE_IN.and_(lambda: not Robot.intake.note_in_intake and not Robot.wrist.note_staged).onTrue(
-        #     command.RunIntake(Robot.intake).alongWith(commands2.InstantCommand(lambda: Robot.wrist.feed_idle()))
-        # ).onFalse(
-        #     command.IntakeIdle(Robot.intake).andThen(commands2.InstantCommand(lambda: Robot.wrist.stop_feed()).onlyIf(lambda: not Robot.intake.note_in_intake))
-        # )
 
         Keymap.Intake.INTAKE_IN.whileTrue(
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
@@ -88,22 +68,18 @@ class OI:
         )
 
         Keymap.Elevator.ELEVATOR_HIGH.onTrue(
-            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorHigh)
-            # command.EmergencyManuver(Robot.wrist, Robot.intake)
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)
         ).onFalse(
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
 
         Keymap.Elevator.ELEVATOR_MID.onTrue(
-            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorMid)
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorMid.height)
         ).onFalse(
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
 
         Keymap.Elevator.ELEVATOR_LOW.onTrue(
-            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kElevatorLow)
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorLow.height)
         )
 
@@ -114,10 +90,8 @@ class OI:
             states.flywheel_state = states.FlywheelState.released
             
         Keymap.Elevator.AMP.whileTrue(
-            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAmp).andThen(command.SetWrist(Robot.wrist, radians(-30)))
             command.Amp(Robot.elevator, Robot.wrist)
         ).onFalse(
-            # command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kIdle)
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
                 command.SetWristIdle(Robot.wrist)
             )
@@ -143,12 +117,7 @@ class OI:
 
         Keymap.Feeder.DUMP_NOTE.onTrue(
             command.PassNote(Robot.wrist),
-            # command.SetWrist(Robot.wrist, radians(config.staging_angle))
         )
-
-        # Keymap.Feeder.CLEAR_NOTE.onTrue(
-        #     commands2.InstantCommand(lambda: Robot.wrist.set_note_not_staged())
-        # )
 
         Keymap.Feeder.FEED.and_(lambda: not Robot.wrist.note_detected()).onTrue(
             commands2.InstantCommand(lambda: Robot.wrist.feed_in())
@@ -209,13 +178,3 @@ class OI:
         def set_auto_flywheel():
             states.flywheel_manual = False
 
-        #TODO: MANUAL REVERSE FLYWHEEL
-        # Keymap.Shooter.FLYWHEEL_MANUAL_REVERSE.onTrue(
-        #     commands2.InstantCommand(lambda: set_manual_flywheel()).alongWith(
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, -5)
-        #     )
-        # ).onFalse(
-        #     commands2.InstantCommand(lambda: set_auto_flywheel()).alongWith(
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.v0_flywheel)
-        #     )
-        # )

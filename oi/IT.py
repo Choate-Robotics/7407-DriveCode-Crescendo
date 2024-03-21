@@ -30,18 +30,7 @@ class IT:
         log.info("Mapping systems...")
 
         # INTAKE TRIGGERS ----------------
-        # If outer roller detects a note, run the intake in
-        # button.Trigger(lambda: Robot.intake.get_outer_current() >
-        # config.intake_roller_current_limit and not Robot.intake.intake_running)\
-        # .debounce(config.intake_sensor_debounce).onTrue(
-        #     command.RunIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
-        # )
 
-        # # If note in intake and wrist, after certain time, eject
-        # button.Trigger(lambda: Robot.intake.note_in_intake)\
-        #     .debounce(config.double_note_timeout).onTrue(
-        #         command.EjectIntake(Robot.intake).withTimeout(config.intake_timeout).andThen(command.IntakeIdle(Robot.intake))
-        #     )
 
         #INTAKE TRIGGERS ----------------
         
@@ -129,25 +118,7 @@ class IT:
         ).debounce(0.005).onTrue(command.Shoot(Robot.wrist))
         # SHOOTER TRIGGERS ----------------
 
-        #     #ODOMETRY TRIGGERS ----------------
 
-        #     def lock_giraffe():
-        #         Robot.elevator.lock()
-        #         Robot.wrist.lock()
-
-        #     def unlock_giraffe():
-        #         Robot.elevator.unlock()
-        #         Robot.wrist.unlock()
-
-        #     # # if close to stage, lock giraffe
-        #     # button.Trigger(lambda: Field.odometry.getPose().translation()
-        #     .distance(Field.POI.Coordinates.Structures.Obstacles.kStage
-        #     .getTranslation()) < config.stage_distance_threshold\
-        #     #     and (Robot.elevator.get_length() > config.elevator_stage_max
-        #     or Robot.wrist.get_wrist_angle() < config.wrist_stage_max))\
-        #     #     .debounce(config.odometry_debounce).onTrue(
-        #     #         command.GiraffeLock(Robot.elevator, Robot.wrist)
-        #     #     ).onFalse(InstantCommand(unlock_giraffe))
         #     # ODOMETRY TRIGGERS ----------------
 
         #     # LIMELIGHT TRIGGERS ----------------
