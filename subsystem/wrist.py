@@ -151,6 +151,9 @@ class Wrist(Subsystem):
         :param threshold: The threshold to check for
         :return: True if the wrist is at the given angle, False otherwise
         """
+        if not math.isfinite(self.get_wrist_angle()):
+            return False # usually means the encoder is not connected/simulation
+        
         return abs(bounded_angle_diff(self.get_wrist_angle(), angle)) < threshold
 
     def get_wrist_abs_angle(self):

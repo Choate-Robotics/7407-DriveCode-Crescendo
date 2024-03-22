@@ -1,185 +1,171 @@
-from command.autonomous.custom_pathing import FollowPathCustom
-from command.autonomous.trajectory import CustomTrajectory
+from command.autonomous.custom_pathing import FollowPathCustom, AngleType
+from command.autonomous.trajectory import CustomTrajectory, PoseType
 import command
 from robot_systems import Robot, Field
 from utils import POIPose
 import config
 import math
+from command import *
 
 from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
     ParallelCommandGroup,
-    WaitCommand
+    WaitCommand,
+    ParallelRaceGroup,
+    ParallelDeadlineGroup,
+    WaitUntilCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.MIDLINE_NOTES.coords import (
-    initial,
-    come_out_shoot_preload,
-    get_first_ring,
-    come_back_to_shoot_first_ring,
-    get_second_ring,
-    come_back_to_shoot_second_ring,
-    # get_third_ring,
-    # come_back_to_shoot_third_ring,
-)
+from autonomous.routines.MIDLINE_NOTES.coords import *
 
 from wpimath.geometry import Pose2d, Translation2d
-
-path_0 = FollowPathCustom(
-    subsystem=Robot.drivetrain,
-    trajectory=CustomTrajectory(
-        start_pose=POIPose(Pose2d(*come_out_shoot_preload[0])),
-        waypoints=[Translation2d(*coord) for coord in come_out_shoot_preload[1]],
-        end_pose=POIPose(Pose2d(*come_out_shoot_preload[2])),
-        max_velocity=5,
-        max_accel=3,
-        start_velocity=0,
-        end_velocity=0,
-        rev=True,
-    ),
-    # period=0.03,
-)
 
 path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=POIPose(Pose2d(*get_first_ring[0])),
-        waypoints=[Translation2d(*coord) for coord in get_first_ring[1]],
-        end_pose=get_first_ring[2],
+        start_pose=POIPose(Pose2d(*shoot_first_note[0])),
+        waypoints=[coord for coord in shoot_first_note[1]],
+        end_pose=shoot_first_note[2],
         max_velocity=5,
-        max_accel=3,
+        max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=True
     ),
-    # period=0.03,
+    theta_f=AngleType.calculate
 )
 
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=come_back_to_shoot_first_ring[0],
-        waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_first_ring[1]],
-        end_pose=come_back_to_shoot_first_ring[2],
-        max_velocity=5,
+        # start_pose=get_second_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in get_second_note[1]],
+        end_pose=get_second_note[2],
+        max_velocity=6,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True
     ),
-    # period=0.03,
+    theta_f=math.radians(-180)
 )
 
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_second_ring[0],
-        waypoints=[Translation2d(*coord) for coord in get_second_ring[1]],
-        end_pose=get_second_ring[2],
-        max_velocity=5,
+        # start_pose=shoot_second_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in shoot_second_note[1]],
+        end_pose=shoot_second_note[2],
+        max_velocity=6,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False
     ),
-    # period=0.03,
+    theta_f=AngleType.calculate
 )
 
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=come_back_to_shoot_second_ring[0],
-        waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_second_ring[1]],
-        end_pose=come_back_to_shoot_second_ring[2],
-        max_velocity=5,
+        # start_pose=get_third_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in get_third_note[1]],
+        end_pose=get_third_note[2],
+        max_velocity=6,
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=False,
+        rev=True
     ),
-    # period=0.03,
+    theta_f=math.radians(147)
 )
 
-# path_5 = FollowPathCustom(
-#     subsystem=Robot.drivetrain,
-#     trajectory=CustomTrajectory(
-#         start_pose=get_third_ring[0],
-#         waypoints=[Translation2d(*coord) for coord in get_third_ring[1]],
-#         end_pose=get_third_ring[2],
-#         max_velocity=12,
-#         max_accel=3,
-#         start_velocity=0,
-#         end_velocity=0,
-#         rev=True,
-#     ),
-#     period=0.03,
-# )
+path_5 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        # start_pose=shoot_third_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in shoot_third_note[1]],
+        end_pose=shoot_third_note[2],
+        max_velocity=6,
+        max_accel=3,
+        start_velocity=0,
+        end_velocity=0,
+        rev=False
+    ),
+    theta_f=AngleType.calculate
+)
 
-# path_6 = FollowPathCustom(
-#     subsystem=Robot.drivetrain,
-#     trajectory=CustomTrajectory(
-#         start_pose=come_back_to_shoot_third_ring[0],
-#         waypoints=[Translation2d(*coord) for coord in come_back_to_shoot_third_ring[1]],
-#         end_pose=come_back_to_shoot_third_ring[2],
-#         max_velocity=12,
-#         max_accel=3,
-#         start_velocity=0,
-#         end_velocity=0,
-#         rev=False,
-#     ),
-#     period=0.03,
-# )
+path_6 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        # start_pose=get_fourth_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in get_fourth_note[1]],
+        end_pose=get_fourth_note[2],
+        max_velocity=6,
+        max_accel=3,
+        start_velocity=0,
+        end_velocity=0,
+        rev=True
+    ),
+    theta_f=math.radians(-180)
+)
 
-# Between paths, need to score rings
 auto = ParallelCommandGroup(
-    command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+    SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
-        command.ZeroWrist(Robot.wrist),
-        command.ZeroElevator(Robot.elevator),
-        
-        path_0,
+        ZeroWrist(Robot.wrist),
+        ZeroElevator(Robot.elevator),
 
+        # Drive to shot zone and deploy intake
         ParallelCommandGroup(
-            command.ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-            command.DeployIntake(Robot.intake)
-        ),
-
-        ParallelCommandGroup(
-            command.DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)),
-            command.SetWristIdle(Robot.wrist)
-        ),
-
-        # ParallelCommandGroup(
             path_1,
-        #     command.RunIntake(Robot.intake)
-        # ),
+            DeployIntake(Robot.intake),
+        ),
+        
+        # Shoot first note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-        path_2,
+        # get second note from midline
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+        
+        # drive to shot zone
+        path_3,
+        
+        # shoot second note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-        # command.ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        # get third note from midline
+        PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+        
+        # drive to shot zone
+        path_5,
+        
+        # shoot third note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-        # ParallelCommandGroup(
-            path_3,
-        #     command.RunIntake(Robot.intake)
-        # ),
-
-        path_4,
-
-        # command.ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-        # ParallelCommandGroup(
-            # path_5,
-            # command.RunIntake(Robot.intake)
-        # ),
-
-        # path_6,
-        # command.ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-                # InstantCommand(lambda: print("Done")),
-            # )
+        # get fourth note from midline
+        PathUntilIntake(path_6, Robot.wrist, Robot.intake)
     )
+    # SequentialCommandGroup(
+    #     path_1,
+    #     WaitCommand(1),
+    #     path_2,
+    #     WaitCommand(1),
+    #     path_3,
+    #     WaitCommand(1),
+    #     path_4,
+    #     WaitCommand(1),
+    #     path_5,
+    #     WaitCommand(1),
+    #     path_6
+    # )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

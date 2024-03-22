@@ -16,6 +16,7 @@ from commands2 import (
     SequentialCommandGroup,
     WaitCommand,
 )
+from commands2.command import Command
 from wpimath.geometry import Pose2d, Rotation2d  # noqa
 
 import config
@@ -235,7 +236,23 @@ class IntakeStageNote(SequentialCommandGroup):
         super().__init__(
             SetWristIdle(wrist), RunIntakeConstant(intake), FeedIn(wrist)  # noqa
         )  # noqa
+        
+class IntakeStageNoteAuto(ParallelRaceGroup):
+    def __init__(self, wrist: Wrist, intake: Intake):
+        super().__init__(
+            IntakeStageNote(wrist, intake),
+            WaitUntilCommand(lambda: wrist.note_in_feeder()),
+        )
 
+class PathUntilIntake(ParallelRaceGroup):
+    def __init__(self, path: Command, wrist: Wrist, intake: Intake):
+        super().__init__(
+            SequentialCommandGroup(
+                path,
+                WaitCommand(config.auto_path_intake_note_deadline)
+            ),
+            IntakeStageNote(wrist, intake)
+        )
 
 class IntakeStageIdle(SequentialCommandGroup):
     def __init__(self, wrist: Wrist, intake: Intake):
