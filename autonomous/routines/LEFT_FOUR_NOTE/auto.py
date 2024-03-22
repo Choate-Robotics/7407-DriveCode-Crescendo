@@ -1,4 +1,4 @@
-from command.autonomous.custom_pathing import FollowPathCustom
+from command.autonomous.custom_pathing import FollowPathCustom, AngleType
 from command.autonomous.trajectory import CustomTrajectory, PoseType
 from robot_systems import Robot, Field
 from utils import POIPose
@@ -67,7 +67,8 @@ path_3 = FollowPathCustom(
         start_velocity=0,
         end_velocity=0,
         rev=False
-    )
+    ),
+    theta_f=AngleType.calculate
 )
 
 path_4 = FollowPathCustom(
@@ -97,7 +98,8 @@ path_5 = FollowPathCustom(
         start_velocity=0,
         end_velocity=0,
         rev=False
-    )
+    ),
+    theta_f=AngleType.calculate
 )
 
 
@@ -114,7 +116,7 @@ auto = SequentialCommandGroup(
                 DeployIntake(Robot.intake)
             ),
 
-            # Get first note
+            # Get second note
             PathUntilIntake(path_1, Robot.wrist, Robot.intake),
 
             # Shoot second note
@@ -128,8 +130,25 @@ auto = SequentialCommandGroup(
 
             # Shoot third note
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+
+            # Get fourth note
+            PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+
+            # Drive back to wing
+            path_5,
+
+            # Shoot fourth note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
+
+
         )
     ),
+
+    # path_1,
+    # path_2,
+    # path_3,
+    # path_4,
+    # path_5
 
 )
 

@@ -20,7 +20,7 @@ get_first_note: path = (
 get_second_note: path = (
     get_first_note[2],
     [Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.3))],
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.7, 0.1))
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.7, 0))
 )
 
 go_to_wing_boundary_1: path = (
@@ -31,7 +31,9 @@ go_to_wing_boundary_1: path = (
 
 get_third_note: path = (
     go_to_wing_boundary_1[2],
-    [Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(-1.5, constants.FieldPos.MidLine.note_gap / 2))],
+    [
+        # Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(-1.5, constants.FieldPos.MidLine.note_gap / 2))
+        ],
     Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.7, 0))
 )
 
