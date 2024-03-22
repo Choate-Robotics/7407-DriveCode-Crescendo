@@ -1,5 +1,5 @@
 from command.autonomous.custom_pathing import FollowPathCustom, AngleType
-from command.autonomous.trajectory import CustomTrajectory
+from command.autonomous.trajectory import CustomTrajectory, PoseType
 import command
 from robot_systems import Robot, Field
 from utils import POIPose
@@ -37,7 +37,8 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_second_note[0],
+        # start_pose=get_second_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=6,
@@ -52,7 +53,8 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=shoot_second_note[0],
+        # start_pose=shoot_second_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_second_note[1]],
         end_pose=shoot_second_note[2],
         max_velocity=6,
@@ -67,7 +69,8 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_third_note[0],
+        # start_pose=get_third_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=6,
@@ -76,13 +79,14 @@ path_4 = FollowPathCustom(
         end_velocity=0,
         rev=True
     ),
-    theta_f=math.radians(-180)
+    theta_f=math.radians(147)
 )
 
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=shoot_third_note[0],
+        # start_pose=shoot_third_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
         max_velocity=6,
@@ -97,7 +101,8 @@ path_5 = FollowPathCustom(
 path_6 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_fourth_note[0],
+        # start_pose=get_fourth_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_fourth_note[1]],
         end_pose=get_fourth_note[2],
         max_velocity=6,
@@ -119,8 +124,8 @@ auto = ParallelCommandGroup(
             path_1,
             DeployIntake(Robot.intake),
         ),
-        AimWrist(Robot.wrist, Field.calculations).until(lambda: Robot.wrist.ready_to_shoot),
-        PassNote(Robot.wrist),
+
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
             path_2,
             SequentialCommandGroup(
@@ -129,8 +134,7 @@ auto = ParallelCommandGroup(
             )
         ),
         path_3,
-        AimWrist(Robot.wrist, Field.calculations).until(lambda: Robot.wrist.ready_to_shoot),
-        PassNote(Robot.wrist),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
             path_4,
             SequentialCommandGroup(
@@ -139,8 +143,7 @@ auto = ParallelCommandGroup(
             )
         ),
         path_5,
-        AimWrist(Robot.wrist, Field.calculations).until(lambda: Robot.wrist.ready_to_shoot),
-        PassNote(Robot.wrist),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         ParallelCommandGroup(
             path_6,
             SequentialCommandGroup(
