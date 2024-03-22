@@ -233,6 +233,7 @@ shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 auto_shoot_deadline = 1.2
 auto_intake_note_deadline = 3
+auto_path_intake_note_deadline = 0.5
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.5

@@ -11,7 +11,10 @@ from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
     ParallelCommandGroup,
-    WaitCommand
+    WaitCommand,
+    ParallelRaceGroup,
+    ParallelDeadlineGroup,
+    WaitUntilCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -126,31 +129,45 @@ auto = ParallelCommandGroup(
         ),
 
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        ParallelCommandGroup(
-            path_2,
-            SequentialCommandGroup(
-                SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(4)
-            )
-        ),
+        # ParallelCommandGroup(
+        #     path_2,
+        #     SequentialCommandGroup(
+        #         SetWristIdle(Robot.wrist),
+        #         ParallelRaceGroup(
+        #             IntakeStageNote(Robot.wrist, Robot.intake)
+        #         )
+        #         .withInterrupt(lambda: Robot.wrist.note_in_feeder()).withTimeout(4)
+        #     )
+        # ),
+        # path_2,
+        # ParallelRaceGroup(
+        #     SequentialCommandGroup(
+        #         path_2,
+        #         WaitCommand(config.auto_path_intake_note_deadline)
+        #     ),
+        #     IntakeStageNote(Robot.wrist, Robot.intake)
+        # ),
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake),
         path_3,
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        ParallelCommandGroup(
-            path_4,
-            SequentialCommandGroup(
-                SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(4)
-            )
-        ),
+        # ParallelCommandGroup(
+        #     path_4,
+        #     SequentialCommandGroup(
+        #         SetWristIdle(Robot.wrist),
+        #         IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(4)
+        #     )
+        # ),
+        PathUntilIntake(path_4, Robot.wrist, Robot.intake),
         path_5,
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        ParallelCommandGroup(
-            path_6,
-            SequentialCommandGroup(
-                SetWristIdle(Robot.wrist),
-                IntakeStageNote(Robot.wrist, Robot.intake)
-            )
-        ),
+        # ParallelCommandGroup(
+        #     path_6,
+        #     SequentialCommandGroup(
+        #         SetWristIdle(Robot.wrist),
+        #         IntakeStageNote(Robot.wrist, Robot.intake)
+        #     )
+        # ),
+        PathUntilIntake(path_6, Robot.wrist, Robot.intake)
     )
     # SequentialCommandGroup(
     #     path_1,
