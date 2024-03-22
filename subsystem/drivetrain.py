@@ -26,7 +26,6 @@ from toolkit.subsystem_templates.drivetrain import (
     SwerveDrivetrain,
     SwerveNode,
 )
-
 foc_active = False
 
 
@@ -43,6 +42,7 @@ class CustomSwerveNode(SwerveNode):
         print(f"Initializing {self.name}", self.counter)
         self.m_move.init()
         self.m_turn.init()
+        self.m_turn.optimize_normal_sparkmax()
         self.counter += 1
 
     def zero(self):
