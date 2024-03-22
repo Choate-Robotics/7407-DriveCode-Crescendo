@@ -2,6 +2,7 @@
 import math
 from enum import Enum
 
+import wpilib
 import rev
 
 # from rev import CANSparkMax
@@ -17,16 +18,13 @@ from units.SI import (
     meters,
     meters_per_second,
     radians,
-    degrees
+    degrees,
+    inches
 )
-
-# from typing import Literal
-
 
 comp_bot: DigitalInput = DigitalInput(
     2
 )  # if false, we are using the practice bot (we will put a jumper on the DIO port)
-
 
 DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
@@ -62,18 +60,22 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
     math.radians(30)
 )
 
-
 # STATE VARIABLES -- PLEASE DO NOT CHANGE
 
 
 # Leds
-def KRainbow():
-    return {"type": 2}
+leds_id = 0
+leds_size = 28
 
 
-class Type:
+class LEDType:
     def KStatic(r, g, b):
         return {"type": 1, "color": {"r": r, "g": g, "b": b}}
+
+    def KRainbow():
+        return {
+            'type': 2
+        }
 
     def KTrack(r1, g1, b1, r2, g2, b2):
         return {
@@ -92,6 +94,21 @@ class Type:
             "typeB": typeB,
             "speed": speed,
         }
+
+    def __getitem__(self, item):
+        if item == 1:
+            return self.KStatic
+        elif item == 3:
+            return self.KTrack
+        elif item == 4:
+            return self.KBlink
+        elif item == 5:
+            return self.KLadder
+        else:
+            raise KeyError(f"Type {item} is not supported.")
+
+
+active_leds: tuple[LEDType, float, float] = (LEDType.KStatic(0, 0, 255), 1, 5)
 
 
 # TEAM
@@ -166,8 +183,8 @@ elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
 elevator_climb_current_limit: float = 45
-elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
-#helloworld
+elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
+
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
@@ -181,7 +198,7 @@ wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = 0.2
 feeder_voltage_feed = 8
 feeder_voltage_trap = 14
-feeder_voltage_crawl = 4.15
+feeder_voltage_crawl = 4.25 if comp_bot.get() else 4
 feeder_pass_velocity = 0.5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = 0.65
@@ -216,8 +233,13 @@ drivetrain_rotation_I: float = 0.0
 drivetrain_rotation_D: float = 0.08
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
-drivetrain_aiming_offset: degrees = 2.0 # degrees
+
 drivetrain_rotation_enable_tuner: bool = True
+
+#Shooting
+drivetrain_aiming_offset: degrees = 2.0 # degrees
+shot_height_offset: inches = 2.0 # inches 
+
 
 # Flywheel
 flywheel_id_1 = 19

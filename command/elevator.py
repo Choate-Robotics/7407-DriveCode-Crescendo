@@ -39,6 +39,7 @@ class SetElevator(SubsystemCommand[Elevator]):
         super().__init__(subsystem)
         self.length: float = length
 
+
     def initialize(self):
 
         self.length = self.subsystem.limit_length(self.length)

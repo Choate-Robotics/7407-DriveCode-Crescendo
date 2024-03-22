@@ -106,6 +106,7 @@ auto = ParallelCommandGroup(
         # Shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
+
         # Get third note
         PathUntilIntake(path_2, Robot.wrist, Robot.intake),
 
@@ -120,6 +121,7 @@ auto = ParallelCommandGroup(
 
         # Get fifth note, go to midline
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+
     )
 )
 

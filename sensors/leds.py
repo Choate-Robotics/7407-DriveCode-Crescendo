@@ -1,21 +1,8 @@
-from wpilib import AddressableLED, PowerDistribution
+from wpilib import AddressableLED, PowerDistribution, SmartDashboard
 import math, config
 
-
-class ALeds():
-    """
-    Addressable LEDS from PWM RIO
-    """
-
+class ALeds:
     m_led: AddressableLED
-
-    # active_mode: dict
-    # speed: int
-    # brightness: float
-    # last_active_mode: dict
-    # last_speed: int
-    # last_brightness: float
-    # m_ledBuffer: AddressableLED.LEDData
 
     def __init__(self, id: int, size: int):
         self.size = size
@@ -32,13 +19,12 @@ class ALeds():
     def init(self):
         self.m_rainbowFirstPixelHue = 0
         self.m_led = AddressableLED(self.id)
-        self.m_led.setLength(self.size)
+        self.m_led.setLength(self.size)  # 27
         self.m_ledBuffer = self.m_led.LEDData()
-        self.array = [self.m_ledBuffer for i in range(self.size)]
-        # for i in range(self.size):
-        #     self.array.append(self.m_led.LEDData())
-        self.m_led.setData(self.array)
-        self.m_led.start()
+        self.led_data = [self.m_ledBuffer for i in range(self.size)]
+        self.m_led.setData(self.led_data)
+
+        SmartDashboard.putBoolean("LEDs Initialized", True)
 
     def enable(self):
         self.m_led.start()
@@ -46,34 +32,17 @@ class ALeds():
     def disable(self):
         self.m_led.stop()
 
-    def setBrightness(self, brightness: float):
+    def set_brightness(self, brightness: float):
         self.brightness = brightness
 
-    def getArray(self):
+    def get_led_data(self):
         return [self.m_led.LEDData() for i in range(self.size)].copy()
 
-    def getCurrentCycle(self):
-        return self.array
+    def get_current_cycle(self):
+        return self.led_data
 
-    def getCurrentType(self):
-        return self.active_mode
-
-    def run(self):
-        pass
-
-    def storeCurrent(self):
-        self.last_active_mode = self.active_mode
-        self.last_speed = self.speed
-        self.last_brightness = self.brightness
-
-    def setLED(self, type: config.Type, brightness: float = 1.0, speed: int = 5):
-        self.storeCurrent()
-        self.active_mode = type
-        self.speed = speed
-        self.brightness = brightness
-
-    def getLED(self):
-        if self.active_mode == None:
+    def get_current_type(self):
+        if self.active_mode is None:
             return {
                 'type': 0,
                 'color': {
@@ -82,17 +51,26 @@ class ALeds():
                     'b': 0
                 }
             }
-        else:
-            return self.active_mode
+        return self.active_mode
 
-    def setLast(self):
+    def store_current(self):
+        self.last_active_mode = self.active_mode
+        self.last_speed = self.speed
+        self.last_brightness = self.brightness
+
+    def set_LED(self, type, brightness: float = 1.0, speed: int = 5):
+        self.store_current()
+        self.active_mode = type
+        self.speed = speed
+        self.brightness = brightness
+
+    def set_last_current(self):
         self.active_mode = self.last_active_mode
         self.speed = self.last_speed
         self.brightness = self.last_brightness
 
-    def match(self, type: config.Type):
-
-        res = self.getArray()
+    def match(self, type: config.LEDType):
+        res = self.get_led_data()
         match type['type']:
             case 1:
                 color = type['color']
@@ -114,45 +92,36 @@ class ALeds():
         return res
 
     def cycle(self):
-        '''
-        cycles through LED array
-        this should be called periodically
-        '''
-        self.array = self.match(self.active_mode)
-
-        # self.m_led.setData(self.match(self.active_mode))
-
-        self.m_led.setData(self.array)
+        self.m_led.setData(self.match(self.active_mode))
 
     def _setStatic(self, red: int, green: int, blue: int):
 
-        static = self.getArray()
+        static = self.get_led_data()
 
         for i in range(self.size):
             static[i].setRGB(red, green, blue)
-        # self.m_led.setData(self.array)
 
         return static
 
     def _setRainbow(self):
-        arr = self.getArray()
+        rainbow = self.get_led_data()
         for i in range(self.size):
             # Calculate the hue - hue is easier for rainbows because the color
             # shape is a circle so only one value needs to precess
-            hue = math.floor(self.m_rainbowFirstPixelHue + (i * 180 / self.size) % 180)
+            hue = math.floor((self.m_rainbowFirstPixelHue + (i * 180 / self.size)) % 180)
             # Set the value
-            arr[i].setHSV(hue, 255, 128)
+            rainbow[i].setHSV(hue, 255, 128)
 
         # Increase by to make the rainbow "move"
         self.m_rainbowFirstPixelHue += self.speed
+
         # Check bounds
         self.m_rainbowFirstPixelHue %= 180
-        # self.m_led.setData(self.array)
 
-        return arr.copy()
+        return rainbow
 
     def _setTrack(self, r1, g1, b1, r2, g2, b2):
-        track = self.getArray()
+        track = self.get_led_data()
         for i in range(self.size):
             track[i].setRGB(r1, g1, b1)
 
@@ -166,10 +135,8 @@ class ALeds():
 
         return track
 
-        # self.m_led.setData(self.array)
-
     def _setBlink(self, r, g, b):
-        blink = self.getArray()
+        blink = self.get_led_data()
         if self.blink_index / (2 * self.speed) <= .5:
             for i in range(self.size):
                 blink[i].setRGB(r, g, b)
@@ -183,16 +150,12 @@ class ALeds():
 
         return blink
 
-    def _setLadder(self, typeA: config.Type, typeB: config.Type, percent: float, speed: int):
+    def _setLadder(self, typeA: config.LEDType, typeB: config.LEDType, percent: float, speed: int):
 
         if percent < 0:
             percent = 0
         elif percent > 1:
             percent = 1
-
-        # print('a type', typeA['type'])
-
-        # print('ladder percent:', percent)
 
         save = self.speed
 
@@ -205,9 +168,6 @@ class ALeds():
         for i, led_b in enumerate(b_led):
             if i < math.floor(self.size * percent):
                 b.append(led_b)
-        # print('b size:', len(b))
-
-        # print('list b', len(b))
 
         self.speed = save
 
@@ -226,7 +186,7 @@ class ALeds():
         else:
             return res.copy()
 
-        return self.array
+        return self.led_data
 
 
 class SLEDS:

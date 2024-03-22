@@ -12,7 +12,7 @@ from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
 from wpimath.geometry import Rotation2d, Translation3d, Translation2d
-
+from units.SI import inches_to_meters
 
 
 # from scipy.integrate import solve_ivp
@@ -53,6 +53,7 @@ class TrajectoryCalculator:
             self.table.putNumber('flywheel distance scalar', config.flywheel_distance_scalar)
             self.table.putNumber('flywheel minimum value', config.v0_flywheel_minimum)
             self.table.putNumber('flywheel maximum value', config.v0_flywheel_maximum)
+            self.table.putNumber('shot height offset', config.shot_height_offset)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -125,8 +126,14 @@ class TrajectoryCalculator:
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
-                self.speaker_z - self.elevator.get_length() - constants.shooter_height
+                self.speaker_z - self.elevator.get_length() - constants.shooter_height 
         )
+        
+        if self.tuning:
+            config.shot_height_offset = self.table.getNumber('shot height offset', config.shot_height_offset)
+            
+        self.delta_z += (config.shot_height_offset * inches_to_meters)
+        
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
@@ -184,6 +191,7 @@ class TrajectoryCalculator:
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
         self.table.putNumber('delta z', self.delta_z)
+        self.table.putNumber('flywheel speed', self.get_flywheel_speed(self.distance_to_target))
         
     def run_sim(self, shooter_theta):
         def hit_target(t, u):

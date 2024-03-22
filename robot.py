@@ -96,7 +96,6 @@ class _Robot(wpilib.TimedRobot):
                 subsystem.init()
                 CAN_delay(0.2)
 
-
         self.handle(init_subsystems)
 
         def init_sensors():
@@ -105,7 +104,8 @@ class _Robot(wpilib.TimedRobot):
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.calculations.init()
-
+            LEDs.leds.init()
+            LEDs.leds.enable()
 
         self.handle(init_sensors)
         Field.calculations.tuning = True
@@ -116,6 +116,22 @@ class _Robot(wpilib.TimedRobot):
         # Field.odometry.disable()
 
     def robotPeriodic(self):
+        # Leds
+        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.get_outer_current() > 0:
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        else:
+            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
+
+        LEDs.leds.set_LED(*config.active_leds)
+        LEDs.leds.cycle()
+
+        # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+        #     config.active_team = config.Team.BLUE
+        # else:
+        #     config.active_team = config.Team.RED
+
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
@@ -162,10 +178,6 @@ class _Robot(wpilib.TimedRobot):
 
         IT.init()
         IT.map_systems()
-        
-
-        
-        
 
         self.scheduler.schedule(
             commands2.SequentialCommandGroup(
@@ -179,7 +191,14 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
 
     def teleopPeriodic(self):
-        pass
+        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.get_outer_current() > 0:
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        else:
+            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
+        LEDs.leds.set_LED(*config.active_leds)
+        LEDs.leds.cycle()
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
@@ -202,8 +221,6 @@ class _Robot(wpilib.TimedRobot):
         # Robot.drivetrain.n_front_right.zero()
         # Robot.drivetrain.n_back_left.zero()
         # Robot.drivetrain.n_back_right.zero()
-        ...
-
         # Robot.drivetrain.gyro.reset_angle(radians(180))
         #
         # new_pose = Robot.drivetrain.odometry.getPose()
