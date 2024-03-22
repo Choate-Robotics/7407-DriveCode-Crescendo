@@ -123,50 +123,34 @@ auto = ParallelCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
 
+        # Drive to shot zone and deploy intake
         ParallelCommandGroup(
             path_1,
             DeployIntake(Robot.intake),
         ),
+        
+        # Shoot first note
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     path_2,
-        #     SequentialCommandGroup(
-        #         SetWristIdle(Robot.wrist),
-        #         ParallelRaceGroup(
-        #             IntakeStageNote(Robot.wrist, Robot.intake)
-        #         )
-        #         .withInterrupt(lambda: Robot.wrist.note_in_feeder()).withTimeout(4)
-        #     )
-        # ),
-        # path_2,
-        # ParallelRaceGroup(
-        #     SequentialCommandGroup(
-        #         path_2,
-        #         WaitCommand(config.auto_path_intake_note_deadline)
-        #     ),
-        #     IntakeStageNote(Robot.wrist, Robot.intake)
-        # ),
+        # get second note from midline
         PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+        
+        # drive to shot zone
         path_3,
+        
+        # shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     path_4,
-        #     SequentialCommandGroup(
-        #         SetWristIdle(Robot.wrist),
-        #         IntakeStageNote(Robot.wrist, Robot.intake).withTimeout(4)
-        #     )
-        # ),
+
+        # get third note from midline
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+        
+        # drive to shot zone
         path_5,
+        
+        # shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # ParallelCommandGroup(
-        #     path_6,
-        #     SequentialCommandGroup(
-        #         SetWristIdle(Robot.wrist),
-        #         IntakeStageNote(Robot.wrist, Robot.intake)
-        #     )
-        # ),
+
+        # get fourth note from midline
         PathUntilIntake(path_6, Robot.wrist, Robot.intake)
     )
     # SequentialCommandGroup(

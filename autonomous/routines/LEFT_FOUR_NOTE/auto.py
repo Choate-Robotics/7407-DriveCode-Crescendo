@@ -107,7 +107,6 @@ auto = SequentialCommandGroup(
         SequentialCommandGroup(
             ZeroWrist(Robot.wrist),
             ZeroElevator(Robot.elevator),
-            DriveSwerveHoldRotation(Robot.drivetrain, math.radians(-180)).withTimeout(3),
 
             # Shoot preload and deploy intake
             ParallelCommandGroup(
@@ -115,16 +114,19 @@ auto = SequentialCommandGroup(
                 DeployIntake(Robot.intake)
             ),
 
+            # Get first note
             PathUntilIntake(path_1, Robot.wrist, Robot.intake),
 
             # Shoot second note
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-
+            # Get third note at midline
             PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+            
+            # Drive back to wing
             path_3,
 
-
+            # Shoot third note
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         )
     ),
