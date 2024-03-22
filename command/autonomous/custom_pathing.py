@@ -91,6 +91,9 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             self.theta_f = self.end_pose.rotation().radians()
         elif self.theta_f == AngleType.calculate:
             self.use_calculations = True
+        else:
+            if config.active_team == config.Team.BLUE:
+                self.theta_f *= -1
 
         # self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
         self.finished = False
