@@ -37,7 +37,7 @@ class IT:
         
         #FEEDER TRIGGERS ----------------
         
-        button.Trigger(lambda: Robot.wrist.note_in_feeder() and not robot_states.climbed)\
+        button.Trigger(lambda: Robot.wrist.detect_note_first() and not Robot.wrist.detect_note_second() and not robot_states.climbed)\
             .onTrue(
                 InstantCommand(lambda: Robot.wrist.set_feed_voltage(config.feeder_voltage_crawl))
             )\
