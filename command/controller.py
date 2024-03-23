@@ -245,11 +245,11 @@ class IntakeStageNoteAuto(ParallelRaceGroup):
         )
 
 class PathUntilIntake(ParallelRaceGroup):
-    def __init__(self, path: Command, wrist: Wrist, intake: Intake):
+    def __init__(self, path: Command, wrist: Wrist, intake: Intake, waittime:float = config.auto_path_intake_note_deadline):
         super().__init__(
             SequentialCommandGroup(
                 path,
-                WaitCommand(config.auto_path_intake_note_deadline)
+                WaitCommand(waittime)
             ),
             IntakeStageNote(wrist, intake)
         )

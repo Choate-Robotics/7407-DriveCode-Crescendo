@@ -238,7 +238,7 @@ drivetrain_rotation_enable_tuner: bool = True
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-shot_height_offset: inches = 5.0 if active_team == Team.BLUE else 3.5 # inches
+shot_height_offset: inches = 3.5 if active_team == Team.BLUE else 3.5 # inches
 wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
 
 
@@ -256,7 +256,7 @@ shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 auto_shoot_deadline = 1.2
 auto_intake_note_deadline = 3
-auto_path_intake_note_deadline = 0.5
+auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.5
