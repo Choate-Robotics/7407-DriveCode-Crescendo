@@ -44,11 +44,12 @@ path_2 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
-        max_velocity=6,
-        max_accel=3,
+        max_velocity=9,
+        max_accel=4,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=get_second_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(-180)
 )
@@ -60,11 +61,12 @@ path_3 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_second_note[1]],
         end_pose=shoot_second_note[2],
-        max_velocity=6,
-        max_accel=3,
+        max_velocity=9,
+        max_accel=4,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=False,
+        start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
     theta_f=AngleType.calculate
 )
@@ -76,13 +78,14 @@ path_4 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
-        max_velocity=6,
-        max_accel=3,
+        max_velocity=9,
+        max_accel=4,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=get_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(147)
+    theta_f=math.radians(160)
 )
 
 path_5 = FollowPathCustom(
@@ -92,11 +95,12 @@ path_5 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
-        max_velocity=6,
-        max_accel=3,
+        max_velocity=9,
+        max_accel=4,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=False,
+        start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
     theta_f=AngleType.calculate
 )
@@ -108,11 +112,12 @@ path_6 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in get_fourth_note[1]],
         end_pose=get_fourth_note[2],
-        max_velocity=6,
-        max_accel=3,
+        max_velocity=9,
+        max_accel=4,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=get_fourth_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(-180)
 )
@@ -125,7 +130,7 @@ auto = ParallelCommandGroup(
 
         # Drive to shot zone and deploy intake
         ParallelCommandGroup(
-            path_1,
+            path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
             DeployIntake(Robot.intake),
         ),
         
@@ -133,10 +138,10 @@ auto = ParallelCommandGroup(
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         # get second note from midline
-        PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
         
         # drive to shot zone
-        path_3,
+        path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
         
         # shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
@@ -145,7 +150,7 @@ auto = ParallelCommandGroup(
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
         
         # drive to shot zone
-        path_5,
+        path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
         
         # shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
@@ -155,15 +160,10 @@ auto = ParallelCommandGroup(
     )
     # SequentialCommandGroup(
     #     path_1,
-    #     WaitCommand(1),
     #     path_2,
-    #     WaitCommand(1),
     #     path_3,
-    #     WaitCommand(1),
     #     path_4,
-    #     WaitCommand(1),
     #     path_5,
-    #     WaitCommand(1),
     #     path_6
     # )
 )

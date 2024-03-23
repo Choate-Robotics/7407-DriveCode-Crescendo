@@ -35,7 +35,7 @@ get_third_note = (
     [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.25, 0)),
     #  Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d(-1, 0))
      ],
-    Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d((-2 * drivetrain_length / 3) + 0.7, -0.5))
+    Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d((-2 * drivetrain_length / 3) + 0.7, -0.35))
 )
 
 shoot_third_note = (
