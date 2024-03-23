@@ -22,6 +22,7 @@ from autonomous.routines.FOUR_NOTE_MIDDLE.coords import (
     initial
 )
 
+
 from wpimath.geometry import Pose2d, Translation2d
 
 path_1 = FollowPathCustom(
@@ -35,7 +36,8 @@ path_1 = FollowPathCustom(
         max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=math.radians(-135)
     ),
     theta_f=math.radians(-135)
 )
@@ -51,7 +53,8 @@ path_2 = FollowPathCustom(
         max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=False,
+        start_rotation=get_second_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(135)
 )
@@ -67,7 +70,8 @@ path_3 = FollowPathCustom(
         max_accel=2,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=False,
+        start_rotation=get_third_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(135)
 )
@@ -83,7 +87,8 @@ path_4 = FollowPathCustom(
         max_accel=3,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=go_to_midline[0].get().rotation().radians()
     ),
     theta_f=math.radians(-180)
 )
@@ -101,20 +106,20 @@ auto = ParallelCommandGroup(
         ),
         
         # Get second note
-        PathUntilIntake(path_1, Robot.wrist, Robot.intake),
+        PathUntilIntake(path_1, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot second note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
 
         # Get third note
-        PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot third note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         # Get fourth note
-        PathUntilIntake(path_3, Robot.wrist, Robot.intake),
+        PathUntilIntake(path_3, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot fourth note
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
@@ -123,6 +128,12 @@ auto = ParallelCommandGroup(
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
 
     )
+    # SequentialCommandGroup(
+    #     path_1,
+    #     path_2,
+    #     path_3,
+    #     path_4,
+    # )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)
