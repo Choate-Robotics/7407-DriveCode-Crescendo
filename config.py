@@ -238,7 +238,7 @@ drivetrain_rotation_enable_tuner: bool = True
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-shot_height_offset: inches = 2.0 # inches
+shot_height_offset: inches = 5.0 if active_team == Team.BLUE else 3.5 # inches
 wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
 
 
