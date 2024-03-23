@@ -41,7 +41,7 @@ get_third_note = (
 shoot_third_note = (
     get_third_note[2],
     [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.25, 0))],
-    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(135)
+    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-135)
 )
 
 get_fourth_note = (

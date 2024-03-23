@@ -249,7 +249,8 @@ class PathUntilIntake(ParallelRaceGroup):
         super().__init__(
             SequentialCommandGroup(
                 path,
-                WaitCommand(waittime)
+                WaitCommand(waittime),
+                WaitUntilCommand(lambda: not wrist.note_in_feeder())
             ),
             IntakeStageNote(wrist, intake)
         )

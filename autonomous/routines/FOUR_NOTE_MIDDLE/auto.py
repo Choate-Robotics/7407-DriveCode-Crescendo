@@ -99,7 +99,7 @@ auto = ParallelCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
 
-        # Shoot first note preload and deploy intake
+        # Shoot first note preload and deploy intake`   `
         ParallelCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
             DeployIntake(Robot.intake)

@@ -28,6 +28,7 @@ from robot_systems import (  # noqa
 from toolkit.subsystem import Subsystem
 from units.SI import inches_to_meters
 from utils import CAN_delay
+import robot_states as states
 
 
 class _Robot(wpilib.TimedRobot):
@@ -127,10 +128,21 @@ class _Robot(wpilib.TimedRobot):
         LEDs.leds.set_LED(*config.active_leds)
         LEDs.leds.cycle()
 
-        # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-        #     config.active_team = config.Team.BLUE
-        # else:
-        #     config.active_team = config.Team.RED
+        def get_flywheel_state():
+            match states.flywheel_state:
+                case states.FlywheelState.idle:
+                    return 'Idle'
+                case states.FlywheelState.shooting:
+                    return 'Shooting'
+                case states.FlywheelState.amping:
+                    return 'Amping'
+                case states.FlywheelState.released:
+                    return 'Released'
+
+        states_nt = self.nt.getTable('states')
+        states_nt.putString('flywheel', get_flywheel_state())
+        
+
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
@@ -188,7 +200,20 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.schedule(
             command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
+
+        if Robot.wrist.note_in_feeder():
+            states.flywheel_state = states.FlywheelState.shooting
+        else:
+            states.flywheel_state = states.FlywheelState.idle
+            
+        # self.scheduler.schedule(
+        #     commands2.ConditionalCommand(
+        #         command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel),
+        #         lambda: Robot.wrist.note_in_feeder()
+        #     )
+            
+        # )
 
     def teleopPeriodic(self):
         if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
