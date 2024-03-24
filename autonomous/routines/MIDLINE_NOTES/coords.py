@@ -15,7 +15,7 @@ initial = (1.9 - drivetrain_length_with_bumpers/2, 2.92, math.radians(-180))
 shoot_first_note = (
     initial,
     [],
-    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring
+    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withOffset(Translation2d(-0.25, 0))
 )
 
 get_second_note = (
@@ -40,7 +40,7 @@ get_third_note = (
 
 shoot_third_note = (
     get_third_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.25, 0))],
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.5, 0))],
     Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-135)
 )
 

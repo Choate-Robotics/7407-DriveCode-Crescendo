@@ -34,7 +34,7 @@ path_1 = FollowPathCustom(
         end_velocity=0,
         rev=True
     ),
-    theta_f=AngleType.calculate
+    theta_f=math.radians(-120)
 )
 
 path_2 = FollowPathCustom(
@@ -45,7 +45,7 @@ path_2 = FollowPathCustom(
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=9,
-        max_accel=4,
+        max_accel=7,
         start_velocity=0,
         end_velocity=0,
         rev=True,
@@ -62,13 +62,13 @@ path_3 = FollowPathCustom(
         waypoints=[coord for coord in shoot_second_note[1]],
         end_pose=shoot_second_note[2],
         max_velocity=9,
-        max_accel=4,
+        max_accel=5.5,
         start_velocity=0,
         end_velocity=0,
         rev=False,
         start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
-    theta_f=AngleType.calculate
+    theta_f=math.radians(-120)
 )
 
 path_4 = FollowPathCustom(
@@ -79,7 +79,7 @@ path_4 = FollowPathCustom(
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=9,
-        max_accel=4,
+        max_accel=7,
         start_velocity=0,
         end_velocity=0,
         rev=True,
@@ -96,13 +96,13 @@ path_5 = FollowPathCustom(
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
         max_velocity=9,
-        max_accel=4,
+        max_accel=5.5,
         start_velocity=0,
         end_velocity=0,
         rev=False,
         start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
-    theta_f=AngleType.calculate
+    theta_f=math.radians(-120)
 )
 
 path_6 = FollowPathCustom(
@@ -113,7 +113,7 @@ path_6 = FollowPathCustom(
         waypoints=[coord for coord in get_fourth_note[1]],
         end_pose=get_fourth_note[2],
         max_velocity=9,
-        max_accel=4,
+        max_accel=7,
         start_velocity=0,
         end_velocity=0,
         rev=True,
