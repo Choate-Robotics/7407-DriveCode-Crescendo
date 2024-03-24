@@ -133,8 +133,14 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             self.finished = True
 
         goal = self.trajectory.sample(self.t)
+    
         # goal_theta = self.theta_i + (self.t/self.duration)*self.theta_diff if not goal_reached else self.theta_f
-        # table = ntcore.NetworkTableInstance.getDefault().getTable('Auto')
+        table = ntcore.NetworkTableInstance.getDefault().getTable('Auto')
+        table.putNumberArray('auto state', [
+            goal.pose.X(),
+            goal.pose.Y(),
+            self.theta_f
+        ])
         # table.putBoolean("goal reached", goal_reached)
         # table.putNumber("theta_i", math.degrees(self.theta_i))
         # table.putNumber("theta_f", math.degrees(self.theta_f))
