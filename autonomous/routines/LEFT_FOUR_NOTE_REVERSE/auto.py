@@ -15,7 +15,7 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.LEFT_FOUR_NOTE.coords import (
+from autonomous.routines.LEFT_FOUR_NOTE_REVERSE.coords import (
     get_first_note,
     get_second_note,
     get_third_note,
@@ -148,11 +148,11 @@ auto = SequentialCommandGroup(
     #     )
     # ),
 
-    # path_1,
-    # path_4,
-    # path_5,
-    # path_2,
-    # path_3
+    path_1,
+    path_4,
+    path_5,
+    path_2,
+    path_3
 
 )
 

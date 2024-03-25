@@ -11,6 +11,9 @@ from autonomous.routines.FOUR_NOTE_MIDDLE.auto import (  # noqa
     routine as four_note_middle,
 )
 from autonomous.routines.LEFT_FOUR_NOTE.auto import routine as left_four_note  # noqa
+from autonomous.routines.LEFT_FOUR_NOTE_REVERSE.auto import (  # noqa
+    routine as left_four_note_reverse,
+)
 from autonomous.routines.MIDDLE_LEAVE.auto import routine as speaker_shoot_leave  # noqa
 from autonomous.routines.MIDLINE_NOTES.auto import routine as mid_notes  # noqa
 from autonomous.routines.RIGHT_THREE_NOTE.auto import (  # noqa
