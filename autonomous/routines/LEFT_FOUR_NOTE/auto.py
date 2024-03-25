@@ -135,24 +135,24 @@ auto = SequentialCommandGroup(
             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
             # Get fourth note
-            # PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+            PathUntilIntake(path_2, Robot.wrist, Robot.intake),
 
-            # # Drive back to wing
-            # path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+            # Drive back to wing
+            path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
-            # # Shoot fourth note
-            # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
+            # Shoot fourth note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-            path_2
+            SetWristIdle(Robot.wrist)
+
         )
     ),
 
     # path_1,
-    # path_2,
-    # path_3,
     # path_4,
     # path_5,
-    # path_2
+    # path_2,
+    # path_3
 
 )
 
