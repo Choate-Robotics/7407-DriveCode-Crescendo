@@ -49,3 +49,15 @@ class Pigeon2(BaseGyro):
         Resets the gyro's yaw.
         """
         self._gyro.set_yaw(math.degrees(angle))
+        
+    def get_forward_accel(self):
+        
+        return self._gyro.get_acceleration_x().value
+    
+    def get_right_accel(self):
+        
+        return self._gyro.get_acceleration_y().value
+    
+    def get_vertical_accel(self):
+        
+        return self._gyro.get_acceleration_z().value
