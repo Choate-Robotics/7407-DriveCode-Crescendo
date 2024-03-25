@@ -1,7 +1,7 @@
 import math
 import time
 import ntcore
-import config
+import config, constants
 from toolkit.sensors.odometry import VisionEstimator
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
 
@@ -70,6 +70,8 @@ class FieldOdometry:
         self.robot_pose_weight: float = 1 - self.vision_estimator_pose_weight
         self.degree_thres = 10
         self.std_dev: tuple[float, float, float] = (0.5, 0.5, 0.5)
+        
+        self.last_pose: Pose2d = Pose2d(0,0,0)
 
         self.dist_thres = 1.0
 
@@ -87,11 +89,15 @@ class FieldOdometry:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
-        self.update_from_internal()
 
         self.update_from_internal()
+        
+        # if not self.pose_within_field(self.getPose()):
+        #     self.resetOdometry(self.last_pose)
+            
 
         if not self.vision_on:
+            # self.update_tables()
             return self.getPose()
 
         vision_robot_pose_list = self.get_vision_poses()
@@ -112,27 +118,17 @@ class FieldOdometry:
 
             self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count, tag_area)
 
+        # self.update_tables()
+        
+        self.last_pose = self.getPose()
+
         return self.getPose()
 
-    def update_odom(self, pose: Pose3d):
-        weighted_pose = weighted_pose_average(
-            self.drivetrain.odometry.getPose(),
-            pose,
-            self.robot_pose_weight,
-            self.vision_estimator_pose_weight,
-        )
-
-        self.drivetrain.odometry.resetPosition(
-            self.drivetrain.get_heading(),
-            self.drivetrain.node_positions,
-            weighted_pose
-        )
-
-        self.drivetrain.odometry_estimator.resetPosition(
-            self.drivetrain.get_heading(),
-            self.drivetrain.node_positions,
-            weighted_pose
-        )
+        
+    def pose_within_field(self, pose: Pose2d):
+        x_within = 0 <= pose.translation().X() <= constants.field_length
+        y_within = 0 <= pose.translation().Y() <= constants.field_width
+        return x_within and y_within
 
     def set_std_auto(self):
         self.std_formula = config.odometry_std_auto_formula
@@ -175,7 +171,8 @@ class FieldOdometry:
     
 
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float):
-
+        if not self.pose_within_field(vision_pose.toPose2d()):
+            return
         distance_deviation = self.getPose().translation().distance(vision_pose.toPose2d().translation())
         std_dev = 0.5
         std_dev_omega = abs(math.radians(7))
@@ -228,7 +225,14 @@ class FieldOdometry:
                 self.drivetrain.node_positions,
                 est_pose
             )
+            
 
+        return est_pose
+    
+    def update_tables(self):
+        
+        est_pose = self.getPose()
+        
         self.table.putNumberArray('Estimated Pose', [
             est_pose.translation().X(),
             est_pose.translation().Y(),
@@ -292,8 +296,17 @@ class FieldOdometry:
             'estimated rotation',
             math.degrees(bound_angle(self.drivetrain.odometry_estimator.getEstimatedPosition().rotation().degrees()))
         )
-
-        return est_pose
+        
+        self.table.putNumber(
+            'accel x',
+            self.drivetrain.gyro.get_y_accel()
+        )
+        
+        self.table.putNumber(
+            'velocity x',
+            speeds.vx
+        )
+        
 
     def resetOdometry(self, pose: Pose2d):
         """

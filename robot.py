@@ -169,6 +169,8 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Sensors.limelight_intake.update)
 
         self.handle(Field.odometry.update)
+        
+        self.handle(Field.odometry.update_tables)
 
         self.handle(Field.calculations.update)
 

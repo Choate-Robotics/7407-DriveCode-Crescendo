@@ -50,14 +50,15 @@ class Pigeon2(BaseGyro):
         """
         self._gyro.set_yaw(math.degrees(angle))
         
-    def get_forward_accel(self):
+    def get_x_accel(self):
         
         return self._gyro.get_acceleration_x().value
     
-    def get_right_accel(self):
+    def get_y_accel(self):
         
         return self._gyro.get_acceleration_y().value
     
-    def get_vertical_accel(self):
+    def get_z_accel(self):
         
         return self._gyro.get_acceleration_z().value
+    
