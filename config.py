@@ -228,7 +228,7 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-drivetrain_rotation_P: float = 8
+drivetrain_rotation_P: float = 9
 drivetrain_rotation_I: float = 0.0
 drivetrain_rotation_D: float = 0.08
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel

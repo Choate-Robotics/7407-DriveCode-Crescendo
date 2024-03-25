@@ -99,11 +99,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         super().__init__(drivetrain)
         self.target_calc = target_calc
         # self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
-        constraints = TrapezoidProfileRadians.Constraints(config.drivetrain_aiming_max_angular_speed,
-                                                          config.drivetrain_aiming_max_angular_accel)
-        self.theta_controller = ProfiledPIDControllerRadians(
+        self.theta_controller = PIDController(
             config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
-            constraints,
             config.
             period
             )
@@ -112,10 +109,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
 
     def initialize(self) -> None:
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
-        self.theta_controller.reset(
-            self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(),
-            0#self.subsystem.chassis_speeds.omega
-        )
+        self.theta_controller.reset()
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('P', config.drivetrain_rotation_P)
             self.table.putNumber('I', config.drivetrain_rotation_I)
@@ -123,8 +117,6 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('tolerance', 1)
             self.table.putNumber('velocity tolerance', 2)
             self.table.putNumber('drivetrain offset', config.drivetrain_aiming_offset)
-            self.table.putNumber('drivetrain max angular speed', config.drivetrain_aiming_max_angular_speed)
-            self.table.putNumber('drivetrain max angular accel', config.drivetrain_aiming_max_angular_accel)
 
 
     def execute(self) -> None:
@@ -138,14 +130,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setD(config.drivetrain_rotation_D)
             self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 1)), radians(self.table.getNumber('velocity tolerance', 2)))
             
-            config.drivetrain_aiming_max_angular_speed = self.table.getNumber('drivetrain max angular speed', config.drivetrain_aiming_max_angular_speed)
-            config.drivetrain_aiming_max_angular_accel = self.table.getNumber('drivetrain max angular accel', config.drivetrain_aiming_max_angular_accel)
-            
-            self.theta_controller.setConstraints(
-                TrapezoidProfileRadians.Constraints(
-                    config.drivetrain_aiming_max_angular_speed,
-                    config.drivetrain_aiming_max_angular_accel)
-                )
+
             
             config.drivetrain_aiming_offset = self.table.getNumber('drivetrain offset', config.drivetrain_aiming_offset)
             # put graphs
@@ -173,7 +158,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
 
         dx *= states.drivetrain_controlled_vel
         dy *= states.drivetrain_controlled_vel
-        # d_theta *= self.subsystem.max_angular_vel
+        # d_theta *= config.drivetrain_aiming_max_angular_speed
 
         if config.driver_centric:
             self.subsystem.set_driver_centric((dy, dx), -d_theta)
