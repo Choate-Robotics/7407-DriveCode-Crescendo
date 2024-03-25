@@ -26,7 +26,7 @@ comp_bot: DigitalInput = DigitalInput(
     2
 )  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-DEBUG_MODE: bool = False
+DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
