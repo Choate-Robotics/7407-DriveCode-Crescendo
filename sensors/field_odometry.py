@@ -1,7 +1,7 @@
 import math
 import time
 import ntcore
-import config, constants
+import config
 from toolkit.sensors.odometry import VisionEstimator
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
 
@@ -56,7 +56,7 @@ class FieldOdometry:
     """
 
     def __init__(
-            self, drivetrain: Drivetrain, vision_estimator: VisionEstimator | None
+            self, drivetrain: Drivetrain, vision_estimator: VisionEstimator | None, field_width: float, field_length: float
     ):
         self.drivetrain: Drivetrain = drivetrain
         self.table = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")
@@ -70,7 +70,8 @@ class FieldOdometry:
         self.robot_pose_weight: float = 1 - self.vision_estimator_pose_weight
         self.degree_thres = 10
         self.std_dev: tuple[float, float, float] = (0.5, 0.5, 0.5)
-        
+        self.field_width = field_width
+        self.field_length = field_length
         self.last_pose: Pose2d = Pose2d(0,0,0)
 
         self.dist_thres = 1.0
@@ -92,8 +93,8 @@ class FieldOdometry:
 
         self.update_from_internal()
         
-        # if not self.pose_within_field(self.getPose()):
-        #     self.resetOdometry(self.last_pose)
+        if not self.pose_within_field(self.getPose()):
+            self.keep_pose_in_field()
             
 
         if not self.vision_on:
@@ -126,9 +127,17 @@ class FieldOdometry:
 
         
     def pose_within_field(self, pose: Pose2d):
-        x_within = 0 <= pose.translation().X() <= constants.field_length
-        y_within = 0 <= pose.translation().Y() <= constants.field_width
+        x_within = 0 <= pose.translation().X() <= self.field_length
+        y_within = 0 <= pose.translation().Y() <= self.field_width
         return x_within and y_within
+    
+    def keep_pose_in_field(self):
+        pose = self.getPose()
+        
+        new_x = max(0, min(pose.translation().X(), self.field_length))
+        new_y = max(0, min(pose.translation().Y(), self.field_width))
+        new_pose = Pose2d(new_x, new_y, pose.rotation())
+        self.resetOdometry(new_pose)
 
     def set_std_auto(self):
         self.std_formula = config.odometry_std_auto_formula
