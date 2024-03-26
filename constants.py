@@ -11,7 +11,7 @@ from units.SI import (
     rotations_per_minute,
     degrees_to_radians,
     meters_per_second_squared,
-    kilograms
+    kilograms,
 )
 
 # Main
@@ -35,24 +35,29 @@ track_width = 20 * inches_to_meters  # TODO: change to 20 inches for actual robo
 drivetrain_length = 25 * inches_to_meters
 bumper_thickness = 3.5 * inches_to_meters
 drivetrain_length_with_bumpers = drivetrain_length + (2 * bumper_thickness)
-drivetrain_max_vel = 30 * feet_to_meters
-drivetrain_max_accel = 5 * feet_to_meters
-drivetrain_max_angular_vel = 2000 * degrees_per_second__to__radians_per_second
-drivetrain_max_angular_accel = 1280 * degrees_per_second__to__radians_per_second
+
 drivetrain_move_motor_free_speed: rotations_per_minute = (
-    6000  # 5676 is the free speed RPM of the NEO
+    6000  # 5676 is the free speed RPM of the NEO, 6000 is the free speed RPM of the Kraken without FOC
 )
+
 drivetrain_wheel_diameter: meters = (
         4 * inches_to_meters
-)  # 3.5 is the diameter of the wheel in inches
-drivetrain_move_gear_ratio: rotations_per_minute = (
-        drivetrain_move_motor_free_speed / drivetrain_wheel_gear_ratio
-)  # is the RPM constant multiple of the driving motor
+)  
+ 
+
+drivetrain_max_vel:meters = (
+    ((drivetrain_move_motor_free_speed / 60) / drivetrain_wheel_gear_ratio) * (drivetrain_wheel_diameter * math.pi)
+    )
+# drivetrain_max_vel = 17.7
+drivetrain_max_accel: meters_per_second_squared = 0 # setting to 0 will set to default motor accel
+drivetrain_max_angular_vel = 2000 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_accel = 1280 * degrees_per_second__to__radians_per_second
+
 
 # the below variable is the rotation the motor rotates per meter of wheel movement
 drivetrain_move_gear_ratio_as_rotations_per_meter: float = (
-                                                                   1 / (drivetrain_wheel_diameter * math.pi)
-                                                           ) * drivetrain_wheel_gear_ratio
+    1 / (drivetrain_wheel_diameter * math.pi)
+) * drivetrain_wheel_gear_ratio
 
 # Field
 field_width = 8.21  # meters

@@ -169,6 +169,8 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Sensors.limelight_intake.update)
 
         self.handle(Field.odometry.update)
+        
+        self.handle(Field.odometry.update_tables)
 
         self.handle(Field.calculations.update)
 
@@ -176,7 +178,8 @@ class _Robot(wpilib.TimedRobot):
             "abs encoders", Robot.drivetrain.get_abs()
         )
         if not self.isSimulation():
-            self.nt.getTable("swerve").putBoolean("comp bot", config.comp_bot.get())
+            self.nt.getTable("General").putBoolean("comp bot", config.comp_bot.get())
+            self.nt.getTable('General').putNumber('max vel', constants.drivetrain_max_vel)
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
