@@ -80,8 +80,8 @@ class TalonConfig:
 
         # motion magic
         magic = talon_config.motion_magic
-        magic.motion_magic_acceleration = 400
-        magic.motion_magic_jerk = 4000
+        magic.motion_magic_acceleration = 800
+        magic.motion_magic_jerk = 8000
 
         res = motor.configurator.apply(talon_config)
         if res != StatusCode.OK:
@@ -185,7 +185,7 @@ class TalonFX(PIDMotor):
         self.error_check(self._motor.set_position(pos), f'sensor position: {pos}')
 
     def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0):
-        self.error_check(self._motor.set_control(self._mm_v_v.with_velocity(vel)), f'target velocity: {vel}, accel: {accel}')
+        self.error_check(self._motor.set_control(self._mm_v_v.with_velocity(vel).with_acceleration(accel)), f'target velocity: {vel}, accel: {accel}')
 
 
     def set_raw_output(self, x: float):

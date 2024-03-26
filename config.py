@@ -296,7 +296,6 @@ WRIST_CONFIG = SparkMaxConfig(
     0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 INNER_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -328,7 +327,8 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=70,  # integral_zone=1000, max_integral_accumulator=10000
+    current_limit=70,
+    kV=0.12
 )
 
 # Giraffe
