@@ -98,7 +98,6 @@ class FieldOdometry:
             
 
         if not self.vision_on:
-            # self.update_tables()
             return self.getPose()
 
         vision_robot_pose_list = self.get_vision_poses()
@@ -178,7 +177,6 @@ class FieldOdometry:
         )
         
     
-
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float):
         if not self.pose_within_field(vision_pose.toPose2d()):
             return

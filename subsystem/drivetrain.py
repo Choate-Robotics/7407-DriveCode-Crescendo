@@ -91,8 +91,13 @@ class CustomSwerveNode(SwerveNode):
                 constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
         
+        rotations_per_second_squared = (
+            constants.drivetrain_max_accel *
+            constants.drivetrain_move_gear_ratio_as_rotations_per_meter
+        ) if constants.drivetrain_max_accel > 0 else 0
+        
 
-        self.m_move.set_target_velocity(rotations_per_second)
+        self.m_move.set_target_velocity(rotations_per_second, rotations_per_second_squared)
 
     def get_motor_velocity(self) -> meters_per_second:
         return (
@@ -144,6 +149,7 @@ class Drivetrain(SwerveDrivetrain):
     axis_rotation = Keymap.Drivetrain.DRIVE_ROTATION_AXIS
     track_width: meters = constants.track_width
     max_vel: meters_per_second = constants.drivetrain_max_vel
+    max_accel: meters_per_second_squared = constants.drivetrain_max_accel
     max_angular_vel: radians_per_second = constants.drivetrain_max_angular_vel
     deadzone_velocity: meters_per_second = 0.05
     deadzone_angular_velocity: radians_per_second = math.radians(5)
