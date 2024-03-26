@@ -7,16 +7,14 @@ from sensors import FieldOdometry, TrajectoryCalculator, Limelight
 import commands2
 import ntcore
 import wpilib  # noqa
-from commands2 import ParallelDeadlineGroup  # noqa
-from commands2 import ParallelRaceGroup  # noqa
-from commands2 import RunCommand  # noqa
-from commands2 import WaitUntilCommand  # noqa
 from commands2 import (
     InstantCommand,
     ParallelCommandGroup,
     PrintCommand,
     SequentialCommandGroup,
     WaitCommand,
+    ParallelRaceGroup,
+    WaitUntilCommand
 )
 from commands2.command import Command
 from wpimath.geometry import Pose2d, Rotation2d  # noqa
