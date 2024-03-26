@@ -1,34 +1,30 @@
 # from dataclasses import dataclass
+import math
 from enum import Enum
 
+import wpilib
+import rev
+
+# from rev import CANSparkMax
 from wpilib import AnalogEncoder, DigitalInput
 from wpimath.geometry import Pose3d, Rotation3d
 
-from toolkit.motors import SparkMaxConfig
-from rev import CANSparkMax
-import rev, math
-from enum import Enum
 import constants
-
-from wpilib import AnalogEncoder, DigitalInput
-from wpimath.geometry import Pose3d, Rotation3d
-
 from toolkit.motors import SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonConfig
-from units.SI import degrees_to_radians, meters, radians, meters_per_second, inches_to_meters
-from typing import Literal
+from units.SI import (
+    degrees_to_radians,
+    inches_to_meters,
+    meters,
+    meters_per_second,
+    radians,
+    degrees,
+    inches
+)
 
 comp_bot: DigitalInput = DigitalInput(
     2
-)  # if true, we are using the practice bot (we will put a jumper on the DIO port)
-
-# from units.SI import (
-#     inches_to_meters,
-#     meters,
-#     meters_per_second,
-#     meters_per_second_squared,
-#     radians,
-# )
+)  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
 DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
@@ -60,22 +56,26 @@ elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
 # odometry config
 
 odometry_debounce: float = 0.1  # TODO: PLACEHOLDER
-stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(math.radians(30))
+stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.sin(
+    math.radians(30)
+)
 
-
-#STATE VARIABLES -- PLEASE DO NOT CHANGE
-
-
+# STATE VARIABLES -- PLEASE DO NOT CHANGE
 
 
 # Leds
-def KRainbow():
-    return {"type": 2}
+leds_id = 0
+leds_size = 28
 
 
-class Type:
+class LEDType:
     def KStatic(r, g, b):
         return {"type": 1, "color": {"r": r, "g": g, "b": b}}
+
+    def KRainbow():
+        return {
+            'type': 2
+        }
 
     def KTrack(r1, g1, b1, r2, g2, b2):
         return {
@@ -94,6 +94,21 @@ class Type:
             "typeB": typeB,
             "speed": speed,
         }
+
+    def __getitem__(self, item):
+        if item == 1:
+            return self.KStatic
+        elif item == 3:
+            return self.KTrack
+        elif item == 4:
+            return self.KBlink
+        elif item == 5:
+            return self.KLadder
+        else:
+            raise KeyError(f"Type {item} is not supported.")
+
+
+active_leds: tuple[LEDType, float, float] = (LEDType.KStatic(0, 0, 255), 1, 5)
 
 
 # TEAM
@@ -121,11 +136,20 @@ limelight_led_mode = {
 
 
 class LimelightPosition:
-    init_elevator_front = Pose3d(constants.limelight_right_LL3, constants.limelight_forward_LL3,
-                                 constants.limelight_height_LL3, Rotation3d(0, constants.limelight_elevator_angle, 0))
-    init_elevator_back = Pose3d(constants.limelight_right, constants.limelight_forward, constants.limelight_height,
-                                Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw))
+    init_elevator_front = Pose3d(
+        constants.limelight_right_LL3,
+        constants.limelight_forward_LL3,
+        constants.limelight_height_LL3,
+        Rotation3d(0, constants.limelight_elevator_angle, 0),
+    )
+    init_elevator_back = Pose3d(
+        constants.limelight_right,
+        constants.limelight_forward,
+        constants.limelight_height,
+        Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw),
+    )
     fixed_intake = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
+
 
 # Intake
 inner_intake_id = 13
@@ -133,14 +157,14 @@ outer_intake_back_id = 17
 deploy_intake_id = 12
 
 intake_inner_speed = 0.5
-intake_inner_pass_speed = .1
+intake_inner_pass_speed = 0.1
 intake_inner_eject_speed = 1
 intake_outer_speed = 1
 intake_outer_idle_speed = 0
 intake_outer_eject_speed = 1
 
-deploy_intake_timeout = .25
-deploy_tenting_timeout = .1
+deploy_intake_timeout = 0.25
+deploy_tenting_timeout = 0.1
 
 intake_timeout = 5
 intake_roller_current_limit = 18
@@ -158,24 +182,26 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023 
-#helloworld
+elevator_climb_current_limit: float = 45
+elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
+
 # Wrist
 wrist_zeroed_pos = 0.0
 wrist_motor_id = 2
 wrist_time_to_max_vel = 0.0
 feed_motor_id = 3
 feed_motor_ramp_rate = 0
-wrist_flat_ff = -0.9
+wrist_max_ff = -0.32  # used to be -0.9
+wrist_ff_offset = 14.3 * degrees_to_radians
 stage_timeout = 5
 wrist_tent_limit = 15 * degrees_to_radians
-feeder_velocity = .2
+feeder_velocity = 0.2
 feeder_voltage_feed = 8
 feeder_voltage_trap = 14
-feeder_voltage_crawl = 4
-feeder_pass_velocity = .5
+feeder_voltage_crawl = 4.2 if comp_bot.get() else 4
+feeder_pass_velocity = 0.5
 feeder_pass_voltage = 2
-feeder_sensor_threshold = .65
+feeder_sensor_threshold = 0.65
 feeder_beam_break_first_channel = 1
 feeder_beam_break_second_channel = 0
 
@@ -202,12 +228,27 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
+drivetrain_rotation_P: float = 8
+drivetrain_rotation_I: float = 0.0
+drivetrain_rotation_D: float = 0.08
+drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
+drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
+
+drivetrain_rotation_enable_tuner: bool = True
+
+#Shooting
+drivetrain_aiming_offset: degrees = 2.0 # degrees
+shot_height_offset: inches = 2.65 # inches
+wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
+
+
 # Flywheel
 flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 19.5
-v0_flywheel_minimum: meters_per_second = 18
+flywheel_distance_scalar: float = 1.8
+v0_flywheel_minimum: meters_per_second = 14
 v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12
 idle_flywheel: meters_per_second = v0_flywheel_minimum / 2
@@ -215,8 +256,10 @@ shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
 auto_shoot_deadline = 1.2
 auto_intake_note_deadline = 3
-flywheel_feed_forward = 0.0  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = .5
+auto_path_intake_note_deadline = 1
+
+flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
+flywheel_shot_tolerance: meters_per_second = 0.5
 flywheel_shot_current_threshold = 20
 
 
@@ -224,11 +267,12 @@ flywheel_shot_current_threshold = 20
 odometry_visible_tags_threshold = 2
 odometry_tag_area_threshold = 0
 odometry_vision_deviation_threshold = 0.5
-odometry_tag_distance_threshold:meters = 4
+odometry_tag_distance_threshold: meters = 4
 odometry_two_tag_distance_threshold = 7
-odometry_distance_deviation_threshold:meters = 0.5
-odometry_std_auto_formula = lambda x: abs(x **2) / 2.5
-odometry_std_tele_formula = lambda x: abs(x** 1.3) / 1.3
+odometry_distance_deviation_threshold: meters = 0.5
+odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
+odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
+
 
 #object detection
 object_detection_ty = 0
@@ -240,40 +284,68 @@ object_detection_drivetrain_speed_dy = .5
 
 
 
-# Configs 
-ELEVATOR_CONFIG = SparkMaxConfig( # -.65, 1
-    0.2, 0.0, 0.08, elevator_feed_forward, (-.75, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+
+# Configs
+ELEVATOR_CONFIG = SparkMaxConfig(  # -.65, 1
+    0.2,
+    0.0,
+    0.08,
+    elevator_feed_forward,
+    (-0.75, 1),
+    idle_mode=rev.CANSparkMax.IdleMode.kBrake,
 )
 
 ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
-    100, 0.0, 0, elevator_feed_forward,(-.6, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+    100,
+    0.0,
+    0,
+    elevator_feed_forward,
+    (-0.6, 0.5),
+    idle_mode=rev.CANSparkMax.IdleMode.kBrake,
+)
+# P=.2, I=0, D=0.003
+WRIST_CONFIG = SparkMaxConfig(
+    0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
-WRIST_CONFIG = SparkMaxConfig(.16, 0, 0.003, .00015, (-.5, .5), idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
-INNER_CONFIG = SparkMaxConfig(.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+INNER_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
-OUTER_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+OUTER_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
-DEPLOY_CONFIG = SparkMaxConfig(.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
+DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
-FLYWHEEL_CONFIG = SparkMaxConfig(
-    0.055, 0.0, 0.01, flywheel_feed_forward, idle_mode=rev.CANSparkMax.IdleMode.kCoast
+# FLYWHEEL_CONFIG = SparkMaxConfig(
+#     0.0005,
+#     0.0,
+#     0.0003,
+#     flywheel_feed_forward,
+#     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
+# )
+FLYWHEEL_CONFIG = TalonConfig(
+    0.5, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
+
 
 TURN_CONFIG = SparkMaxConfig(
     0.2, 0, 0.003, 0.00015, (-0.5, 0.5), rev.CANSparkMax.IdleMode.kBrake
 )
 
 MOVE_CONFIG = TalonConfig(
-    0.11, 0, 0, 0.25, 0.01, brake_mode=True, current_limit=70  # integral_zone=1000, max_integral_accumulator=10000
+    0.11,
+    0,
+    0,
+    0.25,
+    0.01,
+    brake_mode=True,
+    current_limit=70,  # integral_zone=1000, max_integral_accumulator=10000
 )
 
 # Giraffe
 
-staging_angle:radians = 60 * degrees_to_radians
+staging_angle: radians = 60 * degrees_to_radians
 
 
 class Giraffe:
@@ -299,34 +371,44 @@ class Giraffe:
 
     kAimHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kAim)
 
-    kClimbReach = GiraffePos(constants.elevator_max_length, 10*degrees_to_radians)
+    kClimbReach = GiraffePos(constants.elevator_max_length, 10 * degrees_to_radians)
 
-    kClimbPullUp = GiraffePos(0, 50*degrees_to_radians)
+    kClimbPullUp = GiraffePos(0, 50 * degrees_to_radians)
 
     kTestFF = GiraffePos(0, 20 * degrees_to_radians)
 
     kClimbTrap = GiraffePos(constants.elevator_max_length, 30 * degrees_to_radians)
 
-    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, 0 * degrees_to_radians)
+    kAmp = GiraffePos(0.27 + 2 * inches_to_meters, -25 * degrees_to_radians)
 
-    kElevatorHigh = GiraffePos(constants.elevator_max_length, GiraffePos.Special.kCurrentAngle)
+    kElevatorHigh = GiraffePos(
+        constants.elevator_max_length, GiraffePos.Special.kCurrentAngle
+    )
 
     kElevatorLow = GiraffePos(0, GiraffePos.Special.kCurrentAngle)
 
-    kElevatorMid = GiraffePos(constants.elevator_max_length / 2, GiraffePos.Special.kCurrentAngle)
+    kElevatorMid = GiraffePos(
+        constants.elevator_max_length / 2, GiraffePos.Special.kCurrentAngle
+    )
 
 
-"""
-c = drag coefficient
-a = projectile area (m^2)
-m = projectile mass (kg)
-rho_air = air density (kg/m^3)
-g = acceleration due to gravity (m/s^2)
-v0 = initial velocity of shooter flywheel (m/s) config
-delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
-y = height of target (COULD BE IN ODOMETRY) (m) const
-tol = tolerance of error in distance to target (m)
-"""
+# """
+# c = drag coefficient
+# a = projectile area (m^2)
+# m = projectile mass (kg)
+# rho_air = air density (kg/m^3)
+# g = acceleration due to gravity (m/s^2)
+# v0 = initial velocity of shooter flywheel (m/s) config
+# delta_x = distance from shooter to target (COULD BE IN ODOMETRY) (m)
+# y = height of target (COULD BE IN ODOMETRY) (m) const
+# tol = tolerance of error in distance to target (m)
+# """
 
 # Gyro
 gyro_id = 29
+
+driver_rumble_intensity:float = 1.0
+driver_rumble_time:float= 5
+
+operator_rumble_intensity:float = 1.0
+operator_rumble_time:float= 5

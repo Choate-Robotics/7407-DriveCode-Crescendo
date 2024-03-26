@@ -494,7 +494,26 @@ class POI:
                 )
 
         class Waypoints:
-            pass
+            class Auto:
+                kMidlineAutoScoring = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            3.72,
+                            2.55
+                        ),
+                        Rotation2d(constants.FieldPos.pose_reverse.radians())
+                    )
+                )
+                kMidlineAutoStart = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            1.9 - constants.drivetrain_length_with_bumpers/2,
+                            2.92
+                        ),
+                        Rotation2d(constants.FieldPos.pose_reverse.radians())
+                    )
+                )
+            
 
     def __init__(self):
         self.nt = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")

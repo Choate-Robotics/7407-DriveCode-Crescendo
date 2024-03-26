@@ -18,7 +18,7 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.MIDLINE_NOTES.coords import *
+from autonomous.routines.MIDLINE_NOTES_2.coords import *
 
 from wpimath.geometry import Pose2d, Translation2d
 
@@ -51,7 +51,7 @@ path_2 = FollowPathCustom(
         rev=True,
         start_rotation=get_second_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(-180)
+    theta_f=math.radians(160)
 )
 
 path_3 = FollowPathCustom(
@@ -85,7 +85,7 @@ path_4 = FollowPathCustom(
         rev=True,
         start_rotation=get_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(160)
+    theta_f=math.radians(-180)
 )
 
 path_5 = FollowPathCustom(

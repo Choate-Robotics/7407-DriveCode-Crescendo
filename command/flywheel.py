@@ -69,14 +69,18 @@ class SetFlywheelShootSpeaker(SubsystemCommand[Flywheel]):
     def initialize(self):
         self.subsystem.set_velocity_linear(config.v0_flywheel_minimum, 1)
         self.subsystem.set_velocity_linear(config.v0_flywheel_minimum, 2)
+        
     
     def execute(self):
         distance = self.traj.get_distance_to_target()
         
-        speed = min(config.v0_flywheel_minimum + distance, config.v0_flywheel_maximum)
+        speed = self.traj.get_flywheel_speed(distance)
         
         self.subsystem.set_velocity_linear(speed, 1)
         self.subsystem.set_velocity_linear(speed, 2)
+        
+        # self.subsystem.motor_1.set_raw_output(1)
+        
         
     def isFinished(self) -> bool:
         return False

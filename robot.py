@@ -1,24 +1,34 @@
+import math  # noqa
+import time
+from math import degrees, pi, radians  # noqa
+
 import commands2
-from toolkit.subsystem import Subsystem
 import ntcore
 import wpilib
+from wpilib import SmartDashboard  # noqa
+from wpimath.geometry import Pose2d, Rotation2d  # noqa
+
+import autonomous
 import command
 import config
 import constants
-from robot_systems import Robot, Pneumatics, Sensors, LEDs, PowerDistribution, Field
-import sensors
-import subsystem
+import sensors  # noqa
+import subsystem  # noqa
 import utils
-from oi.OI import OI
 from oi.IT import IT
-from wpilib import SmartDashboard
-import autonomous
-import math
-from math import degrees, radians, pi
-import time
-from wpimath.geometry import Rotation2d, Pose2d
-
+from oi.OI import OI
+from robot_systems import (  # noqa
+    Field,
+    LEDs,
+    Pneumatics,
+    PowerDistribution,
+    Robot,
+    Sensors,
+)
+from toolkit.subsystem import Subsystem
 from units.SI import inches_to_meters
+from utils import CAN_delay
+import robot_states as states
 
 
 class _Robot(wpilib.TimedRobot):
@@ -26,6 +36,10 @@ class _Robot(wpilib.TimedRobot):
         super().__init__()
         self.log = utils.LocalLogger("Robot")
         self.nt = ntcore.NetworkTableInstance.getDefault()
+
+        # Updates networktables at 100hz (dont use unless graphing PID values)
+        # self.nt.flush()
+
         self.scheduler = commands2.CommandScheduler.getInstance()
 
     def handle(self, func, *args, **kwargs):
@@ -33,7 +47,7 @@ class _Robot(wpilib.TimedRobot):
             func(*args, **kwargs)
         except Exception as e:
             self.log.error(str(e))
-            self.nt.getTable('errors').putString(func.__name__, str(e))
+            self.nt.getTable("errors").putString(func.__name__, str(e))
 
             if config.DEBUG_MODE:
                 raise e
@@ -47,15 +61,18 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        self.auto_selection.setDefaultOption("Two Notes", autonomous.two_note)
+        self.auto_selection.setDefaultOption("Four Note Middle", autonomous.four_note_middle)
+        # self.auto_selection.addOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Left Four Notes", autonomous.left_four_note)
-        self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
-        self.auto_selection.addOption("Five Notes", autonomous.five_note)
-        self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
-        self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
-        self.auto_selection.addOption("Four Note Middle", autonomous.four_note_middle)
+        self.auto_selection.addOption('Left Four Notes Reverse', autonomous.left_four_note_reverse)
+        self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
+        # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
+        # self.auto_selection.addOption("Five Notes", autonomous.five_note)
+        # self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
+        # self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
+        # self.auto_selection.addOption("SQUARE of death", autonomous.square)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
@@ -76,137 +93,90 @@ class _Robot(wpilib.TimedRobot):
                 Robot.intake,
                 Robot.flywheel,
             ]
-            
-            time.sleep(0.2)
-            for subsystem in subsystems:
+
+            CAN_delay(0.2)
+            for subsystem in subsystems:  # noqa
                 subsystem.init()
-                time.sleep(0.2)
-
-
-        # try:
-        #     init_subsystems()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('subsystem init', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
+                CAN_delay(0.2)
 
         self.handle(init_subsystems)
 
         def init_sensors():
-            sensors: list[Sensors] = list(
-                {k: v for k, v in Sensors.__dict__.items() if isinstance(v, Sensors) and hasattr(v, 'init')}.values()
-            )
 
-            # for sensor in sensors:
-            #     sensor.init()
             Sensors.limelight_front.init()
             Sensors.limelight_back.init()
             Sensors.limelight_intake.init()
             Field.calculations.init()
-
-        # try:
-        #     init_sensors()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('sensor init', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
+            LEDs.leds.init()
+            LEDs.leds.enable()
 
         self.handle(init_sensors)
+        Field.calculations.tuning = True
 
         self.log.complete("Robot initialized")
 
         Robot.wrist.zero_wrist()
+        # Field.odometry.disable()
 
     def robotPeriodic(self):
+        # Leds
+        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.get_outer_current() > 0:
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        else:
+            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
 
-        # if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-        #     config.active_team = config.Team.BLUE
-        # else:
-        #     config.active_team = config.Team.RED
+        LEDs.leds.set_LED(*config.active_leds)
+        LEDs.leds.cycle()
+
+        def get_flywheel_state():
+            match states.flywheel_state:
+                case states.FlywheelState.idle:
+                    return 'Idle'
+                case states.FlywheelState.shooting:
+                    return 'Shooting'
+                case states.FlywheelState.amping:
+                    return 'Amping'
+                case states.FlywheelState.released:
+                    return 'Released'
+
+        states_nt = self.nt.getTable('states')
+        states_nt.putString('flywheel', get_flywheel_state())
+        
+
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
             constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
-            constants.FieldPos.Scoring.speaker_y = (218.42 * inches_to_meters + 0.2) - 4 * inches_to_meters
+            # AT HARTFORD
+            # constants.FieldPos.Scoring.speaker_y = (
+            #     218.42 * inches_to_meters + 0.2
+            # ) - 4 * inches_to_meters
+            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
 
         Field.POI.setNTValues()
 
         if self.isSimulation():
             wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
-        # try:
-        #     self.scheduler.run()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('command scheduler', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(self.scheduler.run)
-
-        # try:
-        #     Sensors.limelight_back.update()
-        #     Sensors.limelight_front.update()
-        #     Sensors.limelight_intake.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('limelight update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Sensors.limelight_back.update)
         self.handle(Sensors.limelight_front.update)
         self.handle(Sensors.limelight_intake.update)
 
-        # try:
-        #     Field.odometry.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
-
         self.handle(Field.odometry.update)
-
-        # try:
-        #     Field.calculations.update()
-        # except Exception as e:
-        #     self.log.error(str(e))
-        #     self.nt.getTable('errors').putString('odometry update', str(e))
-
-        #     if config.DEBUG_MODE:
-        #         raise e
 
         self.handle(Field.calculations.update)
 
-        self.nt.getTable('swerve').putNumberArray('abs encoders', Robot.drivetrain.get_abs())
+        self.nt.getTable("swerve").putNumberArray(
+            "abs encoders", Robot.drivetrain.get_abs()
+        )
         if not self.isSimulation():
-            self.nt.getTable('swerve').putBoolean('comp bot', config.comp_bot.get())
-
-        self.nt.getTable('swerve').putNumber('abs front right', Robot.drivetrain.get_abs()[1])
-        self.nt.getTable('swerve').putNumber('front right rotation',
-                                             Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi))
-        self.nt.getTable('swerve').putNumber('front right rotation error',
-                                             (Robot.drivetrain.n_front_right.get_turn_motor_angle() / (2 * pi)) -
-                                             Robot.drivetrain.get_abs()[1])
-
-        # print(config.elevator_zeroed_pos)
-        # print(Robot.wrist.distance_sensor.getVoltage())
-        # print(Robot.intake.distance_sensor.getVoltage())
-        # print(DigitalInput(0).get())
-
-        self.nt.getTable('pdh').putNumber('ch 1 current', PowerDistribution.pd.getCurrent(1))
-        self.nt.getTable('pdh').putNumber('ch 0 current', PowerDistribution.pd.getCurrent(0))
-        # print(config.WRIST_CONFIG.k_P)
+            self.nt.getTable("swerve").putBoolean("comp bot", config.comp_bot.get())
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
@@ -214,6 +184,7 @@ class _Robot(wpilib.TimedRobot):
         Field.odometry.set_std_tele()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
+        Robot.wrist.update_wrist_pid()
 
         # Initialize Operator Interface
         OI.init()
@@ -222,32 +193,45 @@ class _Robot(wpilib.TimedRobot):
         IT.init()
         IT.map_systems()
 
-        self.scheduler.schedule(commands2.SequentialCommandGroup(
-            # command.DrivetrainZero(Robot.drivetrain),
-            command.DriveSwerveCustom(Robot.drivetrain),
+        self.scheduler.schedule(
+            commands2.SequentialCommandGroup(
+                # command.DrivetrainZero(Robot.drivetrain),
+                command.DriveSwerveCustom(Robot.drivetrain),
+            )
         )
+        self.scheduler.schedule(
+            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
-        self.scheduler.schedule(command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)))
-        # self.scheduler.schedule(command.IntakeIdle(Robot.intake))
-        self.scheduler.schedule(command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel))
-        # self.scheduler.schedule(commands2.InstantCommand(lambda: Robot.flywheel.motor_1.set_raw_output(1)))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(0)).andThen(commands2.WaitCommand(3)).andThen(command.SetWrist(Robot.wrist, radians(55))))
-        # self.scheduler.schedule(command.SetWrist(Robot.wrist, radians(-20)))
 
-        # self.scheduler.schedule()
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAim).andThen(command.SetFlywheelLinearVelocity(Robot.flywheel, 30)))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kAimLow, Field.calculations))
-        # self.scheduler.schedule(command.AimWrist(Robot.wrist, Field.calculations))
-        # self.scheduler.schedule(command.Giraffe(Robot.elevator, Robot.wrist, config.Giraffe.kClimbPullUp))
-        # self.scheduler.schedule(command.SetElevator(Robot.elevator, constants.elevator_max_length).andThen(command.SetElevator(Robot.elevator, 0)))
+        if Robot.wrist.note_in_feeder():
+            states.flywheel_state = states.FlywheelState.shooting
+        else:
+            states.flywheel_state = states.FlywheelState.idle
+            
+        # self.scheduler.schedule(
+        #     commands2.ConditionalCommand(
+        #         command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel),
+        #         lambda: Robot.wrist.note_in_feeder()
+        #     )
+            
+        # )
 
     def teleopPeriodic(self):
-        pass
+        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.get_outer_current() > 0:
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        else:
+            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
+        LEDs.leds.set_LED(*config.active_leds)
+        LEDs.leds.cycle()
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
         Field.odometry.set_std_auto()
         Field.calculations.init()
+        Robot.drivetrain.gyro.reset_angle()
         Robot.drivetrain.n_front_left.zero()
         Robot.drivetrain.n_front_right.zero()
         Robot.drivetrain.n_back_left.zero()
@@ -259,14 +243,11 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def autonomousExit(self):
-        # Robot.drivetrain.gyro.reset_angle(radians(-180))
+        # Robot.drivetrain.gyro.reset_angle(radians(180))
         # Robot.drivetrain.n_front_left.zero()
         # Robot.drivetrain.n_front_right.zero()
         # Robot.drivetrain.n_back_left.zero()
         # Robot.drivetrain.n_back_right.zero()
-        ...
-
-
         # Robot.drivetrain.gyro.reset_angle(radians(180))
         #
         # new_pose = Robot.drivetrain.odometry.getPose()
@@ -282,7 +263,6 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def disabledInit(self) -> None:
-
         self.log.info("Robot disabled")
 
     def disabledPeriodic(self) -> None:

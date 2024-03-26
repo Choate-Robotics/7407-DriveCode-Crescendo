@@ -1,5 +1,5 @@
 import config, constants
-
+from enum import Enum
 drivetrain_controlled_vel = constants.drivetrain_max_vel
 drivetrain_controlled_angular_vel = constants.drivetrain_max_angular_vel
 
@@ -9,7 +9,13 @@ climbing: bool = False
 climbed: bool = False
 
 # AMP
-amping: bool = False
 
+class FlywheelState(Enum):
+    
+    idle = 0
+    shooting = 1
+    amping = 2
+    manual = 3
+    released = 4
 
-flywheel_manual: bool = False
+flywheel_state = FlywheelState.idle
