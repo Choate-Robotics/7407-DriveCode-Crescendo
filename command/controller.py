@@ -38,6 +38,7 @@ from command import (
     SetWrist,
     SetWristIdle,
     UnDeployTenting,
+    DriveSwerveNoteLineup
 )
 
 # from command import *  # noqa
@@ -428,6 +429,28 @@ class EmergencyManuver(SequentialCommandGroup):
             DeployTenting(intake),
             UnDeployTenting(intake),
             SetWrist(wrist, config.staging_angle)
+        )
+        
+        
+class AutoPickupNote(SequentialCommandGroup):
+    
+    def __init__(self, drivetrain: Drivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
+        super().__init__(
+            SetWristIdle(wrist),
+            DriveSwerveNoteLineup(drivetrain, limelight),
+            ParallelCommandGroup(
+                SequentialCommandGroup(
+                    InstantCommand(
+                        lambda: drivetrain.set_robot_centric(
+                            (-config.object_detection_drivetrain_speed_dy * drivetrain.max_vel, 0), 0)
+                        ),
+                    WaitUntilCommand(lambda: intake.detect_note()),
+                    InstantCommand(
+                        lambda: drivetrain.set_robot_centric((0, 0), 0)
+                    )
+                ),
+            IntakeStageNote(wrist, intake)
+            )
         )
         
 class ControllerRumble(InstantCommand):
