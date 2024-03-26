@@ -328,7 +328,8 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=70,  # integral_zone=1000, max_integral_accumulator=10000
+    current_limit=70,
+    kV=0.12
 )
 
 # Giraffe
