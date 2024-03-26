@@ -96,6 +96,8 @@ class FieldOdometry:
         if not self.pose_within_field(self.getPose()):
             self.keep_pose_in_field()
             
+        if self.potential_crash():
+            self.hold_pose()
 
         if not self.vision_on:
             return self.getPose()
@@ -117,8 +119,6 @@ class FieldOdometry:
             # distance_to_target = target_pose.translation()
 
             self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count, tag_area)
-
-        # self.update_tables()
         
         self.last_pose = self.getPose()
 
@@ -138,6 +138,20 @@ class FieldOdometry:
         new_pose = Pose2d(new_x, new_y, pose.rotation())
         self.resetOdometry(new_pose)
 
+    def potential_crash(self):
+        accel_x = self.drivetrain.gyro.get_y_accel()
+        accel_y = self.drivetrain.gyro.get_x_accel()
+        if (
+            abs(accel_x) > config.odometry_crash_accel_threshold
+            or
+            abs(accel_y) > config.odometry_crash_accel_threshold
+        ):
+            return True
+        return False
+    
+    def hold_pose(self):
+        self.resetOdometry(self.last_pose)
+    
     def set_std_auto(self):
         self.std_formula = config.odometry_std_auto_formula
 
