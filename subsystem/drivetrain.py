@@ -91,7 +91,6 @@ class CustomSwerveNode(SwerveNode):
                 constants.drivetrain_move_gear_ratio_as_rotations_per_meter
         )
         
-        print(rotations_per_second)
 
         self.m_move.set_target_velocity(rotations_per_second)
 

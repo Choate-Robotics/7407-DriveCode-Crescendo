@@ -178,9 +178,8 @@ class _Robot(wpilib.TimedRobot):
             "abs encoders", Robot.drivetrain.get_abs()
         )
         if not self.isSimulation():
-            self.nt.getTable("swerve").putBoolean("comp bot", config.comp_bot.get())
-            self.nt.getTable('swerve').putNumber('max vel', constants.drivetrain_max_vel)
-            self.nt.getTable('swerve').putNumber('FL RPM', Robot.drivetrain.n_front_left.m_move.get_sensor_velocity())
+            self.nt.getTable("General").putBoolean("comp bot", config.comp_bot.get())
+            self.nt.getTable('General').putNumber('max vel', constants.drivetrain_max_vel)
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
