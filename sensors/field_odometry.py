@@ -141,10 +141,17 @@ class FieldOdometry:
     def potential_crash(self):
         accel_x = self.drivetrain.gyro.get_y_accel()
         accel_y = self.drivetrain.gyro.get_x_accel()
+        
+        rvx = self.drivetrain.chassis_speeds.vx
+        rvy = self.drivetrain.chassis_speeds.vy
         if (
             abs(accel_x) > config.odometry_crash_accel_threshold
+            and
+            (rvx - accel_x > rvx) # if the robot is slowing down and the drivetrain is still moving
             or
             abs(accel_y) > config.odometry_crash_accel_threshold
+            and
+            (rvy - accel_y > rvy) # if the robot is slowing down and the drivetrain is still moving
         ):
             return True
         return False
