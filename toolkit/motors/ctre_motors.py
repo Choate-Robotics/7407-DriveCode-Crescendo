@@ -185,7 +185,7 @@ class TalonFX(PIDMotor):
         self.error_check(self._motor.set_position(pos), f'sensor position: {pos}')
 
     def set_target_velocity(self, vel: rotations_per_second, accel: rotations_per_second_squared = 0):
-        self.error_check(self._motor.set_control(self._mm_v_v.with_velocity(vel)), f'target velocity: {vel}, accel: {accel}')
+        self.error_check(self._motor.set_control(self._mm_v_v.with_velocity(vel).with_acceleration(accel)), f'target velocity: {vel}, accel: {accel}')
 
 
     def set_raw_output(self, x: float):
