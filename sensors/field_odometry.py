@@ -150,7 +150,7 @@ class FieldOdometry:
         return False
     
     def hold_pose(self):
-        self.resetOdometry(self.last_pose)
+        self.resetOdometry(self.getPose())
     
     def set_std_auto(self):
         self.std_formula = config.odometry_std_auto_formula
