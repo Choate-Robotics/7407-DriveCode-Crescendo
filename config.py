@@ -239,7 +239,7 @@ drivetrain_rotation_enable_tuner: bool = True
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 shot_height_offset: inches = 2.65 # inches
-wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
+wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 
 
 # Flywheel
@@ -294,6 +294,10 @@ ELEVATOR_CLIMB_CONFIG = SparkMaxConfig(
 # P=.2, I=0, D=0.003
 WRIST_CONFIG = SparkMaxConfig(
     0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+)
+
+WRIST_AIM_CONFIG = SparkMaxConfig(
+    0.23, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
 
