@@ -80,8 +80,8 @@ class TalonConfig:
 
         # motion magic
         magic = talon_config.motion_magic
-        magic.motion_magic_acceleration = 800
-        magic.motion_magic_jerk = 8000
+        magic.motion_magic_acceleration = 600
+        magic.motion_magic_jerk = 6000
 
         res = motor.configurator.apply(talon_config)
         if res != StatusCode.OK:
