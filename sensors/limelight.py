@@ -146,6 +146,9 @@ class Limelight:
 
     def get_led_mode(self) -> config.limelight_led_mode:
         return self.table.getNumber("ledMode", 0)
+    
+    def get_target_id(self) -> float:
+        return self.tid
 
     def set_cam_vision(self):
         """
@@ -308,7 +311,8 @@ class Limelight:
             tag_span:float = botpose[8]
             ave_tag_dist:float = botpose[9]
             tag_area:float = botpose[10]
-            return pose, timestamp, tag_count, ave_tag_dist, tag_area
+            tag_id:float = self.get_target_id()
+            return pose, timestamp, tag_count, ave_tag_dist, tag_area, tag_id
         
     def get_target_pose(self):
         
@@ -335,7 +339,7 @@ class LimelightController(VisionEstimator):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
 
-    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float]] | None:
+    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float, float]] | None:
         poses = []
         for limelight in self.limelights:
             if (

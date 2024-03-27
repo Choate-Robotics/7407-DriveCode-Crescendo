@@ -120,10 +120,12 @@ class _Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         # Leds
-        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+        if Robot.wrist.detect_note_second():
             config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        elif Robot.intake.detect_note() or Robot.wrist.detect_note_first():
+            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 2)
         elif Robot.intake.get_outer_current() > 0:
-            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+            config.active_leds = (config.LEDType.KRainbow(), 1, 5)
         else:
             config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
 
@@ -169,6 +171,8 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Sensors.limelight_intake.update)
 
         self.handle(Field.odometry.update)
+        
+        self.handle(Field.odometry.update_tables)
 
         self.handle(Field.calculations.update)
 
@@ -176,7 +180,8 @@ class _Robot(wpilib.TimedRobot):
             "abs encoders", Robot.drivetrain.get_abs()
         )
         if not self.isSimulation():
-            self.nt.getTable("swerve").putBoolean("comp bot", config.comp_bot.get())
+            self.nt.getTable("General").putBoolean("comp bot", config.comp_bot.get())
+            self.nt.getTable('General').putNumber('max vel', constants.drivetrain_max_vel)
 
     def teleopInit(self):
         self.log.info("Teleop initialized")
@@ -208,24 +213,16 @@ class _Robot(wpilib.TimedRobot):
         else:
             states.flywheel_state = states.FlywheelState.idle
             
-        # self.scheduler.schedule(
-        #     commands2.ConditionalCommand(
-        #         command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel),
-        #         lambda: Robot.wrist.note_in_feeder()
-        #     )
-            
-        # )
-
     def teleopPeriodic(self):
-        if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
-            config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
-        elif Robot.intake.get_outer_current() > 0:
-            config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
-        else:
-            config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
-        LEDs.leds.set_LED(*config.active_leds)
-        LEDs.leds.cycle()
+        pass
+        # if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
+        #     config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
+        # elif Robot.intake.get_outer_current() > 0:
+        #     config.active_leds = (config.LEDType.KBlink(0, 255, 0), 1, 5)
+        # else:
+        #     config.active_leds = (config.LEDType.KStatic(0, 0, 255), 1, 5)
+        # LEDs.leds.set_LED(*config.active_leds)
+        # LEDs.leds.cycle()
 
     def autonomousInit(self):
         self.log.info("Autonomous initialized")

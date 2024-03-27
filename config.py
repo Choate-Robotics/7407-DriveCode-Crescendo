@@ -171,7 +171,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.3
+intake_distance_sensor_threshold: float = 0.5#0.73
 
 double_note_timeout = 2
 
@@ -228,9 +228,9 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-drivetrain_rotation_P: float = 8
+drivetrain_rotation_P: float = 4
 drivetrain_rotation_I: float = 0.0
-drivetrain_rotation_D: float = 0.08
+drivetrain_rotation_D: float = 0.1
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
 
@@ -238,8 +238,10 @@ drivetrain_rotation_enable_tuner: bool = True
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-shot_height_offset: inches = 2.65 # inches
-wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
+drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
+shot_height_offset: inches = 1.25 # inches
+wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
+wrist_velocity_shot_tolerance: degrees = 1
 
 
 # Flywheel
@@ -272,6 +274,8 @@ odometry_two_tag_distance_threshold = 7
 odometry_distance_deviation_threshold: meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
+odometry_crash_detection_enabled:bool = True
+odometry_crash_accel_threshold:float = 2.5 #G's
 
 
 #object detection
@@ -308,6 +312,10 @@ WRIST_CONFIG = SparkMaxConfig(
     0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
+WRIST_AIM_CONFIG = SparkMaxConfig(
+    0.23, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+)
+
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
@@ -340,7 +348,8 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=70,  # integral_zone=1000, max_integral_accumulator=10000
+    current_limit=40,
+    kV=0.12
 )
 
 # Giraffe
