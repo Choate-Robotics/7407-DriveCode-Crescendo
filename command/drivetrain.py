@@ -164,7 +164,13 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('error', self.theta_controller.getPositionError())
             self.table.putNumber('velocity error', self.theta_controller.getVelocityError())
         
-        if self.theta_controller.atSetpoint():
+        def drive_speed():
+            vx = self.subsystem.chassis_speeds.vx
+            vy = self.subsystem.chassis_speeds.vy
+            v_total = math.sqrt(vx ** 2 + vy ** 2)
+            return v_total
+        
+        if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False

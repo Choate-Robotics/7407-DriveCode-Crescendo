@@ -238,8 +238,10 @@ drivetrain_rotation_enable_tuner: bool = True
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-shot_height_offset: inches = 2.65 # inches
-wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
+drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
+shot_height_offset: inches = 1.25 # inches
+wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
+wrist_velocity_shot_tolerance: degrees = 1
 
 
 # Flywheel
