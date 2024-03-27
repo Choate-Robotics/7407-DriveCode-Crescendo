@@ -211,15 +211,6 @@ class _Robot(wpilib.TimedRobot):
         else:
             states.flywheel_state = states.FlywheelState.idle
             
-        # self.scheduler.schedule(
-        #     commands2.ConditionalCommand(
-        #         command.SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-        #         command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel),
-        #         lambda: Robot.wrist.note_in_feeder()
-        #     )
-            
-        # )
-
     def teleopPeriodic(self):
         if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
             config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)

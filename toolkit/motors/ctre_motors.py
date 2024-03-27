@@ -28,10 +28,10 @@ class TalonConfig:
         kD: float,
         kF: float,
         kA: float,
+        kV: float = 0,
         current_limit: int = 80,
         brake_mode: bool = True,
         output_range: tuple[float, float] = (-1, 1),
-        kV: float = 0,
     ):
         self.kP = kP
         self.kI = kI

@@ -48,14 +48,19 @@ class IT:
         button.Trigger(lambda: Robot.wrist.note_in_feeder())\
             .onTrue(
                 ParallelCommandGroup(
-                    command.ControllerRumble(Controllers.DRIVER_CONTROLLER, config.driver_rumble_intensity),
                     command.ControllerRumbleTimeout(Controllers.OPERATOR_CONTROLLER, config.operator_rumble_time, config.operator_rumble_intensity)
                 )
             ).onFalse(
                 ParallelCommandGroup(
-                command.ControllerRumble(Controllers.DRIVER_CONTROLLER, 0),
                 command.ControllerRumble(Controllers.OPERATOR_CONTROLLER, 0)
                 )
+            )
+            
+        button.Trigger(lambda: Robot.wrist.note_in_feeder() or Robot.intake.detect_note())\
+            .onTrue(
+                command.ControllerRumble(Controllers.DRIVER_CONTROLLER, config.driver_rumble_intensity),
+            ).onFalse(
+                command.ControllerRumble(Controllers.DRIVER_CONTROLLER, 0),
             )
     #     #FEEDER TRIGGERS ----------------
         
@@ -115,7 +120,7 @@ class IT:
             and Robot.drivetrain.ready_to_shoot
             and Robot.flywheel.ready_to_shoot
             and not Robot.elevator.elevator_moving
-        ).debounce(0.005).onTrue(command.Shoot(Robot.wrist))
+        ).onTrue(command.Shoot(Robot.wrist))
         # SHOOTER TRIGGERS ----------------
 
 
