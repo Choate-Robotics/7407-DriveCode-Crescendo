@@ -147,11 +147,11 @@ class FieldOdometry:
         if (
             abs(accel_x) > config.odometry_crash_accel_threshold
             and
-            (rvx - accel_x > rvx) # if the robot is slowing down and the drivetrain is still moving
+            (abs(rvx - accel_x) > abs(rvx)) # if the robot is slowing down and the drivetrain is still moving
             or
             abs(accel_y) > config.odometry_crash_accel_threshold
             and
-            (rvy - accel_y > rvy) # if the robot is slowing down and the drivetrain is still moving
+            (abs(rvy - accel_y) > abs(rvy)) # if the robot is slowing down and the drivetrain is still moving
         ):
             return True
         return False
