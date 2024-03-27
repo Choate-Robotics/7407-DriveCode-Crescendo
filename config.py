@@ -333,7 +333,7 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=70,
+    current_limit=60,
     kV=0.12
 )
 
