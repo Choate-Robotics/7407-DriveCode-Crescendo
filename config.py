@@ -228,9 +228,9 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-drivetrain_rotation_P: float = 8
+drivetrain_rotation_P: float = 4
 drivetrain_rotation_I: float = 0.0
-drivetrain_rotation_D: float = 0.08
+drivetrain_rotation_D: float = 0.1
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
 
@@ -299,6 +299,11 @@ WRIST_CONFIG = SparkMaxConfig(
     0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
+WRIST_AIM_CONFIG = SparkMaxConfig(
+    0.23, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+)
+
+
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
 INNER_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
@@ -330,7 +335,7 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=70,
+    current_limit=60,
     kV=0.12
 )
 
