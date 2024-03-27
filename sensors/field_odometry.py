@@ -223,11 +223,11 @@ class FieldOdometry:
                 return
         
         if config.active_team == config.Team.RED:
-            if tag_id == 7 or tag_id == 8:
-                std_dev = 0
-        elif config.active_team == config.Team.BLUE:
             if tag_id == 3 or tag_id == 4:
-                std_dev = 0
+                std_dev = 0.15 if tag_count > 1 else 0.4
+        elif config.active_team == config.Team.BLUE:
+            if tag_id == 7 or tag_id == 8:
+                std_dev = 0.15 if tag_count > 1 else 0.4
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
