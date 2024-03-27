@@ -171,7 +171,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.3
+intake_distance_sensor_threshold: float = 0.5#0.73
 
 double_note_timeout = 2
 
@@ -274,6 +274,7 @@ odometry_two_tag_distance_threshold = 7
 odometry_distance_deviation_threshold: meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
+odometry_crash_detection_enabled:bool = True
 odometry_crash_accel_threshold:float = 2.5 #G's
 
 # Configs
@@ -335,7 +336,7 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=60,
+    current_limit=40,
     kV=0.12
 )
 

@@ -141,6 +141,8 @@ class FieldOdometry:
         self.resetOdometry(new_pose)
 
     def potential_crash(self):
+        if not config.odometry_crash_detection_enabled:
+            return False
         accel_x = self.drivetrain.gyro.get_y_accel()
         accel_y = self.drivetrain.gyro.get_x_accel()
         
