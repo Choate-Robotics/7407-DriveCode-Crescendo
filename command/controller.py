@@ -14,7 +14,8 @@ from commands2 import (
     SequentialCommandGroup,
     WaitCommand,
     ParallelRaceGroup,
-    WaitUntilCommand
+    WaitUntilCommand,
+    ConditionalCommand
 )
 from commands2.command import Command
 from wpimath.geometry import Pose2d, Rotation2d  # noqa
@@ -434,25 +435,34 @@ class AutoPickupNote(SequentialCommandGroup):
     
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
         super().__init__(
-            ParallelCommandGroup(
-                SetWristIdle(wrist),
-                DriveSwerveNoteLineup(drivetrain, limelight),
-            ),
-            ParallelCommandGroup(
-                SequentialCommandGroup(
-                    InstantCommand(
-                        lambda: drivetrain.set_robot_centric(
-                            (-config.object_detection_drivetrain_speed_dy * drivetrain.max_vel, 0), 0)
-                        ),
-                    WaitUntilCommand(lambda: intake.detect_note()),
-                    InstantCommand(
-                        lambda: drivetrain.set_robot_centric((0, 0), 0)
-                    )
-                ),
+            ConditionalCommand(
                 SequentialCommandGroup(
                     IntakeStageNote(wrist, intake),
                     IntakeStageIdle(wrist, intake)
-                )
+                ),
+                SequentialCommandGroup(
+                    ParallelCommandGroup(
+                        SetWristIdle(wrist),
+                        DriveSwerveNoteLineup(drivetrain, limelight),
+                    ),
+                    ParallelCommandGroup(
+                        SequentialCommandGroup(
+                            InstantCommand(
+                                lambda: drivetrain.set_robot_centric(
+                                    (-config.object_detection_drivetrain_speed_dy * drivetrain.max_vel, 0), 0)
+                                ),
+                            WaitUntilCommand(lambda: intake.detect_note()),
+                            InstantCommand(
+                                lambda: drivetrain.set_robot_centric((0, 0), 0)
+                            )
+                        ),
+                        SequentialCommandGroup(
+                            IntakeStageNote(wrist, intake),
+                            IntakeStageIdle(wrist, intake)
+                        )
+                    )
+                ),
+                lambda: intake.detect_note() or wrist.detect_note_first() or wrist.detect_note_second()
             )
         )
         

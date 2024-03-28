@@ -294,8 +294,8 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.limelight = LimeLight
         self.target_exists = False
         self.target_constrained = False
-        self.v_pid = PIDController(0.04, 0, 0.001)
-        self.h_pid = PIDController(0.04, 0, 0.001)
+        self.v_pid = PIDController(0.1, 0, 0.00)
+        self.h_pid = PIDController(0.06, 0, 0.01)
         self.is_pipeline: bool = False
         
         
