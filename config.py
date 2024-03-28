@@ -283,8 +283,8 @@ object_detection_ty = -12
 object_detection_ty_threshold = 8
 object_detection_tx = 0
 object_detection_tx_threshold = 12
-object_detection_drivetrain_speed_dx = .25
-object_detection_drivetrain_speed_dy = .25
+object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dy = .5
 
 
 

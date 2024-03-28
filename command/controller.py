@@ -449,7 +449,10 @@ class AutoPickupNote(SequentialCommandGroup):
                         lambda: drivetrain.set_robot_centric((0, 0), 0)
                     )
                 ),
-            IntakeStageNote(wrist, intake)
+                SequentialCommandGroup(
+                    IntakeStageNote(wrist, intake),
+                    IntakeStageIdle(wrist, intake)
+                )
             )
         )
         
