@@ -449,7 +449,7 @@ class AutoPickupNote(SequentialCommandGroup):
                         SequentialCommandGroup(
                             InstantCommand(
                                 lambda: drivetrain.set_robot_centric(
-                                    (-config.object_detection_drivetrain_speed_dy * drivetrain.max_vel, 0), 0)
+                                    (-config.object_detection_intaking_drivetrain_speed * drivetrain.max_vel, 0), 0)
                                 ),
                             WaitUntilCommand(lambda: intake.detect_note()),
                             InstantCommand(
