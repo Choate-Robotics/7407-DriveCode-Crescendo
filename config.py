@@ -171,7 +171,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.3
+intake_distance_sensor_threshold: float = 0.5#0.73
 
 double_note_timeout = 2
 
@@ -238,7 +238,8 @@ drivetrain_rotation_enable_tuner: bool = True
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-shot_height_offset: inches = 2.65 # inches
+drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
+shot_height_offset: inches = 1.25 # inches
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
 
@@ -273,6 +274,21 @@ odometry_two_tag_distance_threshold = 7
 odometry_distance_deviation_threshold: meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
+odometry_crash_detection_enabled:bool = False
+odometry_crash_accel_threshold:float = 2.5 #G's
+
+
+#object detection
+object_detection_ty = -12
+object_detection_ty_threshold = 8
+object_detection_tx = 0
+object_detection_tx_threshold = 12
+object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dy = .5
+object_detection_intaking_drivetrain_speed = .3
+
+
+
 
 # Configs
 ELEVATOR_CONFIG = SparkMaxConfig(  # -.65, 1
@@ -333,7 +349,7 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=60,
+    current_limit=40,
     kV=0.12
 )
 
