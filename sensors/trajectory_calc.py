@@ -54,6 +54,7 @@ class TrajectoryCalculator:
             self.table.putNumber('flywheel minimum value', config.v0_flywheel_minimum)
             self.table.putNumber('flywheel maximum value', config.v0_flywheel_maximum)
             self.table.putNumber('shot height offset', config.shot_height_offset)
+            self.table.putNumber('height offset scalar', config.shot_height_offset_scalar)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -112,6 +113,11 @@ class TrajectoryCalculator:
         
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
+    def get_height_offset(self, distance_to_target: float) -> float:
+        if self.tuning:
+            config.shot_height_offset_scalar = self.table.getNumber('height offset scalar', config.shot_height_offset_scalar)
+
+        return distance_to_target * config.shot_height_offset_scalar
     def update_shooter(self):
         """
         function runs sim to calculate a final angle with air resistance considered
@@ -132,7 +138,7 @@ class TrajectoryCalculator:
         if self.tuning:
             config.shot_height_offset = self.table.getNumber('shot height offset', config.shot_height_offset)
             
-        self.delta_z += (config.shot_height_offset * inches_to_meters)
+        self.delta_z += (config.shot_height_offset * inches_to_meters) + self.get_height_offset(self.distance_to_target)
         
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
@@ -223,18 +229,7 @@ class TrajectoryCalculator:
         Returns the angle of the trajectory.
         """
         return self.shoot_angle
-        # if self.use_air_resistance:
-        #     return self.shoot_angle
-        # else:
-        #     self.distance_to_target = (
-        #         self.odometry.getPose().translation().distance(self.speaker)
-        #     )
-        #     # print("distance_to_target", self.distance_to_target)
 
-        #     self.delta_z = (
-        #             self.speaker_z - self.elevator.get_length() - constants.shooter_height
-        #     )
-        #     return self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
 
     def get_bot_theta(self) -> Rotation2d:
         """
