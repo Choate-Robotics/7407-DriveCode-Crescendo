@@ -80,7 +80,8 @@ class OI:
             commands2.ParallelCommandGroup(
                 # command.IntakeStageIdle(Robot.wrist, Robot.intake),
                 commands2.ConditionalCommand(
-                    command.IntakeStageNote(Robot.wrist, Robot.intake),
+                    command.IntakeStageNote(Robot.wrist, Robot.intake).andThen(
+                        command.IntakeStageIdle(Robot.wrist, Robot.intake)),
                     command.IntakeStageIdle(Robot.wrist, Robot.intake),
                     lambda: Robot.intake.detect_note() or Robot.wrist.detect_note_first()
                 ),
