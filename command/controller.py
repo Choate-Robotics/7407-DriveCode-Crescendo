@@ -2,19 +2,20 @@ import logging  # noqa
 import math  # noqa
 from typing import Literal  # noqa
 
+from subsystem import Elevator, Wrist, Intake, Drivetrain, Flywheel
+from sensors import FieldOdometry, TrajectoryCalculator, Limelight
 import commands2
 import ntcore
 import wpilib  # noqa
-from commands2 import ParallelDeadlineGroup  # noqa
-from commands2 import ParallelRaceGroup  # noqa
-from commands2 import RunCommand  # noqa
-from commands2 import WaitUntilCommand  # noqa
 from commands2 import (
     InstantCommand,
     ParallelCommandGroup,
     PrintCommand,
     SequentialCommandGroup,
     WaitCommand,
+    ParallelRaceGroup,
+    WaitUntilCommand,
+    ConditionalCommand
 )
 from commands2.command import Command
 from wpimath.geometry import Pose2d, Rotation2d  # noqa
@@ -36,6 +37,7 @@ from command import (
     SetWrist,
     SetWristIdle,
     UnDeployTenting,
+    DriveSwerveNoteLineup
 )
 
 # from command import *  # noqa
@@ -426,6 +428,42 @@ class EmergencyManuver(SequentialCommandGroup):
             DeployTenting(intake),
             UnDeployTenting(intake),
             SetWrist(wrist, config.staging_angle)
+        )
+        
+        
+class AutoPickupNote(SequentialCommandGroup):
+    
+    def __init__(self, drivetrain: Drivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
+        super().__init__(
+            ConditionalCommand(
+                SequentialCommandGroup(
+                    IntakeStageNote(wrist, intake),
+                    IntakeStageIdle(wrist, intake)
+                ),
+                SequentialCommandGroup(
+                    ParallelCommandGroup(
+                        SetWristIdle(wrist),
+                        DriveSwerveNoteLineup(drivetrain, limelight),
+                    ),
+                    ParallelCommandGroup(
+                        SequentialCommandGroup(
+                            InstantCommand(
+                                lambda: drivetrain.set_robot_centric(
+                                    (-config.object_detection_intaking_drivetrain_speed * drivetrain.max_vel, 0), 0)
+                                ),
+                            WaitUntilCommand(lambda: intake.detect_note()),
+                            InstantCommand(
+                                lambda: drivetrain.set_robot_centric((0, 0), 0)
+                            )
+                        ),
+                        SequentialCommandGroup(
+                            IntakeStageNote(wrist, intake),
+                            IntakeStageIdle(wrist, intake)
+                        )
+                    )
+                ),
+                lambda: intake.detect_note() or wrist.detect_note_first() or wrist.detect_note_second()
+            )
         )
         
 class ControllerRumble(InstantCommand):

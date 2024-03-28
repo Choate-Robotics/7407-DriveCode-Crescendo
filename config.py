@@ -277,6 +277,19 @@ odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
 odometry_crash_detection_enabled:bool = False
 odometry_crash_accel_threshold:float = 2.5 #G's
 
+
+#object detection
+object_detection_ty = -12
+object_detection_ty_threshold = 8
+object_detection_tx = 0
+object_detection_tx_threshold = 12
+object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dy = .5
+object_detection_intaking_drivetrain_speed = .3
+
+
+
+
 # Configs
 ELEVATOR_CONFIG = SparkMaxConfig(  # -.65, 1
     0.2,
