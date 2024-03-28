@@ -30,11 +30,11 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
 
-        Keymap.Shooter.AIM_DRIVETRAIN_RIGHT.and_(lambda: not states.flywheel_state == states.FlywheelState.amping).whileTrue(
-            command.DriveSwerveAim(Robot.drivetrain, Field.calculations)
-        ).onFalse(
-            command.DriveSwerveCustom(Robot.drivetrain)
-        )
+        # Keymap.Shooter.AIM_DRIVETRAIN_RIGHT.and_(lambda: not states.flywheel_state == states.FlywheelState.amping).whileTrue(
+        #     command.DriveSwerveAim(Robot.drivetrain, Field.calculations)
+        # ).onFalse(
+        #     command.DriveSwerveCustom(Robot.drivetrain)
+        # )
         
         Keymap.Shooter.AMP\
             .whileTrue(
@@ -78,10 +78,21 @@ class OI:
             command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake)
         ).onFalse(
             commands2.ParallelCommandGroup(
-                command.IntakeStageIdle(Robot.wrist, Robot.intake),
+                # command.IntakeStageIdle(Robot.wrist, Robot.intake),
+                commands2.ConditionalCommand(
+                    command.IntakeStageNote(Robot.wrist, Robot.intake),
+                    command.IntakeStageIdle(Robot.wrist, Robot.intake),
+                    lambda: Robot.intake.detect_note() or Robot.wrist.detect_note_first()
+                ),
                 command.DriveSwerveCustom(Robot.drivetrain)
             )
         )
+        
+        # Keymap.Intake.AUTO_INTAKE.onTrue(
+        #     command.DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
+        # ).onFalse(
+        #     command.DriveSwerveCustom(Robot.drivetrain)
+        # )
 
         Keymap.Elevator.ELEVATOR_HIGH.onTrue(
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)
