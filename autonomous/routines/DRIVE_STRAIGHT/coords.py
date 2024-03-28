@@ -1,15 +1,17 @@
 from units.SI import meters, radians
+import constants
+import math
 
 coord = (meters, meters, radians)
 waypoints = [(meters, meters)]
 path = (coord, waypoints, coord)
 
-initial: coord = (0, 0, 0)
+initial = (constants.field_length/2, constants.field_width/2, math.radians(180))
 
-drive_forward: path = (
+drive_forward = (
     initial,
     [],
-    (initial[0] - 1, initial[1], 0),
+    (initial[0] + 7, initial[1], math.radians(180)),
 )
 
 
