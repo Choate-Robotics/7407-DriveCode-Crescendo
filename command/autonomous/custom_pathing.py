@@ -23,6 +23,7 @@ from command.autonomous.trajectory import CustomTrajectory
 from enum import Enum
 
 from robot_systems import Field
+from sensors.trajectory_calc import TrajectoryCalculator
 
 class AngleType(Enum):
 
@@ -72,7 +73,6 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.theta_f: float = theta_f
         self.theta_diff: float | None = None
         self.omega: float | None = None
-        self.use_calculations: bool = False
         self.finished: bool = False
 
     def initialize(self) -> None:
@@ -87,7 +87,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         if self.theta_f == AngleType.path:
             self.theta_f = self.end_pose.rotation().radians()
         elif self.theta_f == AngleType.calculate:
-            self.use_calculations = True
+            self.theta_f = TrajectoryCalculator.get_rotation_auto(self.end_pose).radians()
         else:
             if config.active_team == config.Team.BLUE:
                 self.theta_f *= -1
@@ -113,8 +113,6 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
 
     def execute(self) -> None:
         self.t = time.perf_counter() - self.start_time
-        if self.use_calculations:
-            self.theta_f = Field.calculations.get_bot_theta().radians()
 
         relative = self.end_pose.relativeTo(
             self.subsystem.odometry_estimator.getEstimatedPosition()
