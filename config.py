@@ -63,6 +63,16 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 # STATE VARIABLES -- PLEASE DO NOT CHANGE
 
 
+#AUTO
+
+class NoteSelect(Enum):
+    FAR = 0
+    MID = 1
+    CENTER = 2
+
+first_note: NoteSelect = NoteSelect.FAR
+second_note: NoteSelect = NoteSelect.MID
+
 # Leds
 leds_id = 0
 leds_size = 28
@@ -235,6 +245,9 @@ drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angul
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
 
 drivetrain_rotation_enable_tuner: bool = True
+
+drivetrain_max_vel_auto: float = 4.5
+drivetrain_max_accel_auto: float = 4
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees

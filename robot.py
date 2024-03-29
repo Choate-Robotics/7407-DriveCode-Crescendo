@@ -61,8 +61,8 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        self.auto_selection.setDefaultOption("Test", autonomous.drive_straight)
-        self.auto_selection.addOption("Four Note Middle", autonomous.four_note_middle)
+        self.auto_selection.addOption("Test", autonomous.drive_straight)
+        self.auto_selection.setDefaultOption("Four Note Middle", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
@@ -84,6 +84,21 @@ class _Robot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putData("Team", self.team_selection)
 
         self.log.info(f"Scheduler period set to {config.period} seconds")
+
+        self.note_1_selection = wpilib.SendableChooser()
+        self.note_1_selection.setDefaultOption("Far", config.NoteSelect.FAR)
+        self.note_1_selection.addOption("Mid", config.NoteSelect.MID)
+        self.note_1_selection.addOption("Center", config.NoteSelect.CENTER)
+
+        wpilib.SmartDashboard.putData("First note", self.note_1_selection)
+
+        self.note_2_selection = wpilib.SendableChooser()
+        self.note_2_selection.addOption("Far", config.NoteSelect.FAR)
+        self.note_2_selection.setDefaultOption("Mid", config.NoteSelect.MID)
+        self.note_2_selection.addOption("Center", config.NoteSelect.CENTER)
+
+        wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
+
 
         # Initialize subsystems and sensors
         def init_subsystems():
@@ -234,6 +249,9 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_front_right.zero()
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
+
+        config.first_note = self.note_1_selection.getSelected()
+        config.second_note = self.note_2_selection.getSelected()
 
         self.auto_selection.getSelected().run()
 

@@ -54,19 +54,14 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     ):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
-        self.x_controller = PIDController(16, 0, 0, period)
-        self.y_controller = PIDController(16, 0, 0, period)
+        self.x_controller = PIDController(10, 0, 0, period)
+        self.y_controller = PIDController(10, 0, 0, period)
         self.theta_controller = PIDController(
-            5,
-            0,
-            0.08,
+            config.drivetrain_rotation_P,
+            config.drivetrain_rotation_I,
+            config.drivetrain_rotation_D,
             period
         )
-        # self.controller = HolonomicDriveController(
-        #     PIDController(8, 0, 0, period),
-        #     PIDController(8, 0, 0, period),
-        #     self.theta_controller
-        # )
         self.start_time = 0
         self.t = 0
         self.theta_i: float | None = None
