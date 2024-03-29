@@ -315,7 +315,7 @@ WRIST_CONFIG = SparkMaxConfig(
 )
 
 WRIST_AIM_CONFIG = SparkMaxConfig(
-    0.145, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake) if comp_bot.get() else \
+    0.16, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake) if comp_bot.get() else \
     SparkMaxConfig(
     0.23, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
