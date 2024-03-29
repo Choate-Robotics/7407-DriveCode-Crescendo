@@ -276,7 +276,7 @@ odometry_distance_deviation_threshold: meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
 odometry_crash_detection_enabled:bool = False
-odometry_crash_accel_threshold:float = 2.5 #G's
+odometry_crash_accel_threshold:float = 3.5 #G's
 
 
 #object detection
@@ -315,6 +315,8 @@ WRIST_CONFIG = SparkMaxConfig(
 )
 
 WRIST_AIM_CONFIG = SparkMaxConfig(
+    0.16, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake) if comp_bot.get() else \
+    SparkMaxConfig(
     0.23, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
