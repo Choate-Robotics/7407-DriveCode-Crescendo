@@ -62,7 +62,7 @@ class _Robot(wpilib.TimedRobot):
 
         self.auto_selection = wpilib.SendableChooser()
         self.auto_selection.addOption("Test", autonomous.drive_straight)
-        self.auto_selection.setDefaultOption("Four Note Middle", autonomous.four_note_middle)
+        self.auto_selection.setDefaultOption("FIVE Note Middle", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
         self.auto_selection.addOption("Four Notes", autonomous.four_note)
