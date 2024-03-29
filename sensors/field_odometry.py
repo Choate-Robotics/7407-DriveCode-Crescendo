@@ -9,6 +9,7 @@ from subsystem import Drivetrain
 from units.SI import seconds
 from wpilib import Timer
 
+from wpilib import RobotState
 
 def weighted_pose_average(
         robot_pose: Pose2d, vision_pose: Pose3d, robot_weight: float, vision_weight: float
@@ -222,18 +223,19 @@ class FieldOdometry:
             if distance_to_target > config.odometry_two_tag_distance_threshold:
                 return
         
-        if config.active_team == config.Team.RED:
-            if tag_id == 3 or tag_id == 4:
-                std_dev = 0.15 if tag_count > 1 else 0.4
-        elif config.active_team == config.Team.BLUE:
-            if tag_id == 7 or tag_id == 8:
-                std_dev = 0.15 if tag_count > 1 else 0.4
+        if not RobotState.isAutonomous():
+            if config.active_team == config.Team.RED:
+                if tag_id == 3 or tag_id == 4:
+                    std_dev = 0.15 if tag_count > 1 else 0.4
+            elif config.active_team == config.Team.BLUE:
+                if tag_id == 7 or tag_id == 8:
+                    std_dev = 0.15 if tag_count > 1 else 0.4
 
-        dist_calculations = (std_dev, std_dev, std_dev_omega)
-        self.std_dev = dist_calculations
-        self.drivetrain.odometry_estimator.addVisionMeasurement(
-            vision_pose.toPose2d(), vision_time, self.std_dev
-        )
+            dist_calculations = (std_dev, std_dev, std_dev_omega)
+            self.std_dev = dist_calculations
+            self.drivetrain.odometry_estimator.addVisionMeasurement(
+                vision_pose.toPose2d(), vision_time, self.std_dev
+            )
 
     def get_vision_poses(self):
         vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float]] | None
