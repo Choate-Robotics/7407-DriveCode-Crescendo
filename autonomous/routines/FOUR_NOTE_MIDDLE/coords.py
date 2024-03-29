@@ -13,7 +13,7 @@ initial = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.FieldPos.
 get_first_note = (
     (initial[0], initial[1], math.radians(135)),
     [],
-    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length/2, 0)).withRotation(-135)
+    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length/2, -0.12)).withRotation(-135)
 )
 
 get_second_note = (
@@ -31,5 +31,5 @@ get_third_note = (
 go_to_midline = (
     Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-2*constants.drivetrain_length/3, 0)),
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.7, 0.35))
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) - 1.25, 0))
 )
