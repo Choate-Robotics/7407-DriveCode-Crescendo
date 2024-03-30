@@ -337,7 +337,7 @@ DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBr
 #     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
 # )
 FLYWHEEL_CONFIG = TalonConfig(
-    0.5, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
+    0.3, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
 
 
