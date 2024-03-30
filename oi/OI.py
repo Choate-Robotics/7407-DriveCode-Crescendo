@@ -94,6 +94,20 @@ class OI:
         ).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain)
         )
+        
+        Keymap.Shooter.FEED_SHOT.onTrue(
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
+        
+        Keymap.Shooter.FEED_SHOT.onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed)
+        ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
 
         Keymap.Elevator.ELEVATOR_HIGH.onTrue(
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)

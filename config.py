@@ -241,7 +241,7 @@ drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
-wrist_velocity_shot_tolerance: degrees = 1
+wrist_velocity_shot_tolerance: degrees = .25
 shot_height_offset_scalar: float = 0.014
 
 
@@ -262,7 +262,7 @@ auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = 0.5
+flywheel_shot_tolerance: meters_per_second = 0.25
 flywheel_shot_current_threshold = 20
 
 

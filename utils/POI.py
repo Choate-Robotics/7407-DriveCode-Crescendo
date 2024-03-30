@@ -326,6 +326,16 @@ class POI:
                         constants.FieldPos.Scoring.amp_rotation,
                     )
                 )
+                
+                kFeed = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            constants.FieldPos.Scoring.amp_x,
+                            constants.FieldPos.Scoring.amp_y,
+                        ),
+                        constants.FieldPos.Scoring.amp_rotation,
+                    )
+                )
 
                 kAmpActual = POIPose(
                     Pose2d(
