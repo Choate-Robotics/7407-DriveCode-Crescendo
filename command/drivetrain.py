@@ -114,8 +114,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('P', config.drivetrain_rotation_P)
             self.table.putNumber('I', config.drivetrain_rotation_I)
             self.table.putNumber('D', config.drivetrain_rotation_D)
-            self.table.putNumber('tolerance', 1)
-            self.table.putNumber('velocity tolerance', 2)
+            self.table.putNumber('tolerance', 3)
+            self.table.putNumber('velocity tolerance', 3)
             self.table.putNumber('drivetrain offset', config.drivetrain_aiming_offset)
 
 
@@ -128,7 +128,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setP(config.drivetrain_rotation_P)
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
-            self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 1)), radians(self.table.getNumber('velocity tolerance', 2)))
+            self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 3)), radians(self.table.getNumber('velocity tolerance', 3)))
             
 
             
@@ -294,23 +294,20 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.limelight = LimeLight
         self.target_exists = False
         self.target_constrained = False
-        self.v_pid = PIDController(0.1, 0, 0.00)
-        self.h_pid = PIDController(0.06, 0, 0.01)
+        self.v_pid = PIDController(.09, 0, 0.01)
+        self.h_pid = PIDController(.07, 0, 0.01)
         self.is_pipeline: bool = False
+        self.nt = ntcore.NetworkTableInstance.getDefault().getTable('drivetrain pid tune')
         
         
     def initialize(self):
-        self.limelight.set_pipeline_mode(config.LimelightPipeline.neural)
+        # self.limelight.set_pipeline_mode(config.LimelightPipeline.neural)
         self.v_pid.reset()
         self.h_pid.reset()
         self.v_pid.setTolerance(config.object_detection_ty_threshold)
         self.h_pid.setTolerance(config.object_detection_tx_threshold)
         
     def execute(self):
-        if self.limelight.get_pipeline_mode() != config.LimelightPipeline.neural:
-            # print('not right pipeline')
-            self.limelight.update()
-            return
         self.limelight.update()
         self.is_pipeline = True
         # print('can see')
@@ -324,8 +321,11 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         # print("target")
         tx, ty, ta = self.limelight.get_target(True)
         
-        # self.nt.putNumber("tx", tx)
-        # self.nt.putNumber("ty", ty)
+        self.nt.putNumber('tx target', config.object_detection_tx)
+        self.nt.putNumber('ty target', config.object_detection_ty)
+        
+        self.nt.putNumber("tx", tx)
+        self.nt.putNumber("ty", ty)
         # self.nt.putNumber('ta', ta)
         
         
@@ -339,8 +339,8 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         dx = self.h_pid.calculate(tx, config.object_detection_tx)
         
             
-        dx *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dx
-        dy *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dy
+        # dx *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dx
+        # dy *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dy
             
         self.drivetrain.set_robot_centric((dy, -dx), 0)
         
@@ -350,7 +350,7 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         return False
     
     def end(self, interrupted: bool = False):
-        self.limelight.set_pipeline_mode(config.LimelightPipeline.feducial)
+        # self.limelight.set_pipeline_mode(config.LimelightPipeline.feducial)
         self.drivetrain.set_robot_centric((0, 0), 0)
 class DriveSwerveHoldRotationIndef(SubsystemCommand[Drivetrain]):
     """

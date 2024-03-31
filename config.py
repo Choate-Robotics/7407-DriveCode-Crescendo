@@ -255,7 +255,7 @@ drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
-shot_height_offset_scalar: float = 0.017
+shot_height_offset_scalar: float = 0.014
 
 
 # Flywheel
@@ -293,8 +293,8 @@ odometry_crash_accel_threshold:float = 3.5 #G's
 
 
 #object detection
-object_detection_ty = -12
-object_detection_ty_threshold = 8
+object_detection_ty = -16
+object_detection_ty_threshold = 0
 object_detection_tx = 0
 object_detection_tx_threshold = 12
 object_detection_drivetrain_speed_dx = .5
@@ -350,7 +350,7 @@ DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBr
 #     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
 # )
 FLYWHEEL_CONFIG = TalonConfig(
-    0.5, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
+    0.3, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
 
 
