@@ -214,7 +214,6 @@ class TrajectoryCalculator:
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
     
-        
 
     def update_base(self):
         """

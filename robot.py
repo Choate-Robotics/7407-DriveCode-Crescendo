@@ -44,7 +44,7 @@ class _Robot(wpilib.TimedRobot):
 
     def handle(self, func, *args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString(func.__name__, str(e))
@@ -148,7 +148,7 @@ class _Robot(wpilib.TimedRobot):
                     return 'Unknown'
 
         states_nt = self.nt.getTable('states')
-        states_nt.putString('flywheel', get_flywheel_state())
+        states_nt.putString('flywheel', self.handle(get_flywheel_state))
         
 
 
