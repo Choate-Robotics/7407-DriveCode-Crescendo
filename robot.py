@@ -142,6 +142,10 @@ class _Robot(wpilib.TimedRobot):
                     return 'Amping'
                 case states.FlywheelState.released:
                     return 'Released'
+                case states.FlywheelState.feeding:
+                    return 'Feeding'
+                case _:
+                    return 'Unknown'
 
         states_nt = self.nt.getTable('states')
         states_nt.putString('flywheel', get_flywheel_state())

@@ -60,6 +60,9 @@ class TrajectoryCalculator:
             self.table.putNumber('flywheel maximum value', config.v0_flywheel_maximum)
             self.table.putNumber('shot height offset', config.shot_height_offset)
             self.table.putNumber('height offset scalar', config.shot_height_offset_scalar)
+            self.table.putNumber('flywheel feed distance scalar', config.flywheel_distance_feed_scalar)
+            self.table.putNumber('flywheel feed minimum value', config.flywheel_feed_speed_min)
+            self.table.putNumber('flywheel feed maximum value', config.flywheel_feed_speed_max)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -122,6 +125,14 @@ class TrajectoryCalculator:
         
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
+    def get_flywheel_speed_feed(self, distance_to_target:float) -> float:
+        if self.tuning:
+            config.flywheel_distance_scalar = self.table.getNumber('flywheel feed distance scalar', config.flywheel_distance_feed_scalar)
+            config.v0_flywheel_minimum = self.table.getNumber('flywheel feed minimum value', config.flywheel_feed_speed_min)
+            config.v0_flywheel_maximum = self.table.getNumber('flywheel feed maximum value', config.flywheel_feed_speed_max)
+        
+        return  min(config.flywheel_feed_speed_min + distance_to_target * config.flywheel_distance_feed_scalar, config.flywheel_feed_speed_max)
+
     def get_height_offset(self, distance_to_target: float) -> float:
         if self.tuning:
             config.shot_height_offset_scalar = self.table.getNumber('height offset scalar', config.shot_height_offset_scalar)
@@ -142,7 +153,7 @@ class TrajectoryCalculator:
             self.odometry.getPose().translation().distance(self.speaker) - constants.shooter_offset_y
         )
         
-        self.distance_to_feed = (
+        self.distance_to_feed_zone = (
             self.odometry.getPose().translation().distance(self.feed_zone) - constants.shooter_offset_y
         )
         # print("distance_to_target", self.distance_to_target)
@@ -158,7 +169,7 @@ class TrajectoryCalculator:
         
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         
-        feed_angle = self.calculate_angle_feed_zone(self.distance_to_feed)
+        feed_angle = self.calculate_angle_feed_zone(self.distance_to_feed_zone)
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
             self.feed_angle = feed_angle
@@ -230,6 +241,7 @@ class TrajectoryCalculator:
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
         self.table.putNumber('bot feed angle', self.get_bot_theta_feed().degrees())
+        self.table.putNumber('distance to feed zone', self.get_distance_to_feed_zone())
         self.table.putNumber('delta z', self.delta_z)
         self.table.putNumber('flywheel speed', self.get_flywheel_speed(self.distance_to_target))
         

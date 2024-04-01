@@ -96,7 +96,7 @@ class OI:
         )
         
         Keymap.Shooter.FEED_SHOT.onTrue(
-            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed)
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)
         ).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain)
         )
@@ -128,7 +128,7 @@ class OI:
         def set_amping():
             states.flywheel_state = states.FlywheelState.amping
 
-        def set_not_amping():
+        def set_released():
             states.flywheel_state = states.FlywheelState.released
             
         Keymap.Elevator.AMP.whileTrue(
@@ -139,10 +139,21 @@ class OI:
             )
         )
         
+        
         Keymap.Elevator.AMP.onTrue(
             commands2.InstantCommand(lambda: set_amping())
         ).onFalse(
-            commands2.InstantCommand(lambda: set_not_amping())
+            commands2.InstantCommand(lambda: set_released())
+        )
+        
+        def set_feeding():
+            states.flywheel_state = states.FlywheelState.feeding
+            
+            
+        Keymap.Shooter.FEED_SHOT.onTrue(
+            commands2.InstantCommand(lambda: set_feeding())
+        ).onFalse(
+            commands2.InstantCommand(lambda: set_released())
         )
 
         Keymap.Shooter.SET_WRIST_SUBWOOFER.onTrue(

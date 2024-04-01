@@ -238,6 +238,8 @@ drivetrain_rotation_enable_tuner: bool = True
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
+drivetrain_aiming_tolerance: degrees = 2
+drivetrain_aiming_velocity_tolerance: degrees = 3
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
@@ -250,7 +252,10 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 19.5
+flywheel_feed_speed_max: meters_per_second = 16
+flywheel_feed_speed_min: meters_per_second = 13
 flywheel_distance_scalar: float = 1.8
+flywheel_distance_feed_scalar: float = 2.6
 v0_flywheel_minimum: meters_per_second = 14
 v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12

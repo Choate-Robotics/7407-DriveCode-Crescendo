@@ -122,8 +122,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('P', config.drivetrain_rotation_P)
             self.table.putNumber('I', config.drivetrain_rotation_I)
             self.table.putNumber('D', config.drivetrain_rotation_D)
-            self.table.putNumber('tolerance', 3)
-            self.table.putNumber('velocity tolerance', 3)
+            self.table.putNumber('tolerance', config.drivetrain_aiming_tolerance)
+            self.table.putNumber('velocity tolerance', config.drivetrain_aiming_velocity_tolerance)
             self.table.putNumber('drivetrain offset', config.drivetrain_aiming_offset)
 
 
@@ -136,7 +136,10 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setP(config.drivetrain_rotation_P)
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
-            self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 3)), radians(self.table.getNumber('velocity tolerance', 3)))
+            self.theta_controller.setTolerance(
+                radians(self.table.getNumber('tolerance', config.drivetrain_aiming_tolerance)),
+                radians(self.table.getNumber('velocity tolerance', config.drivetrain_aiming_velocity_tolerance))\
+                    )
             
 
             

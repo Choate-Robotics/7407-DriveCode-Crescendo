@@ -17,5 +17,6 @@ class FlywheelState(Enum):
     amping = 2
     manual = 3
     released = 4
+    feeding = 5
 
 flywheel_state = FlywheelState.idle
