@@ -133,12 +133,7 @@ class TrajectoryCalculator:
     
     def get_flywheel_speed_feed(self, distance_to_target: float) -> float:
         
-            
-        # if self.tuning:
-        #     config.flywheel_distance_scalar = self.table.getNumber('flywheel feed distance scalar', config.flywheel_distance_feed_scalar)
-        #     config.v0_flywheel_minimum = self.table.getNumber('flywheel feed minimum value', config.flywheel_feed_speed_min)
-        #     config.v0_flywheel_maximum = self.table.getNumber('flywheel feed maximum value', config.flywheel_feed_speed_max)
-            
+        
         vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height)
         
         v_total = np.sqrt(vy ** 2 + vx **2)
@@ -158,6 +153,8 @@ class TrajectoryCalculator:
             config.shot_height_offset_scalar = self.table.getNumber('height offset scalar', config.shot_height_offset_scalar)
 
         return distance_to_target * config.shot_height_offset_scalar
+    
+    
     def update_shooter(self):
         """
         function runs sim to calculate a final angle with air resistance considered
@@ -263,6 +260,7 @@ class TrajectoryCalculator:
         self.table.putNumber('distance to feed zone', self.get_distance_to_feed_zone())
         self.table.putNumber('delta z', self.delta_z)
         self.table.putNumber('flywheel speed', self.get_flywheel_speed(self.distance_to_target))
+        self.table.putNumber('feed flywheel speed', self.get_flywheel_speed_feed(self.get_distance_to_feed_zone()))
         
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
