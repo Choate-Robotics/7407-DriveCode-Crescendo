@@ -143,9 +143,9 @@ class LimelightPosition:
         Rotation3d(0, constants.limelight_elevator_angle, 0),
     )
     init_elevator_back = Pose3d(
-        constants.limelight_right,
+        constants.limelight_right_LL3,
         constants.limelight_forward,
-        constants.limelight_height,
+        constants.limelight_height_LL3,
         Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw),
     )
     fixed_intake = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
