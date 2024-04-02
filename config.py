@@ -256,6 +256,7 @@ flywheel_feed_speed_max: meters_per_second = 16
 flywheel_feed_speed_min: meters_per_second = 13
 flywheel_distance_scalar: float = 1.8
 flywheel_distance_feed_scalar: float = 2.6
+feed_shot_target_height: meters = 3
 v0_flywheel_minimum: meters_per_second = 14
 v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12

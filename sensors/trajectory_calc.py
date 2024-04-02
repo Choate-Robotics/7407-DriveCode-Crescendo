@@ -113,25 +113,45 @@ class TrajectoryCalculator:
 
         return result_angle
     
+    def calculate_lob_speeds(self, distance_to_target, target_height) -> tuple[float, float]:
+        
+        vy = np.sqrt(2 * constants.g * target_height)
+        
+        time = vy * (2/constants.g)
+        
+        vx = distance_to_target / time
+        
+        return vy, vx
+    
     def calculate_angle_feed_zone(self, distance_to_target: float) -> radians:
         
-        return radians(45)
+        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height)
+        
+        theta = np.arctan(vy / vx)
+        
+        return theta
     
-    def get_flywheel_speed(self, distance_to_target: float) -> float:
+    def get_flywheel_speed_feed(self, distance_to_target: float) -> float:
+        
+            
+        # if self.tuning:
+        #     config.flywheel_distance_scalar = self.table.getNumber('flywheel feed distance scalar', config.flywheel_distance_feed_scalar)
+        #     config.v0_flywheel_minimum = self.table.getNumber('flywheel feed minimum value', config.flywheel_feed_speed_min)
+        #     config.v0_flywheel_maximum = self.table.getNumber('flywheel feed maximum value', config.flywheel_feed_speed_max)
+            
+        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height)
+        
+        v_total = np.sqrt(vy ** 2 + vx **2)
+        
+        return  min(v_total, config.v0_flywheel_maximum)
+
+    def get_flywheel_speed(self, distance_to_target:float) -> float:
         if self.tuning:
             config.flywheel_distance_scalar = self.table.getNumber('flywheel distance scalar', config.flywheel_distance_scalar)
             config.v0_flywheel_minimum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_minimum)
             config.v0_flywheel_maximum = self.table.getNumber('flywheel maximum value', config.v0_flywheel_maximum)
         
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
-
-    def get_flywheel_speed_feed(self, distance_to_target:float) -> float:
-        if self.tuning:
-            config.flywheel_distance_scalar = self.table.getNumber('flywheel feed distance scalar', config.flywheel_distance_feed_scalar)
-            config.v0_flywheel_minimum = self.table.getNumber('flywheel feed minimum value', config.flywheel_feed_speed_min)
-            config.v0_flywheel_maximum = self.table.getNumber('flywheel feed maximum value', config.flywheel_feed_speed_max)
-        
-        return  min(config.flywheel_feed_speed_min + distance_to_target * config.flywheel_distance_feed_scalar, config.flywheel_feed_speed_max)
 
     def get_height_offset(self, distance_to_target: float) -> float:
         if self.tuning:
