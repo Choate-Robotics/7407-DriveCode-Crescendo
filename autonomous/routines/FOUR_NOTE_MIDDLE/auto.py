@@ -1,6 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom, AngleType
 from command.autonomous.trajectory import CustomTrajectory, PoseType
-from robot_systems import Robot, Field
+from robot_systems import Robot, Field, Sensors
 from utils import POIPose
 from command import *
 import config
@@ -10,7 +10,10 @@ from commands2 import (
     InstantCommand,
     SequentialCommandGroup,
     ParallelCommandGroup,
-    WaitCommand
+    WaitCommand,
+    ParallelRaceGroup,
+    ParallelDeadlineGroup,
+    WaitUntilCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -85,9 +88,9 @@ path_4 = FollowPathCustom(
         waypoints=[coord for coord in go_to_midline[1]],
         end_pose=go_to_midline[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
-        end_velocity=0,
+        end_velocity=2.5,
         rev=True,
         start_rotation=go_to_midline[0].get().rotation().radians()
     ),
@@ -141,12 +144,27 @@ auto = ParallelCommandGroup(
 
         # Get fifth note, go to midline
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-        # path_4,
-        # AutoPickupNote
-
-        path_5,
+        # path_4.alongWith(SetWristIdle(Robot.wrist)),
         
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
+        ParallelCommandGroup(
+            ParallelDeadlineGroup(
+                WaitUntilCommand(lambda: Robot.intake.detect_note()),
+                DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
+            ),
+            IntakeStageNote(Robot.wrist, Robot.intake)
+        ),
+
+        # ParallelRaceGroup(
+            # DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake),
+            # AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
+            # IntakeStageNote(Robot.wrist, Robot.intake),
+        # ),
+
+        path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+        
+        InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        SetWristIdle(Robot.wrist)
     )
     # SequentialCommandGroup(
     #     path_1,
