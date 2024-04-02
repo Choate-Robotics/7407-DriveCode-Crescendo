@@ -146,13 +146,13 @@ auto = ParallelCommandGroup(
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
         # path_4.alongWith(SetWristIdle(Robot.wrist)),
         
-        ParallelCommandGroup(
-            ParallelDeadlineGroup(
-                WaitUntilCommand(lambda: Robot.intake.detect_note()),
-                DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
-            ),
-            IntakeStageNote(Robot.wrist, Robot.intake)
-        ),
+        # ParallelCommandGroup(
+        #     ParallelDeadlineGroup(
+        #         WaitUntilCommand(lambda: Robot.intake.detect_note()),
+        #         DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
+        #     ),
+        #     IntakeStageNote(Robot.wrist, Robot.intake)
+        # ),
 
         # ParallelRaceGroup(
             # DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake),
