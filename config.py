@@ -255,7 +255,7 @@ drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
-shot_height_offset_scalar: float = 0.017
+shot_height_offset_scalar: float = 0.014
 
 
 # Flywheel
