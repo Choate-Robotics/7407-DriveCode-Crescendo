@@ -57,9 +57,9 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.x_controller = PIDController(10, 0, 0, period)
         self.y_controller = PIDController(10, 0, 0, period)
         self.theta_controller = PIDController(
-            config.drivetrain_rotation_P,
-            config.drivetrain_rotation_I,
-            config.drivetrain_rotation_D,
+            4,
+            0,
+            0,
             period
         )
         self.start_time = 0
@@ -150,7 +150,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         return self.finished
 
     def end(self, interrupted: bool) -> None:
-        self.subsystem.set_driver_centric((0, 0), 0)
+        if self.trajectory_c.end_velocity == 0:
+            self.subsystem.set_driver_centric((0, 0), 0)
         SmartDashboard.putString("POSE", str(self.subsystem.odometry.getPose()))
         SmartDashboard.putString(
             "POSD", str(Field.odometry.getPose().rotation().degrees())
