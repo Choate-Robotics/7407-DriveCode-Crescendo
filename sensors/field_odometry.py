@@ -81,11 +81,19 @@ class FieldOdometry:
 
         self.std_formula = lambda x: abs(x ** 2) / 2.5
 
+        self.use_speaker_tags: bool = False
+
     def enable(self):
         self.vision_on = True
 
     def disable(self):
         self.vision_on = False
+
+    def enable_speaker_tags(self):
+        self.use_speaker_tags = True
+
+    def disable_speaker_tags(self):
+        self.use_speaker_tags = False
 
     def update(self) -> Pose2d:
         """
@@ -223,7 +231,7 @@ class FieldOdometry:
             if distance_to_target > config.odometry_two_tag_distance_threshold:
                 return
         
-        if not RobotState.isAutonomous():
+        if self.use_speaker_tags:
             if config.active_team == config.Team.RED:
                 if tag_id == 3 or tag_id == 4:
                     std_dev = 0.15 if tag_count > 1 else 0.4

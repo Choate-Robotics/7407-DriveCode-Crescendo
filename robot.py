@@ -203,6 +203,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.info("Teleop initialized")
         Field.calculations.init()
         Field.odometry.set_std_tele()
+        Field.odometry.enable_speaker_tags()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
         Robot.wrist.update_wrist_pid()
@@ -243,6 +244,7 @@ class _Robot(wpilib.TimedRobot):
     def autonomousInit(self):
         self.log.info("Autonomous initialized")
         Field.odometry.set_std_auto()
+        Field.odometry.disable_speaker_tags()
         Field.calculations.init()
         Robot.drivetrain.gyro.reset_angle()
         Robot.drivetrain.n_front_left.zero()
