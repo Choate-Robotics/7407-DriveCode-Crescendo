@@ -129,7 +129,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setP(config.drivetrain_rotation_P)
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
-            self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 2)), radians(self.table.getNumber('velocity tolerance', 1)))
+            # self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 2)), radians(self.table.getNumber('velocity tolerance', 1)))
             
 
             
