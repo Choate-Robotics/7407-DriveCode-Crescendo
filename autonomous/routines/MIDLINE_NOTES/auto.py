@@ -29,8 +29,8 @@ path_1 = FollowPathCustom(
         start_pose=POIPose(Pose2d(*shoot_first_note[0])),
         waypoints=[coord for coord in shoot_first_note[1]],
         end_pose=shoot_first_note[2],
-        max_velocity=config.drivetrain_max_vel_auto - 1.5,
-        max_accel=config.drivetrain_max_accel_auto - 2,
+        max_velocity=config.drivetrain_max_vel_auto - 1,
+        max_accel=config.drivetrain_max_accel_auto - 1.25,
         start_velocity=0,
         end_velocity=0,
         rev=True
@@ -86,7 +86,7 @@ path_4 = FollowPathCustom(
         rev=True,
         start_rotation=get_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(100)
+    theta_f=math.radians(115)
 )
 
 path_5 = FollowPathCustom(
@@ -96,8 +96,8 @@ path_5 = FollowPathCustom(
         # start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
-        max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_velocity=3.5,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=2.5,
         end_velocity=0,
         rev=False,
@@ -144,6 +144,7 @@ auto = ParallelCommandGroup(
     SequentialCommandGroup(
         ZeroWrist(Robot.wrist),
         ZeroElevator(Robot.elevator),
+        # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
 
         # Drive to shot zone and deploy intake
         ParallelCommandGroup(
@@ -186,7 +187,7 @@ auto = ParallelCommandGroup(
         # path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
         
         # shoot third note
-        # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
+        InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         InstantCommand(lambda: Field.odometry.disable_speaker_tags()),
 
