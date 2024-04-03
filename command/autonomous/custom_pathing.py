@@ -56,10 +56,11 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.trajectory_c: CustomTrajectory = trajectory
         self.x_controller = PIDController(10, 0, 0, period)
         self.y_controller = PIDController(10, 0, 0, period)
-        self.theta_controller = PIDController(
+        self.theta_controller = ProfiledPIDControllerRadians(
             4,
             0,
             0,
+            TrapezoidProfileRadians.Constraints(20, 20),
             period
         )
         self.start_time = 0
@@ -73,7 +74,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     def initialize(self) -> None:
         self.x_controller.reset()
         self.y_controller.reset()
-        self.theta_controller.reset()
+        self.theta_controller.reset(Field.odometry.getPose().rotation().radians())
         self.trajectory = self.trajectory_c.generate()
         self.duration = self.trajectory.totalTime()
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
