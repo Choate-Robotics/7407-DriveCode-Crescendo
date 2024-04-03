@@ -90,7 +90,7 @@ path_4 = FollowPathCustom(
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
-        end_velocity=2.5,
+        end_velocity=0,
         rev=True,
         start_rotation=go_to_midline[0].get().rotation().radians()
     ),
