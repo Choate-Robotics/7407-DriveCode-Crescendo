@@ -53,8 +53,8 @@ path_2 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
-        max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_velocity=config.drivetrain_max_vel_auto - 0.5,
+        max_accel=config.drivetrain_max_accel_auto - 1.75,
         start_velocity=0,
         end_velocity=0,
         rev=False,
@@ -123,26 +123,34 @@ auto = ParallelCommandGroup(
         DeployIntake(Robot.intake).withTimeout(1),
         PassNote(Robot.wrist),
         
+        
         # Get second note
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_1, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot second note
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
 
         # Get third note
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot third note
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         # Get fourth note
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_3, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot fourth note
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         # Get fifth note, go to midline
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
         # path_4.alongWith(SetWristIdle(Robot.wrist)),
         
@@ -159,10 +167,11 @@ auto = ParallelCommandGroup(
             # AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
             # IntakeStageNote(Robot.wrist, Robot.intake),
         # ),
-
+        
+        InstantCommand(lambda: Field.odometry.enable()),
         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
         
-        InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         SetWristIdle(Robot.wrist)
     )

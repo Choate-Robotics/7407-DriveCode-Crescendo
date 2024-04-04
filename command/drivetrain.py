@@ -105,7 +105,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             config.
             period
             )
-        self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 1), radians(4 if RobotState.isAutonomous() else 2))
+        self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 3), radians(4 if RobotState.isAutonomous() else 4))
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
