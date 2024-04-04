@@ -168,7 +168,6 @@ auto = ParallelCommandGroup(
             # IntakeStageNote(Robot.wrist, Robot.intake),
         # ),
 
-        InstantCommand(lambda: Field.odometry.enable()),
         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
         InstantCommand(lambda: Field.odometry.enable()),

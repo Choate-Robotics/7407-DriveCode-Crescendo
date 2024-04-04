@@ -25,13 +25,13 @@ get_second_note = (
 get_third_note = (
     get_second_note[2].withRotation(-120),
     [],
-    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, -0.25)).withRotation(-45)
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, -0.25)).withRotation(-50)
 )
 
 go_to_midline = (
     Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-2*constants.drivetrain_length/3, 0)),
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(0, 0.25))
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(0, 0.125))
 )
 
 shoot_last_note = (
