@@ -203,6 +203,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.info("Teleop initialized")
         Field.calculations.init()
         Field.odometry.set_std_tele()
+        Field.odometry.enable()
         Field.odometry.enable_speaker_tags()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
