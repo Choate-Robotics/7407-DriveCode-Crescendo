@@ -32,8 +32,8 @@ from wpimath.geometry import Pose2d, Translation2d
 path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=POIPose(Pose2d(*get_first_note[0])),
-        start_pose=PoseType.current,
+        start_pose=POIPose(Pose2d(*get_first_note[0])),
+        # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
         end_pose=get_first_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -122,8 +122,8 @@ auto = ParallelCommandGroup(
         # Shoot first note preload and deploy intake`   `
         DeployIntake(Robot.intake).withTimeout(1),
         PassNote(Robot.wrist),
-        
-        
+
+
         # Get second note
         InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_1, Robot.wrist, Robot.intake, 1.5),
@@ -153,7 +153,7 @@ auto = ParallelCommandGroup(
         InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
         # path_4.alongWith(SetWristIdle(Robot.wrist)),
-        
+
         # ParallelCommandGroup(
         #     ParallelDeadlineGroup(
         #         WaitUntilCommand(lambda: Robot.intake.detect_note()),
@@ -167,10 +167,10 @@ auto = ParallelCommandGroup(
             # AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
             # IntakeStageNote(Robot.wrist, Robot.intake),
         # ),
-        
+
         InstantCommand(lambda: Field.odometry.enable()),
         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-        
+
         InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         SetWristIdle(Robot.wrist)
