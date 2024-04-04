@@ -13,19 +13,19 @@ initial = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.FieldPos.
 get_first_note = (
     (initial[0], initial[1], math.radians(135)),
     [],
-    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length/2, -0.125)).withRotation(-135)
+    Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length/2, -0.125)).withRotation(-135) # -0.125
 )
 
 get_second_note = (
     get_first_note[2].withRotation(-180),
     [Field.POI.Coordinates.Notes.Wing.kRight.withOffset(Translation2d(-constants.drivetrain_length, -5*constants.FieldPos.Wing.note_gap/6))],
-    Field.POI.Coordinates.Notes.Wing.kCenter.withRotation(0)
+    Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(0, constants.drivetrain_length / 2)).withRotation(0)
 )
 
 get_third_note = (
     get_second_note[2].withRotation(-120),
     [],
-    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, -0.25)).withRotation(130)
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, -0.25)).withRotation(135)
 )
 
 go_to_midline = (

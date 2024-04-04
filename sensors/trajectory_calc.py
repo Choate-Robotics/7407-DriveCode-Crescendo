@@ -240,7 +240,7 @@ class TrajectoryCalculator:
         """
         Returns the angle of the trajectory.
         """
-        return self.shoot_angle + radians(0.4)
+        return self.shoot_angle + radians(1)
 
 
     def get_bot_theta(self) -> Rotation2d:

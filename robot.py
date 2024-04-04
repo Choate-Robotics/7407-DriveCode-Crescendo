@@ -99,7 +99,6 @@ class _Robot(wpilib.TimedRobot):
 
         wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
 
-
         # Initialize subsystems and sensors
         def init_subsystems():
             subsystems: list[Subsystem] = [
@@ -161,8 +160,6 @@ class _Robot(wpilib.TimedRobot):
 
         states_nt = self.nt.getTable('states')
         states_nt.putString('flywheel', get_flywheel_state())
-        
-
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
@@ -187,7 +184,7 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Sensors.limelight_intake.update)
 
         self.handle(Field.odometry.update)
-        
+
         self.handle(Field.odometry.update_tables)
 
         self.handle(Field.calculations.update)
@@ -229,7 +226,7 @@ class _Robot(wpilib.TimedRobot):
             states.flywheel_state = states.FlywheelState.shooting
         else:
             states.flywheel_state = states.FlywheelState.idle
-            
+
     def teleopPeriodic(self):
         pass
         # if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
