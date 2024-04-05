@@ -37,5 +37,5 @@ go_to_midline = (
 shoot_last_note = (
     go_to_midline[2],
     [],
-    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(1.6, 0))
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(1, 0.6))
 )
