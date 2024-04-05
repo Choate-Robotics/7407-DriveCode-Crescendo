@@ -123,7 +123,6 @@ auto = ParallelCommandGroup(
         DeployIntake(Robot.intake).withTimeout(1),
         PassNote(Robot.wrist),
 
-
         # Get second note
         InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_1, Robot.wrist, Robot.intake, 1.5),
@@ -131,7 +130,6 @@ auto = ParallelCommandGroup(
         # Shoot second note
         InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
 
         # Get third note
         InstantCommand(lambda: Field.odometry.disable()),

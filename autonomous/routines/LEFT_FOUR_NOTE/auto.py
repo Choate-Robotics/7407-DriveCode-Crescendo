@@ -30,7 +30,7 @@ path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=POIPose(Pose2d(*get_first_note[0])),
-        waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
+        waypoints=[coord for coord in get_first_note[1]],
         end_pose=get_first_note[2],
         max_velocity=6,
         max_accel=3,
@@ -44,8 +44,8 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=get_third_note[0],
-        start_pose=PoseType.current,
+        start_pose=get_third_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=8,
@@ -60,8 +60,8 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=go_to_wing_boundary_1[0],
-        start_pose=PoseType.current,
+        start_pose=go_to_wing_boundary_1[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in go_to_wing_boundary_1[1]],
         end_pose=go_to_wing_boundary_1[2],
         max_velocity=8,
@@ -76,8 +76,8 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=get_second_note[0],
-        start_pose=PoseType.current,
+        start_pose=get_second_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=8,
@@ -92,8 +92,8 @@ path_4 = FollowPathCustom(
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=go_to_wing_boundary_2[0],
-        start_pose=PoseType.current,
+        start_pose=go_to_wing_boundary_2[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in go_to_wing_boundary_2[1]],
         end_pose=go_to_wing_boundary_2[2],
         max_velocity=8,
@@ -107,54 +107,61 @@ path_5 = FollowPathCustom(
 
 
 auto = SequentialCommandGroup(
-    # ParallelCommandGroup(
-    #     SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-    #     SequentialCommandGroup(
-    #         ZeroWrist(Robot.wrist),
-    #         ZeroElevator(Robot.elevator),
+    ParallelCommandGroup(
+        SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+        SequentialCommandGroup(
+            ZeroWrist(Robot.wrist),
+            ZeroElevator(Robot.elevator),
 
-    #         # Shoot preload and deploy intake
-    #         ParallelCommandGroup(
-    #             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-    #             DeployIntake(Robot.intake)
-    #         ),
+            # Shoot preload and deploy intake
+            InstantCommand(lambda: Field.odometry.enable()),
+            ParallelCommandGroup(
+                ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+                DeployIntake(Robot.intake)
+            ),
+            InstantCommand(lambda: Field.odometry.disable()),
 
-    #         # Get second note
-    #         PathUntilIntake(path_1, Robot.wrist, Robot.intake),
+            # Get second note
+            PathUntilIntake(path_1, Robot.wrist, Robot.intake),
 
-    #         # Shoot second note
-    #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Shoot second note
+            InstantCommand(lambda: Field.odometry.enable()),
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            InstantCommand(lambda: Field.odometry.disable()),
 
-    #         # Get third note at midline
-    #         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+            # Get third note at midline
+            PathUntilIntake(path_4, Robot.wrist, Robot.intake),
             
-    #         # Drive back to wing
-    #         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+            # Drive back to wing
+            path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
-    #         # Shoot third note
-    #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Shoot third note
+            InstantCommand(lambda: Field.odometry.enable()),
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            InstantCommand(lambda: Field.odometry.disable()),
 
-    #         # Get fourth note
-    #         PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+            # Get fourth note
+            PathUntilIntake(path_2, Robot.wrist, Robot.intake),
 
-    #         # Drive back to wing
-    #         path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+            # Drive back to wing
+            path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
-    #         # Shoot fourth note
-    #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Shoot fourth note
+            InstantCommand(lambda: Field.odometry.enable()),
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            InstantCommand(lambda: Field.odometry.disable()),
 
-    #         SetWristIdle(Robot.wrist)
+            SetWristIdle(Robot.wrist)
 
-    #     )
-    # ),
-    SequentialCommandGroup (
-        path_1,
-        path_4,
-        path_5,
-        path_2,
-        path_3
-    )
-
+        )
+    ),
+    # SequentialCommandGroup (
+    #     path_1,
+    #     path_4,
+    #     path_5,
+    #     path_2,
+    #     path_3
+    # )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)
