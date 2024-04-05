@@ -44,8 +44,8 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_third_note[0],
-        # start_pose=PoseType.current,
+        # start_pose=get_third_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=8,
@@ -60,8 +60,8 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=go_to_wing_boundary_1[0],
-        # start_pose=PoseType.current,
+        # start_pose=go_to_wing_boundary_1[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in go_to_wing_boundary_1[1]],
         end_pose=go_to_wing_boundary_1[2],
         max_velocity=8,
@@ -76,8 +76,8 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_second_note[0],
-        # start_pose=PoseType.current,
+        # start_pose=get_second_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=8,
@@ -92,8 +92,8 @@ path_4 = FollowPathCustom(
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=go_to_wing_boundary_2[0],
-        # start_pose=PoseType.current,
+        # start_pose=go_to_wing_boundary_2[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in go_to_wing_boundary_2[1]],
         end_pose=go_to_wing_boundary_2[2],
         max_velocity=8,
@@ -147,12 +147,13 @@ auto = SequentialCommandGroup(
 
     #     )
     # ),
-
-    # path_1,
-    # path_4,
-    # path_5,
-    # path_2,
-    # path_3
+    SequentialCommandGroup (
+        path_1,
+        path_4,
+        path_5,
+        path_2,
+        path_3
+    )
 
 )
 

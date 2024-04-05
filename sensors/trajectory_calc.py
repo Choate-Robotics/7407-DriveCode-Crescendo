@@ -55,6 +55,7 @@ class TrajectoryCalculator:
             self.table.putNumber('flywheel maximum value', config.v0_flywheel_maximum)
             self.table.putNumber('shot height offset', config.shot_height_offset)
             self.table.putNumber('height offset scalar', config.shot_height_offset_scalar)
+            self.table.putNumber('shot angle offset', config.shot_angle_offset)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -240,7 +241,10 @@ class TrajectoryCalculator:
         """
         Returns the angle of the trajectory.
         """
-        return self.shoot_angle + radians(1)
+        if self.tuning:
+            config.shot_angle_offset = self.table.getNumber('shot angle offset', config.shot_angle_offset)
+
+        return self.shoot_angle + radians(config.shot_angle_offset)
 
 
     def get_bot_theta(self) -> Rotation2d:

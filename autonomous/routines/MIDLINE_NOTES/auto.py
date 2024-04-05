@@ -140,6 +140,23 @@ path_7 = FollowPathCustom(
     theta_f=AngleType.calculate
 )
 
+path_8 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        # start_pose=come_back_with_third[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in come_back_with_third[1]],
+        end_pose=come_back_with_third[2],
+        max_velocity=config.drivetrain_max_vel_auto - 0.5,
+        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        start_velocity=0,
+        end_velocity=0,
+        rev=False,
+        start_rotation=come_back_with_third[0].get().rotation().radians()
+    ),
+    theta_f=AngleType.calculate
+)
+
 auto = ParallelCommandGroup(
     SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
@@ -177,7 +194,7 @@ auto = ParallelCommandGroup(
             SequentialCommandGroup(
                 path_4,
                 # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
-                path_5
+                path_8
             ),
             SequentialCommandGroup(
                 IntakeStageNote(Robot.wrist, Robot.intake),
@@ -194,21 +211,22 @@ auto = ParallelCommandGroup(
         InstantCommand(lambda: Field.odometry.disable()),
 
         # get fourth note from midline
-        PathUntilIntake(path_6, Robot.wrist, Robot.intake),
-
-        path_7.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-
-        InstantCommand(lambda: Field.odometry.enable()),
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
+        # PathUntilIntake(path_6, Robot.wrist, Robot.intake),
+        #
+        # path_7.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+        #
+        # InstantCommand(lambda: Field.odometry.enable()),
+        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
     )
     # SequentialCommandGroup(
     #     path_1,
     #     path_2,
     #     path_3,
     #     path_4,
-    #     path_5,
-    #     path_6,
-    #     path_7
+    #     path_8,
+    #     # path_5,
+    #     # path_6,
+    #     # path_7
     # )
 )
 
