@@ -123,49 +123,49 @@ path_6 = FollowPathCustom(
 )
 
 auto = ParallelCommandGroup(
-    SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-    SequentialCommandGroup(
-        ZeroWrist(Robot.wrist),
-        ZeroElevator(Robot.elevator),
-
-        # Drive to shot zone and deploy intake
-        ParallelCommandGroup(
-            path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-            DeployIntake(Robot.intake),
-        ),
-        
-        # Shoot first note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-        # get second note from midline
-        PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
-        
-        # drive to shot zone
-        path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-        
-        # shoot second note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-        # get third note from midline
-        PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-        
-        # drive to shot zone
-        path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-        
-        # shoot third note
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
-        # get fourth note from midline
-        PathUntilIntake(path_6, Robot.wrist, Robot.intake)
-    )
+    # SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     # SequentialCommandGroup(
-    #     path_1,
-    #     path_2,
-    #     path_3,
-    #     path_4,
-    #     path_5,
-    #     path_6
+    #     ZeroWrist(Robot.wrist),
+    #     ZeroElevator(Robot.elevator),
+    #
+    #     # Drive to shot zone and deploy intake
+    #     ParallelCommandGroup(
+    #         path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+    #         DeployIntake(Robot.intake),
+    #     ),
+    #
+    #     # Shoot first note
+    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    #
+    #     # get second note from midline
+    #     PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
+    #
+    #     # drive to shot zone
+    #     path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+    #
+    #     # shoot second note
+    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    #
+    #     # get third note from midline
+    #     PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+    #
+    #     # drive to shot zone
+    #     path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+    #
+    #     # shoot third note
+    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    #
+    #     # get fourth note from midline
+    #     PathUntilIntake(path_6, Robot.wrist, Robot.intake)
     # )
+    SequentialCommandGroup(
+        path_1,
+        path_2,
+        path_3,
+        path_4,
+        path_5,
+        path_6
+    )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

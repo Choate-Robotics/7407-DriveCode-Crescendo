@@ -67,6 +67,7 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Source Midline Auto", autonomous.mid_notes)
         # self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Amp Three Note", autonomous.left_four_note)
+        self.auto_selection.addOption("Speaker and Leave", autonomous.speaker_shoot_leave)
         # self.auto_selection.addOption("Do Nothing")
         # self.auto_selection.addOption('Left Four Notes Reverse', autonomous.left_four_note_reverse)
         # self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
