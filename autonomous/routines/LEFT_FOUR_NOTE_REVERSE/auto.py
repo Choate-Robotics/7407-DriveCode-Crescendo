@@ -107,52 +107,52 @@ path_5 = FollowPathCustom(
 
 
 auto = SequentialCommandGroup(
-    # ParallelCommandGroup(
-    #     SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-    #     SequentialCommandGroup(
-    #         ZeroWrist(Robot.wrist),
-    #         ZeroElevator(Robot.elevator),
+    ParallelCommandGroup(
+        SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+        SequentialCommandGroup(
+            ZeroWrist(Robot.wrist),
+            ZeroElevator(Robot.elevator),
 
-    #         # Shoot preload and deploy intake
-    #         ParallelCommandGroup(
-    #             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-    #             DeployIntake(Robot.intake)
-    #         ),
+            # Shoot preload and deploy intake
+            ParallelCommandGroup(
+                ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+                DeployIntake(Robot.intake)
+            ),
 
-    #         # Get second note
-    #         PathUntilIntake(path_1, Robot.wrist, Robot.intake),
+            # Get second note
+            PathUntilIntake(path_1, Robot.wrist, Robot.intake),
 
-    #         # Shoot second note
-    #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Shoot second note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-    #         # Get third note at midline
-    #         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+            # Get third note at midline
+            PathUntilIntake(path_4, Robot.wrist, Robot.intake),
             
-    #         # Drive back to wing
-    #         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+            # Drive back to wing
+            path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
-    #         # Shoot third note
-    #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Shoot third note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-    #         # Get fourth note
-    #         PathUntilIntake(path_2, Robot.wrist, Robot.intake),
+            # Get fourth note
+            PathUntilIntake(path_2, Robot.wrist, Robot.intake),
 
-    #         # Drive back to wing
-    #         path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+            # Drive back to wing
+            path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
-    #         # Shoot fourth note
-    #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+            # Shoot fourth note
+            ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-    #         SetWristIdle(Robot.wrist)
+            SetWristIdle(Robot.wrist)
 
-    #     )
-    # ),
+        )
+    ),
 
-    path_1,
-    path_4,
-    path_5,
-    path_2,
-    path_3
+    # path_1,
+    # path_4,
+    # path_5,
+    # path_2,
+    # path_3
 
 )
 

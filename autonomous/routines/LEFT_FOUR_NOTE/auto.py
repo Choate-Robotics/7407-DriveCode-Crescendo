@@ -131,7 +131,7 @@ auto = SequentialCommandGroup(
 
             # Get third note at midline
             PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-            
+
             # Drive back to wing
             path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
