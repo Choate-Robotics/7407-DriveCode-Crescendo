@@ -14,7 +14,7 @@ initial = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.FieldPos.
 get_first_note = (
     initial,
     [],
-    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.2, 0))
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.2, 0)).withRotation(-180)
 )
 
 get_second_note = (
@@ -33,7 +33,7 @@ go_to_wing_boundary_1 = (
 get_third_note = (
     go_to_wing_boundary_1[2],
     [Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost.withOffset(Translation3d(0, -1.3, 0))],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0))
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, -0.25))
 )
 
 go_to_wing_boundary_2 = (
