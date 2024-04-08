@@ -30,7 +30,7 @@ path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=POIPose(Pose2d(*get_first_note[0])),
-        waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
+        waypoints=[coord for coord in get_first_note[1]],
         end_pose=get_first_note[2],
         max_velocity=6,
         max_accel=3,
@@ -112,48 +112,56 @@ auto = SequentialCommandGroup(
     #     SequentialCommandGroup(
     #         ZeroWrist(Robot.wrist),
     #         ZeroElevator(Robot.elevator),
-
+    #
     #         # Shoot preload and deploy intake
+    #         InstantCommand(lambda: Field.odometry.enable()),
     #         ParallelCommandGroup(
     #             ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
     #             DeployIntake(Robot.intake)
     #         ),
-
+    #         InstantCommand(lambda: Field.odometry.disable()),
+    #
     #         # Get second note
     #         PathUntilIntake(path_1, Robot.wrist, Robot.intake),
-
+    #
     #         # Shoot second note
+    #         InstantCommand(lambda: Field.odometry.enable()),
     #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
+    #         InstantCommand(lambda: Field.odometry.disable()),
+    #
     #         # Get third note at midline
     #         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-            
+    #
     #         # Drive back to wing
     #         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-
+    #
     #         # Shoot third note
+    #         InstantCommand(lambda: Field.odometry.enable()),
     #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
+    #         InstantCommand(lambda: Field.odometry.disable()),
+    #
     #         # Get fourth note
     #         PathUntilIntake(path_2, Robot.wrist, Robot.intake),
-
+    #
     #         # Drive back to wing
     #         path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-
+    #
     #         # Shoot fourth note
+    #         InstantCommand(lambda: Field.odometry.enable()),
     #         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-
+    #         InstantCommand(lambda: Field.odometry.disable()),
+    #
     #         SetWristIdle(Robot.wrist)
-
+    #
     #     )
     # ),
-
-    # path_1,
-    # path_4,
-    # path_5,
-    # path_2,
-    # path_3
-
+    SequentialCommandGroup (
+        path_1,
+        path_4,
+        path_5,
+        path_2,
+        path_3
+    )
 )
 
 routine = AutoRoutine(Pose2d(*initial), auto)

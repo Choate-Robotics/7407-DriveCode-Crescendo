@@ -11,7 +11,7 @@ from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
-from wpimath.geometry import Rotation2d, Translation3d, Translation2d
+from wpimath.geometry import Rotation2d, Translation3d, Translation2d, Pose2d
 from units.SI import inches_to_meters
 
 
@@ -54,6 +54,8 @@ class TrajectoryCalculator:
             self.table.putNumber('flywheel minimum value', config.v0_flywheel_minimum)
             self.table.putNumber('flywheel maximum value', config.v0_flywheel_maximum)
             self.table.putNumber('shot height offset', config.shot_height_offset)
+            self.table.putNumber('height offset scalar', config.shot_height_offset_scalar)
+            self.table.putNumber('shot angle offset', config.shot_angle_offset)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -112,6 +114,11 @@ class TrajectoryCalculator:
         
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
+    def get_height_offset(self, distance_to_target: float) -> float:
+        if self.tuning:
+            config.shot_height_offset_scalar = self.table.getNumber('height offset scalar', config.shot_height_offset_scalar)
+
+        return distance_to_target * config.shot_height_offset_scalar
     def update_shooter(self):
         """
         function runs sim to calculate a final angle with air resistance considered
@@ -132,7 +139,7 @@ class TrajectoryCalculator:
         if self.tuning:
             config.shot_height_offset = self.table.getNumber('shot height offset', config.shot_height_offset)
             
-        self.delta_z += (config.shot_height_offset * inches_to_meters)
+        self.delta_z += (config.shot_height_offset * inches_to_meters) + self.get_height_offset(self.distance_to_target)
         
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
@@ -166,6 +173,18 @@ class TrajectoryCalculator:
         speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
+        return robot_to_speaker.angle()
+
+    @staticmethod
+    def get_rotation_auto(robot_pose: Pose2d) -> Rotation2d:
+        """
+        returns rotation of base at a given pose
+        meant to be used in auto
+        :return: base target angle
+        :rtype: Rotation2d
+        """
+        speaker_translation: Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        robot_to_speaker = speaker_translation - robot_pose.translation()
         return robot_to_speaker.angle()
 
     def update_base(self):
@@ -222,19 +241,11 @@ class TrajectoryCalculator:
         """
         Returns the angle of the trajectory.
         """
-        return self.shoot_angle
-        # if self.use_air_resistance:
-        #     return self.shoot_angle
-        # else:
-        #     self.distance_to_target = (
-        #         self.odometry.getPose().translation().distance(self.speaker)
-        #     )
-        #     # print("distance_to_target", self.distance_to_target)
+        if self.tuning:
+            config.shot_angle_offset = self.table.getNumber('shot angle offset', config.shot_angle_offset)
 
-        #     self.delta_z = (
-        #             self.speaker_z - self.elevator.get_length() - constants.shooter_height
-        #     )
-        #     return self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
+        return self.shoot_angle + radians(config.shot_angle_offset)
+
 
     def get_bot_theta(self) -> Rotation2d:
         """

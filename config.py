@@ -63,6 +63,16 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 # STATE VARIABLES -- PLEASE DO NOT CHANGE
 
 
+#AUTO
+
+class NoteSelect(Enum):
+    FAR = 0
+    MID = 1
+    CENTER = 2
+
+first_note: NoteSelect = NoteSelect.FAR
+second_note: NoteSelect = NoteSelect.MID
+
 # Leds
 leds_id = 0
 leds_size = 28
@@ -143,9 +153,9 @@ class LimelightPosition:
         Rotation3d(0, constants.limelight_elevator_angle, 0),
     )
     init_elevator_back = Pose3d(
-        constants.limelight_right,
+        constants.limelight_right_LL3,
         constants.limelight_forward,
-        constants.limelight_height,
+        constants.limelight_height_LL3,
         Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw),
     )
     fixed_intake = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
@@ -171,7 +181,7 @@ intake_roller_current_limit = 18
 intake_deploy_current_limit = 30
 tenting_deploy_current_limit = 30
 intake_sensor_debounce = 0.1
-intake_distance_sensor_threshold: float = 0.3
+intake_distance_sensor_threshold: float = 0.5#0.73
 
 double_note_timeout = 2
 
@@ -228,18 +238,25 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-drivetrain_rotation_P: float = 8
+drivetrain_rotation_P: float = 4
 drivetrain_rotation_I: float = 0.0
-drivetrain_rotation_D: float = 0.08
+drivetrain_rotation_D: float = 0.1
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
 
 drivetrain_rotation_enable_tuner: bool = True
 
+drivetrain_max_vel_auto: float = 4.5
+drivetrain_max_accel_auto: float = 4
+
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-shot_height_offset: inches = 2.65 # inches
-wrist_shot_tolerance: degrees = 1 if comp_bot.get() else 2 
+drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
+shot_height_offset: inches = 0 # inches
+shot_angle_offset: degrees = 0.7
+wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
+wrist_velocity_shot_tolerance: degrees = 1
+shot_height_offset_scalar: float = 0.014
 
 
 # Flywheel
@@ -259,7 +276,7 @@ auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = 0.5
+flywheel_shot_tolerance: meters_per_second = 0.25
 flywheel_shot_current_threshold = 20
 
 
@@ -272,6 +289,21 @@ odometry_two_tag_distance_threshold = 7
 odometry_distance_deviation_threshold: meters = 0.5
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
+odometry_crash_detection_enabled:bool = False
+odometry_crash_accel_threshold:float = 3.5 #G's
+
+
+#object detection
+object_detection_ty = -16
+object_detection_ty_threshold = 0
+object_detection_tx = 0
+object_detection_tx_threshold = 12
+object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dy = .5
+object_detection_intaking_drivetrain_speed = .3
+
+
+
 
 # Configs
 ELEVATOR_CONFIG = SparkMaxConfig(  # -.65, 1
@@ -296,6 +328,12 @@ WRIST_CONFIG = SparkMaxConfig(
     0.4, 0, 40, 0, (-0.5, 0.5), idle_mode=rev.CANSparkMax.IdleMode.kBrake
 )
 
+WRIST_AIM_CONFIG = SparkMaxConfig(
+    0.16, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake) if comp_bot.get() else \
+    SparkMaxConfig(
+    0.23, 0, 0, 0, (-1, 1), idle_mode=rev.CANSparkMax.IdleMode.kBrake
+)
+
 
 FEED_CONFIG = SparkMaxConfig(0.08, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBrake)
 
@@ -313,7 +351,7 @@ DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBr
 #     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
 # )
 FLYWHEEL_CONFIG = TalonConfig(
-    0.5, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
+    0.3, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
 
 
@@ -328,7 +366,8 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=70,  # integral_zone=1000, max_integral_accumulator=10000
+    current_limit=50,
+    kV=0.12
 )
 
 # Giraffe

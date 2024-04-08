@@ -14,7 +14,8 @@ class Wrist(Subsystem):
     def __init__(self):
         super().__init__()
         self.wrist_motor = SparkMax(
-            can_id=config.wrist_motor_id, inverted=True, config=config.WRIST_CONFIG
+            can_id=config.wrist_motor_id, inverted=True, config=config.WRIST_CONFIG,
+            config_others=[config.WRIST_AIM_CONFIG]
         )
 
         self.feed_motor = SparkMax(
@@ -42,28 +43,31 @@ class Wrist(Subsystem):
         self.feed_motor.optimize_sparkmax_no_position()
         self.beam_break_first = DigitalInput(config.feeder_beam_break_first_channel)
         self.beam_break_second = DigitalInput(config.feeder_beam_break_second_channel)
-        self.table.getSubTable('wrist motor').putNumber('P', config.WRIST_CONFIG.k_P)
-        self.table.getSubTable('wrist motor').putNumber('I', config.WRIST_CONFIG.k_I)
-        self.table.getSubTable('wrist motor').putNumber('D', config.WRIST_CONFIG.k_D)
+        self.table.getSubTable('wrist motor').putNumber('P', config.WRIST_AIM_CONFIG.k_P)
+        self.table.getSubTable('wrist motor').putNumber('I', config.WRIST_AIM_CONFIG.k_I)
+        self.table.getSubTable('wrist motor').putNumber('D', config.WRIST_AIM_CONFIG.k_D)
         
         
         
     def update_wrist_pid(self):
         
-        WP = self.table.getSubTable('wrist motor').getNumber('P', config.WRIST_CONFIG.k_P)
-        WI = self.table.getSubTable('wrist motor').getNumber('I', config.WRIST_CONFIG.k_I)
-        WD = self.table.getSubTable('wrist motor').getNumber('D', config.WRIST_CONFIG.k_D)
+        WP = self.table.getSubTable('wrist motor').getNumber('P', config.WRIST_AIM_CONFIG.k_P)
+        WI = self.table.getSubTable('wrist motor').getNumber('I', config.WRIST_AIM_CONFIG.k_I)
+        WD = self.table.getSubTable('wrist motor').getNumber('D', config.WRIST_AIM_CONFIG.k_D)
         
         self.wrist_motor.pid_controller.setP(
-            WP
+            WP,
+            1
         )
         
         self.wrist_motor.pid_controller.setI(
-            WI
+            WI,
+            1
         )
         
         self.wrist_motor.pid_controller.setD(
-            WD
+            WD,
+            1
         )
 
     def limit_angle(self, angle: radians) -> radians:
@@ -93,7 +97,7 @@ class Wrist(Subsystem):
             return angle / (2 * math.pi)
 
     # wrist methods
-    def set_wrist_angle(self, angle: radians):
+    def set_wrist_angle(self, angle: radians, slot=0):
         """
         Sets the wrist angle to the given position
         :param pos: The position to set the wrist to(float)
@@ -110,12 +114,37 @@ class Wrist(Subsystem):
 
         current_angle = self.get_wrist_angle()
 
-        ff = config.wrist_max_ff * math.cos(angle - config.wrist_ff_offset) #* (1 if angle < current_angle else -1)
+        ff = config.wrist_max_ff * math.cos(angle - config.wrist_ff_offset)
 
         if not self.rotation_disabled:
             self.wrist_motor.set_target_position(
                 (angle / (pi * 2)) * constants.wrist_gear_ratio,
-                ff# if angle < current_angle else 0
+                ff,# if angle < current_angle else 0,
+                slot=slot
+            )
+            
+    def aim_wrist(self, angle: radians):
+        """
+        Sets the wrist angle to the given position
+        :param pos: The position to set the wrist to(float)
+        :return: None
+        """
+        
+        if not self.check_value_type(angle):
+            if config.DEBUG_MODE:
+                raise ValueError("Angle must be a float or int")
+            return
+        
+        angle = self.limit_angle(angle)
+        self.target_angle = angle
+        
+        ff = config.wrist_max_ff * math.cos(angle - config.wrist_ff_offset)
+
+        if not self.rotation_disabled:
+            self.wrist_motor.set_target_position(
+                (angle / (pi * 2)) * constants.wrist_gear_ratio,
+                ff - .2,# if angle < current_angle else 0,
+                slot=1
             )
             
 
@@ -155,6 +184,9 @@ class Wrist(Subsystem):
             return False # usually means the encoder is not connected/simulation
         
         return abs(bounded_angle_diff(self.get_wrist_angle(), angle)) < threshold
+    
+    def get_wrist_velocity(self):
+        return self.wrist_motor.get_sensor_velocity() * (2 * math.pi) / constants.wrist_gear_ratio
 
     def get_wrist_abs_angle(self):
 

@@ -108,5 +108,59 @@ class CustomTrajectory:
         )
         return self.trajectory
     
-    # def get_final_rotation(self)
     
+# class CustomTrajectoryAutoIntake:
+    
+#     def __init__(
+#         self,
+#         start_pose: Pose2d | POIPose,
+#         waypoints: list[Translation2d] | list[POIPose],
+#         note_detect_pose: Pose2d | POIPose,
+#         alt_pose: Pose2d | POIPose,
+#         max_velocity: float,
+#         max_accel: float,
+#         start_velocity: float = 0,
+#         end_velocity: float = 0,
+#         rev: bool = False,
+#     ):
+#         self.start_pose = start_pose
+#         self.waypoints = waypoints
+#         self.note_detect_pose = note_detect_pose
+#         self.alt_pose = alt_pose
+#         self.max_velocity = max_velocity
+#         self.max_accel = max_accel
+#         self.start_velocity = start_velocity
+#         self.end_velocity = end_velocity
+#         self.rev = rev
+        
+#         self.base_exit_vel = min(self.end_velocity, config.object_detection_drivetrain_speed_dx * constants.drivetrain_max_vel)
+
+#         self.base_trajectory = CustomTrajectory(
+#             self.start_pose,
+#             self.waypoints,
+#             self.note_detect_pose,
+#             self.max_velocity,
+#             self.max_accel,
+#             self.start_velocity,
+#             self.base_exit_vel,
+#             self.rev
+#         )
+        
+#         self.alt_trajectory = CustomTrajectory(
+#             self.note_detect_pose, # eventually replace with current pose
+#             [],
+#             self.alt_pose, 
+#             self.max_velocity,
+#             self.max_accel,
+#             self.base_exit_vel,
+#             self.end_velocity,
+#             self.rev
+#         )
+        
+#     def get_base(self):
+#         return self.base_trajectory
+    
+#     def get_alt(self):
+#         return self.alt_trajectory
+
+

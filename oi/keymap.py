@@ -60,6 +60,9 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.4
         )
         
+        AUTO_INTAKE = commands2.button.Trigger(
+            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
+        )
         
         
     class Shooter:
@@ -68,9 +71,9 @@ class Keymap:
             lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.RT) > 0.4
         )
 
-        AIM_DRIVETRAIN_RIGHT = commands2.button.Trigger(
-            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
-        )
+        # AIM_DRIVETRAIN_RIGHT = commands2.button.Trigger(
+        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
+        # )
         
         ENABLE_AIM_WRIST = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
