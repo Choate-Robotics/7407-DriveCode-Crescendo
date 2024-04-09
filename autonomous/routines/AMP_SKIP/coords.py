@@ -13,41 +13,39 @@ path = (coord, waypoints, coord)
 
 initial = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap * 1.5, math.radians(-180))
 
+shoot_location = POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(-180)))
+
 shoot_first_note = (
     initial,
     [],
-    POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(-180)))
+    shoot_location
 )
 
 get_second_note = (
-    shoot_first_note[2].withRotation(-135),
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.25, 0)),
-    #  Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d(-1, 0))
-     ],
-    Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d((-2 * drivetrain_length / 3) + 0.7, 0.1))
+    shoot_first_note[2],
+    [Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
+        Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.3))],
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
+        Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0))
 )
 
 shoot_second_note = (
     get_second_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.5, 0))],
-    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-135)
+    [Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
+        Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.3))],
+    shoot_location
 )
 
 get_third_note = (
-    shoot_second_note[2].withRotation(-155),
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0)),],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d((-2 * drivetrain_length / 3) + 0.7, 0))
-
+    shoot_second_note[2],
+    [Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost.withOffset(Translation3d(0, -1, 0))],
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, -0.25))
 )
 
 shoot_third_note = (
     get_third_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0)),],
-    Field.POI.Coordinates.Waypoints.Auto.kMidlineAutoScoring.withRotation(-155)
+    [Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
+        Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.7))],
+    shoot_location
 )
 
-get_fourth_note = (
-    shoot_third_note[2].withRotation(135),
-    [Field.POI.Coordinates.Structures.Obstacles.kStage.withOffset(Translation2d(0.25, 0.25))],
-    Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d((-2 * drivetrain_length / 3) + 0.7, 0))
-)
