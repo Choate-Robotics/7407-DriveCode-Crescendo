@@ -39,6 +39,8 @@ class TrajectoryCalculator:
         self.delta_z = 0
         self.shoot_angle:radians = 0
         self.base_rotation2d = Rotation2d(0)
+        self.bot_shot_tolerance:radians = radians(1)
+        self.t_total = 0
         self.elevator = elevator
         self.flywheel = flywheel
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
@@ -144,6 +146,7 @@ class TrajectoryCalculator:
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
+            self.t_total = self.distance_to_target / (self.flywheel.get_velocity_linear() * np.cos(theta_1))
             return theta_1
         else:
             theta_2 = theta_1 + np.radians(1)
@@ -174,6 +177,34 @@ class TrajectoryCalculator:
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
+    
+    def get_shot_pos_tolerance(self):
+        """
+        returns tolerance of base to face target
+        :return: base tolerance angle
+        """
+        speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        
+        bot_speaker_offset = config.speaker_length/2 - config.note_length/2
+        
+        bot_speaker_translation:Translation2d = speaker_translation - Translation2d(0, bot_speaker_offset)
+        
+        robot_pose_2d = self.odometry.getPose()
+        bot_speaker_origin = bot_speaker_translation - robot_pose_2d.translation()
+        small_angle = bot_speaker_origin.angle().radians()
+        big_angle = self.get_rotation_to_speaker().radians()
+        return max(
+            min(abs(small_angle - big_angle), radians(config.min_drivetrain_tolerance)),
+            radians(config.max_drivetrain_tolerance)
+        )
+    
+    def get_shot_vel_tolerance(self):
+        """
+        returns tolerance of base to face target
+        :return: base tolerance angle
+        """
+        tolerance = self.get_shot_pos_tolerance()
+        pass
 
     @staticmethod
     def get_rotation_auto(robot_pose: Pose2d) -> Rotation2d:
@@ -193,6 +224,7 @@ class TrajectoryCalculator:
         :return: base target angle
         """
         self.base_rotation2d = self.get_rotation_to_speaker()
+        self.bot_shot_tolerance = self.get_shot_pos_tolerance()
         return self.base_rotation2d
 
     def update(self):
@@ -209,6 +241,7 @@ class TrajectoryCalculator:
         self.table.putNumber('wrist angle', degrees(self.get_theta()))
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
+        self.table.putNumber('bot tolerance', degrees(self.get_shot_pos_tolerance()))
         self.table.putNumber('delta z', self.delta_z)
         self.table.putNumber('flywheel speed', self.get_flywheel_speed(self.distance_to_target))
         

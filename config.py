@@ -257,6 +257,10 @@ shot_angle_offset: degrees = 0.7
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
 shot_height_offset_scalar: float = 0.014
+speaker_length: meters = 41.83 * inches_to_meters
+note_length: meters = 14 * inches_to_meters
+min_drivetrain_tolerance: degrees = 1
+max_drivetrain_tolerance: degrees = 10
 
 
 # Flywheel
