@@ -32,8 +32,8 @@ from wpimath.geometry import Pose2d, Translation2d
 path_1 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=POIPose(Pose2d(*get_first_note[0])),
-        start_pose=PoseType.current,
+        start_pose=POIPose(Pose2d(*get_first_note[0])),
+        # start_pose=PoseType.current,
         waypoints=[Translation2d(*coord) for coord in get_first_note[1]],
         end_pose=get_first_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -53,8 +53,8 @@ path_2 = FollowPathCustom(
         start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
-        max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_velocity=config.drivetrain_max_vel_auto - 0.5,
+        max_accel=config.drivetrain_max_accel_auto - 1.75,
         start_velocity=0,
         end_velocity=0,
         rev=False,
@@ -100,11 +100,12 @@ path_4 = FollowPathCustom(
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
+        # start_pose=shoot_last_note[0],
         start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_last_note[1]],
         end_pose=shoot_last_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_accel=config.drivetrain_max_accel_auto - 0.75,
         start_velocity=0,
         end_velocity=0,
         rev=False,
@@ -122,30 +123,36 @@ auto = ParallelCommandGroup(
         # Shoot first note preload and deploy intake`   `
         DeployIntake(Robot.intake).withTimeout(1),
         PassNote(Robot.wrist),
-        
+
         # Get second note
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_1, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot second note
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
-
         # Get third note
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot third note
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         # Get fourth note
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_3, Robot.wrist, Robot.intake, 1.5),
 
         # Shoot fourth note
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
 
         # Get fifth note, go to midline
+        InstantCommand(lambda: Field.odometry.disable()),
         PathUntilIntake(path_4, Robot.wrist, Robot.intake),
         # path_4.alongWith(SetWristIdle(Robot.wrist)),
-        
+
         # ParallelCommandGroup(
         #     ParallelDeadlineGroup(
         #         WaitUntilCommand(lambda: Robot.intake.detect_note()),
@@ -161,8 +168,8 @@ auto = ParallelCommandGroup(
         # ),
 
         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-        
-        InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
+
+        InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         SetWristIdle(Robot.wrist)
     )

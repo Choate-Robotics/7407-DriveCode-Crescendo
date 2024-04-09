@@ -26,7 +26,7 @@ comp_bot: DigitalInput = DigitalInput(
     2
 )  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-DEBUG_MODE: bool = True
+DEBUG_MODE: bool = False
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
@@ -253,6 +253,7 @@ drivetrain_max_accel_auto: float = 4
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
+shot_angle_offset: degrees = 0.7
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
 shot_height_offset_scalar: float = 0.014
@@ -365,7 +366,7 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=40,
+    current_limit=50,
     kV=0.12
 )
 

@@ -61,14 +61,17 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        self.auto_selection.addOption("Test", autonomous.drive_straight)
-        self.auto_selection.setDefaultOption("FIVE Note Middle", autonomous.four_note_middle)
+        # self.auto_selection.addOption("Test", autonomous.drive_straight)
+        self.auto_selection.setDefaultOption("Five Note", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
-        self.auto_selection.addOption("Midline Auto", autonomous.mid_notes)
-        self.auto_selection.addOption("Four Notes", autonomous.four_note)
-        self.auto_selection.addOption("Left Four Notes", autonomous.left_four_note)
-        self.auto_selection.addOption('Left Four Notes Reverse', autonomous.left_four_note_reverse)
-        self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
+        self.auto_selection.addOption("Source Midline Auto", autonomous.mid_notes)
+        self.auto_selection.addOption("Alt Source Midline Auto", autonomous.mid_notes_2)
+        # self.auto_selection.addOption("Four Notes", autonomous.four_note)
+        self.auto_selection.addOption("Amp Side", autonomous.left_four_note)
+        self.auto_selection.addOption("Speaker and Leave", autonomous.speaker_shoot_leave)
+        # self.auto_selection.addOption("Do Nothing")
+        self.auto_selection.addOption('Alt Amp Side', autonomous.left_four_note_reverse)
+        # self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
         # self.auto_selection.addOption("Five Notes", autonomous.five_note)
         # self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
@@ -98,7 +101,6 @@ class _Robot(wpilib.TimedRobot):
         self.note_2_selection.addOption("Center", config.NoteSelect.CENTER)
 
         wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
-
 
         # Initialize subsystems and sensors
         def init_subsystems():
@@ -161,8 +163,6 @@ class _Robot(wpilib.TimedRobot):
 
         states_nt = self.nt.getTable('states')
         states_nt.putString('flywheel', get_flywheel_state())
-        
-
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
@@ -187,7 +187,7 @@ class _Robot(wpilib.TimedRobot):
         self.handle(Sensors.limelight_intake.update)
 
         self.handle(Field.odometry.update)
-        
+
         self.handle(Field.odometry.update_tables)
 
         self.handle(Field.calculations.update)
@@ -203,6 +203,7 @@ class _Robot(wpilib.TimedRobot):
         self.log.info("Teleop initialized")
         Field.calculations.init()
         Field.odometry.set_std_tele()
+        Field.odometry.enable()
         Field.odometry.enable_speaker_tags()
         Robot.wrist.zero_wrist()
         Robot.elevator.zero()
@@ -229,7 +230,7 @@ class _Robot(wpilib.TimedRobot):
             states.flywheel_state = states.FlywheelState.shooting
         else:
             states.flywheel_state = states.FlywheelState.idle
-            
+
     def teleopPeriodic(self):
         pass
         # if Robot.wrist.detect_note_first() or Robot.wrist.detect_note_second():
