@@ -63,6 +63,16 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 # STATE VARIABLES -- PLEASE DO NOT CHANGE
 
 
+#AUTO
+
+class NoteSelect(Enum):
+    FAR = 0
+    MID = 1
+    CENTER = 2
+
+first_note: NoteSelect = NoteSelect.FAR
+second_note: NoteSelect = NoteSelect.MID
+
 # Leds
 leds_id = 0
 leds_size = 28
@@ -236,6 +246,9 @@ drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angu
 
 drivetrain_rotation_enable_tuner: bool = True
 
+drivetrain_max_vel_auto: float = 4.5
+drivetrain_max_accel_auto: float = 4
+
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
@@ -262,7 +275,7 @@ auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = 0.5
+flywheel_shot_tolerance: meters_per_second = 0.25
 flywheel_shot_current_threshold = 20
 
 

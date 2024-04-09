@@ -9,6 +9,7 @@ from subsystem import Drivetrain
 from units.SI import seconds
 from wpilib import Timer
 
+from wpilib import RobotState
 
 def weighted_pose_average(
         robot_pose: Pose2d, vision_pose: Pose3d, robot_weight: float, vision_weight: float
@@ -80,11 +81,19 @@ class FieldOdometry:
 
         self.std_formula = lambda x: abs(x ** 2) / 2.5
 
+        self.use_speaker_tags: bool = False
+
     def enable(self):
         self.vision_on = True
 
     def disable(self):
         self.vision_on = False
+
+    def enable_speaker_tags(self):
+        self.use_speaker_tags = True
+
+    def disable_speaker_tags(self):
+        self.use_speaker_tags = False
 
     def update(self) -> Pose2d:
         """
@@ -222,12 +231,13 @@ class FieldOdometry:
             if distance_to_target > config.odometry_two_tag_distance_threshold:
                 return
         
-        if config.active_team == config.Team.RED:
-            if tag_id == 3 or tag_id == 4:
-                std_dev = 0.15 if tag_count > 1 else 0.4
-        elif config.active_team == config.Team.BLUE:
-            if tag_id == 7 or tag_id == 8:
-                std_dev = 0.15 if tag_count > 1 else 0.4
+        if self.use_speaker_tags:
+            if config.active_team == config.Team.RED:
+                if tag_id == 3 or tag_id == 4:
+                    std_dev = 0.15 if tag_count > 1 else 0.4
+            elif config.active_team == config.Team.BLUE:
+                if tag_id == 7 or tag_id == 8:
+                    std_dev = 0.15 if tag_count > 1 else 0.4
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
