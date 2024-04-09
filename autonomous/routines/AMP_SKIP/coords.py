@@ -1,7 +1,7 @@
 from units.SI import meters, radians
 from robot_systems import Field
 from utils import POIPose
-from wpimath.geometry import Translation2d, Translation3d
+from wpimath.geometry import Translation2d, Translation3d, Pose2d
 # from constants.FieldPos import MidLine
 from constants import field_width, FieldPos, drivetrain_length_with_bumpers, drivetrain_length
 import math
@@ -16,7 +16,7 @@ initial = (1.9 - constants.drivetrain_length_with_bumpers/2, constants.FieldPos.
 shoot_first_note = (
     initial,
     [],
-    Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.5, 0.9, 0))
+    POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(-180)))
 )
 
 get_second_note = (
