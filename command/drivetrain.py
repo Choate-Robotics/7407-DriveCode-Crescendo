@@ -351,7 +351,7 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         
             
     def isFinished(self):
-        return self.h_pid.atSetpoint() #and self.v_pid.atSetpoint()
+        # return self.h_pid.atSetpoint() #and self.v_pid.atSetpoint()
         return False
     
     def end(self, interrupted: bool = False):
