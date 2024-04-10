@@ -26,7 +26,7 @@ comp_bot: DigitalInput = DigitalInput(
     2
 )  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-DEBUG_MODE: bool = False
+DEBUG_MODE: bool = True
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
@@ -229,7 +229,7 @@ front_right_encoder_zeroed_pos = 0.793 if comp_bot.get() else 0.536
 back_left_move_id = 11
 back_left_turn_id = 14
 back_left_encoder_port = AnalogEncoder(1 if comp_bot.get() else 0)
-back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.458
+back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.181
 
 back_right_move_id = 18
 back_right_turn_id = 16

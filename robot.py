@@ -61,7 +61,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        # self.auto_selection.addOption("Test", autonomous.drive_straight)
+        self.auto_selection.addOption("Test", autonomous.drive_straight)
         self.auto_selection.setDefaultOption("Five Note", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Source Midline Auto", autonomous.mid_notes)
@@ -77,7 +77,7 @@ class _Robot(wpilib.TimedRobot):
         # self.auto_selection.addOption("Five Notes", autonomous.five_note)
         # self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         # self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
-        # self.auto_selection.addOption("SQUARE of death", autonomous.square)
+        self.auto_selection.addOption("SQUARE of death", autonomous.square)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 

@@ -31,7 +31,7 @@ get_third_note = (
 go_to_midline = (
     Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-2*constants.drivetrain_length/3, 0)),
     [],
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(0, 0.125))
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft
 )
 
 shoot_last_note = (

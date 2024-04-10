@@ -54,14 +54,25 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     ):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
-        self.x_controller = PIDController(10, 0, 0, period)
-        self.y_controller = PIDController(10, 0, 0, period)
-        self.theta_controller = ProfiledPIDControllerRadians(
-            4,
-            0,
-            0,
-            TrapezoidProfileRadians.Constraints(20, 20),
-            period
+        # self.x_controller = PIDController(10, 0, 0, period)
+        # self.y_controller = PIDController(10, 0, 0, period)
+        # self.theta_controller = ProfiledPIDControllerRadians(
+        #     4,
+        #     0,
+        #     0,
+        #     TrapezoidProfileRadians.Constraints(20, 20),
+        #     period
+        # )
+        self.controller = HolonomicDriveController(
+            PIDController(2, 0, 0),
+            PIDController(2, 0, 0),
+            ProfiledPIDControllerRadians(
+                6,
+                0,
+                1,
+                TrapezoidProfileRadians.Constraints(20, 20),
+                period
+            )
         )
         self.start_time = 0
         self.t = 0
@@ -72,9 +83,9 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         self.finished: bool = False
 
     def initialize(self) -> None:
-        self.x_controller.reset()
-        self.y_controller.reset()
-        self.theta_controller.reset(Field.odometry.getPose().rotation().radians())
+        # self.x_controller.reset()
+        # self.y_controller.reset()
+        # self.theta_controller.reset(Field.odometry.getPose().rotation().radians())
         self.trajectory = self.trajectory_c.generate()
         self.duration = self.trajectory.totalTime()
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
@@ -90,7 +101,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
 
         # self.theta_diff = bounded_angle_diff(self.theta_i, self.theta_f)
         self.finished = False
-        self.theta_controller.enableContinuousInput(math.radians(-180), math.radians(180))
+        # self.theta_controller.enableContinuousInput(math.radians(-180), math.radians(180))
 
         traj_path = []
         for i in range(len(self.trajectory.states())):
@@ -106,6 +117,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
             )
 
         ntcore.NetworkTableInstance.getDefault().getTable('Auto').putNumberArray('trajectory', traj_path)
+
+        # self.controller.setEnabled(False)
 
     def execute(self) -> None:
         self.t = time.perf_counter() - self.start_time
@@ -140,12 +153,15 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         # table.putNumber("time", self.t)
         # table.putNumber("duration", self.duration)
 
-        dx = self.x_controller.calculate(Field.odometry.getPose().X(), goal.pose.X())
-        dy = self.y_controller.calculate(Field.odometry.getPose().Y(), goal.pose.Y())
-        dtheta = self.theta_controller.calculate(Field.odometry.getPose().rotation().radians(), self.theta_f)
+        # dx = self.x_controller.calculate(Field.odometry.getPose().X(), goal.pose.X())
+        # dy = self.y_controller.calculate(Field.odometry.getPose().Y(), goal.pose.Y())
+        # dtheta = self.theta_controller.calculate(Field.odometry.getPose().rotation().radians(), self.theta_f)
 
+        speeds = self.controller.calculate(Field.odometry.getPose(), goal, Rotation2d(self.theta_f))
 
-        self.subsystem.set_driver_centric((-dx, -dy), -dtheta)
+        dx, dy, dtheta = speeds.vx, speeds.vy, speeds.omega
+
+        self.subsystem.set_robot_centric((speeds.vx, speeds.vy), -speeds.omega)
 
     def isFinished(self) -> bool:
         return self.finished
