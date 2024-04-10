@@ -229,7 +229,7 @@ front_right_encoder_zeroed_pos = 0.793 if comp_bot.get() else 0.536
 back_left_move_id = 11
 back_left_turn_id = 14
 back_left_encoder_port = AnalogEncoder(1 if comp_bot.get() else 0)
-back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.458
+back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.181
 
 back_right_move_id = 18
 back_right_turn_id = 16
@@ -259,6 +259,12 @@ shot_angle_offset: degrees = 0.7
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = .25
 shot_height_offset_scalar: float = 0.014
+speaker_length: meters = 41.83 * inches_to_meters
+note_length: meters = 14 * inches_to_meters
+min_drivetrain_tolerance: degrees = 1
+max_drivetrain_tolerance: degrees = 13
+drivetrain_static_tolerance_offset: degrees = 1
+
 
 
 # Flywheel
