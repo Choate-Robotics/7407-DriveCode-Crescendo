@@ -47,6 +47,7 @@ path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=get_second_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -62,6 +63,7 @@ path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=shoot_second_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_second_note[1]],
         end_pose=shoot_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -77,6 +79,7 @@ path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=get_third_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -85,13 +88,14 @@ path_4 = FollowPathCustom(
         end_velocity=0,
         rev=True
     ),
-    theta_f=math.radians(-180)
+    theta_f=math.radians(-135)
 )
 
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
         start_pose=shoot_third_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -100,7 +104,7 @@ path_5 = FollowPathCustom(
         end_velocity=0,
         rev=False
     ),
-    theta_f=math.radians(-180)
+    theta_f=AngleType.calculate
 )
 
 path_far_to_mid = FollowPathCustom(
@@ -132,13 +136,17 @@ path_mid_to_far = FollowPathCustom(
     ),
 )
 
-auto = SequentialCommandGroup(
-    InstantCommand(lambda: Field.odometry.disable()),
-    path_1,
-    path_2,
-    path_3,
-    path_4,
-    path_5,
+auto = ParallelCommandGroup(
+    SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
+    SequentialCommandGroup(
+
+    ),
+    # InstantCommand(lambda: Field.odometry.disable()),
+    # path_1,
+    # path_2,
+    # path_3,
+    # path_4,
+    # path_5,
     # path_far_to_mid,
     # path_mid_to_far
 
