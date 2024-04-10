@@ -295,8 +295,8 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.limelight = LimeLight
         self.target_exists = False
         self.target_constrained = False
-        self.v_pid = PIDController(.09, 0, 0.01)
-        self.h_pid = PIDController(.07, 0, 0.01)
+        self.v_pid = PIDController(.09, 0, 0.1)
+        self.h_pid = PIDController(.07, 0, 0.1)
         self.is_pipeline: bool = False
         self.nt = ntcore.NetworkTableInstance.getDefault().getTable('drivetrain pid tune')
         
