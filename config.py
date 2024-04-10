@@ -261,7 +261,7 @@ speaker_length: meters = 41.83 * inches_to_meters
 note_length: meters = 14 * inches_to_meters
 min_drivetrain_tolerance: degrees = 1
 max_drivetrain_tolerance: degrees = 15
-min_drivetrain_velocity_tolerance
+
 
 
 # Flywheel
