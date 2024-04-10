@@ -60,11 +60,11 @@ class Giraffe(commands2.Command):
     """
 
     def __init__(
-        self,
-        elevator: Elevator,
-        wrist: Wrist,
-        target: config.Giraffe.GiraffePos,
-        shot_calc: TrajectoryCalculator | None = None,
+            self,
+            elevator: Elevator,
+            wrist: Wrist,
+            target: config.Giraffe.GiraffePos,
+            shot_calc: TrajectoryCalculator | None = None,
     ):
         self.elevator = elevator
         self.wrist = wrist
@@ -141,18 +141,18 @@ class Giraffe(commands2.Command):
 
         # if the desired elevator height is greater than 0 while the elevator is locked down
         if (
-            self.target.height > constants.elevator_max_length_stage
-            and self.elevator.locked
-            or self.target.wrist_angle < constants.wrist_min_rotation_stage
-            and self.elevator.locked
+                self.target.height > constants.elevator_max_length_stage
+                and self.elevator.locked
+                or self.target.wrist_angle < constants.wrist_min_rotation_stage
+                and self.elevator.locked
         ):
             self.finished = True
             print("stage is in the way")
             return  # cant perform this action while elevator is locked down
 
         if (
-            type(self.target.height) is not float
-            and type(self.target.height) is not int
+                type(self.target.height) is not float
+                and type(self.target.height) is not int
         ):
             print(
                 "height not float (possibly set wrong enum type)",
@@ -161,8 +161,8 @@ class Giraffe(commands2.Command):
             return
 
         if (
-            type(self.target.wrist_angle) is not float  # noqa
-            and type(self.target.wrist_angle) is not int  # noqa
+                type(self.target.wrist_angle) is not float  # noqa
+                and type(self.target.wrist_angle) is not int  # noqa
         ):
             print(
                 "wrist not float (possibly set wrong enum type)",
@@ -211,7 +211,6 @@ class Giraffe(commands2.Command):
         commands2.CommandScheduler.getInstance().schedule(self.continuous_command)
 
 
-
 class StageNote(SequentialCommandGroup):
     """
     Stages a note to the feeder from the intake
@@ -238,7 +237,8 @@ class IntakeStageNote(SequentialCommandGroup):
         super().__init__(
             SetWristIdle(wrist), RunIntakeConstant(intake), FeedIn(wrist)  # noqa
         )  # noqa
-        
+
+
 class IntakeStageNoteAuto(ParallelRaceGroup):
     def __init__(self, wrist: Wrist, intake: Intake):
         super().__init__(
@@ -246,16 +246,19 @@ class IntakeStageNoteAuto(ParallelRaceGroup):
             WaitUntilCommand(lambda: wrist.note_in_feeder()),
         )
 
+
 class PathUntilIntake(ParallelRaceGroup):
-    def __init__(self, path: Command, wrist: Wrist, intake: Intake, waittime:float = config.auto_path_intake_note_deadline):
+    def __init__(self, path: Command, wrist: Wrist, intake: Intake,
+                 wait_time: float = config.auto_path_intake_note_deadline):
         super().__init__(
             SequentialCommandGroup(
                 path,
-                WaitCommand(waittime),
+                WaitCommand(wait_time),
                 WaitUntilCommand(lambda: not wrist.note_in_feeder())
             ),
             IntakeStageNote(wrist, intake)
         )
+
 
 class IntakeStageIdle(SequentialCommandGroup):
     def __init__(self, wrist: Wrist, intake: Intake):
@@ -276,12 +279,12 @@ class AimWristSpeaker(ParallelCommandGroup):
     """
 
     def __init__(
-        self,
-        calculations: TrajectoryCalculator,
-        elevator: Elevator,
-        wrist: Wrist,
-        flywheel: Flywheel,
-        atPose: Pose2d | None = None,
+            self,
+            calculations: TrajectoryCalculator,
+            elevator: Elevator,
+            wrist: Wrist,
+            flywheel: Flywheel,
+            atPose: Pose2d | None = None,
     ):
         super().__init__(
             SetFlywheelLinearVelocity(flywheel, config.v0_flywheel),  # noqa
@@ -317,11 +320,11 @@ class ShootAuto(SequentialCommandGroup):
     """
 
     def __init__(
-        self,
-        drivetrain: Drivetrain,
-        wrist: Wrist,
-        flywheel: Flywheel,
-        traj_cal: TrajectoryCalculator,
+            self,
+            drivetrain: Drivetrain,
+            wrist: Wrist,
+            flywheel: Flywheel,
+            traj_cal: TrajectoryCalculator,
     ):
         super().__init__(
             ParallelCommandGroup(  # Aim
@@ -330,14 +333,12 @@ class ShootAuto(SequentialCommandGroup):
             )
             .until(
                 lambda: drivetrain.ready_to_shoot
-                and wrist.ready_to_shoot
-                and flywheel.ready_to_shoot
+                        and wrist.ready_to_shoot
+                        and flywheel.ready_to_shoot
             )
             .withTimeout(config.auto_shoot_deadline),
             PassNote(wrist),  # noqa
         )
-
-
 
 
 class EnableClimb(SequentialCommandGroup):
@@ -352,8 +353,8 @@ class EnableClimb(SequentialCommandGroup):
                 SetElevator(elevator, config.Giraffe.kClimbReach.height / 3),  # noqa
                 SequentialCommandGroup(
                     WaitUntilCommand(lambda: wrist.get_wrist_angle() < 20 * degrees_to_radians),  # noqa
-                    DeployTenting(intake), 
-                    )# noqa
+                    DeployTenting(intake),
+                )  # noqa
             ),
             SetWrist(wrist, 35 * degrees_to_radians),  # noqa
             ParallelCommandGroup(
@@ -429,10 +430,10 @@ class EmergencyManuver(SequentialCommandGroup):
             UnDeployTenting(intake),
             SetWrist(wrist, config.staging_angle)
         )
-        
-        
+
+
 class AutoPickupNote(SequentialCommandGroup):
-    
+
     def __init__(self, drivetrain: Drivetrain, wrist: Wrist, intake: Intake, limelight: Limelight):
         super().__init__(
             ConditionalCommand(
@@ -450,7 +451,7 @@ class AutoPickupNote(SequentialCommandGroup):
                             InstantCommand(
                                 lambda: drivetrain.set_robot_centric(
                                     (-config.object_detection_intaking_drivetrain_speed * drivetrain.max_vel, 0), 0)
-                                ),
+                            ),
                             WaitUntilCommand(lambda: intake.detect_note()),
                             InstantCommand(
                                 lambda: drivetrain.set_robot_centric((0, 0), 0)
@@ -465,19 +466,20 @@ class AutoPickupNote(SequentialCommandGroup):
                 lambda: intake.detect_note() or wrist.detect_note_first() or wrist.detect_note_second()
             )
         )
-        
+
+
 class ControllerRumble(InstantCommand):
-    
+
     def __init__(self, controller: Joystick, intensity: float = 1.0):
         super().__init__(lambda: controller.setRumble(
             controller.RumbleType.kBothRumble,
             intensity),
-        )
-        
+                         )
+
+
 class ControllerRumbleTimeout(SequentialCommandGroup):
-    
+
     def __init__(self, controller: Joystick, timeout: float = 3, intensity: float = 1.0):
-        
         super().__init__(
             ControllerRumble(controller, intensity),
             WaitCommand(timeout),

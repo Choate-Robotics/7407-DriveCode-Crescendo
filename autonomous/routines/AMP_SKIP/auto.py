@@ -139,6 +139,42 @@ path_mid_to_far = FollowPathCustom(
 auto = ParallelCommandGroup(
     SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
+        ZeroWrist(Robot.wrist),
+        ZeroElevator(Robot.elevator),
+
+        InstantCommand(lambda: Field.odometry.disable()),
+
+        ParallelCommandGroup(
+            path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+            DeployIntake(Robot.intake),
+        ),
+
+        # Shoot first note
+        InstantCommand(lambda: Field.odometry.enable()),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        InstantCommand(lambda: Field.odometry.disable()),
+
+        # Get second note
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
+
+        # Go to shot location
+        path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+
+        # Shoot second note
+        InstantCommand(lambda: Field.odometry.enable()),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        InstantCommand(lambda: Field.odometry.disable()),
+
+        # Get third note
+        PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+
+        # Go to shot location
+        path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+
+        # Shoot third note
+        InstantCommand(lambda: Field.odometry.enable()),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        InstantCommand(lambda: Field.odometry.disable()),
 
     ),
     # InstantCommand(lambda: Field.odometry.disable()),
