@@ -202,18 +202,15 @@ class FieldOdometry:
 
     def update_from_internal(self):
         
-        if TimedRobot.isSimulation():
-            return
-
         self.drivetrain.odometry_estimator.updateWithTime(
             Timer.getFPGATimestamp(),
             self.drivetrain.get_heading(),
             self.drivetrain.node_positions,
         )
 
-        self.drivetrain.odometry.update(
-            self.drivetrain.get_heading(), self.drivetrain.node_positions
-        )
+        # self.drivetrain.odometry.update(
+        #     self.drivetrain.get_heading(), self.drivetrain.node_positions
+        # )
         
     
     def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float, tag_id:float):
@@ -271,7 +268,7 @@ class FieldOdometry:
         """
         # return self.drivetrain.odometry.getPose()
         est_pose = self.drivetrain.odometry_estimator.getEstimatedPosition()
-        if not self.vision_on:
+        if not self.vision_on or TimedRobot.isSimulation():
             est_pose = self.drivetrain.odometry.getPose()
         else:
             self.drivetrain.odometry.resetPosition(
