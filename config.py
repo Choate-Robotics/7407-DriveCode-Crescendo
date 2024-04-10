@@ -63,6 +63,16 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 # STATE VARIABLES -- PLEASE DO NOT CHANGE
 
 
+#AUTO
+
+class NoteSelect(Enum):
+    FAR = 0
+    MID = 1
+    CENTER = 2
+
+first_note: NoteSelect = NoteSelect.FAR
+second_note: NoteSelect = NoteSelect.MID
+
 # Leds
 leds_id = 0
 leds_size = 28
@@ -143,9 +153,9 @@ class LimelightPosition:
         Rotation3d(0, constants.limelight_elevator_angle, 0),
     )
     init_elevator_back = Pose3d(
-        constants.limelight_right,
+        constants.limelight_right_LL3,
         constants.limelight_forward,
-        constants.limelight_height,
+        constants.limelight_height_LL3,
         Rotation3d(0, constants.limelight_elevator_angle, constants.limelight_back_yaw),
     )
     fixed_intake = Pose3d(0, 0, 0, Rotation3d(0, 0, 0))
@@ -236,12 +246,16 @@ drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angu
 
 drivetrain_rotation_enable_tuner: bool = True
 
+drivetrain_max_vel_auto: float = 4.5
+drivetrain_max_accel_auto: float = 4
+
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_tolerance: degrees = 2
 drivetrain_aiming_velocity_tolerance: degrees = 3
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
+shot_angle_offset: degrees = 0.7
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = .25
 shot_height_offset_scalar: float = 0.014
@@ -358,7 +372,7 @@ MOVE_CONFIG = TalonConfig(
     0.25,
     0.01,
     brake_mode=True,
-    current_limit=40,
+    current_limit=50,
     kV=0.12
 )
 

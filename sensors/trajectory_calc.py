@@ -11,7 +11,7 @@ from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
 from utils import POI
-from wpimath.geometry import Rotation2d, Translation3d, Translation2d
+from wpimath.geometry import Rotation2d, Translation3d, Translation2d, Pose2d
 from units.SI import inches_to_meters
 
 
@@ -63,6 +63,7 @@ class TrajectoryCalculator:
             self.table.putNumber('flywheel feed distance scalar', config.flywheel_distance_feed_scalar)
             self.table.putNumber('flywheel feed minimum value', config.flywheel_feed_speed_min)
             self.table.putNumber('flywheel feed maximum value', config.flywheel_feed_speed_max)
+            self.table.putNumber('shot angle offset', config.shot_angle_offset)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -232,6 +233,18 @@ class TrajectoryCalculator:
         return robot_to_speaker.angle()
     
 
+    @staticmethod
+    def get_rotation_auto(robot_pose: Pose2d) -> Rotation2d:
+        """
+        returns rotation of base at a given pose
+        meant to be used in auto
+        :return: base target angle
+        :rtype: Rotation2d
+        """
+        speaker_translation: Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        robot_to_speaker = speaker_translation - robot_pose.translation()
+        return robot_to_speaker.angle()
+
     def update_base(self):
         """
         updates rotation of base to score shot
@@ -290,15 +303,17 @@ class TrajectoryCalculator:
     def get_theta(self) -> radians:
         """
         Returns the angle of the trajectory.
-        """
-        return self.shoot_angle
-    
-    def get_feed_theta(self) -> radians:
+        """    
+        if self.tuning:
+            config.shot_angle_offset = self.table.getNumber('shot angle offset', config.shot_angle_offset)
+
+        return self.shoot_angle + radians(config.shot_angle_offset)
+
+def get_feed_theta(self) -> radians:
         """
         Returns the angle of the trajectory.
         """
         return self.feed_angle
-
 
     def get_bot_theta(self) -> Rotation2d:
         """

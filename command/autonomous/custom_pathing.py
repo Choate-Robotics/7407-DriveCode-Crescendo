@@ -23,6 +23,7 @@ from command.autonomous.trajectory import CustomTrajectory
 from enum import Enum
 
 from robot_systems import Field
+from sensors.trajectory_calc import TrajectoryCalculator
 
 class AngleType(Enum):
 
@@ -53,35 +54,27 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
     ):
         super().__init__(subsystem)
         self.trajectory_c: CustomTrajectory = trajectory
-        self.x_controller = PIDController(8, 0, 0, period)
-        self.y_controller = PIDController(8, 0, 0, period)
-        constraints = TrapezoidProfileRadians.Constraints(config.drivetrain_aiming_max_angular_speed,
-                                                          config.drivetrain_aiming_max_angular_accel)
+        self.x_controller = PIDController(10, 0, 0, period)
+        self.y_controller = PIDController(10, 0, 0, period)
         self.theta_controller = ProfiledPIDControllerRadians(
-            5,
+            4,
             0,
-            0.08,
-            constraints,
-            config.period
+            0,
+            TrapezoidProfileRadians.Constraints(20, 20),
+            period
         )
-        # self.controller = HolonomicDriveController(
-        #     PIDController(8, 0, 0, period),
-        #     PIDController(8, 0, 0, period),
-        #     self.theta_controller
-        # )
         self.start_time = 0
         self.t = 0
         self.theta_i: float | None = None
         self.theta_f: float = theta_f
         self.theta_diff: float | None = None
         self.omega: float | None = None
-        self.use_calculations: bool = False
         self.finished: bool = False
 
     def initialize(self) -> None:
         self.x_controller.reset()
         self.y_controller.reset()
-        self.theta_controller.reset(Field.odometry.getPose().rotation().radians(), 0)
+        self.theta_controller.reset(Field.odometry.getPose().rotation().radians())
         self.trajectory = self.trajectory_c.generate()
         self.duration = self.trajectory.totalTime()
         self.end_pose: Pose2d = self.trajectory.states()[-1].pose
@@ -90,7 +83,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         if self.theta_f == AngleType.path:
             self.theta_f = self.end_pose.rotation().radians()
         elif self.theta_f == AngleType.calculate:
-            self.use_calculations = True
+            self.theta_f = TrajectoryCalculator.get_rotation_auto(self.end_pose).radians()
         else:
             if config.active_team == config.Team.BLUE:
                 self.theta_f *= -1
@@ -116,8 +109,6 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
 
     def execute(self) -> None:
         self.t = time.perf_counter() - self.start_time
-        if self.use_calculations:
-            self.theta_f = Field.calculations.get_bot_theta().radians()
 
         relative = self.end_pose.relativeTo(
             self.subsystem.odometry_estimator.getEstimatedPosition()
@@ -160,7 +151,8 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         return self.finished
 
     def end(self, interrupted: bool) -> None:
-        self.subsystem.set_driver_centric((0, 0), 0)
+        if self.trajectory_c.end_velocity == 0:
+            self.subsystem.set_driver_centric((0, 0), 0)
         SmartDashboard.putString("POSE", str(self.subsystem.odometry.getPose()))
         SmartDashboard.putString(
             "POSD", str(Field.odometry.getPose().rotation().degrees())

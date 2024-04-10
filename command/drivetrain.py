@@ -19,6 +19,7 @@ import robot_states as states
 import ntcore
 from enum import Enum
 
+from wpilib import RobotState
 
 
 def curve_abs(x):
@@ -112,7 +113,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             config.
             period
             )
-        self.theta_controller.setTolerance(radians(1), radians(2))
+        self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 3), radians(4 if RobotState.isAutonomous() else 4))
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
@@ -122,8 +123,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('P', config.drivetrain_rotation_P)
             self.table.putNumber('I', config.drivetrain_rotation_I)
             self.table.putNumber('D', config.drivetrain_rotation_D)
-            self.table.putNumber('tolerance', config.drivetrain_aiming_tolerance)
-            self.table.putNumber('velocity tolerance', config.drivetrain_aiming_velocity_tolerance)
+            self.table.putNumber('tolerance', 2)
+            self.table.putNumber('velocity tolerance', 1)
             self.table.putNumber('drivetrain offset', config.drivetrain_aiming_offset)
 
 
@@ -136,10 +137,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setP(config.drivetrain_rotation_P)
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
-            self.theta_controller.setTolerance(
-                radians(self.table.getNumber('tolerance', config.drivetrain_aiming_tolerance)),
-                radians(self.table.getNumber('velocity tolerance', config.drivetrain_aiming_velocity_tolerance))\
-                    )
+            # self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 2)), radians(self.table.getNumber('velocity tolerance', 1)))
             
 
             
