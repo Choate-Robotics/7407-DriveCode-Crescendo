@@ -309,7 +309,7 @@ class TrajectoryCalculator:
 
         return self.shoot_angle + radians(config.shot_angle_offset)
 
-def get_feed_theta(self) -> radians:
+    def get_feed_theta(self) -> radians:
         """
         Returns the angle of the trajectory.
         """
