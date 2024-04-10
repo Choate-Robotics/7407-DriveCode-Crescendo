@@ -114,9 +114,9 @@ class TrajectoryCalculator:
 
         return result_angle
     
-    def calculate_lob_speeds(self, distance_to_target, target_height) -> tuple[float, float]:
+    def calculate_lob_speeds(self, distance_to_target, target_height, z_init=0) -> tuple[float, float]:
         
-        vy = np.sqrt(2 * constants.g * target_height)
+        vy = np.sqrt(2 * constants.g * (target_height - z_init))
         
         time = vy * (2/constants.g)
         
@@ -124,22 +124,26 @@ class TrajectoryCalculator:
         
         return vy, vx
     
-    def calculate_angle_feed_zone(self, distance_to_target: float) -> radians:
+    def calculate_angle_feed_zone(self, distance_to_target: float, z_init: float) -> radians:
         
-        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height)
+        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height, z_init)
         
-        theta = np.arctan(vy / vx)
+        theta = np.arctan(vy / vx) if vx != 0 else np.radians(90)
         
         return theta
     
     def get_flywheel_speed_feed(self, distance_to_target: float) -> float:
         
         
-        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height)
+        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height, self.get_shooter_height())
         
         v_total = np.sqrt(vy ** 2 + vx **2)
+        # print(vx, vy, v_total)
         
         return  min(v_total, config.v0_flywheel_maximum)
+    
+    def get_shooter_height(self) -> float:
+        return constants.shooter_height + self.elevator.get_length()
 
     def get_flywheel_speed(self, distance_to_target:float) -> float:
         if self.tuning:
@@ -187,7 +191,7 @@ class TrajectoryCalculator:
         
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
         
-        feed_angle = self.calculate_angle_feed_zone(self.distance_to_feed_zone)
+        feed_angle = self.calculate_angle_feed_zone(self.distance_to_feed_zone, self.get_shooter_height())
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
             self.feed_angle = feed_angle
@@ -273,7 +277,7 @@ class TrajectoryCalculator:
         self.table.putNumber('distance to feed zone', self.get_distance_to_feed_zone())
         self.table.putNumber('delta z', self.delta_z)
         self.table.putNumber('flywheel speed', self.get_flywheel_speed(self.distance_to_target))
-        self.table.putNumber('feed flywheel speed', self.get_flywheel_speed_feed(self.get_distance_to_feed_zone()))
+        self.table.putNumber('feed flywheel speed', self.get_flywheel_speed_feed(self.distance_to_feed_zone))
         
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
