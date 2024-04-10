@@ -296,16 +296,25 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.target_exists = False
         self.target_constrained = False
         # self.v_pid = PIDController(.09, 0, 0.1)
-        self.h_pid = PIDController(.07, 0, 0.1)
-        self.v_constant = 3
+        self.h_pid = PIDController(.03, 0, 00)
+        self.o_pid = PIDController(
+            config.drivetrain_rotation_P,
+            config.drivetrain_rotation_I,
+            config.drivetrain_rotation_D
+        )
+        self.v_constant = 2.5
         self.is_pipeline: bool = False
         self.nt = ntcore.NetworkTableInstance.getDefault().getTable('drivetrain pid tune')
-        
+        self.gyro_lock = 0
         
     def initialize(self):
         # self.limelight.set_pipeline_mode(config.LimelightPipeline.neural)
         # self.v_pid.reset()
+        self.o_pid.enableContinuousInput(radians(-180), radians(180))
+        self.o_pid.reset()
         self.h_pid.reset()
+        self.gyro_lock = 0
+        self.target_exists = False
         # self.v_pid.setTolerance(config.object_detection_ty_threshold)
         self.h_pid.setTolerance(config.object_detection_tx_threshold)
         
@@ -319,9 +328,16 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
             # print(self.limelight.table.getNumber('tv', 3))
             self.drivetrain.set_robot_centric((0,0),0)
             return
+        
+        if self.limelight.target_exists() and self.target_exists == False:
+            self.target_exists = True
+            self.gyro_lock = self.drivetrain.get_heading().radians()
+        else:
+            self.target_exists = False
+            return
         # self.nt.putBoolean('see target', True)
         # print("target")
-        tx, ty, ta = self.limelight.get_target(True)
+        tx, ty, ta = self.limelight.get_target()
         
         self.nt.putNumber('tx target', config.object_detection_tx)
         self.nt.putNumber('ty target', config.object_detection_ty)
@@ -332,22 +348,23 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         
         
         
-        if self.target_exists == False and self.target_exists:
-            self.target_exists = True
+        # if self.target_exists == False and self.target_exists:
+        #     self.target_exists = True
             
         # print("Tracking...")
             
         # dy = self.v_pid.calculate(ty, config.object_detection_ty)
         dx = self.h_pid.calculate(tx, config.object_detection_tx)
+        omega = self.o_pid.calculate(self.drivetrain.get_heading().radians(), self.gyro_lock)
         
-        dy = self.v_constant ** (-(abs(self.h_pid.getPositionError()) / 10)) if abs(self.h_pid.getPositionError()) > 0 else 1
+        dy = self.v_constant ** (-(abs(self.h_pid.getPositionError()) / 30)) if abs(self.h_pid.getPositionError()) > 0 else 1
         
         
             
         # dx *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dx
         dy *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dy
             
-        self.drivetrain.set_robot_centric((dy, -dx), 0)
+        self.drivetrain.set_robot_centric((-dy, -dx), -omega)
         
             
     def isFinished(self):
