@@ -41,8 +41,8 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=get_second_note[0],
-        start_pose=PoseType.current,
+        start_pose=POIPose(Pose2d(*get_second_note[0])),
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -50,7 +50,7 @@ path_2 = FollowPathCustom(
         start_velocity=0,
         end_velocity=0,
         rev=True,
-        start_rotation=get_second_note[0].get().rotation().radians()
+        start_rotation=get_second_note[0][2]
     ),
     theta_f=math.radians(-180)
 )
@@ -158,76 +158,76 @@ path_8 = FollowPathCustom(
 )
 
 auto = ParallelCommandGroup(
-    SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-    SequentialCommandGroup(
-        ZeroWrist(Robot.wrist),
-        ZeroElevator(Robot.elevator),
-        # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
-
-        # Drive to shot zone and deploy intake
-        InstantCommand(lambda: Field.odometry.disable()),
-        ParallelCommandGroup(
-            path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-            DeployIntake(Robot.intake),
-        ),
-
-        # Shoot first note
-        InstantCommand(lambda: Field.odometry.enable()),
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        InstantCommand(lambda: Field.odometry.disable()),
-
-        # get second note from midline
-        PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
-
-        # drive to shot zone
-        path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-
-        # shoot second note
-        InstantCommand(lambda: Field.odometry.enable()),
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        InstantCommand(lambda: Field.odometry.disable()),
-
-        # get third note from midline
-        # PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-
-        ParallelRaceGroup(
-            SequentialCommandGroup(
-                path_4,
-                # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
-                path_8
-            ),
-            SequentialCommandGroup(
-                IntakeStageNote(Robot.wrist, Robot.intake),
-                AimWrist(Robot.wrist, Field.calculations)
-            )
-        ),
-
-        # drive to shot zone
-        # path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-
-        # shoot third note
-        InstantCommand(lambda: Field.odometry.enable()),
-        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        InstantCommand(lambda: Field.odometry.disable()),
-
-        # get fourth note from midline
-        # PathUntilIntake(path_6, Robot.wrist, Robot.intake),
-        #
-        # path_7.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-        #
-        # InstantCommand(lambda: Field.odometry.enable()),
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
-    )
+    # SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     # SequentialCommandGroup(
-    #     path_1,
-    #     path_2,
-    #     path_3,
-    #     path_4,
-    #     path_8,
-    #     # path_5,
-    #     # path_6,
-    #     # path_7
+    #     ZeroWrist(Robot.wrist),
+    #     ZeroElevator(Robot.elevator),
+    #     # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
+
+    #     # Drive to shot zone and deploy intake
+    #     InstantCommand(lambda: Field.odometry.disable()),
+    #     ParallelCommandGroup(
+    #         path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+    #         DeployIntake(Robot.intake),
+    #     ),
+
+    #     # Shoot first note
+    #     InstantCommand(lambda: Field.odometry.enable()),
+    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    #     InstantCommand(lambda: Field.odometry.disable()),
+
+    #     # get second note from midline
+    #     PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
+
+    #     # drive to shot zone
+    #     path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+
+    #     # shoot second note
+    #     InstantCommand(lambda: Field.odometry.enable()),
+    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    #     InstantCommand(lambda: Field.odometry.disable()),
+
+    #     # get third note from midline
+    #     # PathUntilIntake(path_4, Robot.wrist, Robot.intake),
+
+    #     ParallelRaceGroup(
+    #         SequentialCommandGroup(
+    #             path_4,
+    #             # InstantCommand(lambda: Field.odometry.enable_speaker_tags()),
+    #             path_8
+    #         ),
+    #         SequentialCommandGroup(
+    #             IntakeStageNote(Robot.wrist, Robot.intake),
+    #             AimWrist(Robot.wrist, Field.calculations)
+    #         )
+    #     ),
+
+    #     # drive to shot zone
+    #     # path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+
+    #     # shoot third note
+    #     InstantCommand(lambda: Field.odometry.enable()),
+    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+    #     InstantCommand(lambda: Field.odometry.disable()),
+
+    #     # get fourth note from midline
+    #     # PathUntilIntake(path_6, Robot.wrist, Robot.intake),
+    #     #
+    #     # path_7.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+    #     #
+    #     # InstantCommand(lambda: Field.odometry.enable()),
+    #     # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
     # )
+    SequentialCommandGroup(
+        # path_1,
+        path_2,
+        path_3,
+        path_4,
+        path_8,
+        # path_5,
+        # path_6,
+        # path_7
+    )
 )
 
-routine = AutoRoutine(Pose2d(*initial), auto)
+routine = AutoRoutine(Pose2d(initial[0], initial[1], math.radians(120)), auto)

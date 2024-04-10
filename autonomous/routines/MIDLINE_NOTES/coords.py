@@ -10,7 +10,9 @@ coord = (meters, meters, radians)
 waypoints = (meters, meters)
 path = (coord, waypoints, coord)
 
-initial = (1.9 - drivetrain_length_with_bumpers/2, 2.92, math.radians(-180))
+start = Field.POI.Coordinates.Waypoints.Auto.kSubwooferRight.get()
+
+initial = (0.67, field_width/2 + 0.3, math.radians(120))
 
 shoot_first_note = (
     initial,
@@ -19,8 +21,10 @@ shoot_first_note = (
 )
 
 get_second_note = (
-    shoot_first_note[2].withRotation(-155),
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.3, 0)),],
+    initial,
+    [
+        # Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.3, 0)),
+     ],
     Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(0.1, 0.18))  # 0.25
 )
 
