@@ -195,7 +195,7 @@ class TrajectoryCalculator:
         self.table.putNumber('bot speaker angle', degrees(small_angle))
         big_angle = self.get_rotation_to_speaker().radians()
         return min(
-            max(abs(abs(small_angle) - abs(big_angle)), radians(config.min_drivetrain_tolerance)),
+            max(abs(abs(small_angle) - abs(big_angle)) - config.drivetrain_static_tolerance_offset, radians(config.min_drivetrain_tolerance)),
             radians(config.max_drivetrain_tolerance)
         )
     
