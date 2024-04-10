@@ -1,7 +1,7 @@
 import math
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory, PoseType
-from robot_systems import Robot
+from robot_systems import Robot, Field
 
 from commands2 import (
     InstantCommand,
@@ -32,8 +32,7 @@ path_1 = FollowPathCustom(
         end_velocity=0,
         rev=False,
     ),
-    period=0.03,
-    theta_f=math.radians(90)
+    theta_f=math.radians(45)
 )
 
 path_2 = FollowPathCustom(
@@ -49,8 +48,7 @@ path_2 = FollowPathCustom(
         end_velocity=0,
         rev=False,
     ),
-    period=0.03,
-    theta_f=math.radians(180)
+    theta_f=math.radians(90)
 )
 
 path_3 = FollowPathCustom(
@@ -66,8 +64,7 @@ path_3 = FollowPathCustom(
         end_velocity=0,
         rev=True,
     ),
-    period=0.03,
-    theta_f=math.radians(-90)
+    theta_f=math.radians(135)
 )
 
 path_4 = FollowPathCustom(
@@ -83,11 +80,11 @@ path_4 = FollowPathCustom(
         end_velocity=0,
         rev=True,
     ),
-    period=0.03,
-    theta_f=math.radians(0)
+    theta_f=math.radians(180)
 )
 
 auto = SequentialCommandGroup(
+    InstantCommand(lambda: Field.odometry.disable()),
     path_1,
     path_2,
     path_3,
