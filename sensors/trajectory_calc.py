@@ -192,9 +192,10 @@ class TrajectoryCalculator:
         robot_pose_2d = self.odometry.getPose()
         bot_speaker_origin = bot_speaker_translation - robot_pose_2d.translation()
         small_angle = bot_speaker_origin.angle().radians()
+        self.table.putNumber('bot speaker angle', degrees(small_angle))
         big_angle = self.get_rotation_to_speaker().radians()
-        return max(
-            min(abs(small_angle - big_angle), radians(config.min_drivetrain_tolerance)),
+        return min(
+            max(abs(abs(small_angle) - abs(big_angle)), radians(config.min_drivetrain_tolerance)),
             radians(config.max_drivetrain_tolerance)
         )
     
