@@ -450,28 +450,6 @@ class AutoPickupNote(SequentialCommandGroup):
                         )
                     )
                 ),
-                # SequentialCommandGroup(
-                #     ParallelCommandGroup(
-                #         SetWristIdle(wrist),
-                #         DriveSwerveNoteLineup(drivetrain, limelight),
-                #     ),
-                #     ParallelCommandGroup(
-                #         SequentialCommandGroup(
-                #             InstantCommand(
-                #                 lambda: drivetrain.set_robot_centric(
-                #                     (-config.object_detection_intaking_drivetrain_speed * drivetrain.max_vel, 0), 0)
-                #                 ),
-                #             WaitUntilCommand(lambda: intake.detect_note()),
-                #             InstantCommand(
-                #                 lambda: drivetrain.set_robot_centric((0, 0), 0)
-                #             )
-                #         ),
-                #         SequentialCommandGroup(
-                #             IntakeStageNote(wrist, intake),
-                #             IntakeStageIdle(wrist, intake)
-                #         )
-                #     )
-                # ),
                 lambda: intake.detect_note() or wrist.detect_note_first() or wrist.detect_note_second()
             )
         )
