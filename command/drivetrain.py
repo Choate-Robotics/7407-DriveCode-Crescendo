@@ -288,24 +288,25 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         '''
         Lines up the robot with the target
         :param drivetrain: Drivetrain subsystem
-        :param LimeLight: Limelight subsystem
-        :param target: (cube/cone) target to line up with'''
+        :param LimeLight: Limelight sensor
+        '''
         super().__init__(subsystem)
         self.drivetrain = subsystem
         self.limelight = LimeLight
         self.target_exists = False
         self.target_constrained = False
-        self.v_pid = PIDController(.09, 0, 0.1)
+        # self.v_pid = PIDController(.09, 0, 0.1)
         self.h_pid = PIDController(.07, 0, 0.1)
+        self.v_constant = 3
         self.is_pipeline: bool = False
         self.nt = ntcore.NetworkTableInstance.getDefault().getTable('drivetrain pid tune')
         
         
     def initialize(self):
         # self.limelight.set_pipeline_mode(config.LimelightPipeline.neural)
-        self.v_pid.reset()
+        # self.v_pid.reset()
         self.h_pid.reset()
-        self.v_pid.setTolerance(config.object_detection_ty_threshold)
+        # self.v_pid.setTolerance(config.object_detection_ty_threshold)
         self.h_pid.setTolerance(config.object_detection_tx_threshold)
         
     def execute(self):
@@ -336,18 +337,21 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
             
         # print("Tracking...")
             
-        dy = self.v_pid.calculate(ty, config.object_detection_ty)
+        # dy = self.v_pid.calculate(ty, config.object_detection_ty)
         dx = self.h_pid.calculate(tx, config.object_detection_tx)
+        
+        dy = self.v_constant ** (-(abs(self.h_pid.getPositionError()) / 10)) if abs(self.h_pid.getPositionError()) > 0 else 1
+        
         
             
         # dx *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dx
-        # dy *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dy
+        dy *= states.drivetrain_controlled_vel * config.object_detection_drivetrain_speed_dy
             
         self.drivetrain.set_robot_centric((dy, -dx), 0)
         
             
     def isFinished(self):
-        return self.h_pid.atSetpoint() and self.v_pid.atSetpoint()
+        return self.h_pid.atSetpoint() #and self.v_pid.atSetpoint()
         return False
     
     def end(self, interrupted: bool = False):
