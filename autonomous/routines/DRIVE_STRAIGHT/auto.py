@@ -1,6 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom
 from command.autonomous.trajectory import CustomTrajectory
-from robot_systems import Robot
+from robot_systems import Robot, Field
 import constants
 import math
 import config
@@ -54,6 +54,7 @@ path_1 = FollowPathCustom(
 # )
 
 auto = SequentialCommandGroup(
+    InstantCommand(lambda: Field.odometry.disable()),
     path_1,
     # path_2
 )
