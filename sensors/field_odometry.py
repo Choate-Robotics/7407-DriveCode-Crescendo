@@ -9,7 +9,7 @@ from subsystem import Drivetrain
 from units.SI import seconds
 from wpilib import Timer
 
-from wpilib import RobotState
+from wpilib import RobotState, TimedRobot
 
 def weighted_pose_average(
         robot_pose: Pose2d, vision_pose: Pose3d, robot_weight: float, vision_weight: float
@@ -99,6 +99,8 @@ class FieldOdometry:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
+        
+        
 
         self.update_from_internal()
         
@@ -199,6 +201,9 @@ class FieldOdometry:
         return False
 
     def update_from_internal(self):
+        
+        if TimedRobot.isSimulation():
+            return
 
         self.drivetrain.odometry_estimator.updateWithTime(
             Timer.getFPGATimestamp(),

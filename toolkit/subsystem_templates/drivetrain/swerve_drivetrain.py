@@ -14,7 +14,7 @@ from units.SI import meters, meters_per_second, \
     radians_per_second, radians, miles_per_hour, miles_per_hour_to_meters_per_second, rotations_per_second, \
     rotations_per_second__to__radians_per_second, \
     degrees_per_second, degrees_per_second__to__radians_per_second, degrees
-
+from wpilib import TimedRobot
 
 class SwerveNode:
     """
@@ -174,7 +174,11 @@ class SwerveDrivetrain(Subsystem):
         self.odometry_estimator: SwerveDrive4PoseEstimator | None = None
         self.chassis_speeds: ChassisSpeeds | None = ChassisSpeeds(0, 0, 0)
         self._omega: radians_per_second = 0
-
+        self._sim_fl: meters_per_second = 0
+        self._sim_fr: meters_per_second = 0
+        self._sim_bl: meters_per_second = 0
+        self._sim_br: meters_per_second = 0
+        self._sim_omega: radians_per_second = 0
         self.node_translations: tuple[Translation2d] | None = None
 
     def init(self):
@@ -280,17 +284,46 @@ class SwerveDrivetrain(Subsystem):
         normalized_states = self.kinematics.desaturateWheelSpeeds(new_states, self.max_vel)
         # normalized_states = new_states
         fl, fr, bl, br = normalized_states
-        self.n_front_left.set(fl.speed, fl.angle.radians())
-        self.n_front_right.set(fr.speed, fr.angle.radians())
-        self.n_back_left.set(bl.speed, bl.angle.radians())
-        self.n_back_right.set(br.speed, br.angle.radians())
+        if not TimedRobot.isSimulation():
+            
+            self.n_front_left.set(fl.speed, fl.angle.radians())
+            self.n_front_right.set(fr.speed, fr.angle.radians())
+            self.n_back_left.set(bl.speed, bl.angle.radians())
+            self.n_back_right.set(br.speed, br.angle.radians())
+            
+            self.odometry.update(
+                self.get_heading(),
+                self.node_positions
+            )
+        else:
+            print(self._sim_fl, self._sim_fr, self._sim_bl, self._sim_br, self._sim_omega)
+            # self._sim_fl += fl.speed * .03
+            # self._sim_fr += fr.speed * .03
+            # self._sim_bl += bl.speed * .03
+            # self._sim_br += br.speed * .03
+            self._sim_fl = fl.speed * .03
+            self._sim_fr = fr.speed * .03
+            self._sim_bl = bl.speed * .03
+            self._sim_br = br.speed * .03
+            self._sim_omega = angular_vel * .03
+            
+            sim_node_positions = (
+                SwerveModulePosition(self._sim_fl, fl.angle),
+                SwerveModulePosition(self._sim_fr, fr.angle),
+                SwerveModulePosition(self._sim_bl, bl.angle),
+                SwerveModulePosition(self._sim_br, br.angle)
+            )
+            
+            new_pose = self.odometry.update(
+                Rotation2d(self._sim_omega),
+                sim_node_positions
+            )
+            
+            self.reset_odometry(new_pose)
 
         self._omega = angular_vel  # For simulation
 
-        self.odometry.update(
-            self.get_heading(),
-            self.node_positions
-        )
+        
 
         # self.odometry_estimator.update(
         #     self.get_heading(),
