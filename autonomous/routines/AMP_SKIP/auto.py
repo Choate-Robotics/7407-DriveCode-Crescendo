@@ -46,15 +46,16 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_second_note[0],
-        # start_pose=PoseType.current,
+        # start_pose=get_second_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.5,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=get_second_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(-180)
 )
@@ -62,15 +63,16 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=shoot_second_note[0],
-        # start_pose=PoseType.current,
+        # start_pose=shoot_second_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_second_note[1]],
         end_pose=shoot_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.5,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=False,
+        start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(-180)
 )
@@ -78,15 +80,16 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=get_third_note[0],
-        # start_pose=PoseType.current,
+        # start_pose=get_third_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.5,
         start_velocity=0,
         end_velocity=0,
-        rev=True
+        rev=True,
+        start_rotation=get_third_note[0].get().rotation().radians()
     ),
     theta_f=math.radians(-135)
 )
@@ -94,15 +97,16 @@ path_4 = FollowPathCustom(
 path_5 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=shoot_third_note[0],
-        # start_pose=PoseType.current,
+        # start_pose=shoot_third_note[0],
+        start_pose=PoseType.current,
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.5,
         start_velocity=0,
         end_velocity=0,
-        rev=False
+        rev=False,
+        start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
     theta_f=AngleType.calculate
 )
@@ -177,12 +181,15 @@ auto = ParallelCommandGroup(
         InstantCommand(lambda: Field.odometry.disable()),
 
     ),
-    # InstantCommand(lambda: Field.odometry.disable()),
-    # path_1,
-    # path_2,
-    # path_3,
-    # path_4,
-    # path_5,
+
+    # SequentialCommandGroup(
+    #     InstantCommand(lambda: Field.odometry.disable()),
+    #     path_1,
+    #     path_2,
+    #     path_3,
+    #     path_4,
+    #     path_5,
+    # )
     # path_far_to_mid,
     # path_mid_to_far
 
