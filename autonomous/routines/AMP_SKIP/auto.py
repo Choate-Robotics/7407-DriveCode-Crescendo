@@ -21,6 +21,8 @@ from autonomous.routines.AMP_SKIP.coords import (
     shoot_second_note,
     get_third_note,
     shoot_third_note,
+    far_to_mid,
+    mid_to_far,
     initial
 )
 
@@ -101,15 +103,44 @@ path_5 = FollowPathCustom(
     theta_f=math.radians(-180)
 )
 
-auto = SequentialCommandGroup(
+path_far_to_mid = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=far_to_mid[0],
+        waypoints=[Translation2d(*coord) for coord in far_to_mid[1]],
+        end_pose=far_to_mid[2],
+        max_velocity=12,
+        max_accel=3,
+        start_velocity=0,
+        end_velocity=0,
+        rev=False,
+    ),
+    period=0.03,
+)
 
+path_mid_to_far = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=mid_to_far[0],
+        waypoints=[coord for coord in mid_to_far[1]],
+        end_pose=mid_to_far[2],
+        max_velocity=config.drivetrain_max_vel_auto,
+        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        start_velocity=0,
+        end_velocity=0,
+        rev=False
+    ),
+)
+
+auto = SequentialCommandGroup(
+    InstantCommand(lambda: Field.odometry.disable()),
     path_1,
     path_2,
     path_3,
     path_4,
     path_5,
-    # path_2,
-    # path_3
+    # path_far_to_mid,
+    # path_mid_to_far
 
 )
 

@@ -24,9 +24,9 @@ shoot_first_note = (
 get_second_note = (
     shoot_first_note[2],
     [Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
-        Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.3))],
+        Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.425))],
     Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
-        Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0))
+        Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0.25))
 )
 
 shoot_second_note = (
@@ -38,8 +38,8 @@ shoot_second_note = (
 
 get_third_note = (
     shoot_second_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost.withOffset(Translation3d(0, -1, 0))],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, -0.25))
+    [Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost.withOffset(Translation3d(0, -0.95, 0))],
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.625, 0.25))
 )
 
 shoot_third_note = (
@@ -49,3 +49,14 @@ shoot_third_note = (
     shoot_location
 )
 
+far_to_mid = (
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(-120),
+    [],
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(0, -0.25)).withRotation(130)
+)
+
+mid_to_far = (
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withRotation(0),
+    [],
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(0)
+)
