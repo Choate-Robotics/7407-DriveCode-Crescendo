@@ -262,6 +262,7 @@ note_length: meters = 14 * inches_to_meters
 min_drivetrain_tolerance: degrees = 1
 max_drivetrain_tolerance: degrees = 13
 drivetrain_static_tolerance_offset: degrees = 1
+drivetrain_feed_tolerance: degrees = 5
 
 
 
@@ -270,7 +271,10 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 19.5
+flywheel_feed_speed_max: meters_per_second = 16
+flywheel_feed_speed_min: meters_per_second = 13
 flywheel_distance_scalar: float = 1.8
+feed_shot_target_height: meters = 4
 v0_flywheel_minimum: meters_per_second = 14
 v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12

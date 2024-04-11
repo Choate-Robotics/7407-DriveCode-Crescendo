@@ -36,9 +36,12 @@ class TrajectoryCalculator:
         self.odometry = odometry
         self.k = 0.5 * constants.c * constants.rho_air * constants.a
         self.distance_to_target = 0
+        self.distance_to_feed_zone = 0
         self.delta_z = 0
         self.shoot_angle:radians = 0
+        self.feed_angle:radians = 0
         self.base_rotation2d = Rotation2d(0)
+        self.feed_rotation2d = Rotation2d(0)
         self.bot_shot_tolerance:radians = radians(1)
         self.t_total = 0
         self.elevator = elevator
@@ -51,6 +54,10 @@ class TrajectoryCalculator:
     def init(self):
         self.speaker = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
         self.speaker_z = POI.Coordinates.Structures.Scoring.kSpeaker.getZ()
+        self.feed_zone = POI.Coordinates.Structures.Scoring.kFeed.getTranslation()
+        self.feed_zone_z = POI.Coordinates.Structures.Scoring.kFeed.getZ()
+        self.feed_zone_midline = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
+        self.feed_zone_midline_z = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
         if self.tuning:
             self.table.putNumber('flywheel distance scalar', config.flywheel_distance_scalar)
             self.table.putNumber('flywheel minimum value', config.v0_flywheel_minimum)
@@ -108,7 +115,41 @@ class TrajectoryCalculator:
 
         return result_angle
     
-    def get_flywheel_speed(self, distance_to_target: float) -> float:
+    def calculate_lob_speeds(self, distance_to_target, target_height, z_init=0) -> tuple[float, float]:
+        
+        vy = np.sqrt(2 * constants.g * (target_height - z_init))
+        
+        time = vy * (2/constants.g)
+        
+        vx = distance_to_target / time 
+        
+        return vy, vx
+    
+    def calculate_angle_feed_zone(self, distance_to_target: float, z_init: float) -> radians:
+        
+        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height, z_init)
+        
+        theta = np.arctan(vy / vx) if vx != 0 else np.radians(90)
+        
+        if theta > np.radians(60):
+            theta = np.radians(55)
+        
+        return theta
+    
+    def get_flywheel_speed_feed(self, distance_to_target: float) -> float:
+        
+        
+        vy, vx = self.calculate_lob_speeds(distance_to_target, config.feed_shot_target_height, self.get_shooter_height())
+        
+        v_total = np.sqrt(vy ** 2 + vx **2) + 4
+        # print(vx, vy, v_total)
+        
+        return  min(v_total, config.v0_flywheel_maximum)
+    
+    def get_shooter_height(self) -> float:
+        return constants.shooter_height + self.elevator.get_length()
+
+    def get_flywheel_speed(self, distance_to_target:float) -> float:
         if self.tuning:
             config.flywheel_distance_scalar = self.table.getNumber('flywheel distance scalar', config.flywheel_distance_scalar)
             config.v0_flywheel_minimum = self.table.getNumber('flywheel minimum value', config.v0_flywheel_minimum)
@@ -121,6 +162,8 @@ class TrajectoryCalculator:
             config.shot_height_offset_scalar = self.table.getNumber('height offset scalar', config.shot_height_offset_scalar)
 
         return distance_to_target * config.shot_height_offset_scalar
+    
+    
     def update_shooter(self):
         """
         function runs sim to calculate a final angle with air resistance considered
@@ -128,10 +171,29 @@ class TrajectoryCalculator:
         """
         if type(self.speaker) == Translation3d:
             self.speaker = self.speaker.toTranslation2d()
+            
+        if type(self.feed_zone) == Translation3d:
+            self.feed_zone = self.feed_zone.toTranslation2d()
+            
+        if type(self.feed_zone_midline) == Translation3d:
+            self.feed_zone_midline = self.feed_zone.toTranslation2d()
 
         self.distance_to_target = (
             self.odometry.getPose().translation().distance(self.speaker) - constants.shooter_offset_y
         )
+        
+        active_feed_zone = self.feed_zone
+        
+        pose_x = self.odometry.getPose().X()
+        
+        if pose_x > constants.FieldPos.op_wing_boundary:
+            active_feed_zone = self.feed_zone_midline
+        
+        self.distance_to_feed_zone = (
+            self.odometry.getPose().translation().distance(active_feed_zone) - constants.shooter_offset_y
+        )
+        
+    
         # print("distance_to_target", self.distance_to_target)
 
         self.delta_z = (
@@ -144,9 +206,12 @@ class TrajectoryCalculator:
         self.delta_z += (config.shot_height_offset * inches_to_meters) + self.get_height_offset(self.distance_to_target)
         
         theta_1 = self.calculate_angle_no_air(self.distance_to_target, self.delta_z)
+        
+        feed_angle = self.calculate_angle_feed_zone(self.distance_to_feed_zone, self.get_shooter_height())
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
-            self.t_total = self.distance_to_target / (self.flywheel.get_velocity_linear() * np.cos(theta_1))
+            self.feed_angle = feed_angle
+            self.t_total = self.distance_to_target / ((self.flywheel.get_velocity_linear() if self.flywheel.get_velocity_linear() > 0 else 1) * np.cos(theta_1))
             return theta_1
         else:
             theta_2 = theta_1 + np.radians(1)
@@ -174,6 +239,22 @@ class TrajectoryCalculator:
         :return: base target angle
         """
         speaker_translation:Translation2d = POI.Coordinates.Structures.Scoring.kSpeaker.getTranslation()
+        robot_pose_2d = self.odometry.getPose()
+        robot_to_speaker = speaker_translation - robot_pose_2d.translation()
+        return robot_to_speaker.angle()
+    
+    def get_rotation_to_feed_zone(self):
+        """
+        returns rotation of base to face target
+        :return: base target angle
+        """
+        
+        pose_x = self.odometry.getPose().X()
+        feed_location = POI.Coordinates.Structures.Scoring.kFeed.getTranslation()
+        if pose_x > constants.FieldPos.op_wing_boundary:
+            feed_location = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
+        
+        speaker_translation:Translation2d = feed_location
         robot_pose_2d = self.odometry.getPose()
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
@@ -227,6 +308,7 @@ class TrajectoryCalculator:
         :return: base target angle
         """
         self.base_rotation2d = self.get_rotation_to_speaker()
+        self.feed_rotation2d = self.get_rotation_to_feed_zone()
         self.bot_shot_tolerance = self.get_shot_pos_tolerance()
         return self.base_rotation2d
 
@@ -242,11 +324,15 @@ class TrajectoryCalculator:
 
     def update_tables(self):
         self.table.putNumber('wrist angle', degrees(self.get_theta()))
+        self.table.putNumber('wrist feed angle', degrees(self.get_feed_theta()))
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
+        self.table.putNumber('bot feed angle', self.get_bot_theta_feed().degrees())
+        self.table.putNumber('distance to feed zone', self.get_distance_to_feed_zone())
         self.table.putNumber('bot tolerance', degrees(self.get_shot_pos_tolerance()))
         self.table.putNumber('delta z', self.delta_z)
         self.table.putNumber('flywheel speed', self.get_flywheel_speed(self.distance_to_target))
+        self.table.putNumber('feed flywheel speed', self.get_flywheel_speed_feed(self.distance_to_feed_zone))
         
     def run_sim(self, shooter_theta):
         def hit_target(t, u):
@@ -276,12 +362,17 @@ class TrajectoryCalculator:
     def get_theta(self) -> radians:
         """
         Returns the angle of the trajectory.
-        """
+        """    
         if self.tuning:
             config.shot_angle_offset = self.table.getNumber('shot angle offset', config.shot_angle_offset)
 
         return self.shoot_angle + radians(config.shot_angle_offset)
 
+    def get_feed_theta(self) -> radians:
+        """
+        Returns the angle of the trajectory.
+        """
+        return self.feed_angle
 
     def get_bot_theta(self) -> Rotation2d:
         """
@@ -289,9 +380,19 @@ class TrajectoryCalculator:
         """
         return self.base_rotation2d
     
+    def get_bot_theta_feed(self) -> Rotation2d:
+        """
+        Returns the angle of the Robot
+        """
+        return self.feed_rotation2d
+    
     def get_distance_to_target(self) -> float:
         
         return self.distance_to_target
+    
+    def get_distance_to_feed_zone(self) -> float:
+        
+        return self.distance_to_feed_zone
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u

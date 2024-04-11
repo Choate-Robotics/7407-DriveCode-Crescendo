@@ -81,6 +81,7 @@ class IT:
         button.Trigger(
             lambda: not Robot.wrist.note_in_feeder()\
                 and not robot_states.flywheel_state == robot_states.FlywheelState.amping
+                and not robot_states.flywheel_state == robot_states.FlywheelState.feeding
         ).onTrue(
             InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.idle))
         )
@@ -97,6 +98,13 @@ class IT:
             )\
             .onTrue(
                 command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 5))
+            )
+            
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.feeding
+            )\
+            .onTrue(
+                command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations)
             )
 
         button.Trigger(

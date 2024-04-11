@@ -17,6 +17,8 @@ from math import radians
 from wpimath.units import seconds
 import robot_states as states
 import ntcore
+from enum import Enum
+
 from wpilib import RobotState
 
 
@@ -95,10 +97,16 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
     """
     driver_centric = False
     driver_centric_reversed = True
+    
+    class Target(Enum):
+        speaker = 0
+        feed = 1
 
-    def __init__(self, drivetrain, target_calc: TrajectoryCalculator):
+    def __init__(self, drivetrain, target_calc: TrajectoryCalculator, target: Target = Target.speaker, limit_speed: bool = True):
         super().__init__(drivetrain)
         self.target_calc = target_calc
+        self.target = target
+        self.limit_speed = limit_speed
         # self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
         self.theta_controller = PIDController(
             config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
@@ -138,6 +146,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         
         self.theta_controller.setTolerance(
             self.target_calc.get_shot_pos_tolerance()
+            if self.target == DriveSwerveAim.Target.speaker
+            else config.drivetrain_feed_tolerance
         )
         
         dx, dy = (
@@ -145,7 +155,13 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
         )
 
-        target_angle = self.target_calc.get_bot_theta()
+        target_angle = (
+            self.target_calc.get_bot_theta()
+            if self.target == DriveSwerveAim.Target.speaker
+            else self.target_calc.get_bot_theta_feed()
+            )
+        
+        
         current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians() - radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
@@ -155,6 +171,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.table.putNumber('velocity error', self.theta_controller.getVelocityError())
         
         def drive_speed():
+            if not self.limit_speed:
+                return 0
             vx = self.subsystem.chassis_speeds.vx
             vy = self.subsystem.chassis_speeds.vy
             v_total = math.sqrt(vx ** 2 + vy ** 2)

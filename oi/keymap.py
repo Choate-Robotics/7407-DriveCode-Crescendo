@@ -99,6 +99,10 @@ class Keymap:
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.RB
         )
         
+        FEED_SHOT = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
+        )
+        
         
     class Feeder:
         FEED = commands2.button.JoystickButton(

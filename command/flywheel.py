@@ -87,3 +87,33 @@ class SetFlywheelShootSpeaker(SubsystemCommand[Flywheel]):
     
     def end(self, interrupted: bool) -> None:
         pass
+
+
+class SetFlywheelShootFeeder(SubsystemCommand[Flywheel]):
+    
+    def __init__(self, subsystem: Flywheel, trajectory: TrajectoryCalculator):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+        self.traj = trajectory
+        
+    def initialize(self):
+        self.subsystem.set_velocity_linear(config.flywheel_feed_speed_min, 1)
+        self.subsystem.set_velocity_linear(config.flywheel_feed_speed_min, 2)
+        
+    
+    def execute(self):
+        distance = self.traj.get_distance_to_feed_zone()
+        
+        speed = self.traj.get_flywheel_speed_feed(distance)
+        
+        self.subsystem.set_velocity_linear(speed, 1)
+        self.subsystem.set_velocity_linear(speed, 2)
+        
+        # self.subsystem.motor_1.set_raw_output(1)
+        
+        
+    def isFinished(self) -> bool:
+        return False
+    
+    def end(self, interrupted: bool) -> None:
+        pass

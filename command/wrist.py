@@ -11,6 +11,7 @@ from sensors import TrajectoryCalculator
 from subsystem import Wrist
 from toolkit.command import SubsystemCommand
 from units.SI import radians
+from enum import Enum
 
 
 class ZeroWrist(SubsystemCommand[Wrist]):
@@ -107,22 +108,32 @@ class AimWrist(SubsystemCommand[Wrist]):
     """
     Aims wrist to angle according to shooter calculations
     """
+    
+    class Target(Enum):
+        
+        speaker = 0
+        feed = 1
 
-    def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator):
+    def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator, target: Target = Target.speaker):
         super().__init__(subsystem)
         self.subsystem = subsystem
         self.traj_calc = traj_calc
+        self.target = target
 
     def initialize(self):
         self.subsystem.wrist_moving = True
 
     def execute(self):
-        # angle = self.traj_calc.get_theta()
+        angle = (
+            self.traj_calc.get_theta()
+            if self.target == AimWrist.Target.speaker
+            else self.traj_calc.get_feed_theta()
+        )
 
-        self.subsystem.aim_wrist(self.traj_calc.get_theta())
+        self.subsystem.aim_wrist(angle)
 
         if (
-            self.subsystem.is_at_angle(self.traj_calc.get_theta(), math.radians(config.wrist_shot_tolerance))
+            self.subsystem.is_at_angle(angle, math.radians(config.wrist_shot_tolerance))
             and
             self.subsystem.get_wrist_velocity() < config.wrist_velocity_shot_tolerance
             ):
