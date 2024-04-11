@@ -336,6 +336,14 @@ class POI:
                         constants.FieldPos.Scoring.amp_rotation,
                     )
                 )
+                
+                kFeedMidline = POIPose(
+                    Pose2d(
+                        6.460,
+                        constants.field_width - 0.623,
+                        3.109,
+                    )
+                )
 
                 kAmpActual = POIPose(
                     Pose2d(
