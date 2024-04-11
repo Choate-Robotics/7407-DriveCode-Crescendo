@@ -264,6 +264,7 @@ note_length: meters = 14 * inches_to_meters
 min_drivetrain_tolerance: degrees = 1
 max_drivetrain_tolerance: degrees = 13
 drivetrain_static_tolerance_offset: degrees = 1
+drivetrain_feed_tolerance: degrees = 5
 
 
 

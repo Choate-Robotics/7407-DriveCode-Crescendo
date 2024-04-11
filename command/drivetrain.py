@@ -146,6 +146,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         
         self.theta_controller.setTolerance(
             self.target_calc.get_shot_pos_tolerance()
+            if self.target == DriveSwerveAim.Target.speaker
+            else config.drivetrain_feed_tolerance
         )
         
         dx, dy = (
