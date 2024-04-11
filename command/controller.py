@@ -15,7 +15,8 @@ from commands2 import (
     WaitCommand,
     ParallelRaceGroup,
     WaitUntilCommand,
-    ConditionalCommand
+    ConditionalCommand,
+    ParallelDeadlineGroup
 )
 from commands2.command import Command
 from wpimath.geometry import Pose2d, Rotation2d  # noqa
@@ -249,11 +250,11 @@ class IntakeStageNoteAuto(ParallelRaceGroup):
 
 class PathUntilIntake(ParallelRaceGroup):
     def __init__(self, path: Command, wrist: Wrist, intake: Intake,
-                 wait_time: float = config.auto_path_intake_note_deadline):
+                 waittime: float = config.auto_path_intake_note_deadline):
         super().__init__(
             SequentialCommandGroup(
                 path,
-                WaitCommand(wait_time),
+                WaitCommand(waittime),
                 WaitUntilCommand(lambda: not wrist.note_in_feeder())
             ),
             IntakeStageNote(wrist, intake)
@@ -443,23 +444,10 @@ class AutoPickupNote(SequentialCommandGroup):
                 ),
                 SequentialCommandGroup(
                     ParallelCommandGroup(
-                        SetWristIdle(wrist),
-                        DriveSwerveNoteLineup(drivetrain, limelight),
-                    ),
-                    ParallelCommandGroup(
-                        SequentialCommandGroup(
-                            InstantCommand(
-                                lambda: drivetrain.set_robot_centric(
-                                    (-config.object_detection_intaking_drivetrain_speed * drivetrain.max_vel, 0), 0)
-                            ),
+                        IntakeStageNote(wrist, intake),
+                        ParallelDeadlineGroup(
                             WaitUntilCommand(lambda: intake.detect_note()),
-                            InstantCommand(
-                                lambda: drivetrain.set_robot_centric((0, 0), 0)
-                            )
-                        ),
-                        SequentialCommandGroup(
-                            IntakeStageNote(wrist, intake),
-                            IntakeStageIdle(wrist, intake)
+                            DriveSwerveNoteLineup(drivetrain, limelight)
                         )
                     )
                 ),

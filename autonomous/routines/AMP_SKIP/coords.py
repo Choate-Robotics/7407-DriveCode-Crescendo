@@ -39,8 +39,8 @@ shoot_second_note = (
 
 get_third_note = (
     shoot_second_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost.withOffset(Translation3d(0, -1.63, 0))],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0)).withRotation(-135)
+    [Field.POI.Coordinates.Structures.Obstacles.kStageLeftPost.withOffset(Translation3d(-0.125, -1.65, 0))],
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, -0.05)).withRotation(-135)
 )
 
 shoot_third_note = (
