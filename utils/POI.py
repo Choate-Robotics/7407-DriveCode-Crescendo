@@ -340,7 +340,7 @@ class POI:
                 kFeedMidline = POIPose(
                     Pose2d(
                         6.460,
-                        constants.field_width - 0.623,
+                        constants.field_width - 1,
                         3.109,
                     )
                 )
