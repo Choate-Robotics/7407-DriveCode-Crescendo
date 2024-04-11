@@ -13,7 +13,7 @@ path = (coord, waypoints, coord)
 
 initial = (1.9 - constants.drivetrain_length_with_bumpers/2, (constants.FieldPos.Wing.note_init + constants.FieldPos.Wing.note_gap * 1.5) + 0.15, math.radians(-180))
 
-shoot_location = POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(-180))).withRotation(-180)
+shoot_location = POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(162.5))).withRotation(162.5)
 
 shoot_first_note = (
     initial,

@@ -40,7 +40,7 @@ path_1 = FollowPathCustom(
         end_velocity=0,
         rev=True
     ),
-    theta_f=math.radians(-180)
+    theta_f=math.radians(163)
 )
 
 path_2 = FollowPathCustom(
@@ -74,7 +74,7 @@ path_3 = FollowPathCustom(
         rev=False,
         start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(-180)
+    theta_f=math.radians(163)
 )
 
 path_4 = FollowPathCustom(
@@ -108,7 +108,7 @@ path_5 = FollowPathCustom(
         rev=False,
         start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
-    theta_f=AngleType.calculate
+    theta_f=math.radians(163)
 )
 
 path_far_to_mid = FollowPathCustom(
