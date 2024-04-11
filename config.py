@@ -251,8 +251,6 @@ drivetrain_max_accel_auto: float = 4
 
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
-drivetrain_aiming_tolerance: degrees = 2
-drivetrain_aiming_velocity_tolerance: degrees = 3
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 shot_height_offset: inches = 0 # inches
 shot_angle_offset: degrees = 0.7

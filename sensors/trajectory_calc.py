@@ -211,7 +211,7 @@ class TrajectoryCalculator:
         if not self.use_air_resistance:
             self.shoot_angle = theta_1
             self.feed_angle = feed_angle
-            self.t_total = self.distance_to_target / (self.flywheel.get_velocity_linear() * np.cos(theta_1))
+            self.t_total = self.distance_to_target / ((self.flywheel.get_velocity_linear() if self.flywheel.get_velocity_linear() > 0 else 1) * np.cos(theta_1))
             return theta_1
         else:
             theta_2 = theta_1 + np.radians(1)
