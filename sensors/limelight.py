@@ -6,7 +6,8 @@ from wpimath.geometry import Pose3d, Rotation3d, Translation3d
 
 import config
 from toolkit.sensors.odometry import VisionEstimator
-from units.SI import meters
+from toolkit.sensors.gyro import Pigeon2
+from units.SI import meters, degrees, degrees_per_second
 
 
 class Limelight:
@@ -14,7 +15,7 @@ class Limelight:
     A class for interfacing with the limelight camera.
     """
 
-    def __init__(self, origin_offset: Pose3d, name: str = "limelight"):
+    def __init__(self, origin_offset: Pose3d, name: str = "limelight", megatag2: bool = True):
         """
 
         :param origin_offset: The offset of the limelight from the robot's origin in meters
@@ -32,6 +33,7 @@ class Limelight:
         self.tv: float = 0
         self.ta: float = 0
         self.tid: float = -1
+        self.megatag2: bool = megatag2
         self.origin_offset: Pose3d = origin_offset
         self.drive_cam = False
         self.pipeline: config.LimelightPipeline = config.LimelightPipeline.feducial
@@ -205,19 +207,40 @@ class Limelight:
         self.tv = self.table.getNumber("tv", 0)
         self.ta = self.table.getNumber("ta", 0)
         self.tid = self.table.getNumber("tid", -1)
+        
+        
+        
         self.get_pipeline_mode()
         self.get_neural_classId()
         # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
+        botpose = 'botpose'
+        botpose_red = 'botpose_wpired'
+        botpose_blue = 'botpose_wpiblue'
+        if self.megatag2:
+            botpose = 'botpose_orb'
+            botpose_red = 'botpose_orb_wpired'
+            botpose_blue = 'botpose_orb_wpiblue'
+        
         self.botpose_red = self.table.getNumberArray(
-            "botpose_wpired", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
+            botpose_red, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
         # self.botpose_blue = self.table.getEntry("botpose_wpiblue").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose_blue = self.table.getNumberArray(
-            "botpose_wpiblue", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
+            botpose_blue, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0])
+        self.botpose = self.table.getNumberArray(botpose, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0])
         self.targetpose = self.table.getNumberArray("botpose_targetspace", [0, 0, 0, 0, 0, 0])
+        
+    def set_robot_orientation(self, yaw: degrees, yaw_rate: degrees_per_second, pitch: degrees, pitch_rate: degrees_per_second, roll: degrees, roll_rate: degrees_per_second):
+        '''
+        Sets robot gyro orientation
+        
+        NEEDED for Megatag2
+        '''
+        array = [yaw, yaw_rate, pitch, pitch_rate, roll, roll_rate]
+        
+        self.table.putNumberArray("robot_orientation_set", array)
 
     def target_exists(self, force_update: bool = False):
         """
@@ -272,6 +295,8 @@ class Limelight:
         force_update: bool = False,
     ):
         """
+        IF USING MEGATAG2 USE SET ORIENTATION FUNCTION EVERY CYCLE
+        
         Gets the pose of the robot relative to the field using the feducial pipeline.
         This uses the botpose values from the limelight configuration, which are relative to the alliance wall.
         To call this properly, you must set the pipeline to feducial.
@@ -335,13 +360,26 @@ class Limelight:
 
 
 class LimelightController(VisionEstimator):
-    def __init__(self, limelight_list: list[Limelight]):
+    def __init__(self, limelight_list: list[Limelight], gyro: Pigeon2, mega_tag2: bool = True):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
+        self.gyro = gyro
+        self.mega_tag2 = mega_tag2
 
     def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float, float]] | None:
         poses = []
         for limelight in self.limelights:
+            if self.mega_tag2:
+                gyro_data = [
+                    math.degrees(self.gyro.get_robot_heading()),
+                    math.degrees(self.gyro.get_robot_heading_rate()),   
+                    math.degrees(self.gyro.get_robot_pitch()),
+                    math.degrees(self.gyro.get_robot_pitch_rate()),
+                    math.degrees(self.gyro.get_robot_roll()),
+                    math.degrees(self.gyro.get_robot_roll_rate())
+                ]
+                
+                limelight.set_robot_orientation(*gyro_data)            
             if (
                 limelight.april_tag_exists()
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial

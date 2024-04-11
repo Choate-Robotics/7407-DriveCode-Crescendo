@@ -1,7 +1,7 @@
 import phoenix6
 import math
 
-from units.SI import radians
+from units.SI import radians, radians_per_second
 from toolkit.sensors.gyro.base_gyro import BaseGyro
 
 
@@ -29,6 +29,13 @@ class Pigeon2(BaseGyro):
         :return: Robot heading (radians)
         """
         return math.radians(self._gyro.get_yaw().value)
+    
+    def get_robot_heading_rate(self) -> radians_per_second:
+        """
+        Returns the rate of the robot's heading in radians per second
+        :return: Robot heading (radians)
+        """
+        return math.radians(self._gyro.get_angular_velocity_z_world().value)
 
     def get_robot_pitch(self) -> radians:
         """
@@ -36,6 +43,13 @@ class Pigeon2(BaseGyro):
         :return: Robot pitch (radians)
         """
         return math.radians(self._gyro.get_pitch().value)
+    
+    def get_robot_pitch_rate(self) -> radians_per_second:
+        """
+        Returns the rate of the robot's pitch in radians per second
+        :return: Robot pitch rate (radians per second)
+        """
+        return math.radians(self._gyro.get_angular_velocity_y_world().value)
 
     def get_robot_roll(self) -> radians:
         """
@@ -43,6 +57,13 @@ class Pigeon2(BaseGyro):
         :return: Robot roll (radians)
         """
         return math.radians(self._gyro.get_roll().value)
+    
+    def get_robot_roll_rate(self) -> radians_per_second:
+        """
+        Returns the rate of the robot's roll in radians per second
+        :return: Robot roll (radians)
+        """
+        return math.radians(self._gyro.get_angular_velocity_x_world().value)
 
     def reset_angle(self, angle: radians = 0):
         """
