@@ -35,12 +35,12 @@ path_1 = FollowPathCustom(
         waypoints=[coord for coord in shoot_first_note[1]],
         end_pose=shoot_first_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
         end_velocity=0,
         rev=True
     ),
-    theta_f=math.radians(163)
+    theta_f=math.radians(-180)
 )
 
 path_2 = FollowPathCustom(
@@ -51,7 +51,7 @@ path_2 = FollowPathCustom(
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
         end_velocity=0,
         rev=True,
@@ -68,13 +68,13 @@ path_3 = FollowPathCustom(
         waypoints=[coord for coord in shoot_second_note[1]],
         end_pose=shoot_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
         end_velocity=0,
         rev=False,
         start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(163)
+    theta_f=math.radians(163.5)
 )
 
 path_4 = FollowPathCustom(
@@ -85,7 +85,7 @@ path_4 = FollowPathCustom(
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
         end_velocity=0,
         rev=True,
@@ -102,13 +102,13 @@ path_5 = FollowPathCustom(
         waypoints=[coord for coord in shoot_third_note[1]],
         end_pose=shoot_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1.5,
+        max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
         end_velocity=0,
         rev=False,
         start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(163)
+    theta_f=math.radians(163.5)
 )
 
 path_far_to_mid = FollowPathCustom(
