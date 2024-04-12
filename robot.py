@@ -223,9 +223,10 @@ class _Robot(wpilib.TimedRobot):
                 command.DriveSwerveCustom(Robot.drivetrain),
             )
         )
-        self.scheduler.schedule(
-            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
-        )
+        if config.comp_bot.get():
+            self.scheduler.schedule(
+                command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
+            )
         # self.scheduler.schedule(
         #     command.IntakeIdle(Robot.intake)
         # )
