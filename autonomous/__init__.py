@@ -24,3 +24,4 @@ from autonomous.routines.TWO_NOTE.auto import routine as two_note  # noqa
 from autonomous.routines.MIDLINE_NOTES_2.auto import routine as mid_notes_2
 
 from autonomous.routines.AMP_SKIP.auto import routine as amp_skip
+from autonomous.routines.AMP_SKIP_2.auto import routine as amp_skip_2

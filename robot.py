@@ -72,6 +72,7 @@ class _Robot(wpilib.TimedRobot):
         # self.auto_selection.addOption("Do Nothing")
         self.auto_selection.addOption('Alt Amp Side', autonomous.left_four_note_reverse)
         self.auto_selection.addOption('Amp Skip', autonomous.amp_skip)
+        self.auto_selection.addOption('Amp Skip 2', autonomous.amp_skip_2)
         # self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
         # self.auto_selection.addOption("Five Notes", autonomous.five_note)

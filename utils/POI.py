@@ -524,6 +524,15 @@ class POI:
                         Rotation2d(math.radians(120))
                     )
                 )
+                kSubwooferLeft = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            0.67,
+                            constants.field_width / 2 + 2.7
+                        ),
+                        Rotation2d(math.radians(-60))
+                    )
+                )
             
 
     def __init__(self):
