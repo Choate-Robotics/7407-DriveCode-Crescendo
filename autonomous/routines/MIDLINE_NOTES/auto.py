@@ -220,14 +220,15 @@ auto = ParallelCommandGroup(
     # )
     SequentialCommandGroup(
         # path_1,
+        InstantCommand(lambda: Field.odometry.disable()),
         path_2,
         path_3,
         path_4,
-        path_8,
-        # path_5,
-        # path_6,
-        # path_7
+        # path_8,
+        path_5,
+        path_6,
+        path_7
     )
 )
 
-routine = AutoRoutine(Pose2d(initial[0], initial[1], math.radians(120)), auto)
+routine = AutoRoutine(Pose2d(initial[0], initial[1], math.radians(-120)), auto)
