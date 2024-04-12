@@ -13,7 +13,7 @@ path = (coord, waypoints, coord)
 
 start = Field.POI.Coordinates.Waypoints.Auto.kSubwooferLeft
 
-initial = (0.68, field_width/2 + 2.6, math.radians(60))
+initial = (0.68, field_width/2 + 2.6, math.radians(120))
 
 initial_shot_location = POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(-180))).withRotation(-180)
 shot_location = POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(163.5))).withRotation(163.5)
@@ -21,7 +21,7 @@ shot_location = POIPose(Pose2d(initial[0] + 2.5, initial[1], math.radians(163.5)
 shoot_first_note = (
     start,
     [],
-    POIPose(Pose2d(initial[0] + 0.2, initial[1], math.radians(60)))
+    POIPose(Pose2d(initial[0] + 0.2, initial[1], math.radians(-120)))
 )
 
 get_second_note = (
