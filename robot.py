@@ -59,6 +59,7 @@ class _Robot(wpilib.TimedRobot):
             self.log.setup("WARNING: DEBUG MODE IS ENABLED")
 
         self.scheduler.setPeriod(config.period)
+        
 
         self.auto_selection = wpilib.SendableChooser()
         # self.auto_selection.addOption("Test", autonomous.drive_straight)
@@ -228,12 +229,12 @@ class _Robot(wpilib.TimedRobot):
                 command.DriveSwerveCustom(Robot.drivetrain),
             )
         )
-        self.scheduler.schedule(
-            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
-        )
         # self.scheduler.schedule(
-        #     command.IntakeIdle(Robot.intake)
+        #     command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         # )
+        self.scheduler.schedule(
+            command.IntakeIdle(Robot.intake)
+        )
 
         if Robot.wrist.note_in_feeder():
             states.flywheel_state = states.FlywheelState.shooting

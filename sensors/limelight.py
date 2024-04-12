@@ -199,6 +199,8 @@ class Limelight:
         Updates the tx, ty, and tv values of the limelight Manually.
         For proper use, this should be called in the main event loop.
         """
+        
+        # return
 
         self.tx = self.table.getNumber("tx", 0)
         self.ty = self.table.getNumber("ty", 0)

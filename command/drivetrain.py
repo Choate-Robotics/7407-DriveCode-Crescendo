@@ -13,7 +13,7 @@ from sensors import TrajectoryCalculator, Limelight
 from wpimath.controller import PIDController, ProfiledPIDControllerRadians
 from wpimath.trajectory import TrapezoidProfileRadians
 from toolkit.utils.toolkit_math import bounded_angle_diff
-from math import radians
+from math import radians, degrees
 from wpimath.units import seconds
 import robot_states as states
 import ntcore
@@ -117,7 +117,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
-        self.theta_controller.enableContinuousInput(radians(-180), radians(180))
+        self.theta_controller.enableContinuousInput(-180, 180)
         self.theta_controller.reset()
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('P', config.drivetrain_rotation_P)
@@ -137,8 +137,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.theta_controller.setP(config.drivetrain_rotation_P)
             self.theta_controller.setI(config.drivetrain_rotation_I)
             self.theta_controller.setD(config.drivetrain_rotation_D)
-            # self.theta_controller.setTolerance(radians(self.table.getNumber('tolerance', 2)), radians(self.table.getNumber('velocity tolerance', 1)))
-            
+  
 
             
             config.drivetrain_aiming_offset = self.table.getNumber('drivetrain offset', config.drivetrain_aiming_offset)
@@ -162,10 +161,10 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             )
         
         
-        current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians() - radians(config.drivetrain_aiming_offset)
-        d_theta = self.theta_controller.calculate(current, target_angle.radians())
+        current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().degrees() - config.drivetrain_aiming_offset
+        d_theta = self.theta_controller.calculate(current, target_angle.degrees())
         if config.drivetrain_rotation_enable_tuner:
-            self.table.putNumber('target angle', target_angle.radians())
+            self.table.putNumber('target angle', target_angle.degrees())
             self.table.putNumber('current angle', current)
             self.table.putNumber('error', self.theta_controller.getPositionError())
             self.table.putNumber('velocity error', self.theta_controller.getVelocityError())
