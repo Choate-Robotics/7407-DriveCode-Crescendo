@@ -110,8 +110,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         # self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
         self.theta_controller = PIDController(
             config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
-            config.
-            period
+            config.period
             )
         # self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 3), radians(4 if RobotState.isAutonomous() else 4))
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
@@ -178,7 +177,14 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             v_total = math.sqrt(vx ** 2 + vy ** 2)
             return v_total
         
-        if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold:
+        def robot_angle():
+            pitch = self.subsystem.gyro.get_robot_pitch()
+            roll = self.subsystem.gyro.get_robot_roll()
+            max_angle = max(pitch, roll)
+            return max_angle
+        
+        if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold\
+            and robot_angle() < config.drivetrain_aiming_tilt_threshold:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False

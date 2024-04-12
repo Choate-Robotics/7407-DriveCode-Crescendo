@@ -69,7 +69,7 @@ class FieldPos:
 
     wing_boundary = 231 * inches_to_meters
     
-    op_wing_boundary = 10
+    op_wing_boundary = field_length - wing_boundary
 
     # all poses are relative to the blue field origin
     class Wing:
