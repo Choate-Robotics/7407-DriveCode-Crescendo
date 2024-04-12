@@ -228,12 +228,16 @@ class _Robot(wpilib.TimedRobot):
                 command.DriveSwerveCustom(Robot.drivetrain),
             )
         )
-        self.scheduler.schedule(
-            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
-        )
         # self.scheduler.schedule(
-        #     command.IntakeIdle(Robot.intake)
+        #     command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         # )
+        self.scheduler.schedule(
+            commands2.ConditionalCommand(
+                command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)),
+                command.IntakeIdle(Robot.intake),
+                lambda: config.comp_bot.get()
+            )
+        )
 
         if Robot.wrist.note_in_feeder():
             states.flywheel_state = states.FlywheelState.shooting

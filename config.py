@@ -252,6 +252,7 @@ drivetrain_max_accel_auto: float = 4
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
+drivetrain_aiming_tilt_threshold: radians = 5 * degrees_to_radians
 shot_height_offset: inches = 0 # inches
 shot_angle_offset: degrees = 0.7
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
