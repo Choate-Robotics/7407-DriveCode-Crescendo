@@ -366,17 +366,20 @@ class LimelightController(VisionEstimator):
         self.gyro = gyro
         self.mega_tag2 = mega_tag2
 
-    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float, float]] | None:
+    def get_estimated_robot_pose(self, rotation: degrees) -> list[tuple[Pose3d, float, float, float, float]] | None:
         poses = []
+        # print('its trying to get pose')
         for limelight in self.limelights:
             if self.mega_tag2:
+                if config.active_team == config.Team.RED:
+                    rotation +=180
+                    
+                # print(rotation)
                 gyro_data = [
+                    # rotation,
                     math.degrees(self.gyro.get_robot_heading()),
-                    math.degrees(self.gyro.get_robot_heading_rate()),   
-                    math.degrees(self.gyro.get_robot_pitch()),
-                    math.degrees(self.gyro.get_robot_pitch_rate()),
-                    math.degrees(self.gyro.get_robot_roll()),
-                    math.degrees(self.gyro.get_robot_roll_rate())
+                    math.degrees(self.gyro.get_robot_heading_rate()),
+                    0,0,0,0
                 ]
                 
                 limelight.set_robot_orientation(*gyro_data)            
@@ -386,7 +389,7 @@ class LimelightController(VisionEstimator):
                 and limelight.get_target_pose()
                 and not limelight.cam_pos_moving
             ):
-                # print(limelight.name+' Is sending bot pose'
+                # print(limelight.name+' Is sending bot pose')
                 poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
             return poses

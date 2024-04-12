@@ -9,7 +9,7 @@ class VisionEstimator:
     def __init__(self):
         pass
 
-    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float]] | None:
+    def get_estimated_robot_pose(self, rotation) -> list[tuple[Pose3d, float, float, float]] | None:
         """
         Returns the robot's pose relative to the field, estimated by the vision system. Override this method.
         :return: Vision system estimate of robot pose along with the associated timestamp.

@@ -82,6 +82,8 @@ class FieldOdometry:
         self.std_formula = lambda x: abs(x ** 2) / 2.5
 
         self.use_speaker_tags: bool = False
+        
+        self.vision_poses: list[Pose3d] = []
 
     def enable(self):
         self.vision_on = True
@@ -116,14 +118,20 @@ class FieldOdometry:
         if vision_robot_pose_list is None:
             return self.getPose()
 
+        self.vision_poses = []
+
         for vision_pose in vision_robot_pose_list:
             if vision_pose is None:
                 continue
+            
+            
 
             vision_time: float
             vision_robot_pose: Pose3d
 
             vision_robot_pose, vision_time, tag_count, distance_to_target, tag_area, tag_id = vision_pose
+            
+            self.vision_poses += [vision_robot_pose]
             # vision_robot_pose, vision_time = pose_data
             # distance_to_target = target_pose.translation()
 
@@ -248,8 +256,10 @@ class FieldOdometry:
     def get_vision_poses(self):
         vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float]] | None
         try:
+            rotation = self.getPose().rotation().degrees()
+            
             vision_robot_pose_list = (
-                self.vision_estimator.get_estimated_robot_pose()
+                self.vision_estimator.get_estimated_robot_pose(rotation)
                 if self.vision_estimator
                 else None
             )
@@ -277,6 +287,21 @@ class FieldOdometry:
             
 
         return est_pose
+    
+    def send_vision_poses(self):
+        
+        vision_array = []
+        
+        for pose in self.vision_poses:
+            vision_array +=[
+                pose.X(),
+                pose.Y(),
+                pose.rotation().toRotation2d().radians()
+            ]
+            
+        self.table.putNumberArray(
+            'Vision Poses', vision_array
+        )
     
     def update_tables(self):
         
@@ -310,13 +335,15 @@ class FieldOdometry:
             speeds.omega
         ])
         
-        speeds_field = speeds.fromRobotRelativeSpeeds(speeds, self.drivetrain.get_heading())
+        self.send_vision_poses()
         
-        self.table.putNumberArray('Velocity Field', [
-            speeds_field.vx,
-            speeds_field.vy,
-            speeds_field.omega
-        ])
+        # speeds_field = speeds.fromRobotRelativeSpeeds(speeds, self.drivetrain.get_heading())
+        
+        # self.table.putNumberArray('Velocity Field', [
+        #     speeds_field.vx,
+        #     speeds_field.vy,
+        #     speeds_field.omega
+        # ])
 
         self.table.putNumber('Robot Heading Degrees', self.drivetrain.get_heading().degrees())
 
