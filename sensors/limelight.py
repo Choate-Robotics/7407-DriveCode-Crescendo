@@ -24,7 +24,7 @@ class Limelight:
         """
 
         self.name = name
-        self.table = NetworkTable(f"limelight-{self.name}")
+        self.table = NetworkTable(self.name)
         self.tx: float = 0
         self.ty: float = 0
         self.tv: float = 0

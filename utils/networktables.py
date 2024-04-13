@@ -11,7 +11,6 @@ class NetworkTableManager:
         table = self.nt.getTable(table_name)
         return NetworkTable(table)
 
-
 class NetworkTable:
     
     class TopicType(Enum):
@@ -25,14 +24,16 @@ class NetworkTable:
         
     entries: dict[str,
             ntcore.BooleanArrayEntry | ntcore.BooleanEntry | ntcore.RawEntry | ntcore.DoubleEntry | ntcore.DoubleArrayEntry
-            ] = {}
+            ]={}
     
     def __init__(self, table_name: str | ntcore.NetworkTable):
         if isinstance(table_name, str):
             
             self.table = ntcore.NetworkTableInstance.getDefault().getTable(table_name)
+            self.name = self.table.getPath()
         elif isinstance(table_name, ntcore.NetworkTable):
             self.table = table_name
+            self.name = self.table.getPath()
         else:
             raise ValueError("Invalid table_name type")
         
@@ -129,12 +130,12 @@ class NetworkTable:
         
         entry = None
         
-        entry = self.entries.get(key)
+        entry = self.entries.get(self.name+key)
         
         if entry is None:
-            print("Creating new entry", key, type, default)
-            print('entries size', len(self.entries))
+            print(self.name, "Creating new entry", self.name+key, type, default)
             entry = self.__create_entry(key, type, default)
+            print(self.name, 'entries size', len(self.entries))
         
         return entry
         
@@ -163,7 +164,7 @@ class NetworkTable:
         
         entry = topic.getEntry(default)
         
-        self.entries[key] = entry
+        self.entries[self.name+key] = entry
         
         return entry
     
