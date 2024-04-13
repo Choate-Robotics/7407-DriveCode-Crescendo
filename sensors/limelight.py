@@ -198,21 +198,31 @@ class Limelight:
 
     def update(self):
         """
-        Updates the tx, ty, and tv values of the limelight Manually.
+        Updates all values of the limelight Manually.
         For proper use, this should be called in the main event loop.
         """
 
+        self.update_generic()
+        
+        self.get_pipeline_mode()
+        self.get_neural_classId()
+        # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
+        self.update_bot_pose()
+        
+    def update_generic(self):
+        '''
+        Updates generic values from the limelight network table
+        '''
         self.tx = self.table.getNumber("tx", 0)
         self.ty = self.table.getNumber("ty", 0)
         self.tv = self.table.getNumber("tv", 0)
         self.ta = self.table.getNumber("ta", 0)
         self.tid = self.table.getNumber("tid", -1)
         
-        
-        
-        self.get_pipeline_mode()
-        self.get_neural_classId()
-        # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
+    def update_bot_pose(self):
+        '''
+        Updates botpose values from the limelight network table
+        '''
         botpose = 'botpose'
         botpose_red = 'botpose_wpired'
         botpose_blue = 'botpose_wpiblue'
@@ -282,8 +292,7 @@ class Limelight:
         :return None: if no target exists
         """
 
-        if self.force_update or force_update:
-            self.update()
+        self.update_bot_pose()
         if self.tv < 1:
             return None
         return (self.tx, self.ty, self.ta)
