@@ -25,7 +25,7 @@ get_second_note = (
     [
         # Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.3, 0)),
      ],
-    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(0.1, 0))  # 0.25
+    Field.POI.Coordinates.Notes.MidLine.kFarRight.withOffset(Translation2d(0.1, 0.25))  # 0.25
 )
 
 shoot_second_note = (
@@ -37,13 +37,13 @@ shoot_second_note = (
 get_third_note = (
     shoot_second_note[2].withRotation(-135),
     [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.75, 0))],
-    Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d(0, 0)).withRotation(90)
+    Field.POI.Coordinates.Notes.MidLine.kMidRight.withOffset(Translation2d(0.2, -0.2)).withRotation(135)
 )
 
 come_back_with_third = (
-    get_third_note[2].withRotation(90),
+    get_third_note[2].withRotation(135),
     [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.5, 0))],
-    Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.1, 1.25, 0)).withRotation(-180)
+    Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.1, 1.25, 0)).withRotation(-135)
 )
 
 shoot_third_note = (
