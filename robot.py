@@ -188,9 +188,9 @@ class _Robot(wpilib.TimedRobot):
 
         self.handle(self.scheduler.run)
 
-        self.handle(Sensors.limelight_back.update)
-        self.handle(Sensors.limelight_front.update)
-        self.handle(Sensors.limelight_intake.update)
+        self.handle(Sensors.limelight_back.update_bot_pose)
+        self.handle(Sensors.limelight_front.update_bot_pose)
+        self.handle(Sensors.limelight_intake.update_generic)
 
         self.handle(Field.odometry.update)
 

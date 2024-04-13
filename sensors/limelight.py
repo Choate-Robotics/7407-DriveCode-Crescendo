@@ -212,6 +212,7 @@ class Limelight:
     def update_generic(self):
         '''
         Updates generic values from the limelight network table
+        calling this in the main event loop will only update generic values
         '''
         self.tx = self.table.getNumber("tx", 0)
         self.ty = self.table.getNumber("ty", 0)
@@ -222,6 +223,7 @@ class Limelight:
     def update_bot_pose(self):
         '''
         Updates botpose values from the limelight network table
+        calling this in the main event loop will only update botpose values
         '''
         botpose = 'botpose'
         botpose_red = 'botpose_wpired'
