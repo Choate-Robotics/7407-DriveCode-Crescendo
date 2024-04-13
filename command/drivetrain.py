@@ -300,7 +300,7 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.target_exists = False
         self.target_constrained = False
         # self.v_pid = PIDController(.09, 0, 0.1)
-        self.h_pid = PIDController(.03, 0, 00)
+        self.h_pid = PIDController(.04, 0, 00)
         self.o_pid = PIDController(
             config.drivetrain_rotation_P,
             config.drivetrain_rotation_I,
