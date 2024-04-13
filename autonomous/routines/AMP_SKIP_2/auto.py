@@ -11,7 +11,8 @@ from commands2 import (
     SequentialCommandGroup,
     ParallelCommandGroup,
     ParallelDeadlineGroup,
-    WaitCommand
+    WaitCommand,
+    ParallelRaceGroup
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -21,6 +22,7 @@ from autonomous.routines.AMP_SKIP_2.coords import (
     shoot_second_note,
     get_third_note,
     shoot_third_note,
+    get_fourth_note,
     far_to_mid,
     mid_to_far,
     initial
@@ -53,11 +55,11 @@ path_2 = FollowPathCustom(
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
-        end_velocity=0,
+        end_velocity=1,
         rev=True,
         start_rotation=get_second_note[0][2]
     ),
-    theta_f=math.radians(120)
+    theta_f=math.radians(-180)
 )
 
 path_3 = FollowPathCustom(
@@ -74,7 +76,7 @@ path_3 = FollowPathCustom(
         rev=False,
         start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(163.5)
+    theta_f=AngleType.calculate
 )
 
 path_4 = FollowPathCustom(
@@ -91,7 +93,7 @@ path_4 = FollowPathCustom(
         rev=True,
         start_rotation=get_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(-135)
+    theta_f=math.radians(-155)
 )
 
 path_5 = FollowPathCustom(
@@ -108,7 +110,24 @@ path_5 = FollowPathCustom(
         rev=False,
         start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(163.5)
+    theta_f=AngleType.calculate
+)
+
+path_6 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        # start_pose=get_fourth_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in get_fourth_note[1]],
+        end_pose=get_fourth_note[2],
+        max_velocity=config.drivetrain_max_vel_auto,
+        max_accel=config.drivetrain_max_accel_auto - 1,
+        start_velocity=0,
+        end_velocity=0,
+        rev=True,
+        start_rotation=get_fourth_note[0].get().rotation().radians()
+    ),
+    theta_f=(math.radians(-180))
 )
 
 # path_far_to_mid = FollowPathCustom(
@@ -141,57 +160,66 @@ path_5 = FollowPathCustom(
 # )
 
 auto = ParallelCommandGroup(
-    # SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
-    # SequentialCommandGroup(
-    #     ZeroWrist(Robot.wrist),
-    #     ZeroElevator(Robot.elevator),
-    #
-    #     InstantCommand(lambda: Field.odometry.disable()),
-    #
-    #     ParallelCommandGroup(
-    #         path_1.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-    #         DeployIntake(Robot.intake),
-    #     ),
-    #
-    #     # Shoot first note
-    #     InstantCommand(lambda: Field.odometry.enable()),
-    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-    #     InstantCommand(lambda: Field.odometry.disable()),
-    #
-    #     # Get second note
-    #     PathUntilIntake(path_2, Robot.wrist, Robot.intake, 1),
-    #
-    #     # Go to shot location
-    #     path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-    #
-    #     # Shoot second note
-    #     InstantCommand(lambda: Field.odometry.enable()),
-    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-    #     InstantCommand(lambda: Field.odometry.disable()),
-    #
-    #     # Get third note
-    #     PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-    #
-    #     # Go to shot location
-    #     path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-    #
-    #     # Shoot third note
-    #     InstantCommand(lambda: Field.odometry.enable()),
-    #     ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-    #     InstantCommand(lambda: Field.odometry.disable()),
-    #
-    # ),
-
+    SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
+        ZeroWrist(Robot.wrist),
+        ZeroElevator(Robot.elevator),
+    
         InstantCommand(lambda: Field.odometry.disable()),
-        path_2,
-        # path_3,
-        # path_4,
-        # path_5,
-    )
+    
+        # Shoot first note
+        DeployIntake(Robot.intake).withTimeout(0.3),
+        PassNote(Robot.wrist),
+        
+        # Get second note
+        ParallelRaceGroup(
+            SequentialCommandGroup(
+                path_2,
+                path_3
+            ),
+            SequentialCommandGroup(
+                IntakeStageNote(Robot.wrist, Robot.intake),
+                AimWrist(Robot.wrist, Field.calculations)
+            )
+        ),
+    
+        # Shoot second note
+        InstantCommand(lambda: Field.odometry.enable()),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        InstantCommand(lambda: Field.odometry.disable()),
+    
+        # Get third note
+        ParallelRaceGroup(
+            SequentialCommandGroup(
+                path_4,
+                path_5
+            ),
+            SequentialCommandGroup(
+                IntakeStageNote(Robot.wrist, Robot.intake),
+                AimWrist(Robot.wrist, Field.calculations)
+            )
+        ),
+    
+        # Shoot third note
+        InstantCommand(lambda: Field.odometry.enable()),
+        ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
+        InstantCommand(lambda: Field.odometry.disable()),
+
+        PathUntilIntake(path_6, Robot.wrist, Robot.intake, 1)
+    
+    ),
+
+    # SequentialCommandGroup(
+    #     InstantCommand(lambda: Field.odometry.disable()),
+    #     path_2,
+    #     path_3,
+    #     path_4,
+    #     path_5,
+    #     path_6,
+    # )
     # path_far_to_mid,
     # path_mid_to_far
 
 )
 
-routine = AutoRoutine(Pose2d(*initial), auto)
+routine = AutoRoutine(Pose2d(initial[0], initial[1], math.radians(120)), auto)
