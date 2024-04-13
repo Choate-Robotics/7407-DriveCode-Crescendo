@@ -292,7 +292,8 @@ class Limelight:
         :return None: if no target exists
         """
 
-        self.update_bot_pose()
+        if self.force_update or force_update:
+            self.update()
         if self.tv < 1:
             return None
         return (self.tx, self.ty, self.ta)
@@ -320,8 +321,7 @@ class Limelight:
         :return False: if the pipeline is not set to feducial
         """
 
-        if self.force_update or force_update:
-            self.update()
+        self.update_bot_pose()
         if self.pipeline != config.LimelightPipeline.feducial:
             return False
         elif not self.target_exists():
