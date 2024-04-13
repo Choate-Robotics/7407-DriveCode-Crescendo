@@ -32,7 +32,7 @@ class Limelight:
         self.ty: float = 0
         self.tv: float = 0
         self.ta: float = 0
-        self.tid: float = -1
+        self.tid: float = -1.0
         self.megatag2: bool = megatag2
         self.origin_offset: Pose3d = origin_offset
         self.drive_cam = False
@@ -237,7 +237,7 @@ class Limelight:
             botpose_red, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
         self.get_pipeline_mode()
-        self.tid = self.table.getNumber("tid", -1)
+        
         # self.botpose_blue = self.table.getEntry("botpose_wpiblue").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose_blue = self.table.getNumberArray(
             botpose_blue, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
@@ -266,11 +266,10 @@ class Limelight:
         :return bool: True if a target exists, False if not
         """
 
-        if self.force_update or force_update:
-            self.update()
+        self.tv = self.table.getNumber("tv", 0)
         return self.tv > 0.0
 
-    def april_tag_exists(self, force_update: bool = False):
+    def april_tag_exists(self) -> bool:
         """
         Checks if an AprilTag exists within the limelight's field of view.
 
@@ -280,8 +279,7 @@ class Limelight:
         :return bool: True if an AprilTag exists, False if not
         """
 
-        if self.force_update or force_update:
-            self.update()
+        self.tid = self.table.getNumber("tid", -1)
         return self.tid > 0.0
 
     def get_target(self, force_update: bool = False):
@@ -325,32 +323,34 @@ class Limelight:
         :return False: if the pipeline is not set to feducial
         """
 
-        self.update_bot_pose()
-        if self.pipeline != config.LimelightPipeline.feducial:
+        
+        
+        if self.get_pipeline_mode() != config.LimelightPipeline.feducial:
             return False
         elif not self.april_tag_exists():
             return None
-        else:
-            botpose: list = []
 
-            if config.active_team == config.Team.RED:
-                botpose = self.botpose_red
-            elif config.active_team == config.Team.BLUE:
-                botpose = self.botpose_blue
-            else:
-                botpose = self.botpose
-            botpose = [round(i, round_to) for i in botpose]
-            pose = Pose3d(
-                Translation3d(botpose[0], botpose[1], botpose[2]),
-                Rotation3d(botpose[3], botpose[4], math.radians(botpose[5])),
-            )
-            timestamp:float = Timer.getFPGATimestamp() - (botpose[6] / 1000)
-            tag_count:float = botpose[7]
-            tag_span:float = botpose[8]
-            ave_tag_dist:float = botpose[9]
-            tag_area:float = botpose[10]
-            tag_id:float = self.get_target_id()
-            return pose, timestamp, tag_count, ave_tag_dist, tag_area, tag_id
+        self.update_bot_pose()
+        botpose: list = []
+
+        if config.active_team == config.Team.RED:
+            botpose = self.botpose_red
+        elif config.active_team == config.Team.BLUE:
+            botpose = self.botpose_blue
+        else:
+            botpose = self.botpose
+        botpose = [round(i, round_to) for i in botpose]
+        pose = Pose3d(
+            Translation3d(botpose[0], botpose[1], botpose[2]),
+            Rotation3d(botpose[3], botpose[4], math.radians(botpose[5])),
+        )
+        timestamp:float = Timer.getFPGATimestamp() - (botpose[6] / 1000)
+        tag_count:float = botpose[7]
+        tag_span:float = botpose[8]
+        ave_tag_dist:float = botpose[9]
+        tag_area:float = botpose[10]
+        tag_id:float = self.get_target_id()
+        return pose, timestamp, tag_count, ave_tag_dist, tag_area, tag_id
         
     def get_target_pose(self):
         
