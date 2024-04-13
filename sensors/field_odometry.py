@@ -256,10 +256,9 @@ class FieldOdometry:
     def get_vision_poses(self):
         vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float]] | None
         try:
-            rotation = self.getPose().rotation().degrees()
             
             vision_robot_pose_list = (
-                self.vision_estimator.get_estimated_robot_pose(rotation)
+                self.vision_estimator.get_estimated_robot_pose()
                 if self.vision_estimator
                 else None
             )
