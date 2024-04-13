@@ -368,12 +368,9 @@ class LimelightController(VisionEstimator):
 
     def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float, float]] | None:
         poses = []
-        # print('its trying to get pose')
         for limelight in self.limelights:
             if self.mega_tag2:
-                # print(rotation)
                 gyro_data = [
-                    # rotation,
                     math.degrees(self.gyro.get_robot_heading()),
                     math.degrees(self.gyro.get_robot_heading_rate()),
                     0,0,0,0
