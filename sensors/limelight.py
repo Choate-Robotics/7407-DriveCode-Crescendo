@@ -236,6 +236,8 @@ class Limelight:
         self.botpose_red = self.table.getNumberArray(
             botpose_red, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
+        self.get_pipeline_mode()
+        self.tid = self.table.getNumber("tid", -1)
         # self.botpose_blue = self.table.getEntry("botpose_wpiblue").getDoubleArray([0, 0, 0, 0, 0, 0])
         self.botpose_blue = self.table.getNumberArray(
             botpose_blue, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
@@ -326,7 +328,7 @@ class Limelight:
         self.update_bot_pose()
         if self.pipeline != config.LimelightPipeline.feducial:
             return False
-        elif not self.target_exists():
+        elif not self.april_tag_exists():
             return None
         else:
             botpose: list = []
@@ -391,7 +393,6 @@ class LimelightController(VisionEstimator):
             if (
                 limelight.april_tag_exists()
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
-                and limelight.get_target_pose()
                 and not limelight.cam_pos_moving
             ):
                 # print(limelight.name+' Is sending bot pose')
