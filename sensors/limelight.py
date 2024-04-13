@@ -1,13 +1,12 @@
 import math
 
-import ntcore
 from wpilib import Timer
 from wpimath.geometry import Pose3d, Rotation3d, Translation3d
 
 import config
 from toolkit.sensors.odometry import VisionEstimator
 from units.SI import meters
-
+from utils import NetworkTable
 
 class Limelight:
     """
@@ -24,9 +23,8 @@ class Limelight:
         correctly. If you only have one limelight, you can leave this as the default value.
         """
 
-        self.nt = ntcore.NetworkTableInstance.getDefault()
         self.name = name
-        self.table: ntcore.NetworkTable = self.nt.getTable(name)
+        self.table = NetworkTable(f"limelight-{self.name}")
         self.tx: float = 0
         self.ty: float = 0
         self.tv: float = 0

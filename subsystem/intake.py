@@ -3,7 +3,7 @@ import constants
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from rev import AnalogInput, CANSparkMax
-import ntcore
+from utils import NetworkTable
 
 class Intake(Subsystem):
 
@@ -155,7 +155,8 @@ class Intake(Subsystem):
         self.note_in_intake = False
 
     def periodic(self) -> None:
-        table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
+        # table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
+        table = NetworkTable('intake')
 
         table.putBoolean('note in intake', self.note_in_intake)
         table.putBoolean('note detected', self.detect_note())

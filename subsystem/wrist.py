@@ -2,14 +2,14 @@ import math
 from math import pi
 
 import config
-import ntcore
+
 import constants
 from toolkit.motors.rev_motors import SparkMax
 from toolkit.subsystem import Subsystem
 from toolkit.utils.toolkit_math import bounded_angle_diff
 from units.SI import radians
 from wpilib import DigitalInput
-
+from utils import NetworkTable
 class Wrist(Subsystem):
     def __init__(self):
         super().__init__()
@@ -35,7 +35,7 @@ class Wrist(Subsystem):
 
     def init(self):
         self.wrist_motor.init()
-        self.table = ntcore.NetworkTableInstance.getDefault().getTable('wrist')
+        self.table = NetworkTable('wrist')
         self.wrist_motor.optimize_sparkmax_absolute_encoder(30)
         # self.wrist_motor.pid_controller.setIMaxAccum(.00)
         self.wrist_abs_encoder = self.wrist_motor.abs_encoder()

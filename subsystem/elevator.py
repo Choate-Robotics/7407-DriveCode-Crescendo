@@ -3,10 +3,10 @@ import config
 import constants
 
 from units.SI import meters
-import ntcore
 from toolkit.subsystem import Subsystem
 from toolkit.motors.rev_motors import SparkMax
 import robot_states as states
+from utils import NetworkTable
 
 class Elevator(Subsystem):
 
@@ -159,7 +159,8 @@ class Elevator(Subsystem):
 
     def periodic(self) -> None:
 
-        table = ntcore.NetworkTableInstance.getDefault().getTable('elevator')
+        table = NetworkTable('elevator')
+        # table = ntcore.NetworkTableInstance.getDefault().getTable('elevator')
 
         table.putNumber('elevator height', self.get_length())
         table.putNumber('elevator abs height', self.get_elevator_abs())

@@ -3,7 +3,6 @@ import time
 from math import degrees, pi, radians  # noqa
 
 import commands2
-import ntcore
 import wpilib
 from wpilib import SmartDashboard  # noqa
 from wpimath.geometry import Pose2d, Rotation2d  # noqa
@@ -27,7 +26,7 @@ from robot_systems import (  # noqa
 )
 from toolkit.subsystem import Subsystem
 from units.SI import inches_to_meters
-from utils import CAN_delay
+from utils import CAN_delay, NetworkTableManager
 import robot_states as states
 
 
@@ -35,7 +34,7 @@ class _Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
         self.log = utils.LocalLogger("Robot")
-        self.nt = ntcore.NetworkTableInstance.getDefault()
+        self.nt = NetworkTableManager()
 
         # Updates networktables at 100hz (dont use unless graphing PID values)
         # self.nt.flush()

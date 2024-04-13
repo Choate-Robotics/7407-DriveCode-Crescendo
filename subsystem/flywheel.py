@@ -1,17 +1,12 @@
 import math
 
-import ntcore
 
 import config
 import constants
 from toolkit.motors.ctre_motors import TalonFX
 from toolkit.subsystem import Subsystem
 from units.SI import meters_per_second, radians_per_second
-
-# from wpimath.controller import LinearQuadraticRegulator_1_1
-# from wpimath.estimator import KalmanFilter_1_1_1
-# from wpimath.system import LinearSystemLoop_1_1_1
-# from wpimath.system.plant import DCMotor, LinearSystemId
+from utils import NetworkTable
 
 foc_active = False
 
@@ -20,12 +15,7 @@ class Flywheel(Subsystem):
     def __init__(self):
         super().__init__()
 
-        # self.motor_1: SparkMax = SparkMax(
-        #     can_id=config.flywheel_id_1, config=config.FLYWHEEL_CONFIG
-        # )
-        # self.motor_2: SparkMax = SparkMax(
-        #     can_id=config.flywheel_id_2, config=config.FLYWHEEL_CONFIG
-        # )
+
 
         self.motor_1: TalonFX = TalonFX(
             can_id=config.flywheel_id_1,
@@ -43,65 +33,6 @@ class Flywheel(Subsystem):
         # self.motor_1.set_average_depth()
         self.flywheel_top_target = 0
         self.flywheel_bottom_target = 0
-
-        # self.flywheel_MOI = (constants.flywheel_mass / 2) * (constants.flywheel_radius_outer ** 2)
-
-        # self.shaft_MOI = (constants.flywheel_shaft_mass / 2) * (constants.flywheel_shaft_radius ** 2)
-
-        # self.total_MOI = .001284
-
-        # self.flywheel_plant_top = LinearSystemId().flywheelSystem(
-        #     DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
-        # )
-
-        # self.flywheel_plant_bottom = LinearSystemId().flywheelSystem(
-        #     DCMotor.NEO(config.flywheel_motor_count), self.total_MOI, constants.flywheel_gear_ratio
-        # )
-
-        # self.flywheel_observer_top = KalmanFilter_1_1_1(
-        #     self.flywheel_plant_top,
-        #     [3.0],  # how accurate we think our model is
-        #     [0.01],  # how accurate we think our encoder data is
-        #     config.period
-        # )
-
-        # self.flywheel_observer_bottom = KalmanFilter_1_1_1(
-        #     self.flywheel_plant_bottom,
-        #     [3.0],  # how accurate we think our model is
-        #     [0.01],  # how accurate we think our encoder data is
-        #     config.period
-        # )
-
-        # self.flywheel_controller_top = LinearQuadraticRegulator_1_1(
-        #     self.flywheel_plant_top,
-        #     [1.5],  # velocity error tolerance
-        #     [12.0],  # control effort tolerance
-        #     config.period
-        # )
-
-        # self.flywheel_controller_bottom = LinearQuadraticRegulator_1_1(
-        #     self.flywheel_plant_bottom,
-        #     [1.5],  # velocity error tolerance
-        #     [12.0],  # control effort tolerance
-        #     config.period
-        # )
-
-        # self.flywheel_controller_top.latencyCompensate(self.flywheel_plant_top, config.period, 0.025)
-        # self.flywheel_controller_bottom.latencyCompensate(self.flywheel_plant_bottom, config.period, 0.025)
-        # self.top_flywheel_state = LinearSystemLoop_1_1_1(
-        #     self.flywheel_plant_top,
-        #     self.flywheel_controller_top,
-        #     self.flywheel_observer_top,
-        #     12.0,
-        #     config.period
-        # )
-        # self.bottom_flywheel_state = LinearSystemLoop_1_1_1(
-        #     self.flywheel_plant_bottom,
-        #     self.flywheel_controller_bottom,
-        #     self.flywheel_observer_bottom,
-        #     12.0,
-        #     config.period
-        # )
 
         self.ready_to_shoot: bool = False
         self.initialized: bool = False
@@ -145,24 +76,6 @@ class Flywheel(Subsystem):
     def init(self) -> None:
         self.motor_1.init()
         self.motor_2.init()
-
-        # self.motor_1.optimize_sparkmax_no_position()
-        # self.motor_2.optimize_sparkmax_no_position()
-
-        # self.motor_1.motor.setSmartCurrentLimit(200)
-        # self.motor_2.motor.setSmartCurrentLimit(200)
-
-        # self.motor_1.motor.setOpenLoopRampRate(0)
-        # self.motor_2.motor.setOpenLoopRampRate(0)
-        # self.motor_2.motor.burnFlash()
-        # self.motor_1.motor.burnFlash()
-
-        # self.motor_1.set_average_depth(1)
-        # self.motor_2.set_average_depth(1)
-        # self.motor_1.set_measurement_period(8)
-        # self.motor_2.set_measurement_period(8)
-
-        # self.initialized = True
 
     def note_shot(self) -> bool:
         return (
@@ -221,33 +134,6 @@ class Flywheel(Subsystem):
         else:
             return self.get_velocity(motor) * constants.flywheel_radius_outer
 
-    # def set_voltage(self, voltage: float, motor=0) -> None:
-    #     if motor == 1:
-    #         self.motor_1.pid_controller.setReference(
-    #             voltage, rev.CANSparkMax.ControlType.kVoltage
-    #         )
-    #     elif motor == 2:
-    #         self.motor_2.pid_controller.setReference(
-    #             voltage, rev.CANSparkMax.ControlType.kVoltage
-    #         )
-    #     else:
-    #         self.motor_1.pid_controller.setReference(
-    #             voltage, rev.CANSparkMax.ControlType.kVoltage
-    #         )
-    #         self.motor_2.pid_controller.setReference(
-    #             voltage, rev.CANSparkMax.ControlType.kVoltage
-    #         )
-
-    # def get_voltage(self, motor=0) -> float:
-    #     if motor == 1:
-    #         return self.motor_1.get_raw_output()
-    #     elif motor == 2:
-    #         return self.motor_2.get_raw_output()
-    #     else:
-    #         return (
-    #             self.motor_1.get_raw_output(),
-    #             self.motor_2.get_raw_output(),
-    #         )
 
     def get_current(self, motor=0) -> float:
         if motor == 1:
@@ -319,7 +205,8 @@ class Flywheel(Subsystem):
         else:
             self.ready_to_shoot = False
 
-        table = ntcore.NetworkTableInstance.getDefault().getTable("flywheel")
+        # table = ntcore.NetworkTableInstance.getDefault().getTable("flywheel")
+        table = NetworkTable("flywheel")
         table.putNumber("flywheel top velocity", self.get_velocity_linear(1))
         table.putNumber("flywheel bottom velocity", self.get_velocity_linear(2))
         table.putBoolean("ready to shoot", self.ready_to_shoot)

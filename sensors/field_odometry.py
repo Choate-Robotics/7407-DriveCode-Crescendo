@@ -1,6 +1,5 @@
 import math
 import time
-import ntcore
 import config
 from toolkit.sensors.odometry import VisionEstimator
 from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
@@ -8,6 +7,7 @@ from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translat
 from subsystem import Drivetrain
 from units.SI import seconds
 from wpilib import Timer
+from utils import NetworkTable
 
 from wpilib import RobotState
 
@@ -60,7 +60,7 @@ class FieldOdometry:
             self, drivetrain: Drivetrain, vision_estimator: VisionEstimator | None, field_width: float, field_length: float
     ):
         self.drivetrain: Drivetrain = drivetrain
-        self.table = ntcore.NetworkTableInstance.getDefault().getTable("Odometry")
+        self.table = NetworkTable('Odometry')
         self.last_update_time: seconds | None = None
         self.min_update_wait_time: seconds = (
             0.05  # time to wait before checking for pose update

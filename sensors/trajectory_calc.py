@@ -5,14 +5,15 @@
 # import ntcore
 import numpy as np
 from math import degrees, radians, isnan
-import config, ntcore
+import config
 import constants
 from sensors.field_odometry import FieldOdometry
 from subsystem import Elevator, Flywheel
 from toolkit.utils.toolkit_math import NumericalIntegration, extrapolate
-from utils import POI
+from utils import POI, NetworkTable
 from wpimath.geometry import Rotation2d, Translation3d, Translation2d, Pose2d
 from units.SI import inches_to_meters
+
 
 
 # from scipy.integrate import solve_ivp
@@ -46,7 +47,7 @@ class TrajectoryCalculator:
         self.t_total = 0
         self.elevator = elevator
         self.flywheel = flywheel
-        self.table = ntcore.NetworkTableInstance.getDefault().getTable('shot calculations')
+        self.table = NetworkTable('shot calculations')
         self.numerical_integration = NumericalIntegration()
         self.use_air_resistance = False
         self.tuning = False
