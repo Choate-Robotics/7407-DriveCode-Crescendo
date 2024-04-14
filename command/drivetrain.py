@@ -115,10 +115,12 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
             config.period
             )
+        self.feeding: bool = False
         # self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 3), radians(4 if RobotState.isAutonomous() else 4))
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
+        self.feeding = True
         self.target_calc.odometry.enable_shooting()
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
         self.theta_controller.reset()
@@ -132,6 +134,13 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
 
 
     def execute(self) -> None:
+        
+        if (
+            self.target == DriveSwerveAim.Target.speaker
+        ):
+            self.feeding = False
+        else:
+            self.feeding = True
         
         if config.drivetrain_rotation_enable_tuner:
             config.drivetrain_rotation_P = self.table.getNumber('P', config.drivetrain_rotation_P)
@@ -192,7 +201,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             return abs(pitch)
         
         if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold\
-            and robot_angle() < config.drivetrain_aiming_tilt_threshold:
+            and robot_angle() < config.drivetrain_aiming_tilt_threshold and not self.feeding:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False

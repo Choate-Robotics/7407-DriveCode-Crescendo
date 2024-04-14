@@ -80,7 +80,7 @@ class Keymap:
         # )
         
         STATIC_FEED_SHOT = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.LB
         )
         
         SET_WRIST_SUBWOOFER = commands2.button.Trigger(

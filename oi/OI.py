@@ -96,7 +96,7 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Shooter.FEED_SHOT.onTrue(
+        Keymap.Shooter.FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second()).onTrue(
             command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed_amp)
         ).onFalse(
                 commands2.WaitCommand(0.5).andThen(
@@ -111,7 +111,8 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Shooter.FEED_SHOT.and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
+        Keymap.Shooter.FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second())\
+            .and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
             command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed)
         ).onFalse(
                 commands2.WaitCommand(0.5).andThen(
@@ -128,7 +129,8 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
+        Keymap.Shooter.STATIC_FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second())\
+            .onTrue(
             command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed_static)
         ).onFalse(
                 commands2.WaitCommand(0.5).andThen(
