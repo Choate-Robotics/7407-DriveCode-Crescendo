@@ -128,7 +128,7 @@ class IT:
             and Robot.drivetrain.ready_to_shoot
             and Robot.flywheel.ready_to_shoot
             and not Robot.elevator.elevator_moving
-        ).debounce(.03).onTrue(command.Shoot(Robot.wrist))
+        ).debounce(0.0).onTrue(command.Shoot(Robot.wrist))
         # SHOOTER TRIGGERS ----------------
 
 
