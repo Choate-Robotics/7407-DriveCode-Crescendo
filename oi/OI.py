@@ -30,6 +30,7 @@ class OI:
             command.DriveSwerveCustom(Robot.drivetrain)
         )
 
+
         # Keymap.Shooter.AIM_DRIVETRAIN_RIGHT.and_(lambda: not states.flywheel_state == states.FlywheelState.amping).whileTrue(
         #     command.DriveSwerveAim(Robot.drivetrain, Field.calculations)
         # ).onFalse(
@@ -74,39 +75,73 @@ class OI:
             command.IntakeIdle(Robot.intake)
         )
         
-        Keymap.Intake.AUTO_INTAKE.onTrue(
-            command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake)
-        ).onFalse(
-            commands2.ParallelCommandGroup(
-                # command.IntakeStageIdle(Robot.wrist, Robot.intake),
-                commands2.ConditionalCommand(
-                    command.IntakeStageNote(Robot.wrist, Robot.intake).andThen(
-                        command.IntakeStageIdle(Robot.wrist, Robot.intake)),
-                    command.IntakeStageIdle(Robot.wrist, Robot.intake),
-                    lambda: Robot.intake.detect_note() or Robot.wrist.detect_note_first()
-                ),
-                command.DriveSwerveCustom(Robot.drivetrain)
-            )
-        )
+        # Keymap.Intake.AUTO_INTAKE.onTrue(
+        #     command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake)
+        # ).onFalse(
+        #     commands2.ParallelCommandGroup(
+        #         # command.IntakeStageIdle(Robot.wrist, Robot.intake),
+        #         commands2.ConditionalCommand(
+        #             command.IntakeStageNote(Robot.wrist, Robot.intake).andThen(
+        #                 command.IntakeStageIdle(Robot.wrist, Robot.intake)),
+        #             command.IntakeStageIdle(Robot.wrist, Robot.intake),
+        #             lambda: Robot.intake.detect_note() or Robot.wrist.detect_note_first()
+        #         ),
+        #         command.DriveSwerveCustom(Robot.drivetrain)
+        #     )
+        # )
         
         Keymap.Shooter.FEED_SHOT.onTrue(
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed_amp, False)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
+        
+        Keymap.Shooter.FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second()).onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed_amp)
+        ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
+        
+        
+        Keymap.Shooter.FEED_SHOT.and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
             command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)
         ).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
-        Keymap.Shooter.FEED_SHOT.onTrue(
+        Keymap.Shooter.FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second())\
+            .and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
             command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed)
         ).onFalse(
                 commands2.WaitCommand(0.5).andThen(
                 command.SetWristIdle(Robot.wrist)
                 )
             )
-        # Keymap.Intake.AUTO_INTAKE.onTrue(
-        #     command.DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
-        # ).onFalse(
-        #     command.DriveSwerveCustom(Robot.drivetrain)
-        # )
+        
+        
+        
+        
+        Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.static_feed, False)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
+        
+        Keymap.Shooter.STATIC_FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second())\
+            .onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed_static)
+        ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
+        Keymap.Intake.AUTO_INTAKE.onTrue(
+            command.DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
 
         Keymap.Elevator.ELEVATOR_HIGH.onTrue(
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)
@@ -148,9 +183,18 @@ class OI:
         def set_feeding():
             states.flywheel_state = states.FlywheelState.feeding
             
+        def set_static_feeding():
+            states.flywheel_state = states.FlywheelState.static_feeding
+            
             
         Keymap.Shooter.FEED_SHOT.onTrue(
             commands2.InstantCommand(lambda: set_feeding())
+        ).onFalse(
+            commands2.InstantCommand(lambda: set_released())
+        )
+        
+        Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
+            commands2.InstantCommand(lambda: set_static_feeding())
         ).onFalse(
             commands2.InstantCommand(lambda: set_released())
         )
@@ -159,9 +203,9 @@ class OI:
             command.SetWristIdle(Robot.wrist)
         )
 
-        Keymap.Shooter.ENABLE_AIM_WRIST.onTrue(
-            command.AimWrist(Robot.wrist, Field.calculations)
-        )
+        # Keymap.Shooter.ENABLE_AIM_WRIST.onTrue(
+        #     command.AimWrist(Robot.wrist, Field.calculations)
+        # )
 
         Keymap.Shooter.ENABLE_AIM_WRIST_OPERATOR.onTrue(
             command.AimWrist(Robot.wrist, Field.calculations)

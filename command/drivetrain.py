@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import math
 import time
@@ -101,6 +102,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
     class Target(Enum):
         speaker = 0
         feed = 1
+        static_feed = 2
+        feed_amp = 3
 
     def __init__(self, drivetrain, target_calc: TrajectoryCalculator, target: Target = Target.speaker, limit_speed: bool = True):
         super().__init__(drivetrain)
@@ -112,10 +115,13 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
             config.period
             )
+        self.feeding: bool = False
         # self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 3), radians(4 if RobotState.isAutonomous() else 4))
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
+        self.feeding = True
+        self.target_calc.odometry.enable_shooting()
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
         self.theta_controller.reset()
         if config.drivetrain_rotation_enable_tuner:
@@ -128,6 +134,13 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
 
 
     def execute(self) -> None:
+        
+        if (
+            self.target == DriveSwerveAim.Target.speaker
+        ):
+            self.feeding = False
+        else:
+            self.feeding = True
         
         if config.drivetrain_rotation_enable_tuner:
             config.drivetrain_rotation_P = self.table.getNumber('P', config.drivetrain_rotation_P)
@@ -158,10 +171,16 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.target_calc.get_bot_theta()
             if self.target == DriveSwerveAim.Target.speaker
             else self.target_calc.get_bot_theta_feed()
+            if self.target == DriveSwerveAim.Target.feed
+            else self.target_calc.get_bot_theta_static_feed()
+            if self.target == DriveSwerveAim.Target.static_feed
+            else self.target_calc.get_bot_theta_feed()
             )
         
         
-        current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians() - radians(config.drivetrain_aiming_offset)
+        # current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()
+        current = self.subsystem.get_heading().radians() - radians(180)
+        current -= radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('target angle', target_angle.radians())
@@ -179,12 +198,10 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         
         def robot_angle():
             pitch = self.subsystem.gyro.get_robot_pitch()
-            roll = self.subsystem.gyro.get_robot_roll()
-            max_angle = max(pitch, roll)
-            return max_angle
+            return abs(pitch)
         
         if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold\
-            and robot_angle() < config.drivetrain_aiming_tilt_threshold:
+            and robot_angle() < config.drivetrain_aiming_tilt_threshold and not self.feeding:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
@@ -201,6 +218,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
     def end(self, interrupted: bool) -> None:
+        self.target_calc.odometry.disable_shooting()
         self.subsystem.ready_to_shoot = False
         self.subsystem.n_front_left.set_motor_velocity(0)
         self.subsystem.n_front_right.set_motor_velocity(0)

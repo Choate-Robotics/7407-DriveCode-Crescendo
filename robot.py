@@ -137,7 +137,9 @@ class _Robot(wpilib.TimedRobot):
         # Field.odometry.disable()
 
     def robotPeriodic(self):
-        # Leds
+        
+        self.handle(Field.odometry.vision_estimator.set_orientations)
+        
         if Robot.wrist.detect_note_second():
             config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
         elif Robot.intake.detect_note() or Robot.wrist.detect_note_first():
@@ -162,6 +164,8 @@ class _Robot(wpilib.TimedRobot):
                     return 'Released'
                 case states.FlywheelState.feeding:
                     return 'Feeding'
+                case states.FlywheelState.static_feeding:
+                    return 'Static Feed'
                 case _:
                     return 'Unknown'
 
@@ -188,15 +192,17 @@ class _Robot(wpilib.TimedRobot):
 
         self.handle(self.scheduler.run)
 
-        self.handle(Sensors.limelight_back.update)
-        self.handle(Sensors.limelight_front.update)
-        self.handle(Sensors.limelight_intake.update)
+        # self.handle(Sensors.limelight_back.update_bot_pose)
+        # self.handle(Sensors.limelight_front.update_bot_pose)
+        # These already get called in the odometry update
+        
+        self.handle(Sensors.limelight_intake.update_generic)
 
         self.handle(Field.odometry.update)
 
         self.handle(Field.odometry.update_tables)
 
-        self.handle(Field.calculations.update)
+        # self.handle(Field.calculations.update)
 
         self.nt.getTable("swerve").putNumberArray(
             "abs encoders", Robot.drivetrain.get_abs()
@@ -228,15 +234,18 @@ class _Robot(wpilib.TimedRobot):
                 command.DriveSwerveCustom(Robot.drivetrain),
             )
         )
-        # self.scheduler.schedule(
-        #     command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
-        # )
-        self.scheduler.schedule(
-            commands2.ConditionalCommand(
-                command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)),
-                command.IntakeIdle(Robot.intake),
-                lambda: config.comp_bot.get()
+        
+        if not self.isSimulation():
+            self.scheduler.schedule(
+                commands2.ConditionalCommand(
+                    command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)),
+                    command.IntakeIdle(Robot.intake),
+                    lambda: config.comp_bot.get()
+                )
             )
+        else:
+            self.scheduler.schedule(
+            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
 
         if Robot.wrist.note_in_feeder():
@@ -275,7 +284,7 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def autonomousExit(self):
-        # Robot.drivetrain.gyro.reset_angle(radians(180))
+        # Robot.drivetrain.gyro.reset_angle(self.auto_selection.getSelected().initial_robot_pose.rotation().radians())
         # Robot.drivetrain.n_front_left.zero()
         # Robot.drivetrain.n_front_right.zero()
         # Robot.drivetrain.n_back_left.zero()

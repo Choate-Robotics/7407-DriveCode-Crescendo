@@ -104,6 +104,8 @@ class TalonFX(PIDMotor):
     _motor_pos: StatusSignal
 
     _motor_vel: StatusSignal
+    
+    _motor_accel: StatusSignal
 
     _motor_current: StatusSignal
 
@@ -148,6 +150,7 @@ class TalonFX(PIDMotor):
         self._config = self._motor.configurator
         self._motor_pos = self._motor.get_position()
         self._motor_vel = self._motor.get_velocity()
+        self._motor_accel = self._motor.get_acceleration()
         self._motor_current = self._motor.get_torque_current()
         if self._talon_config is not None:
             self._talon_config._apply_settings(self._motor, self._inverted)
@@ -197,6 +200,10 @@ class TalonFX(PIDMotor):
     def get_sensor_velocity(self) -> rotations_per_second:
         self._motor_vel.refresh()
         return self._motor_vel.value
+    
+    def get_sensor_acceleration(self) -> rotations_per_second_squared:
+        self._motor_accel.refresh()
+        return self._motor_accel.value
 
     def get_motor_current(self) -> float:
         self._motor_current.refresh()
@@ -213,5 +220,6 @@ class TalonFX(PIDMotor):
         """
         self._motor_pos.set_update_frequency(ms)
         self._motor_vel.set_update_frequency(ms)
+        self._motor_accel.set_update_frequency(ms)
         self._motor_current.set_update_frequency(ms)
         return self._motor.optimize_bus_utilization()

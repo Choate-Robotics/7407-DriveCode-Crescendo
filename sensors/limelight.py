@@ -6,7 +6,8 @@ from wpimath.geometry import Pose3d, Rotation3d, Translation3d
 
 import config
 from toolkit.sensors.odometry import VisionEstimator
-from units.SI import meters
+from toolkit.sensors.gyro import Pigeon2
+from units.SI import meters, degrees, degrees_per_second
 
 
 class Limelight:
@@ -14,7 +15,7 @@ class Limelight:
     A class for interfacing with the limelight camera.
     """
 
-    def __init__(self, origin_offset: Pose3d, name: str = "limelight"):
+    def __init__(self, origin_offset: Pose3d, name: str = "limelight", megatag2: bool = False):
         """
 
         :param origin_offset: The offset of the limelight from the robot's origin in meters
@@ -31,14 +32,17 @@ class Limelight:
         self.ty: float = 0
         self.tv: float = 0
         self.ta: float = 0
-        self.tid: float = -1
+        self.tid: float = -1.0
+        self.megatag2: bool = megatag2
         self.origin_offset: Pose3d = origin_offset
         self.drive_cam = False
         self.pipeline: config.LimelightPipeline = config.LimelightPipeline.feducial
         self.t_class = None
         self.force_update = False
         self.botpose_blue: list[float] = [0,0,0,0,0,0,0,0,0,0,0]
+        self.botpose_blue_l: float = 0.0
         self.botpose_red: list[float] = [0,0,0,0,0,0,0,0,0,0,0]
+        self.botpose_red_l: float = 0.0
         self.botpose: list[float] = [0,0,0,0,0,0,0,0,0,0,0]
         self.targetpose: Pose3d = Pose3d(Translation3d(0, 0, 0), Rotation3d(0, 0, 0))
         self.cam_pos_moving: bool = False
@@ -196,28 +200,86 @@ class Limelight:
 
     def update(self):
         """
-        Updates the tx, ty, and tv values of the limelight Manually.
+        Updates all values of the limelight Manually.
         For proper use, this should be called in the main event loop.
         """
 
+        self.update_generic()
+        
+        self.get_pipeline_mode()
+        self.get_neural_classId()
+        # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
+        self.update_bot_pose()
+        
+    def update_generic(self):
+        '''
+        Updates generic values from the limelight network table
+        calling this in the main event loop will only update generic values
+        '''
         self.tx = self.table.getNumber("tx", 0)
         self.ty = self.table.getNumber("ty", 0)
         self.tv = self.table.getNumber("tv", 0)
         self.ta = self.table.getNumber("ta", 0)
         self.tid = self.table.getNumber("tid", -1)
+        
+    def update_bot_pose(self):
+        '''
+        Updates botpose values from the limelight network table
+        calling this in the main event loop will only update botpose values
+        '''
+        botpose = 'botpose'
+        botpose_red = 'botpose_wpired'
+        botpose_blue = 'botpose_wpiblue'
+        if self.megatag2:
+            botpose = 'botpose_orb'
+            botpose_red = 'botpose_orb_wpired'
+            botpose_blue = 'botpose_orb_wpiblue'
+        
+        # self.botpose_red = self.table.getNumberArray(
+        #     botpose_red, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
+        # )
+        
+        botpose_red_entry = self.table.getEntry(botpose_red)
+        
+        self.botpose_red = botpose_red_entry.getDoubleArray(
+            [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
+        )
+        
+        self.botpose_red_l = (botpose_red_entry.getLastChange() / 1000000.0) - (self.botpose_red[6]/1000)
+        
+        
+        
         self.get_pipeline_mode()
-        self.get_neural_classId()
-        # self.botpose_red = self.table.getEntry("botpose_wpired").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose_red = self.table.getNumberArray(
-            "botpose_wpired", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
+        
+        botpose_blue_entry = self.table.getEntry(botpose_blue)
+        
+        self.botpose_blue = botpose_blue_entry.getDoubleArray(
+            [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
         )
-        # self.botpose_blue = self.table.getEntry("botpose_wpiblue").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose_blue = self.table.getNumberArray(
-            "botpose_wpiblue", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
-        )
+        
+        self.botpose_blue_l = (botpose_blue_entry.getLastChange() / 1000000.0) - (self.botpose_blue[6]/1000)
+        # self.botpose_blue = self.table.getNumberArray(
+        #     botpose_blue, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0]
+        # )
         # self.botpose = self.table.getEntry("botpose").getDoubleArray([0, 0, 0, 0, 0, 0])
-        self.botpose = self.table.getNumberArray("botpose", [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0])
+        self.botpose = self.table.getNumberArray(botpose, [0, 0, 0, 0, 0, 0, 0, 0, 0,0,0])
         self.targetpose = self.table.getNumberArray("botpose_targetspace", [0, 0, 0, 0, 0, 0])
+        
+    def set_robot_orientation(self, yaw: degrees, yaw_rate: degrees_per_second, pitch: degrees, pitch_rate: degrees_per_second, roll: degrees, roll_rate: degrees_per_second):
+        '''
+        Sets robot gyro orientation
+        
+        NEEDED for Megatag2
+        '''
+        array = [yaw, yaw_rate, pitch, pitch_rate, roll, roll_rate]
+        
+        # self.table.putNumberArray("robot_orientation_set", array)
+        
+        latency = self.table.getEntry('tl').getDouble(0) + self.table.getEntry('cl').getDouble(0)
+        
+        l_t = ntcore._now() + int((latency / 1000))
+        
+        self.table.getEntry('robot_orientation_set').setDoubleArray(array)
 
     def target_exists(self, force_update: bool = False):
         """
@@ -229,11 +291,10 @@ class Limelight:
         :return bool: True if a target exists, False if not
         """
 
-        if self.force_update or force_update:
-            self.update()
+        self.tv = self.table.getNumber("tv", 0)
         return self.tv > 0.0
 
-    def april_tag_exists(self, force_update: bool = False):
+    def april_tag_exists(self) -> bool:
         """
         Checks if an AprilTag exists within the limelight's field of view.
 
@@ -243,8 +304,7 @@ class Limelight:
         :return bool: True if an AprilTag exists, False if not
         """
 
-        if self.force_update or force_update:
-            self.update()
+        self.tid = self.table.getNumber("tid", -1)
         return self.tid > 0.0
 
     def get_target(self, force_update: bool = False):
@@ -272,6 +332,8 @@ class Limelight:
         force_update: bool = False,
     ):
         """
+        IF USING MEGATAG2 USE SET ORIENTATION FUNCTION EVERY CYCLE
+        
         Gets the pose of the robot relative to the field using the feducial pipeline.
         This uses the botpose values from the limelight configuration, which are relative to the alliance wall.
         To call this properly, you must set the pipeline to feducial.
@@ -286,33 +348,37 @@ class Limelight:
         :return False: if the pipeline is not set to feducial
         """
 
-        if self.force_update or force_update:
-            self.update()
-        if self.pipeline != config.LimelightPipeline.feducial:
+        
+        
+        if self.get_pipeline_mode() != config.LimelightPipeline.feducial:
             return False
-        elif not self.target_exists():
+        elif not self.april_tag_exists():
             return None
-        else:
-            botpose: list = []
 
-            if config.active_team == config.Team.RED:
-                botpose = self.botpose_red
-            elif config.active_team == config.Team.BLUE:
-                botpose = self.botpose_blue
-            else:
-                botpose = self.botpose
-            botpose = [round(i, round_to) for i in botpose]
-            pose = Pose3d(
-                Translation3d(botpose[0], botpose[1], botpose[2]),
-                Rotation3d(botpose[3], botpose[4], math.radians(botpose[5])),
-            )
-            timestamp:float = Timer.getFPGATimestamp() - (botpose[6] / 1000)
-            tag_count:float = botpose[7]
-            tag_span:float = botpose[8]
-            ave_tag_dist:float = botpose[9]
-            tag_area:float = botpose[10]
-            tag_id:float = self.get_target_id()
-            return pose, timestamp, tag_count, ave_tag_dist, tag_area, tag_id
+        self.update_bot_pose()
+        botpose: list = []
+        latency:float = 0
+
+        if config.active_team == config.Team.RED:
+            botpose = self.botpose_red
+            latency = self.botpose_red_l
+        elif config.active_team == config.Team.BLUE:
+            botpose = self.botpose_blue
+            latency = self.botpose_blue_l
+        else:
+            botpose = self.botpose
+        botpose = [round(i, round_to) for i in botpose]
+        pose = Pose3d(
+            Translation3d(botpose[0], botpose[1], botpose[2]),
+            Rotation3d(botpose[3], botpose[4], math.radians(botpose[5])),
+        )
+        timestamp:float = latency
+        tag_count:float = botpose[7]
+        tag_span:float = botpose[8]
+        ave_tag_dist:float = botpose[9]
+        tag_area:float = botpose[10]
+        tag_id:float = self.get_target_id()
+        return pose, timestamp, tag_count, ave_tag_dist, tag_area, tag_id
         
     def get_target_pose(self):
         
@@ -335,20 +401,46 @@ class Limelight:
 
 
 class LimelightController(VisionEstimator):
-    def __init__(self, limelight_list: list[Limelight]):
+    def __init__(self, limelight_list: list[Limelight], gyro: Pigeon2, mega_tag2: bool = False):
         super().__init__()
         self.limelights: list[Limelight] = limelight_list
-
-    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float, float]] | None:
-        poses = []
+        self.gyro = gyro
+        self.mega_tag2 = mega_tag2
+        
+    def set_orientations(self):
         for limelight in self.limelights:
+            if self.mega_tag2:
+
+                gyro_data = [
+                    math.degrees(self.gyro.get_robot_heading()),
+                    # fin_rotation,
+                    math.degrees(self.gyro.get_robot_heading_rate()),
+                    0,0,0,0
+                ]
+                
+                limelight.set_robot_orientation(*gyro_data)   
+
+    def get_estimated_robot_pose(self, rotation) -> list[tuple[Pose3d, float, float, float, float]] | None:
+        poses = []
+        self.set_orientations()
+        for limelight in self.limelights:
+            # if self.mega_tag2:
+
+            #     gyro_data = [
+            #         math.degrees(self.gyro.get_robot_heading()),
+            #         # fin_rotation,
+            #         math.degrees(self.gyro.get_robot_heading_rate()),
+            #         0,0,0,0
+            #     ]
+                
+            #     limelight.set_robot_orientation(*gyro_data)            
             if (
                 limelight.april_tag_exists()
+                # and abs(math.degrees(self.gyro.get_robot_heading_rate())) < 120
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
-                and limelight.get_target_pose()
                 and not limelight.cam_pos_moving
             ):
-                # print(limelight.name+' Is sending bot pose'
+                # print(limelight.name+' Is sending bot pose')
                 poses += [limelight.get_bot_pose()]
         if len(poses) > 0:
             return poses

@@ -74,6 +74,8 @@ class FieldOdometry:
         self.field_width = field_width
         self.field_length = field_length
         self.last_pose: Pose2d = Pose2d(0,0,0)
+        
+        self.shooting:bool = False
 
         self.dist_thres = 1.0
 
@@ -82,6 +84,8 @@ class FieldOdometry:
         self.std_formula = lambda x: abs(x ** 2) / 2.5
 
         self.use_speaker_tags: bool = False
+        
+        self.vision_poses: list[Pose3d] = []
 
     def enable(self):
         self.vision_on = True
@@ -95,12 +99,19 @@ class FieldOdometry:
     def disable_speaker_tags(self):
         self.use_speaker_tags = False
 
+    def enable_shooting(self):
+        self.shooting = True
+        
+    def disable_shooting(self):
+        self.shooting = False
+
     def update(self) -> Pose2d:
         """
         Updates the robot's pose relative to the field. This should be called periodically.
         """
 
         self.update_from_internal()
+        # self.vision_estimator.set_orientations()
         
         if not self.pose_within_field(self.getPose()):
             self.keep_pose_in_field()
@@ -116,14 +127,20 @@ class FieldOdometry:
         if vision_robot_pose_list is None:
             return self.getPose()
 
+        self.vision_poses = []
+
         for vision_pose in vision_robot_pose_list:
             if vision_pose is None:
                 continue
+            
+            
 
             vision_time: float
             vision_robot_pose: Pose3d
 
             vision_robot_pose, vision_time, tag_count, distance_to_target, tag_area, tag_id = vision_pose
+            
+            self.vision_poses += [vision_robot_pose]
             # vision_robot_pose, vision_time = pose_data
             # distance_to_target = target_pose.translation()
 
@@ -215,8 +232,19 @@ class FieldOdometry:
         if not self.pose_within_field(vision_pose.toPose2d()):
             return
         distance_deviation = self.getPose().translation().distance(vision_pose.toPose2d().translation())
-        std_dev = 0.5
-        std_dev_omega = abs(math.radians(7))
+        
+        
+        gyro_rate = abs(self.drivetrain.gyro.get_robot_heading_rate()) / math.radians(720)
+        
+        #std_dev_omega = abs(math.radians(120) + gyro_rate * 4000)
+        std_dev_omega = abs(math.radians(44))
+        
+        std_dev = 0.7 #+ gyro_rate
+        
+        # print(gyro_rate)
+        if tag_count == 0:
+            return
+        # std_dev_omega = 9999999
         if tag_count < 2:
             if distance_to_target > config.odometry_tag_distance_threshold:
                 return
@@ -224,20 +252,34 @@ class FieldOdometry:
                 return
             if distance_deviation > config.odometry_distance_deviation_threshold:
                 return
-            std_dev = 1.4
-            std_dev_omega = abs(math.radians(14))
+            # std_dev = 1.4
+            # std_dev_omega = abs(math.radians(14))
         if tag_count == 2:
-            std_dev = 0.7
+            std_dev = 0.5
             if distance_to_target > config.odometry_two_tag_distance_threshold:
                 return
         
+        def compensate_speaker(deviation):
+            
+            return deviation + distance_to_target / (config.odometry_two_tag_distance_threshold * 2)
+        
+        
+        using_speaker_tags = False
         if self.use_speaker_tags:
-            if config.active_team == config.Team.RED:
+            if config.active_team == config.Team.RED:   
                 if tag_id == 3 or tag_id == 4:
-                    std_dev = 0.15 if tag_count > 1 else 0.4
+                    std_dev = compensate_speaker(0.2) if tag_count > 1 else compensate_speaker(0.5)
+                    using_speaker_tags = True
             elif config.active_team == config.Team.BLUE:
                 if tag_id == 7 or tag_id == 8:
-                    std_dev = 0.15 if tag_count > 1 else 0.4
+                    std_dev = compensate_speaker(0.2) if tag_count > 1 else compensate_speaker(0.5)
+                    using_speaker_tags = True
+        if self.shooting:
+            std_dev_omega = math.radians(99999)
+            if tag_count < 2:
+                return
+            if using_speaker_tags == False and tag_count < 3:
+                std_dev = 1.5
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
@@ -248,8 +290,11 @@ class FieldOdometry:
     def get_vision_poses(self):
         vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float]] | None
         try:
+            
+            rotation = self.getPose().rotation().degrees()
+            
             vision_robot_pose_list = (
-                self.vision_estimator.get_estimated_robot_pose()
+                self.vision_estimator.get_estimated_robot_pose(rotation)
                 if self.vision_estimator
                 else None
             )
@@ -277,6 +322,21 @@ class FieldOdometry:
             
 
         return est_pose
+    
+    def send_vision_poses(self):
+        
+        vision_array = []
+        
+        for pose in self.vision_poses:
+            vision_array +=[
+                pose.X(),
+                pose.Y(),
+                pose.rotation().toRotation2d().radians()
+            ]
+            
+        self.table.putNumberArray(
+            'Vision Poses', vision_array
+        )
     
     def update_tables(self):
         
@@ -310,13 +370,15 @@ class FieldOdometry:
             speeds.omega
         ])
         
-        speeds_field = speeds.fromRobotRelativeSpeeds(speeds, self.drivetrain.get_heading())
+        self.send_vision_poses()
         
-        self.table.putNumberArray('Velocity Field', [
-            speeds_field.vx,
-            speeds_field.vy,
-            speeds_field.omega
-        ])
+        # speeds_field = speeds.fromRobotRelativeSpeeds(speeds, self.drivetrain.get_heading())
+        
+        # self.table.putNumberArray('Velocity Field', [
+        #     speeds_field.vx,
+        #     speeds_field.vy,
+        #     speeds_field.omega
+        # ])
 
         self.table.putNumber('Robot Heading Degrees', self.drivetrain.get_heading().degrees())
 
