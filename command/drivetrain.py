@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import math
 import time
@@ -101,6 +102,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
     class Target(Enum):
         speaker = 0
         feed = 1
+        static_feed = 2
+        feed_amp = 3
 
     def __init__(self, drivetrain, target_calc: TrajectoryCalculator, target: Target = Target.speaker, limit_speed: bool = True):
         super().__init__(drivetrain)
@@ -158,6 +161,10 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         target_angle = (
             self.target_calc.get_bot_theta()
             if self.target == DriveSwerveAim.Target.speaker
+            else self.target_calc.get_bot_theta_feed()
+            if self.target == DriveSwerveAim.Target.feed
+            else self.target_calc.get_bot_theta_static_feed()
+            if self.target == DriveSwerveAim.Target.static_feed
             else self.target_calc.get_bot_theta_feed()
             )
         

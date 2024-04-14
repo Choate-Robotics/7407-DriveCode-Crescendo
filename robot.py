@@ -282,7 +282,7 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def autonomousExit(self):
-        # Robot.drivetrain.gyro.reset_angle(radians(180))
+        # Robot.drivetrain.gyro.reset_angle(self.auto_selection.getSelected().initial_robot_pose.rotation().radians())
         # Robot.drivetrain.n_front_left.zero()
         # Robot.drivetrain.n_front_right.zero()
         # Robot.drivetrain.n_back_left.zero()

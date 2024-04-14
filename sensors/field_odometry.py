@@ -237,7 +237,7 @@ class FieldOdometry:
         gyro_rate = abs(self.drivetrain.gyro.get_robot_heading_rate()) / math.radians(720)
         
         #std_dev_omega = abs(math.radians(120) + gyro_rate * 4000)
-        std_dev_omega = abs(math.radians(120))
+        std_dev_omega = abs(math.radians(44))
         
         std_dev = 0.7 #+ gyro_rate
         
