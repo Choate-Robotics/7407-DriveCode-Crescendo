@@ -293,10 +293,10 @@ auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.15
-flywheel_shot_tolerance_acceleration: meters_per_second = 4.5
-flywheel_min_shot_tolerance: meters_per_second = 0.15
+flywheel_shot_tolerance_acceleration: meters_per_second = 5
+flywheel_min_shot_tolerance: meters_per_second = 0.2
 flywheel_min_shot_tolerance_distance: meters = 7
-flywheel_max_shot_tolerance: meters_per_second = 0.3
+flywheel_max_shot_tolerance: meters_per_second = 0.375
 flywheel_max_shot_tolerance_distance: meters = 4
 flywheel_shot_current_threshold = 20
 

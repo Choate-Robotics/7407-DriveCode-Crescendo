@@ -268,11 +268,11 @@ class FieldOdometry:
         if self.use_speaker_tags:
             if config.active_team == config.Team.RED:   
                 if tag_id == 3 or tag_id == 4:
-                    std_dev = compensate_speaker(0.25) if tag_count > 1 else compensate_speaker(0.5)
+                    std_dev = compensate_speaker(0.2) if tag_count > 1 else compensate_speaker(0.5)
                     using_speaker_tags = True
             elif config.active_team == config.Team.BLUE:
                 if tag_id == 7 or tag_id == 8:
-                    std_dev = compensate_speaker(0.25) if tag_count > 1 else compensate_speaker(0.5)
+                    std_dev = compensate_speaker(0.2) if tag_count > 1 else compensate_speaker(0.5)
                     using_speaker_tags = True
         if self.shooting:
             std_dev_omega = math.radians(99999)
