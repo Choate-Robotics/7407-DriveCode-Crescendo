@@ -300,7 +300,7 @@ class SwerveDrivetrain(Subsystem):
 
         angular_vel = 0 if abs(angular_vel) < self.deadzone_angular_velocity else angular_vel
 
-        self.chassis_speeds = ChassisSpeeds(dx, dy, -angular_vel)
+        self.chassis_speeds = ChassisSpeeds(dx, dy, angular_vel)
 
         new_states = self.kinematics.toSwerveModuleStates(self.chassis_speeds)
         normalized_states = self.kinematics.desaturateWheelSpeeds(new_states, self.max_vel)

@@ -179,7 +179,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         
         
         # current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()
-        current = self.subsystem.get_heading().radians() - radians(180)
+        current = self.subsystem.get_heading().radians()
         current -= radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
