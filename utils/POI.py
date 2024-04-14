@@ -337,6 +337,14 @@ class POI:
                     )
                 )
                 
+                kFeedStatic = POIPose(
+                    Pose2d(
+                        constants.FieldPos.op_wing_boundary,
+                        constants.drivetrain_length_with_bumpers/2,
+                        0
+                    )
+                )
+                
                 kFeedMidline = POIPose(
                     Pose2d(
                         6.460,
