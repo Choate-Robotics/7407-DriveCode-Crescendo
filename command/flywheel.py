@@ -5,7 +5,7 @@ from toolkit.command import SubsystemCommand
 from subsystem import Flywheel
 from sensors import TrajectoryCalculator
 from units.SI import meters_per_second
-
+import robot_states as states
 
 
 class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
@@ -74,6 +74,10 @@ class SetFlywheelShootSpeaker(SubsystemCommand[Flywheel]):
     def execute(self):
         distance = self.traj.get_distance_to_target()
         
+        tolerance = self.traj.get_flywheel_shot_tolerance(distance)
+        
+        states.flywheel_tolerance = tolerance
+        
         speed = self.traj.get_flywheel_speed(distance)
         
         self.subsystem.set_velocity_linear(speed, 1)
@@ -86,7 +90,7 @@ class SetFlywheelShootSpeaker(SubsystemCommand[Flywheel]):
         return False
     
     def end(self, interrupted: bool) -> None:
-        pass
+        states.flywheel_tolerance = config.flywheel_min_shot_tolerance
 
 
 class SetFlywheelShootFeeder(SubsystemCommand[Flywheel]):
