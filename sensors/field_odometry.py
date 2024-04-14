@@ -74,6 +74,8 @@ class FieldOdometry:
         self.field_width = field_width
         self.field_length = field_length
         self.last_pose: Pose2d = Pose2d(0,0,0)
+        
+        self.shooting:bool = False
 
         self.dist_thres = 1.0
 
@@ -96,6 +98,12 @@ class FieldOdometry:
 
     def disable_speaker_tags(self):
         self.use_speaker_tags = False
+
+    def enable_shooting(self):
+        self.shooting = True
+        
+    def disable_shooting(self):
+        self.shooting = False
 
     def update(self) -> Pose2d:
         """
@@ -228,34 +236,50 @@ class FieldOdometry:
         
         gyro_rate = abs(self.drivetrain.gyro.get_robot_heading_rate()) / math.radians(720)
         
-        std_dev_omega = abs(math.radians(120) + gyro_rate * 4000)
+        #std_dev_omega = abs(math.radians(120) + gyro_rate * 4000)
+        std_dev_omega = abs(math.radians(120))
         
-        std_dev = 0.7 + gyro_rate
+        std_dev = 0.7 #+ gyro_rate
         
         # print(gyro_rate)
-        
+        if tag_count == 0:
+            return
         # std_dev_omega = 9999999
         if tag_count < 2:
             if distance_to_target > config.odometry_tag_distance_threshold:
                 return
-        #     if tag_area < config.odometry_tag_area_threshold:
-        #         return
+            if tag_area < config.odometry_tag_area_threshold:
+                return
             if distance_deviation > config.odometry_distance_deviation_threshold:
                 return
-        #     # std_dev = 1.4
-        #     # std_dev_omega = abs(math.radians(14))
-        # if tag_count == 2:
-        #     std_dev = 0.5
-        #     if distance_to_target > config.odometry_two_tag_distance_threshold:
-        #         return
+            # std_dev = 1.4
+            # std_dev_omega = abs(math.radians(14))
+        if tag_count == 2:
+            std_dev = 0.5
+            if distance_to_target > config.odometry_two_tag_distance_threshold:
+                return
         
+        def compensate_speaker(deviation):
+            
+            return deviation + distance_to_target / (config.odometry_two_tag_distance_threshold * 2)
+        
+        
+        using_speaker_tags = False
         if self.use_speaker_tags:
-            if config.active_team == config.Team.RED:
+            if config.active_team == config.Team.RED:   
                 if tag_id == 3 or tag_id == 4:
-                    std_dev = 0.25 + gyro_rate*2 if tag_count > 1 else 0.5 + gyro_rate*2
+                    std_dev = compensate_speaker(0.25) if tag_count > 1 else compensate_speaker(0.5)
+                    using_speaker_tags = True
             elif config.active_team == config.Team.BLUE:
                 if tag_id == 7 or tag_id == 8:
-                    std_dev = 0.25 + gyro_rate*2 if tag_count > 1 else 0.5 + gyro_rate*2
+                    std_dev = compensate_speaker(0.25) if tag_count > 1 else compensate_speaker(0.5)
+                    using_speaker_tags = True
+        if self.shooting:
+            std_dev_omega = math.radians(99999)
+            if tag_count < 2:
+                return
+            if using_speaker_tags == False and tag_count < 3:
+                std_dev = 1.5
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
