@@ -7,7 +7,7 @@ import constants
 from toolkit.motors.ctre_motors import TalonFX
 from toolkit.subsystem import Subsystem
 from units.SI import meters_per_second, radians_per_second
-
+import robot_states as states
 # from wpimath.controller import LinearQuadraticRegulator_1_1
 # from wpimath.estimator import KalmanFilter_1_1_1
 # from wpimath.system import LinearSystemLoop_1_1_1
@@ -210,6 +210,17 @@ class Flywheel(Subsystem):
                 self.rps_to_angular_velocity(self.motor_1.get_sensor_velocity()),
                 self.rps_to_angular_velocity(self.motor_2.get_sensor_velocity()),
             )
+            
+    def get_acceleration(self, motor=0) -> radians_per_second:
+        if motor == 1:
+            return self.rps_to_angular_velocity(self.motor_1.get_sensor_acceleration())
+        elif motor == 2:
+            return self.rps_to_angular_velocity(self.motor_2.get_sensor_acceleration())
+        else:
+            return (
+                self.rps_to_angular_velocity(self.motor_1.get_sensor_acceleration()),
+                self.rps_to_angular_velocity(self.motor_2.get_sensor_acceleration()),
+            )
 
     def get_velocity_linear(self, motor=0) -> meters_per_second:
         if motor == 0:
@@ -220,6 +231,16 @@ class Flywheel(Subsystem):
             )
         else:
             return self.get_velocity(motor) * constants.flywheel_radius_outer
+        
+    def get_acceleration_linear(self, motor=0) -> meters_per_second:
+        if motor == 0:
+            return (
+                (self.get_acceleration(1) + self.get_acceleration(2))
+                / 2
+                * constants.flywheel_radius_outer
+            )
+        else:
+            return self.get_acceleration(motor) * constants.flywheel_radius_outer
 
     # def set_voltage(self, voltage: float, motor=0) -> None:
     #     if motor == 1:
@@ -297,6 +318,25 @@ class Flywheel(Subsystem):
             return tol(self.get_velocity_linear(1), velocity, tolerance) and tol(
                 self.get_velocity_linear(2), velocity, tolerance
             )
+            
+    def within_acceleration_linear(
+        self, accel: meters_per_second, tolerance: meters_per_second, motor=0
+    ) -> bool:
+        """
+        Returns True if the flywheel acceleration is within the tolerance of the target acceleration
+        """
+
+        def tol(vel, target, tol):
+            return abs(vel - target) < tol
+
+        if motor == 1:
+            return tol(self.get_acceleration_linear(1), accel, tolerance)
+        elif motor == 2:
+            return tol(self.get_acceleration_linear(2), accel, tolerance)
+        else:
+            return tol(self.get_acceleration_linear(1), accel, tolerance) and tol(
+                self.get_acceleration_linear(2), accel, tolerance
+            )
 
     def periodic(self):
         # # Correct the state estimate with the encoder and voltage
@@ -311,10 +351,17 @@ class Flywheel(Subsystem):
         # self.set_voltage(self.top_flywheel_state.U(0), 1)
         # self.set_voltage(self.bottom_flywheel_state.U(0), 2)
 
-        if self.within_velocity_linear(
+        if (
+            self.within_velocity_linear(
             self.angular_velocity_to_linear_velocity(self.flywheel_top_target),
-            config.flywheel_shot_tolerance,
-        ):
+            states.flywheel_tolerance,
+            )
+            and
+            self.within_acceleration_linear(
+                self.angular_velocity_to_linear_velocity(0),
+                config.flywheel_shot_tolerance_acceleration
+            )
+            ):
             self.ready_to_shoot = True
         else:
             self.ready_to_shoot = False
@@ -323,9 +370,12 @@ class Flywheel(Subsystem):
         
             table = ntcore.NetworkTableInstance.getDefault().getTable("flywheel")
             table.putNumber("flywheel top velocity", self.get_velocity_linear(1))
+            table.putNumber('flywheel top accel', self.get_acceleration_linear(1))
             table.putNumber("flywheel bottom velocity", self.get_velocity_linear(2))
+            table.putNumber('flywheel bottom accel', self.get_acceleration_linear(2))
             table.putBoolean("ready to shoot", self.ready_to_shoot)
             table.putBoolean("note shot", self.note_shot())
+            table.putNumber('flywheel tolerance', states.flywheel_tolerance)
             table.putNumber("flywheel top velocity rpm", self.motor_1.get_sensor_velocity())
             table.putNumber(
                 "flywheel top target",
