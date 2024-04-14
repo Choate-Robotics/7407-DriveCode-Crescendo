@@ -164,6 +164,8 @@ class _Robot(wpilib.TimedRobot):
                     return 'Released'
                 case states.FlywheelState.feeding:
                     return 'Feeding'
+                case states.FlywheelState.static_feeding:
+                    return 'Static Feed'
                 case _:
                     return 'Unknown'
 

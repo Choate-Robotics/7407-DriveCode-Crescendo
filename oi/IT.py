@@ -73,15 +73,18 @@ class IT:
     
         button.Trigger(
             lambda: Robot.wrist.note_in_feeder()\
-                and not robot_states.flywheel_state == robot_states.FlywheelState.amping
+                and not robot_states.flywheel_state == robot_states.FlywheelState.amping\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.static_feeding
         ).onTrue(
             InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.shooting))
         )
         
         button.Trigger(
             lambda: not Robot.wrist.note_in_feeder()\
-                and not robot_states.flywheel_state == robot_states.FlywheelState.amping
-                and not robot_states.flywheel_state == robot_states.FlywheelState.feeding
+                and not robot_states.flywheel_state == robot_states.FlywheelState.amping\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.static_feeding
         ).onTrue(
             InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.idle))
         )
@@ -122,12 +125,20 @@ class IT:
             .onTrue(
                 command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations, command.SetFlywheelShootFeeder.Style.static)
             )
+            
+        def set_idle():
+            robot_states.flywheel_state = robot_states.FlywheelState.idle
 
         button.Trigger(
             lambda: robot_states.flywheel_state == robot_states.FlywheelState.idle
+                # or robot_states.flywheel_state == robot_states.FlywheelState.released
             ).debounce(1).onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+                ParallelCommandGroup(
+                    InstantCommand(set_idle),
+                    command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+                )
             )
+            
             
     #     #FLYWHEEL TRIGGERS ----------------
         

@@ -137,11 +137,11 @@ class OI:
                 command.SetWristIdle(Robot.wrist)
                 )
             )
-        # Keymap.Intake.AUTO_INTAKE.onTrue(
-        #     command.DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
-        # ).onFalse(
-        #     command.DriveSwerveCustom(Robot.drivetrain)
-        # )
+        Keymap.Intake.AUTO_INTAKE.onTrue(
+            command.DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
 
         Keymap.Elevator.ELEVATOR_HIGH.onTrue(
             command.SetElevator(Robot.elevator, config.Giraffe.kElevatorHigh.height)
@@ -194,9 +194,9 @@ class OI:
         )
         
         Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
-            commands2.InstantCommand(set_static_feeding)
+            commands2.InstantCommand(lambda: set_static_feeding())
         ).onFalse(
-            commands2.InstantCommand(set_released)
+            commands2.InstantCommand(lambda: set_released())
         )
 
         Keymap.Shooter.SET_WRIST_SUBWOOFER.onTrue(
