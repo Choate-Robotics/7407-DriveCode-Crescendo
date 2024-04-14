@@ -11,7 +11,7 @@ from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGr
 import command
 import config
 import robot_states
-from oi.keymap import Controllers
+from oi.keymap import Controllers, Keymap
 from robot_systems import Field, Robot, Sensors
 
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
@@ -101,10 +101,26 @@ class IT:
             )
             
         button.Trigger(
-            lambda: robot_states.flywheel_state == robot_states.FlywheelState.feeding
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and not Keymap.Shooter.FEED_MIDLINE.getAsBoolean()
+            )\
+            .onTrue(
+                command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations, command.SetFlywheelShootFeeder.Style.dynamic_amp)
+            )
+            
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and Keymap.Shooter.FEED_MIDLINE.getAsBoolean()
             )\
             .onTrue(
                 command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations)
+            )
+            
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.static_feeding
+            )\
+            .onTrue(
+                command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations, command.SetFlywheelShootFeeder.Style.static)
             )
 
         button.Trigger(

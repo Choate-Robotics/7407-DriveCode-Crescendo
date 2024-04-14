@@ -1,3 +1,4 @@
+from __future__ import annotations
 import utils
 import constants, config
 
@@ -6,7 +7,7 @@ from subsystem import Flywheel
 from sensors import TrajectoryCalculator
 from units.SI import meters_per_second
 import robot_states as states
-
+from enum import Enum
 
 class SetFlywheelLinearVelocity(SubsystemCommand[Flywheel]):
     """
@@ -95,10 +96,17 @@ class SetFlywheelShootSpeaker(SubsystemCommand[Flywheel]):
 
 class SetFlywheelShootFeeder(SubsystemCommand[Flywheel]):
     
-    def __init__(self, subsystem: Flywheel, trajectory: TrajectoryCalculator):
+    class Style(Enum):
+        
+        dynamic = 0
+        static = 1
+        dynamic_amp = 2
+    
+    def __init__(self, subsystem: Flywheel, trajectory: TrajectoryCalculator,style:Style=Style.dynamic):
         super().__init__(subsystem)
         self.subsystem = subsystem
         self.traj = trajectory
+        self.style = style
         
     def initialize(self):
         self.subsystem.set_velocity_linear(config.flywheel_feed_speed_min, 1)
@@ -106,7 +114,13 @@ class SetFlywheelShootFeeder(SubsystemCommand[Flywheel]):
         
     
     def execute(self):
-        distance = self.traj.get_distance_to_feed_zone()
+        distance = (
+            self.traj.get_distance_to_feed_zone()
+            if self.style == SetFlywheelShootFeeder.Style.dynamic
+            else self.traj.get_distance_to_feed_zone_static(True)
+            if self.style == SetFlywheelShootFeeder.Style.static
+            else self.traj.get_distance_to_feed_zone(force_amp=True)
+            )
         
         speed = self.traj.get_flywheel_speed_feed(distance)
         

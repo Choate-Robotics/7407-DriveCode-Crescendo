@@ -91,13 +91,45 @@ class OI:
         # )
         
         Keymap.Shooter.FEED_SHOT.onTrue(
-            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed_amp, False)
         ).onFalse(
             command.DriveSwerveCustom(Robot.drivetrain)
         )
         
         Keymap.Shooter.FEED_SHOT.onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed_amp)
+        ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
+        
+        
+        Keymap.Shooter.FEED_SHOT.and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
+        
+        Keymap.Shooter.FEED_SHOT.and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
             command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed)
+        ).onFalse(
+                commands2.WaitCommand(0.5).andThen(
+                command.SetWristIdle(Robot.wrist)
+                )
+            )
+        
+        
+        
+        
+        Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
+            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.static_feed, False)
+        ).onFalse(
+            command.DriveSwerveCustom(Robot.drivetrain)
+        )
+        
+        Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
+            command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed_static)
         ).onFalse(
                 commands2.WaitCommand(0.5).andThen(
                 command.SetWristIdle(Robot.wrist)
@@ -149,20 +181,29 @@ class OI:
         def set_feeding():
             states.flywheel_state = states.FlywheelState.feeding
             
+        def set_static_feeding():
+            states.flywheel_state = states.FlywheelState.static_feeding
+            
             
         Keymap.Shooter.FEED_SHOT.onTrue(
             commands2.InstantCommand(lambda: set_feeding())
         ).onFalse(
             commands2.InstantCommand(lambda: set_released())
         )
+        
+        Keymap.Shooter.STATIC_FEED_SHOT.onTrue(
+            commands2.InstantCommand(set_static_feeding)
+        ).onFalse(
+            commands2.InstantCommand(set_released)
+        )
 
         Keymap.Shooter.SET_WRIST_SUBWOOFER.onTrue(
             command.SetWristIdle(Robot.wrist)
         )
 
-        Keymap.Shooter.ENABLE_AIM_WRIST.onTrue(
-            command.AimWrist(Robot.wrist, Field.calculations)
-        )
+        # Keymap.Shooter.ENABLE_AIM_WRIST.onTrue(
+        #     command.AimWrist(Robot.wrist, Field.calculations)
+        # )
 
         Keymap.Shooter.ENABLE_AIM_WRIST_OPERATOR.onTrue(
             command.AimWrist(Robot.wrist, Field.calculations)

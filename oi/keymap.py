@@ -51,13 +51,13 @@ class Keymap:
             Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.X
         )
     class Intake:
-        # INTAKE_IN = commands2.button.Trigger(
-        #     lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.4
-        # )
-        
         INTAKE_IN = commands2.button.Trigger(
-            lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
+            lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.4
         )
+        
+        # INTAKE_IN = commands2.button.Trigger(
+        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
+        # )
         
         
         INTAKE_OUT = commands2.button.Trigger(
@@ -79,7 +79,7 @@ class Keymap:
         #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
         # )
         
-        ENABLE_AIM_WRIST = commands2.button.JoystickButton(
+        STATIC_FEED_SHOT = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
         )
         
@@ -102,6 +102,11 @@ class Keymap:
         FEED_SHOT = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
         )
+        
+        FEED_MIDLINE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+        
         
         
     class Feeder:

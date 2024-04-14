@@ -57,7 +57,9 @@ class TrajectoryCalculator:
         self.feed_zone = POI.Coordinates.Structures.Scoring.kFeed.getTranslation()
         self.feed_zone_z = POI.Coordinates.Structures.Scoring.kFeed.getZ()
         self.feed_zone_midline = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
-        self.feed_zone_midline_z = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
+        self.feed_zone_midline_z = POI.Coordinates.Structures.Scoring.kFeedMidline.getZ()
+        self.feed_static = POI.Coordinates.Structures.Scoring.kFeedStatic.getTranslation()
+        self.feed_static_z = POI.Coordinates.Structures.Scoring.kFeedStatic.getZ()
         if self.tuning:
             self.table.putNumber('flywheel distance scalar', config.flywheel_distance_scalar)
             self.table.putNumber('flywheel minimum value', config.v0_flywheel_minimum)
@@ -252,19 +254,22 @@ class TrajectoryCalculator:
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
     
-    def get_rotation_to_feed_zone(self):
+    def get_rotation_to_feed_zone(self, pose:Pose2d=None, force_amp:bool=False):
         """
         returns rotation of base to face target
         :return: base target angle
         """
         
-        pose_x = self.odometry.getPose().X()
         feed_location = POI.Coordinates.Structures.Scoring.kFeed.getTranslation()
-        if pose_x > constants.FieldPos.op_wing_boundary:
-            feed_location = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
+        
+        robot_pose_2d = self.odometry.getPose() if pose == None else pose
+        pose_x = robot_pose_2d.X()
+        if not force_amp:
+            if pose_x > constants.FieldPos.op_wing_boundary:
+                feed_location = POI.Coordinates.Structures.Scoring.kFeedMidline.getTranslation()
         
         speaker_translation:Translation2d = feed_location
-        robot_pose_2d = self.odometry.getPose()
+        
         robot_to_speaker = speaker_translation - robot_pose_2d.translation()
         return robot_to_speaker.angle()
     
@@ -378,11 +383,21 @@ class TrajectoryCalculator:
         self.shoot_angle = self.calculate_angle_no_air(self.get_distance_to_target(), self.get_delta_z())
         return self.shoot_angle + radians(config.shot_angle_offset)
 
-    def get_feed_theta(self) -> radians:
+    def get_feed_theta(self, force_amp: bool = False) -> radians:
         """
         Returns the angle of the trajectory.
         """
-        self.feed_angle = self.calculate_angle_feed_zone(self.get_distance_to_feed_zone(), self.get_shooter_height())
+        self.feed_angle = self.calculate_angle_feed_zone(self.get_distance_to_feed_zone(force_amp=force_amp), self.get_shooter_height())
+        return self.feed_angle
+    
+    def get_static_feed_theta(self) -> radians:
+        """
+        Returns the angle of the trajectory.
+        """
+        
+        static_pose = POI.Coordinates.Structures.Scoring.kFeedStatic.get()
+        
+        self.feed_angle = self.calculate_angle_feed_zone(self.get_distance_to_feed_zone(static_pose, True), self.get_shooter_height())
         return self.feed_angle
 
     def get_bot_theta(self) -> Rotation2d:
@@ -399,6 +414,15 @@ class TrajectoryCalculator:
         self.feed_rotation2d = self.get_rotation_to_feed_zone()
         return self.feed_rotation2d
     
+    def get_bot_theta_static_feed(self) -> Rotation2d:
+        """
+        Returns the angle of the Robot
+        """
+        
+        static_pose = POI.Coordinates.Structures.Scoring.kFeedStatic.get()
+        
+        return self.get_rotation_to_feed_zone(static_pose, True)
+    
     def get_distance_to_target(self) -> float:
         
         if type(self.speaker) == Translation3d:
@@ -409,7 +433,7 @@ class TrajectoryCalculator:
         )
         return self.distance_to_target
     
-    def get_distance_to_feed_zone(self) -> float:
+    def get_distance_to_feed_zone(self, pose:Pose2d=None, force_amp:bool=False) -> float:
         
         if type(self.feed_zone) == Translation3d:
             self.feed_zone = self.feed_zone.toTranslation2d()
@@ -420,16 +444,25 @@ class TrajectoryCalculator:
         
         active_feed_zone = self.feed_zone
         
-        pose_x = self.odometry.getPose().X()
+        if not force_amp:
+            pose_x = self.odometry.getPose().X()
+            
+            if pose_x > constants.FieldPos.op_wing_boundary:
+                active_feed_zone = self.feed_zone_midline
         
-        if pose_x > constants.FieldPos.op_wing_boundary:
-            active_feed_zone = self.feed_zone_midline
+        est_pose = self.odometry.getPose() if pose == None else pose
         
         self.distance_to_feed_zone = (
-            self.odometry.getPose().translation().distance(active_feed_zone) - constants.shooter_offset_y
+            est_pose.translation().distance(active_feed_zone) - constants.shooter_offset_y
         )
         
         return self.distance_to_feed_zone
+    
+    def get_distance_to_feed_zone_static(self, force_amp) -> float:
+        
+        static_pose = POI.Coordinates.Structures.Scoring.kFeedStatic.get()
+        
+        return self.get_distance_to_feed_zone(static_pose, force_amp)
     
     def get_delta_z(self) -> float:
         

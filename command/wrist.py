@@ -113,6 +113,8 @@ class AimWrist(SubsystemCommand[Wrist]):
         
         speaker = 0
         feed = 1
+        feed_static = 2
+        feed_amp = 3
 
     def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator, target: Target = Target.speaker):
         super().__init__(subsystem)
@@ -128,6 +130,10 @@ class AimWrist(SubsystemCommand[Wrist]):
             self.traj_calc.get_theta()
             if self.target == AimWrist.Target.speaker
             else self.traj_calc.get_feed_theta()
+            if self.target == AimWrist.Target.feed
+            else self.traj_calc.get_static_feed_theta()
+            if self.target == AimWrist.Target.feed_static
+            else self.traj_calc.get_feed_theta(True)
         )
 
         self.subsystem.aim_wrist(angle)
