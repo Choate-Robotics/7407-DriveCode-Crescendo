@@ -157,6 +157,15 @@ class TrajectoryCalculator:
         
         return  min(config.v0_flywheel_minimum + distance_to_target * config.flywheel_distance_scalar, config.v0_flywheel_maximum)
 
+    def get_flywheel_shot_tolerance(self, distance_to_target:float) -> float:
+        
+        slope = (config.flywheel_min_shot_tolerance - config.flywheel_max_shot_tolerance) / (config.flywheel_min_shot_tolerance_distance - config.flywheel_max_shot_tolerance_distance)
+        if distance_to_target < config.flywheel_max_shot_tolerance_distance:
+            return config.flywheel_max_shot_tolerance
+        if distance_to_target > config.flywheel_min_shot_tolerance_distance:
+            return config.flywheel_min_shot_tolerance
+        return distance_to_target * slope + config.flywheel_max_shot_tolerance
+
     def get_height_offset(self, distance_to_target: float) -> float:
         if self.tuning:
             config.shot_height_offset_scalar = self.table.getNumber('height offset scalar', config.shot_height_offset_scalar)
