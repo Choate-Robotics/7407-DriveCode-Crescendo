@@ -243,9 +243,9 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-drivetrain_rotation_P: float = 4
+drivetrain_rotation_P: float = 5
 drivetrain_rotation_I: float = 0.0
-drivetrain_rotation_D: float = 0.1
+drivetrain_rotation_D: float = 0.0
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
 
@@ -293,6 +293,11 @@ auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.15
+flywheel_shot_tolerance_acceleration: meters_per_second = 2.8
+flywheel_min_shot_tolerance: meters_per_second = 0.15
+flywheel_min_shot_tolerance_distance: meters = 7
+flywheel_max_shot_tolerance: meters_per_second = 0.3
+flywheel_max_shot_tolerance_distance: meters = 4
 flywheel_shot_current_threshold = 20
 
 
@@ -367,7 +372,7 @@ DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBr
 #     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
 # )
 FLYWHEEL_CONFIG = TalonConfig(
-    0.365, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
+    0.315, 0, 0.0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
 
 
