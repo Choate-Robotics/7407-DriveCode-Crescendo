@@ -116,6 +116,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
 
     def initialize(self) -> None:
+        self.target_calc.odometry.enable_shooting()
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
         self.theta_controller.reset()
         if config.drivetrain_rotation_enable_tuner:
@@ -161,7 +162,9 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             )
         
         
-        current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians() - radians(config.drivetrain_aiming_offset)
+        # current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()
+        current = self.subsystem.get_heading().radians() - radians(180)
+        current -= radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
             self.table.putNumber('target angle', target_angle.radians())
@@ -199,6 +202,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
     def end(self, interrupted: bool) -> None:
+        self.target_calc.odometry.disable_shooting()
         self.subsystem.ready_to_shoot = False
         self.subsystem.n_front_left.set_motor_velocity(0)
         self.subsystem.n_front_right.set_motor_velocity(0)
