@@ -378,20 +378,37 @@ class LimelightController(VisionEstimator):
         self.limelights: list[Limelight] = limelight_list
         self.gyro = gyro
         self.mega_tag2 = mega_tag2
-
-    def get_estimated_robot_pose(self) -> list[tuple[Pose3d, float, float, float, float]] | None:
-        poses = []
+        
+    def set_orientations(self):
         for limelight in self.limelights:
             if self.mega_tag2:
+
                 gyro_data = [
                     math.degrees(self.gyro.get_robot_heading()),
+                    # fin_rotation,
                     math.degrees(self.gyro.get_robot_heading_rate()),
                     0,0,0,0
                 ]
                 
-                limelight.set_robot_orientation(*gyro_data)            
+                limelight.set_robot_orientation(*gyro_data)   
+
+    def get_estimated_robot_pose(self, rotation) -> list[tuple[Pose3d, float, float, float, float]] | None:
+        poses = []
+        # self.set_orientations()
+        for limelight in self.limelights:
+            # if self.mega_tag2:
+
+            #     gyro_data = [
+            #         math.degrees(self.gyro.get_robot_heading()),
+            #         # fin_rotation,
+            #         math.degrees(self.gyro.get_robot_heading_rate()),
+            #         0,0,0,0
+            #     ]
+                
+            #     limelight.set_robot_orientation(*gyro_data)            
             if (
                 limelight.april_tag_exists()
+                and abs(math.degrees(self.gyro.get_robot_heading_rate())) < 120
                 and limelight.get_pipeline_mode() == config.LimelightPipeline.feducial
                 and not limelight.cam_pos_moving
             ):

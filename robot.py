@@ -137,7 +137,9 @@ class _Robot(wpilib.TimedRobot):
         # Field.odometry.disable()
 
     def robotPeriodic(self):
-        # Leds
+        
+        self.handle(Field.odometry.vision_estimator.set_orientations)
+        
         if Robot.wrist.detect_note_second():
             config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
         elif Robot.intake.detect_note() or Robot.wrist.detect_note_first():
@@ -198,7 +200,7 @@ class _Robot(wpilib.TimedRobot):
 
         self.handle(Field.odometry.update_tables)
 
-        self.handle(Field.calculations.update)
+        # self.handle(Field.calculations.update)
 
         self.nt.getTable("swerve").putNumberArray(
             "abs encoders", Robot.drivetrain.get_abs()
@@ -230,15 +232,18 @@ class _Robot(wpilib.TimedRobot):
                 command.DriveSwerveCustom(Robot.drivetrain),
             )
         )
-        # self.scheduler.schedule(
-        #     command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
-        # )
-        self.scheduler.schedule(
-            commands2.ConditionalCommand(
-                command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)),
-                command.IntakeIdle(Robot.intake),
-                lambda: config.comp_bot.get()
+        
+        if not self.isSimulation():
+            self.scheduler.schedule(
+                commands2.ConditionalCommand(
+                    command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)),
+                    command.IntakeIdle(Robot.intake),
+                    lambda: config.comp_bot.get()
+                )
             )
+        else:
+            self.scheduler.schedule(
+            command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
 
         if Robot.wrist.note_in_feeder():

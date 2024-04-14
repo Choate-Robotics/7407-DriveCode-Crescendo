@@ -319,20 +319,22 @@ class Flywheel(Subsystem):
         else:
             self.ready_to_shoot = False
 
-        table = ntcore.NetworkTableInstance.getDefault().getTable("flywheel")
-        table.putNumber("flywheel top velocity", self.get_velocity_linear(1))
-        table.putNumber("flywheel bottom velocity", self.get_velocity_linear(2))
-        table.putBoolean("ready to shoot", self.ready_to_shoot)
-        table.putBoolean("note shot", self.note_shot())
-        table.putNumber("flywheel top velocity rpm", self.motor_1.get_sensor_velocity())
-        table.putNumber(
-            "flywheel top target",
-            self.angular_velocity_to_linear_velocity(self.flywheel_top_target),
-        )
-        table.putNumber(
-            "flywheel bottom target",
-            self.angular_velocity_to_linear_velocity(self.flywheel_bottom_target),
-        )
+        if config.NT_FLYWHEEL:
+        
+            table = ntcore.NetworkTableInstance.getDefault().getTable("flywheel")
+            table.putNumber("flywheel top velocity", self.get_velocity_linear(1))
+            table.putNumber("flywheel bottom velocity", self.get_velocity_linear(2))
+            table.putBoolean("ready to shoot", self.ready_to_shoot)
+            table.putBoolean("note shot", self.note_shot())
+            table.putNumber("flywheel top velocity rpm", self.motor_1.get_sensor_velocity())
+            table.putNumber(
+                "flywheel top target",
+                self.angular_velocity_to_linear_velocity(self.flywheel_top_target),
+            )
+            table.putNumber(
+                "flywheel bottom target",
+                self.angular_velocity_to_linear_velocity(self.flywheel_bottom_target),
+            )
         # table.putNumber("flywheel top voltage", self.get_voltage(1))
         # table.putNumber("flywheel bottom voltage", self.get_voltage(2))
         # table.putNumber("flywheel top current", self.get_current(1))

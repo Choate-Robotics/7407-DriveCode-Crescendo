@@ -49,6 +49,11 @@ LOG_FILE_LEVEL: int = 1
 
 period: float = 0.04  # seconds
 
+NT_ELEVATOR: bool = False
+NT_WRIST: bool = True
+NT_FLYWHEEL: bool = True
+NT_INTAKE: bool = False
+
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
 elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
@@ -252,7 +257,7 @@ drivetrain_max_accel_auto: float = 4
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
-drivetrain_aiming_tilt_threshold: radians = 5 * degrees_to_radians
+drivetrain_aiming_tilt_threshold: radians = 3 * degrees_to_radians
 shot_height_offset: inches = 0 # inches
 shot_angle_offset: degrees = 0.7
 wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
@@ -287,7 +292,7 @@ auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = 0.25
+flywheel_shot_tolerance: meters_per_second = 0.15
 flywheel_shot_current_threshold = 20
 
 
@@ -295,9 +300,9 @@ flywheel_shot_current_threshold = 20
 odometry_visible_tags_threshold = 2
 odometry_tag_area_threshold = 0
 odometry_vision_deviation_threshold = 0.5
-odometry_tag_distance_threshold: meters = 4
-odometry_two_tag_distance_threshold = 7
-odometry_distance_deviation_threshold: meters = 0.5
+odometry_tag_distance_threshold: meters = 3
+odometry_two_tag_distance_threshold = 8
+odometry_distance_deviation_threshold: meters = 0.3
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
 odometry_crash_detection_enabled:bool = False
@@ -362,7 +367,7 @@ DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBr
 #     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
 # )
 FLYWHEEL_CONFIG = TalonConfig(
-    0.3, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
+    0.365, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
 
 

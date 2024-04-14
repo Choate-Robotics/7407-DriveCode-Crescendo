@@ -318,9 +318,9 @@ class TrajectoryCalculator:
         :return: base target angle
         """
 
-        self.update_shooter()
-        self.update_base()
-        self.update_tables()
+        # self.update_shooter()
+        # self.update_base()
+        # self.update_tables()
 
     def update_tables(self):
         self.table.putNumber('wrist angle', degrees(self.get_theta()))
@@ -365,34 +365,75 @@ class TrajectoryCalculator:
         """    
         if self.tuning:
             config.shot_angle_offset = self.table.getNumber('shot angle offset', config.shot_angle_offset)
-
+        
+        self.shoot_angle = self.calculate_angle_no_air(self.get_distance_to_target(), self.get_delta_z())
         return self.shoot_angle + radians(config.shot_angle_offset)
 
     def get_feed_theta(self) -> radians:
         """
         Returns the angle of the trajectory.
         """
+        self.feed_angle = self.calculate_angle_feed_zone(self.get_distance_to_feed_zone(), self.get_shooter_height())
         return self.feed_angle
 
     def get_bot_theta(self) -> Rotation2d:
         """
         Returns the angle of the Robot
         """
+        self.base_rotation2d = self.get_rotation_to_speaker()
         return self.base_rotation2d
     
     def get_bot_theta_feed(self) -> Rotation2d:
         """
         Returns the angle of the Robot
         """
+        self.feed_rotation2d = self.get_rotation_to_feed_zone()
         return self.feed_rotation2d
     
     def get_distance_to_target(self) -> float:
         
+        if type(self.speaker) == Translation3d:
+            self.speaker = self.speaker.toTranslation2d()
+        
+        self.distance_to_target = (
+            self.odometry.getPose().translation().distance(self.speaker) - constants.shooter_offset_y
+        )
         return self.distance_to_target
     
     def get_distance_to_feed_zone(self) -> float:
         
+        if type(self.feed_zone) == Translation3d:
+            self.feed_zone = self.feed_zone.toTranslation2d()
+            
+        if type(self.feed_zone_midline) == Translation3d:
+            self.feed_zone_midline = self.feed_zone.toTranslation2d()
+
+        
+        active_feed_zone = self.feed_zone
+        
+        pose_x = self.odometry.getPose().X()
+        
+        if pose_x > constants.FieldPos.op_wing_boundary:
+            active_feed_zone = self.feed_zone_midline
+        
+        self.distance_to_feed_zone = (
+            self.odometry.getPose().translation().distance(active_feed_zone) - constants.shooter_offset_y
+        )
+        
         return self.distance_to_feed_zone
+    
+    def get_delta_z(self) -> float:
+        
+        self.delta_z = (
+                self.speaker_z - self.elevator.get_length() - constants.shooter_height 
+        )
+        
+        if self.tuning:
+            config.shot_height_offset = self.table.getNumber('shot height offset', config.shot_height_offset)
+            
+        self.delta_z += (config.shot_height_offset * inches_to_meters) + self.get_height_offset(self.distance_to_target)
+        
+        return self.delta_z
 
     def deriv(self, t, u):
         x, xdot, z, zdot = u

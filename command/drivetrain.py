@@ -179,9 +179,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         
         def robot_angle():
             pitch = self.subsystem.gyro.get_robot_pitch()
-            roll = self.subsystem.gyro.get_robot_roll()
-            max_angle = max(pitch, roll)
-            return max_angle
+            return abs(pitch)
         
         if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold\
             and robot_angle() < config.drivetrain_aiming_tilt_threshold:

@@ -103,6 +103,7 @@ class FieldOdometry:
         """
 
         self.update_from_internal()
+        # self.vision_estimator.set_orientations()
         
         if not self.pose_within_field(self.getPose()):
             self.keep_pose_in_field()
@@ -223,29 +224,38 @@ class FieldOdometry:
         if not self.pose_within_field(vision_pose.toPose2d()):
             return
         distance_deviation = self.getPose().translation().distance(vision_pose.toPose2d().translation())
-        std_dev = 0.5
-        std_dev_omega = abs(math.radians(7))
+        
+        
+        gyro_rate = abs(self.drivetrain.gyro.get_robot_heading_rate()) / math.radians(720)
+        
+        std_dev_omega = abs(math.radians(120) + gyro_rate * 4000)
+        
+        std_dev = 0.7 + gyro_rate
+        
+        # print(gyro_rate)
+        
+        # std_dev_omega = 9999999
         if tag_count < 2:
             if distance_to_target > config.odometry_tag_distance_threshold:
                 return
-            if tag_area < config.odometry_tag_area_threshold:
-                return
+        #     if tag_area < config.odometry_tag_area_threshold:
+        #         return
             if distance_deviation > config.odometry_distance_deviation_threshold:
                 return
-            std_dev = 1.4
-            std_dev_omega = abs(math.radians(14))
-        if tag_count == 2:
-            std_dev = 0.7
-            if distance_to_target > config.odometry_two_tag_distance_threshold:
-                return
+        #     # std_dev = 1.4
+        #     # std_dev_omega = abs(math.radians(14))
+        # if tag_count == 2:
+        #     std_dev = 0.5
+        #     if distance_to_target > config.odometry_two_tag_distance_threshold:
+        #         return
         
         if self.use_speaker_tags:
             if config.active_team == config.Team.RED:
                 if tag_id == 3 or tag_id == 4:
-                    std_dev = 0.15 if tag_count > 1 else 0.4
+                    std_dev = 0.25 + gyro_rate*2 if tag_count > 1 else 0.5 + gyro_rate*2
             elif config.active_team == config.Team.BLUE:
                 if tag_id == 7 or tag_id == 8:
-                    std_dev = 0.15 if tag_count > 1 else 0.4
+                    std_dev = 0.25 + gyro_rate*2 if tag_count > 1 else 0.5 + gyro_rate*2
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
@@ -257,8 +267,10 @@ class FieldOdometry:
         vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float]] | None
         try:
             
+            rotation = self.getPose().rotation().degrees()
+            
             vision_robot_pose_list = (
-                self.vision_estimator.get_estimated_robot_pose()
+                self.vision_estimator.get_estimated_robot_pose(rotation)
                 if self.vision_estimator
                 else None
             )

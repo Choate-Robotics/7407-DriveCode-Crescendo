@@ -74,20 +74,20 @@ class OI:
             command.IntakeIdle(Robot.intake)
         )
         
-        Keymap.Intake.AUTO_INTAKE.onTrue(
-            command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake)
-        ).onFalse(
-            commands2.ParallelCommandGroup(
-                # command.IntakeStageIdle(Robot.wrist, Robot.intake),
-                commands2.ConditionalCommand(
-                    command.IntakeStageNote(Robot.wrist, Robot.intake).andThen(
-                        command.IntakeStageIdle(Robot.wrist, Robot.intake)),
-                    command.IntakeStageIdle(Robot.wrist, Robot.intake),
-                    lambda: Robot.intake.detect_note() or Robot.wrist.detect_note_first()
-                ),
-                command.DriveSwerveCustom(Robot.drivetrain)
-            )
-        )
+        # Keymap.Intake.AUTO_INTAKE.onTrue(
+        #     command.AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake)
+        # ).onFalse(
+        #     commands2.ParallelCommandGroup(
+        #         # command.IntakeStageIdle(Robot.wrist, Robot.intake),
+        #         commands2.ConditionalCommand(
+        #             command.IntakeStageNote(Robot.wrist, Robot.intake).andThen(
+        #                 command.IntakeStageIdle(Robot.wrist, Robot.intake)),
+        #             command.IntakeStageIdle(Robot.wrist, Robot.intake),
+        #             lambda: Robot.intake.detect_note() or Robot.wrist.detect_note_first()
+        #         ),
+        #         command.DriveSwerveCustom(Robot.drivetrain)
+        #     )
+        # )
         
         Keymap.Shooter.FEED_SHOT.onTrue(
             command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)

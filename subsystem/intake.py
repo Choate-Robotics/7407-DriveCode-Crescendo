@@ -155,13 +155,14 @@ class Intake(Subsystem):
         self.note_in_intake = False
 
     def periodic(self) -> None:
-        table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
+        if config.NT_INTAKE:
+            table = ntcore.NetworkTableInstance.getDefault().getTable('intake')
 
-        table.putBoolean('note in intake', self.note_in_intake)
-        table.putBoolean('note detected', self.detect_note())
-        table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
-        table.putBoolean('intake deployed', self.intake_deployed)
-        table.putBoolean('intake running', self.intake_running)
-        table.putNumber('deploy current', self.get_deploy_current())
-        table.putNumber('outer current', self.get_outer_current())
-        table.putNumber('intake applied output', self.inner_motor.motor.getAppliedOutput())
+            table.putBoolean('note in intake', self.note_in_intake)
+            table.putBoolean('note detected', self.detect_note())
+            table.putNumber('distance sensor voltage', self.distance_sensor.getVoltage())
+            table.putBoolean('intake deployed', self.intake_deployed)
+            table.putBoolean('intake running', self.intake_running)
+            table.putNumber('deploy current', self.get_deploy_current())
+            table.putNumber('outer current', self.get_outer_current())
+            table.putNumber('intake applied output', self.inner_motor.motor.getAppliedOutput())
