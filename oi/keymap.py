@@ -79,8 +79,8 @@ class Keymap:
         #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
         # )
         
-        ENABLE_AIM_WRIST = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
+        STATIC_FEED_SHOT = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.LB
         )
         
         SET_WRIST_SUBWOOFER = commands2.button.Trigger(
@@ -98,6 +98,15 @@ class Keymap:
         AMP = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.RB
         )
+        
+        FEED_SHOT = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
+        )
+        
+        FEED_MIDLINE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
+        
         
         
     class Feeder:

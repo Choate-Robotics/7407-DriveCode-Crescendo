@@ -17,5 +17,9 @@ class FlywheelState(Enum):
     amping = 2
     manual = 3
     released = 4
+    feeding = 5
+    static_feeding = 6
 
 flywheel_state = FlywheelState.idle
+
+flywheel_tolerance = config.flywheel_min_shot_tolerance

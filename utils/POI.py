@@ -328,6 +328,32 @@ class POI:
                         constants.FieldPos.Scoring.amp_rotation,
                     )
                 )
+                
+                kFeed = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            constants.FieldPos.Scoring.amp_x,
+                            constants.FieldPos.Scoring.amp_y,
+                        ),
+                        constants.FieldPos.Scoring.amp_rotation,
+                    )
+                )
+                
+                kFeedStatic = POIPose(
+                    Pose2d(
+                        constants.FieldPos.op_wing_boundary,
+                        constants.drivetrain_length_with_bumpers/2,
+                        0
+                    )
+                )
+                
+                kFeedMidline = POIPose(
+                    Pose2d(
+                        6.460,
+                        constants.field_width - 1,
+                        3.109,
+                    )
+                )
 
                 kAmpActual = POIPose(
                     Pose2d(
