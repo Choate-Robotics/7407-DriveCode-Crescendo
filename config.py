@@ -287,13 +287,13 @@ v0_flywheel_maximum: meters_per_second = 28
 idle_flywheel: meters_per_second = v0_flywheel_minimum / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
-auto_shoot_deadline = 1.2
+auto_shoot_deadline = .5
 auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
 flywheel_shot_tolerance: meters_per_second = 0.15
-flywheel_shot_tolerance_acceleration: meters_per_second = 5
+flywheel_shot_tolerance_acceleration: meters_per_second = 50000
 flywheel_min_shot_tolerance: meters_per_second = 0.2
 flywheel_min_shot_tolerance_distance: meters = 7
 flywheel_max_shot_tolerance: meters_per_second = 0.375
@@ -319,7 +319,7 @@ object_detection_ty = -16
 object_detection_ty_threshold = 0
 object_detection_tx = 0
 object_detection_tx_threshold = 12
-object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dx = .75
 object_detection_drivetrain_speed_dy = .5
 object_detection_intaking_drivetrain_speed = .3
 

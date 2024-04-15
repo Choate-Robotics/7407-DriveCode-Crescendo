@@ -14,7 +14,7 @@ from units.SI import meters, meters_per_second, \
     radians_per_second, radians, miles_per_hour, miles_per_hour_to_meters_per_second, rotations_per_second, \
     rotations_per_second__to__radians_per_second, \
     degrees_per_second, degrees_per_second__to__radians_per_second, degrees
-
+from wpilib import TimedRobot
 
 class SwerveNode:
     """
@@ -22,12 +22,16 @@ class SwerveNode:
     """
     motor_reversed: bool = False
     motor_sensor_offset: radians = 0
-
+    sim_travel_distance: meters = 0
+    sim_motor_speed: meters_per_second = 0
+    sim_motor_angle: radians = 0
     def init(self):
         """
         Initialize the swerve node.
         """
-        ...
+        self.sim_travel_distance = 0
+        self.sim_motor_speed = 0
+        self.sim_motor_angle = 0
 
     def set(self, vel: meters_per_second, angle_radians: radians_per_second):
         """
@@ -37,8 +41,13 @@ class SwerveNode:
             vel (meters_per_second): velocity of the swerve node
             angle_radians (radians_per_second): turning swerve node velocity in radians per second
         """
+        
         self._set_angle(angle_radians, self.get_turn_motor_angle() + self.motor_sensor_offset)
         self.set_motor_velocity(vel if not self.motor_reversed else -vel)
+        if TimedRobot.isSimulation():
+            self.sim_motor_speed = vel
+            self.sim_travel_distance += vel * .03
+            self.sim_motor_angle = angle_radians
 
     # OVERRIDDEN FUNCTIONS
     def set_motor_angle(self, pos: radians):
@@ -89,6 +98,11 @@ class SwerveNode:
         Returns:
             SwerveModulePosition: position of the swerve node
         """
+        if TimedRobot.isSimulation():
+            return SwerveModulePosition(
+                self.sim_travel_distance,
+                Rotation2d(self.sim_motor_angle)
+            )
         return SwerveModulePosition(
             self.get_drive_motor_traveled_distance(),
             Rotation2d(self.get_turn_motor_angle())
@@ -100,6 +114,11 @@ class SwerveNode:
         Returns:
             SwerveModuleState: state of the swerve node
         """
+        if TimedRobot.isSimulation():
+            return SwerveModuleState(
+                self.sim_motor_speed,
+                Rotation2d(self.sim_motor_angle)
+            )
         return SwerveModuleState(
             self.get_motor_velocity(),
             Rotation2d(self.get_turn_motor_angle())
@@ -174,7 +193,13 @@ class SwerveDrivetrain(Subsystem):
         self.odometry_estimator: SwerveDrive4PoseEstimator | None = None
         self.chassis_speeds: ChassisSpeeds | None = ChassisSpeeds(0, 0, 0)
         self._omega: radians_per_second = 0
-
+        self._sim_fl: meters_per_second = 0
+        self._sim_fr: meters_per_second = 0
+        self._sim_bl: meters_per_second = 0
+        self._sim_br: meters_per_second = 0
+        self._sim_omega: radians_per_second = 0
+        self.sim_node_positions: tuple[SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition] = None
+        self.sim_node_states: tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState] = None
         self.node_translations: tuple[Translation2d] | None = None
 
     def init(self):
@@ -213,6 +238,7 @@ class SwerveDrivetrain(Subsystem):
             self.node_positions,
             self.start_pose
         )
+        
 
         logger.info("initialization complete", "[swerve_drivetrain]")
 
@@ -274,23 +300,27 @@ class SwerveDrivetrain(Subsystem):
 
         angular_vel = 0 if abs(angular_vel) < self.deadzone_angular_velocity else angular_vel
 
-        self.chassis_speeds = ChassisSpeeds(dx, dy, -angular_vel)
+        self.chassis_speeds = ChassisSpeeds(dx, dy, angular_vel)
 
         new_states = self.kinematics.toSwerveModuleStates(self.chassis_speeds)
         normalized_states = self.kinematics.desaturateWheelSpeeds(new_states, self.max_vel)
         # normalized_states = new_states
         fl, fr, bl, br = normalized_states
+            
+        self._sim_omega += angular_vel * .03
+            
         self.n_front_left.set(fl.speed, fl.angle.radians())
         self.n_front_right.set(fr.speed, fr.angle.radians())
         self.n_back_left.set(bl.speed, bl.angle.radians())
         self.n_back_right.set(br.speed, br.angle.radians())
-
-        self._omega = angular_vel  # For simulation
+        
 
         self.odometry.update(
             self.get_heading(),
             self.node_positions
         )
+
+        
 
         # self.odometry_estimator.update(
         #     self.get_heading(),
@@ -310,6 +340,17 @@ class SwerveDrivetrain(Subsystem):
         self.n_front_right.set(0, 0)
         self.n_back_left.set(0, 0)
         self.n_back_right.set(0, 0)
+        
+    def reset_gyro(self, radians: float = 0):
+        """
+        Reset the gyro to a given angle.
+
+        Args:
+            radians (float): The angle to reset the gyro to in radians.
+        """
+        if TimedRobot.isSimulation():
+            self._sim_omega = radians
+        self.gyro.reset_angle(radians)
 
     def get_heading(self) -> Rotation2d:
         """
@@ -318,6 +359,8 @@ class SwerveDrivetrain(Subsystem):
         Returns:
             Heading (Rotation2d): the robot heading
         """
+        if TimedRobot.isSimulation():
+            return Rotation2d(self._sim_omega + self.gyro_offset)
         return Rotation2d(self.gyro.get_robot_heading() + self.gyro_offset)
 
     def reset_odometry(self, pose: Pose2d):
@@ -334,6 +377,24 @@ class SwerveDrivetrain(Subsystem):
         )
         self.odometry_estimator.resetPosition(
             gyroAngle=self.get_heading(),
+            pose=pose,
+            modulePositions=self.node_positions
+        )
+        
+    def reset_odometry_auto(self, pose: Pose2d):
+        """
+        Reset the odometry to a given pose.
+
+        Args:
+            pose (Pose2d): The pose to reset the odometry to.
+        """
+        self.odometry.resetPosition(
+            gyroAngle=pose.rotation(),
+            pose=pose,
+            modulePositions=self.node_positions,
+        )
+        self.odometry_estimator.resetPosition(
+            gyroAngle=pose.rotation(),
             pose=pose,
             modulePositions=self.node_positions
         )

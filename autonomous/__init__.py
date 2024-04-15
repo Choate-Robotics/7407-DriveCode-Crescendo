@@ -22,3 +22,6 @@ from autonomous.routines.RIGHT_THREE_NOTE.auto import (  # noqa
 from autonomous.routines.ROTATE.auto import routine as rotate  # noqa
 from autonomous.routines.TWO_NOTE.auto import routine as two_note  # noqa
 from autonomous.routines.MIDLINE_NOTES_2.auto import routine as mid_notes_2
+
+from autonomous.routines.AMP_SKIP.auto import routine as amp_skip
+from autonomous.routines.AMP_SKIP_2.auto import routine as amp_skip_2

@@ -39,11 +39,7 @@ class OI:
         
         Keymap.Shooter.AMP\
             .whileTrue(
-                commands2.ConditionalCommand(
-                    command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(-90)),
-                    command.DriveSwerveHoldRotationIndef(Robot.drivetrain, radians(90)),
-                    lambda: config.active_team == config.Team.RED
-                )
+                command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.amp)
             ).onFalse(
                 command.DriveSwerveCustom(Robot.drivetrain)
             )

@@ -19,6 +19,7 @@ from wpimath.units import seconds
 import robot_states as states
 import ntcore
 from enum import Enum
+from wpimath.geometry import Rotation2d
 
 from wpilib import RobotState
 
@@ -53,8 +54,8 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
 
     def execute(self) -> None:
         dx, dy, d_theta = (
-            self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
-            self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
+            self.subsystem.axis_dx.value * (1 if config.drivetrain_reversed else -1),
+            self.subsystem.axis_dy.value * (1 if config.drivetrain_reversed else -1),
             self.subsystem.axis_rotation.value,
         )
 
@@ -75,7 +76,7 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
         
 
         if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, dx), d_theta)
+            self.subsystem.set_driver_centric((dy, dx), -d_theta)
         else:
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
@@ -104,8 +105,9 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         feed = 1
         static_feed = 2
         feed_amp = 3
+        amp = 4
 
-    def __init__(self, drivetrain, target_calc: TrajectoryCalculator, target: Target = Target.speaker, limit_speed: bool = True):
+    def __init__(self, drivetrain, target_calc: TrajectoryCalculator, target: Target = Target.speaker, limit_speed: bool = True, auto:bool = False):
         super().__init__(drivetrain)
         self.target_calc = target_calc
         self.target = target
@@ -115,13 +117,13 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
             config.period
             )
-        self.feeding: bool = False
+        self.shooting: bool = False
         # self.theta_controller.setTolerance(radians(3 if RobotState.isAutonomous() else 3), radians(4 if RobotState.isAutonomous() else 4))
         self.table = ntcore.NetworkTableInstance.getDefault().getTable('Drivetrain Aim')
+        self.auto = auto
 
     def initialize(self) -> None:
-        self.feeding = True
-        self.target_calc.odometry.enable_shooting()
+        self.shooting = True
         self.theta_controller.enableContinuousInput(radians(-180), radians(180))
         self.theta_controller.reset()
         if config.drivetrain_rotation_enable_tuner:
@@ -138,9 +140,11 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         if (
             self.target == DriveSwerveAim.Target.speaker
         ):
-            self.feeding = False
+            self.shooting = True
+            self.target_calc.odometry.enable_shooting()
         else:
-            self.feeding = True
+            self.shooting = False
+            self.target_calc.odometry.disable_shooting()
         
         if config.drivetrain_rotation_enable_tuner:
             config.drivetrain_rotation_P = self.table.getNumber('P', config.drivetrain_rotation_P)
@@ -157,14 +161,14 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             # put graphs
         
         self.theta_controller.setTolerance(
-            self.target_calc.get_shot_pos_tolerance()
+            self.target_calc.get_shot_pos_tolerance() * (2 if self.auto else 1)
             if self.target == DriveSwerveAim.Target.speaker
             else config.drivetrain_feed_tolerance
         )
         
         dx, dy = (
-            self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
-            self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
+            self.subsystem.axis_dx.value * (1 if config.drivetrain_reversed else -1),
+            self.subsystem.axis_dy.value * (1 if config.drivetrain_reversed else -1),
         )
 
         target_angle = (
@@ -174,12 +178,16 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             if self.target == DriveSwerveAim.Target.feed
             else self.target_calc.get_bot_theta_static_feed()
             if self.target == DriveSwerveAim.Target.static_feed
-            else self.target_calc.get_bot_theta_feed()
+            else self.target_calc.get_bot_theta_feed(True)
+            if self.target == DriveSwerveAim.Target.feed_amp
+            else (
+                Rotation2d(radians(-90)) if config.active_team == config.Team.RED else Rotation2d(radians(90))
+            )
             )
         
         
         # current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()
-        current = self.subsystem.get_heading().radians() - radians(180)
+        current = self.subsystem.get_heading().radians()
         current -= radians(config.drivetrain_aiming_offset)
         d_theta = self.theta_controller.calculate(current, target_angle.radians())
         if config.drivetrain_rotation_enable_tuner:
@@ -201,7 +209,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             return abs(pitch)
         
         if self.theta_controller.atSetpoint() and drive_speed() < config.drivetrain_aiming_move_speed_threshold\
-            and robot_angle() < config.drivetrain_aiming_tilt_threshold and not self.feeding:
+            and robot_angle() < config.drivetrain_aiming_tilt_threshold and self.shooting:
             self.subsystem.ready_to_shoot = True
         else:
             self.subsystem.ready_to_shoot = False
@@ -213,7 +221,7 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         # d_theta *= config.drivetrain_aiming_max_angular_speed
 
         if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, dx), -d_theta)
+            self.subsystem.set_driver_centric((dy, dx), d_theta)
         else:
             self.subsystem.set_robot_centric((dy, -dx), d_theta)
 
@@ -243,7 +251,7 @@ class DrivetrainZero(SubsystemCommand[Drivetrain]):
 
     def initialize(self) -> None:
         print("ZEROING DRIVETRAIN")
-        self.subsystem.gyro.reset_angle()
+        self.subsystem.reset_gyro(radians(180))
         self.subsystem.n_front_left.zero()
         self.subsystem.n_front_right.zero()
         self.subsystem.n_back_left.zero()
@@ -297,8 +305,8 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
         d_theta = error
 
         dx, dy = (
-            self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
-            self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
+            self.subsystem.axis_dx.value * (1 if config.drivetrain_reversed else -1),
+            self.subsystem.axis_dy.value * (1 if config.drivetrain_reversed else -1),
 
         )
 
@@ -306,11 +314,11 @@ class DriveSwerveHoldRotation(SubsystemCommand[Drivetrain]):
         dy = curve(dy)
 
         dx *= states.drivetrain_controlled_vel
-        dy *= -states.drivetrain_controlled_vel
+        dy *= states.drivetrain_controlled_vel
         # d_theta *= self.max_angular_vel
 
         if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, -dx), -d_theta)
+            self.subsystem.set_driver_centric((dy, dx), d_theta)
         elif self.driver_centric_reversed:
             self.subsystem.set_driver_centric((-dy, dx), d_theta)
         else:
@@ -342,7 +350,7 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.target_exists = False
         self.target_constrained = False
         # self.v_pid = PIDController(.09, 0, 0.1)
-        self.h_pid = PIDController(.03, 0, 00)
+        self.h_pid = PIDController(.04, 0, 00)
         self.o_pid = PIDController(
             config.drivetrain_rotation_P,
             config.drivetrain_rotation_I,
@@ -420,64 +428,3 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
     def end(self, interrupted: bool = False):
         # self.limelight.set_pipeline_mode(config.LimelightPipeline.feducial)
         self.drivetrain.set_robot_centric((0, 0), 0)
-class DriveSwerveHoldRotationIndef(SubsystemCommand[Drivetrain]):
-    """
-    Aim drivetrain at speaker based on shooter calculations
-    """
-    driver_centric = False
-    driver_centric_reversed = True
-
-    def __init__(self, drivetrain, angle: radians):
-        super().__init__(drivetrain)
-        self.target_calc: radians = angle
-        # self.theta_controller = PIDController(0.0075, 0, 0.0001, config.period)
-        constraints = TrapezoidProfileRadians.Constraints(self.subsystem.max_angular_vel,
-                                                          constants.drivetrain_max_angular_accel)
-        self.theta_controller = ProfiledPIDControllerRadians(
-            config.drivetrain_rotation_P, config.drivetrain_rotation_I, config.drivetrain_rotation_D,
-            constraints,
-            config.
-            period
-            )
-        self.theta_controller.setTolerance(radians(1), radians(0))
-
-    def initialize(self) -> None:
-        self.theta_controller.enableContinuousInput(radians(-180), radians(180))
-        self.theta_controller.reset(
-            self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians(),
-            self.subsystem.chassis_speeds.omega
-        )
-
-
-    def execute(self) -> None:
-        dx, dy = (
-            self.subsystem.axis_dx.value * (-1 if config.drivetrain_reversed else 1),
-            self.subsystem.axis_dy.value * (-1 if config.drivetrain_reversed else 1),
-        )
-
-        target_angle = self.target_calc
-        d_theta = self.theta_controller.calculate(bound_angle(self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()), target_angle)
-
-        dx = curve(dx)
-        dy = curve(dy)
-
-        dx *= states.drivetrain_controlled_vel
-        dy *= states.drivetrain_controlled_vel
-
-        if config.driver_centric:
-            self.subsystem.set_driver_centric((dy, dx), -d_theta)
-        else:
-            self.subsystem.set_robot_centric((dy, -dx), d_theta)
-
-    def end(self, interrupted: bool) -> None:
-        self.subsystem.ready_to_shoot = False
-        self.subsystem.n_front_left.set_motor_velocity(0)
-        self.subsystem.n_front_right.set_motor_velocity(0)
-        self.subsystem.n_back_left.set_motor_velocity(0)
-        self.subsystem.n_back_right.set_motor_velocity(0)
-
-    def isFinished(self) -> bool:
-        return False
-
-    def runsWhenDisabled(self) -> bool:
-        return False

@@ -61,7 +61,7 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        # self.auto_selection.addOption("Test", autonomous.drive_straight)
+        self.auto_selection.addOption("Test", autonomous.drive_straight)
         self.auto_selection.setDefaultOption("Five Note", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
         self.auto_selection.addOption("Source Midline Auto", autonomous.mid_notes)
@@ -71,12 +71,14 @@ class _Robot(wpilib.TimedRobot):
         self.auto_selection.addOption("Speaker and Leave", autonomous.speaker_shoot_leave)
         # self.auto_selection.addOption("Do Nothing")
         self.auto_selection.addOption('Alt Amp Side', autonomous.left_four_note_reverse)
+        self.auto_selection.addOption('Amp Skip', autonomous.amp_skip)
+        self.auto_selection.addOption('Amp Skip 2', autonomous.amp_skip_2)
         # self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
         # self.auto_selection.addOption("Five Notes", autonomous.five_note)
         # self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         # self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
-        # self.auto_selection.addOption("SQUARE of death", autonomous.square)
+        self.auto_selection.addOption("SQUARE of death", autonomous.square)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
@@ -176,14 +178,8 @@ class _Robot(wpilib.TimedRobot):
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
-            # AT HARTFORD
-            # constants.FieldPos.Scoring.speaker_y = (
-            #     218.42 * inches_to_meters + 0.2
-            # ) - 4 * inches_to_meters
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
 
         Field.POI.setNTValues()
 
