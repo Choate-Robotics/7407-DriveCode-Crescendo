@@ -140,13 +140,13 @@ class FieldOdometry:
             vision_time: float
             vision_robot_pose: Pose3d
 
-            vision_robot_pose, vision_time, tag_count, distance_to_target, tag_area, tag_id = vision_pose
+            vision_robot_pose, vision_time, tag_count, distance_to_target, tag_area, tag_id, megatag2 = vision_pose
             
             self.vision_poses += [vision_robot_pose]
             # vision_robot_pose, vision_time = pose_data
             # distance_to_target = target_pose.translation()
 
-            self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count, tag_area, tag_id)
+            self.add_vision_measure(vision_robot_pose, vision_time, distance_to_target, tag_count, tag_area, tag_id, megatag2)
 
         # self.update_tables()
         
@@ -230,7 +230,7 @@ class FieldOdometry:
         # )
         
     
-    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float, tag_id:float):
+    def add_vision_measure(self, vision_pose: Pose3d, vision_time: float, distance_to_target: float, tag_count: int, tag_area:float, tag_id:float, megatag2:bool=False):
         if not self.pose_within_field(vision_pose.toPose2d()):
             return
         distance_deviation = self.getPose().translation().distance(vision_pose.toPose2d().translation())
@@ -277,7 +277,7 @@ class FieldOdometry:
                     std_dev = compensate_speaker(0.2) if tag_count > 1 else compensate_speaker(0.5)
                     using_speaker_tags = True
         if self.shooting:
-            std_dev_omega = math.radians(99999)
+            std_dev_omega = math.radians(9)
             if tag_count < 2:
                 return
             if using_speaker_tags == False and tag_count < 3:
@@ -290,13 +290,11 @@ class FieldOdometry:
         )
 
     def get_vision_poses(self):
-        vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float]] | None
+        vision_robot_pose_list: list[tuple[Pose3d, float, float, float, float, float, bool]] | None
         try:
             
-            rotation = self.getPose().rotation().degrees()
-            
             vision_robot_pose_list = (
-                self.vision_estimator.get_estimated_robot_pose(rotation)
+                self.vision_estimator.get_estimated_robot_pose()
                 if self.vision_estimator
                 else None
             )
