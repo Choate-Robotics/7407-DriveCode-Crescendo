@@ -178,14 +178,8 @@ class _Robot(wpilib.TimedRobot):
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
-            # AT HARTFORD
-            # constants.FieldPos.Scoring.speaker_y = (
-            #     218.42 * inches_to_meters + 0.2
-            # ) - 4 * inches_to_meters
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
 
         Field.POI.setNTValues()
 

@@ -407,11 +407,11 @@ class TrajectoryCalculator:
         self.base_rotation2d = self.get_rotation_to_speaker()
         return self.base_rotation2d
     
-    def get_bot_theta_feed(self) -> Rotation2d:
+    def get_bot_theta_feed(self, force_amp) -> Rotation2d:
         """
         Returns the angle of the Robot
         """
-        self.feed_rotation2d = self.get_rotation_to_feed_zone()
+        self.feed_rotation2d = self.get_rotation_to_feed_zone(force_amp=force_amp)
         return self.feed_rotation2d
     
     def get_bot_theta_static_feed(self) -> Rotation2d:
