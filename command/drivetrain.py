@@ -22,7 +22,7 @@ from enum import Enum
 from wpimath.geometry import Rotation2d
 
 from wpilib import RobotState
-
+from utils import POI
 
 def curve_abs(x):
     curve = wpilib.SmartDashboard.getNumber('curve', 2)
@@ -106,6 +106,8 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
         static_feed = 2
         feed_amp = 3
         amp = 4
+        stage_amp = 5
+        stage_source = 6
 
     def __init__(self, drivetrain, target_calc: TrajectoryCalculator, target: Target = Target.speaker, limit_speed: bool = True, auto:bool = False):
         super().__init__(drivetrain)
@@ -171,19 +173,28 @@ class DriveSwerveAim(SubsystemCommand[Drivetrain]):
             self.subsystem.axis_dy.value * (1 if config.drivetrain_reversed else -1),
         )
 
-        target_angle = (
-            self.target_calc.get_bot_theta()
-            if self.target == DriveSwerveAim.Target.speaker
-            else self.target_calc.get_bot_theta_feed()
-            if self.target == DriveSwerveAim.Target.feed
-            else self.target_calc.get_bot_theta_static_feed()
-            if self.target == DriveSwerveAim.Target.static_feed
-            else self.target_calc.get_bot_theta_feed(True)
-            if self.target == DriveSwerveAim.Target.feed_amp
-            else (
-                Rotation2d(radians(-90)) if config.active_team == config.Team.RED else Rotation2d(radians(90))
-            )
-            )
+        
+        
+        def get_target_angle():
+            match self.target:
+                case DriveSwerveAim.Target.speaker:
+                    return self.target_calc.get_bot_theta()
+                case DriveSwerveAim.Target.feed:
+                    return self.target_calc.get_bot_theta_feed()
+                case DriveSwerveAim.Target.static_feed:
+                    return self.target_calc.get_bot_theta_static_feed()
+                case DriveSwerveAim.Target.feed_amp:
+                    return self.target_calc.get_bot_theta_feed(True)
+                case DriveSwerveAim.Target.amp:
+                    return Rotation2d(radians(-90)) if config.active_team == config.Team.RED else Rotation2d(radians(90))
+                case DriveSwerveAim.Target.stage_amp:
+                    return POI.Coordinates.Structures.Stage.kLeft.get().rotation()
+                case DriveSwerveAim.Target.stage_source:
+                    return POI.Coordinates.Structures.Stage.kRight.get().rotation()
+                case _:
+                    return self.target_calc.get_bot_theta()
+
+        target_angle = get_target_angle()
         
         
         # current = self.subsystem.odometry_estimator.getEstimatedPosition().rotation().radians()

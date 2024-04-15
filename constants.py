@@ -126,9 +126,9 @@ class FieldPos:
 
         x_deviation = stage_x - 182.73 * inches_to_meters + line_x_and_y
 
-        left_rotation = Rotation2d(math.radians(300))
+        left_rotation = Rotation2d(math.radians(180-300))
 
-        right_rotation = Rotation2d(math.radians(60))
+        right_rotation = Rotation2d(math.radians(180-60))
 
     class Source:
         source_x = field_length - 86.1 * inches_to_meters / 2

@@ -43,6 +43,20 @@ class OI:
             ).onFalse(
                 command.DriveSwerveCustom(Robot.drivetrain)
             )
+            
+        Keymap.Climb.LOCK_STAGE_SOURCE\
+            .whileTrue(
+                command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.stage_source)
+            ).onFalse(
+                command.DriveSwerveCustom(Robot.drivetrain)
+            )
+            
+        Keymap.Climb.LOCK_STAGE_AMP\
+            .whileTrue(
+                command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.stage_amp)
+            ).onFalse(
+                command.DriveSwerveCustom(Robot.drivetrain)
+            )
         
         Keymap.Shooter.AIM.and_(lambda: Robot.wrist.detect_note_second())\
             .and_(lambda: not states.flywheel_state == states.FlywheelState.amping)\

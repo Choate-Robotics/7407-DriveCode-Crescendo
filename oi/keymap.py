@@ -147,3 +147,11 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 180
         )
         
+        LOCK_STAGE_SOURCE = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+        )
+        
+        LOCK_STAGE_AMP = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
+        )
+        
