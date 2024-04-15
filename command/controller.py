@@ -330,7 +330,7 @@ class ShootAuto(SequentialCommandGroup):
         super().__init__(
             ParallelCommandGroup(  # Aim
                 AimWrist(wrist, traj_cal),  # noqa
-                DriveSwerveAim(drivetrain, traj_cal),  # noqa
+                DriveSwerveAim(drivetrain, traj_cal, limit_speed=False, auto=True),  # noqa
             )
             .until(
                 lambda: drivetrain.ready_to_shoot

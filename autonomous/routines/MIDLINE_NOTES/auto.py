@@ -228,4 +228,4 @@ auto = ParallelCommandGroup(
     # )
 )
 
-routine = AutoRoutine(Pose2d(initial[0], initial[1], math.radians(-120)), auto)
+routine = AutoRoutine(Pose2d(initial[0], initial[1], math.radians(120)), auto)

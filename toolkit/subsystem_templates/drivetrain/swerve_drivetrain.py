@@ -381,6 +381,24 @@ class SwerveDrivetrain(Subsystem):
             modulePositions=self.node_positions
         )
         
+    def reset_odometry_auto(self, pose: Pose2d):
+        """
+        Reset the odometry to a given pose.
+
+        Args:
+            pose (Pose2d): The pose to reset the odometry to.
+        """
+        self.odometry.resetPosition(
+            gyroAngle=pose.rotation(),
+            pose=pose,
+            modulePositions=self.node_positions,
+        )
+        self.odometry_estimator.resetPosition(
+            gyroAngle=pose.rotation(),
+            pose=pose,
+            modulePositions=self.node_positions
+        )
+        
 
     @staticmethod
     def _calculate_swerve_node(node_x: meters, node_y: meters, dx: meters_per_second, dy: meters_per_second,
