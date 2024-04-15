@@ -148,11 +148,15 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
         # dy = self.y_controller.calculate(Field.odometry.getPose().Y(), goal.pose.Y())
         # dtheta = self.theta_controller.calculate(Field.odometry.getPose().rotation().radians(), self.theta_f)
 
-        speeds = self.controller.calculate(Field.odometry.getPose(), goal, Rotation2d(self.theta_f))
+        pose = Field.odometry.getPose()
+        
+        gyro_pose = Pose2d(pose.translation(), self.subsystem.get_heading())
+
+        speeds = self.controller.calculate(gyro_pose, goal, Rotation2d(self.theta_f))
 
         dx, dy, dtheta = speeds.vx, speeds.vy, speeds.omega
 
-        self.subsystem.set_robot_centric((speeds.vx, speeds.vy), -speeds.omega)
+        self.subsystem.set_robot_centric((speeds.vx, speeds.vy), speeds.omega)
 
     def isFinished(self) -> bool:
         return self.finished
