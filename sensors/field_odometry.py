@@ -285,8 +285,11 @@ class FieldOdometry:
 
         dist_calculations = (std_dev, std_dev, std_dev_omega)
         self.std_dev = dist_calculations
+        
+        final_pose = Pose2d(vision_pose.toPose2d().translation(), self.drivetrain.get_heading())
+        
         self.drivetrain.odometry_estimator.addVisionMeasurement(
-            vision_pose.toPose2d(), vision_time, self.std_dev
+            final_pose, vision_time, self.std_dev
         )
 
     def get_vision_poses(self):

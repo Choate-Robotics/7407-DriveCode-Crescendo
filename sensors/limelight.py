@@ -436,7 +436,7 @@ class LimelightController(VisionEstimator):
                 
                 if abs(math.degrees(self.gyro.get_robot_heading_rate())) < config.odometry_megatag2_max_angular_velocity:
                     use_megatag_2 = True
-                    print('using megatag2')
+
 
             if (
                 limelight.april_tag_exists()
