@@ -67,6 +67,7 @@ class TrajectoryCalculator:
             self.table.putNumber('shot height offset', config.shot_height_offset)
             self.table.putNumber('height offset scalar', config.shot_height_offset_scalar)
             self.table.putNumber('shot angle offset', config.shot_angle_offset)
+            self.table.putNumber('wrist tolerance', config.wrist_shot_tolerance)
 
     def calculate_angle_no_air(self, distance_to_target: float, delta_z) -> radians:
         """
@@ -337,8 +338,16 @@ class TrajectoryCalculator:
         # self.update_tables()
 
     def update_tables(self):
+        
+        
+        
         self.table.putNumber('wrist angle', degrees(self.get_theta()))
         self.table.putNumber('wrist feed angle', degrees(self.get_feed_theta()))
+        self.table.putNumber('wrist tolerance', config.wrist_shot_tolerance)
+        
+        if self.tuning:
+            config.wrist_shot_tolerance = self.table.getNumber('wrist tolerance', config.wrist_shot_tolerance)
+        
         self.table.putNumber('distance to target', self.distance_to_target)
         self.table.putNumber('bot angle', self.get_bot_theta().degrees())
         self.table.putNumber('bot feed angle', self.get_bot_theta_feed().degrees())
@@ -379,6 +388,11 @@ class TrajectoryCalculator:
         """    
         if self.tuning:
             config.shot_angle_offset = self.table.getNumber('shot angle offset', config.shot_angle_offset)
+        
+        
+        
+        if self.tuning:
+            config.wrist_shot_tolerance = self.table.getNumber('wrist tolerance', config.wrist_shot_tolerance)
         
         self.shoot_angle = self.calculate_angle_no_air(self.get_distance_to_target(), self.get_delta_z())
         return self.shoot_angle + radians(config.shot_angle_offset)
