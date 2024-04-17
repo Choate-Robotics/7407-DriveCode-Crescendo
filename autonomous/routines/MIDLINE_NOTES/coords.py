@@ -30,7 +30,9 @@ get_second_note = (
 
 shoot_second_note = (
     get_second_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(-0.75, 1.3, 0))],
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.3, 0)),
+    #   Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(-0.75, 1.3, 0))
+      ],
     Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.1, 1.2, 0)).withRotation(-120)
 )
 

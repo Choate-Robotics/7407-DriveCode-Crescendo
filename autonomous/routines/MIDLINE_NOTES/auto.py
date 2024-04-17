@@ -2,7 +2,7 @@ from command.autonomous.custom_pathing import FollowPathCustom, AngleType
 from command.autonomous.trajectory import CustomTrajectory, PoseType
 import command
 from robot_systems import Robot, Field
-from utils import POIPose
+from utils import POIPose, POI
 import config
 import math
 from command import *
@@ -15,7 +15,8 @@ from commands2 import (
     WaitCommand,
     ParallelRaceGroup,
     ParallelDeadlineGroup,
-    WaitUntilCommand
+    WaitUntilCommand,
+    ConditionalCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -157,6 +158,38 @@ path_8 = FollowPathCustom(
     theta_f=AngleType.calculate
 )
 
+miss_path_1 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=PoseType.current,
+        waypoints=[],
+        end_pose=Field.POI.Coordinates.Notes.MidLine.kMidRight.withRotation(-90),
+        max_velocity=config.drivetrain_max_vel_auto,
+        max_accel=config.drivetrain_max_accel_auto,
+        start_velocity=0,
+        end_velocity=1.5,
+        rev=True,
+        start_rotation=math.radians(90)
+    ),
+    theta_f=math.radians(90)
+)
+
+miss_path_2 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=PoseType.current,
+        waypoints=[],
+        end_pose=Field.POI.Coordinates.Notes.MidLine.kCenter.withRotation(-90),
+        max_velocity=config.drivetrain_max_vel_auto,
+        max_accel=config.drivetrain_max_accel_auto,
+        start_velocity=0,
+        end_velocity=1.5,
+        rev=True,
+        start_rotation=math.radians(90)
+    ),
+    theta_f=math.radians(90)
+)
+
 auto = ParallelCommandGroup(
     SetFlywheelShootSpeaker(Robot.flywheel, Field.calculations),
     SequentialCommandGroup(
@@ -172,6 +205,14 @@ auto = ParallelCommandGroup(
         ParallelRaceGroup(
             SequentialCommandGroup(
                 path_2,
+                ConditionalCommand(
+                    WaitCommand(0),
+                    SequentialCommandGroup(
+                        miss_path_1,
+                    ),
+                    lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
+                    # lambda: True
+                ),
                 path_3
             ),
             SequentialCommandGroup(
@@ -191,6 +232,14 @@ auto = ParallelCommandGroup(
         ParallelRaceGroup(
             SequentialCommandGroup(
                 path_4,
+                ConditionalCommand(
+                    WaitCommand(0),
+                    SequentialCommandGroup(
+                        miss_path_2,
+                    ),
+                    lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
+                    # lambda: True
+                ),
                 path_8
             ),
             SequentialCommandGroup(
