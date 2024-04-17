@@ -26,7 +26,7 @@ comp_bot: DigitalInput = DigitalInput(
     2
 )  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-DEBUG_MODE: bool = True
+DEBUG_MODE: bool = False
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
@@ -51,8 +51,8 @@ period: float = 0.04  # seconds
 
 NT_ELEVATOR: bool = False
 NT_WRIST: bool = True
-NT_FLYWHEEL: bool = True
-NT_INTAKE: bool = False
+NT_FLYWHEEL: bool = False
+NT_INTAKE: bool = True
 
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
