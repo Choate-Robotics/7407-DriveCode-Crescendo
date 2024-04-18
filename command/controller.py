@@ -247,6 +247,14 @@ class IntakeStageNoteAuto(ParallelRaceGroup):
             WaitUntilCommand(lambda: wrist.note_in_feeder()),
         )
 
+class IntakeThenAim(SequentialCommandGroup):
+    def __init__(self, intake: Intake, wrist: Wrist, calculations: TrajectoryCalculator):
+        super().__init__(
+            IntakeStageNote(wrist, intake),
+            IntakeIdle(intake),
+            AimWrist(wrist, calculations)
+        )
+
 
 class PathUntilIntake(ParallelRaceGroup):
     def __init__(self, path: Command, wrist: Wrist, intake: Intake,

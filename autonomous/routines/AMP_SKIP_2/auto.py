@@ -177,10 +177,7 @@ auto = ParallelCommandGroup(
                 path_2,
                 path_3
             ),
-            SequentialCommandGroup(
-                IntakeStageNote(Robot.wrist, Robot.intake),
-                AimWrist(Robot.wrist, Field.calculations)
-            )
+            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
         ),
     
         # Shoot second note
@@ -194,10 +191,7 @@ auto = ParallelCommandGroup(
                 path_4,
                 path_5
             ),
-            SequentialCommandGroup(
-                IntakeStageNote(Robot.wrist, Robot.intake),
-                AimWrist(Robot.wrist, Field.calculations)
-            )
+            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
         ),
     
         # Shoot third note
