@@ -287,7 +287,7 @@ v0_flywheel_maximum: meters_per_second = 28
 idle_flywheel: meters_per_second = v0_flywheel_minimum / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
-auto_shoot_deadline = .5
+auto_shoot_deadline = 1.5
 auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
