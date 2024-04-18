@@ -70,13 +70,13 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 
 #AUTO
 
-class NoteSelect(Enum):
-    FAR = 0
-    MID = 1
-    CENTER = 2
+# class NoteSelect(Enum):
+#     FAR = 0
+#     MID = 1
+#     CENTER = 2
 
-first_note: NoteSelect = NoteSelect.FAR
-second_note: NoteSelect = NoteSelect.MID
+# first_note: NoteSelect = NoteSelect.FAR
+# second_note: NoteSelect = NoteSelect.MID
 
 # Leds
 leds_id = 0
