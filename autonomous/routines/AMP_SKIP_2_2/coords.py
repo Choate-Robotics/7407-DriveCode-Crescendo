@@ -24,15 +24,20 @@ shoot_first_note = (
     POIPose(Pose2d(initial[0] + 0.2, initial[1], math.radians(-120)))
 )
 
-get_second_note = (
+get_second_note_1 = (
     initial,
-    [Field.POI.Coordinates.Structures.Scoring.kAmp.withOffset(Translation2d(0, 0.6)),
-     Field.POI.Coordinates.Structures.Scoring.kAmp.withOffset(Translation2d(2, 0.6))],
+    [Field.POI.Coordinates.Structures.Scoring.kAmp.withOffset(Translation2d(0, 0.6))],
+    Field.POI.Coordinates.Structures.Scoring.kAmp.withOffset(Translation2d(2, 0.45)).withRotation(-180)
+)
+
+get_second_note_2 = (
+    get_second_note_1[2],
+    [],
     Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0)).withRotation(-135)
 )
 
 shoot_second_note = (
-    get_second_note[2],
+    get_second_note_2[2],
     [
         # Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
         # Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.3))
@@ -42,9 +47,7 @@ shoot_second_note = (
 
 get_third_note = (
     shoot_second_note[2],
-    [
-        shoot_second_note[2].withOffset(Translation2d(1, 0))
-        ],
+    [],
     Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(0.1, -0.2)).withRotation(-180)
 )
 

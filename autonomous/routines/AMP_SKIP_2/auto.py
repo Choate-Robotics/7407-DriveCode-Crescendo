@@ -93,7 +93,7 @@ path_4 = FollowPathCustom(
         rev=True,
         start_rotation=get_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(-155)
+    theta_f=math.radians(-145)
 )
 
 path_5 = FollowPathCustom(
