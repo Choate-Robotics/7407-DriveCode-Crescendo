@@ -30,7 +30,7 @@ get_second_note = (
 
 shoot_second_note = (
     get_second_note[2],
-    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.3, 0)),
+    [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.5, 0)),
     #   Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(-0.75, 1.3, 0))
       ],
     Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.1, 1.2, 0)).withRotation(-120)
@@ -45,7 +45,7 @@ get_third_note = (
 come_back_with_third = (
     get_third_note[2].withRotation(135),
     [Field.POI.Coordinates.Structures.Obstacles.kStageRightPost.withOffset(Translation3d(0, 1.5, 0))],
-    Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.1, 1.25, 0)).withRotation(-135)
+    Field.POI.Coordinates.Structures.Obstacles.kStageCenterPost.withOffset(Translation3d(-0.2, 1.1, 0)).withRotation(-135)
 )
 
 shoot_third_note = (

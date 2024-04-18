@@ -44,7 +44,7 @@ get_third_note = (
     [
         shoot_second_note[2].withOffset(Translation2d(1, 0))
         ],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, -0.25)).withRotation(-135)
+    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0)).withRotation(-135)
 )
 
 shoot_third_note = (

@@ -205,14 +205,14 @@ auto = ParallelCommandGroup(
         ParallelRaceGroup(
             SequentialCommandGroup(
                 path_2,
-                ConditionalCommand(
-                    WaitCommand(0),
-                    SequentialCommandGroup(
-                        miss_path_1,
-                    ),
-                    lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
-                    # lambda: True
-                ),
+                # ConditionalCommand(
+                #     WaitCommand(0),
+                #     SequentialCommandGroup(
+                #         miss_path_1,
+                #     ),
+                #     lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
+                #     # lambda: True
+                # ),
                 path_3
             ),
             SequentialCommandGroup(
@@ -232,14 +232,14 @@ auto = ParallelCommandGroup(
         ParallelRaceGroup(
             SequentialCommandGroup(
                 path_4,
-                ConditionalCommand(
-                    WaitCommand(0),
-                    SequentialCommandGroup(
-                        miss_path_2,
-                    ),
-                    lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
-                    # lambda: True
-                ),
+                # ConditionalCommand(
+                #     WaitCommand(0),
+                #     SequentialCommandGroup(
+                #         miss_path_2,
+                #     ),
+                #     lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
+                #     # lambda: True
+                # ),
                 path_8
             ),
             SequentialCommandGroup(

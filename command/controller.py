@@ -260,6 +260,15 @@ class PathUntilIntake(ParallelRaceGroup):
             IntakeStageNote(wrist, intake)
         )
 
+class PathIntakeAim(ParallelRaceGroup):
+    def __init__(self, path: Command, wrist: Wrist, intake: Intake, calculations: TrajectoryCalculator):
+        super().__init__(
+            path,
+            SequentialCommandGroup(
+                IntakeStageNote(wrist, intake),
+                AimWrist(wrist, calculations)
+            ),
+        )
 
 class IntakeStageIdle(SequentialCommandGroup):
     def __init__(self, wrist: Wrist, intake: Intake):

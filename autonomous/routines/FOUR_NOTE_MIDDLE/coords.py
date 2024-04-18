@@ -23,9 +23,9 @@ get_second_note = (
 )
 
 get_third_note = (
-    get_second_note[2].withRotation(-120),
-    [],
-    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, 0)).withRotation(-50)
+    get_second_note[2].withRotation(-180),
+    [Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length, -1*constants.FieldPos.Wing.note_gap/2))],
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(0, 0)).withRotation(-10)
 )
 
 go_to_midline = (
