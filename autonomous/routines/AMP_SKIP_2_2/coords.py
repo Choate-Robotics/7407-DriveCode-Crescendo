@@ -66,6 +66,12 @@ get_fourth_note = (
     Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(0.1, -0.5))
 )
 
+shoot_fourth_note = (
+    get_fourth_note[2].withRotation(0),
+    [Field.POI.Coordinates.Structures.Obstacles.kStage.withOffset(Translation2d(0.15, -0.45))],
+    shot_location.withOffset(Translation2d(0, 1)).withRotation(90)
+)
+
 far_to_mid = (
     Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(-120),
     [],

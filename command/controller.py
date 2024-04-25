@@ -343,6 +343,7 @@ class ShootAuto(SequentialCommandGroup):
             wrist: Wrist,
             flywheel: Flywheel,
             traj_cal: TrajectoryCalculator,
+            deadline = config.auto_shoot_deadline
     ):
         super().__init__(
             ParallelCommandGroup(  # Aim
@@ -354,7 +355,7 @@ class ShootAuto(SequentialCommandGroup):
                         and wrist.ready_to_shoot
                         and flywheel.ready_to_shoot
             )
-            .withTimeout(config.auto_shoot_deadline),
+            .withTimeout(deadline),
             PassNote(wrist),  # noqa
         )
 

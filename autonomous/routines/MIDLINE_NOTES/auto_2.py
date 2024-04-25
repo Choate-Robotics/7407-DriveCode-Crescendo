@@ -1,7 +1,7 @@
 from command.autonomous.custom_pathing import FollowPathCustom, AngleType
 from command.autonomous.trajectory import CustomTrajectory, PoseType
 import command
-from robot_systems import Robot, Field
+from robot_systems import Robot, Field, Sensors
 from utils import POIPose, POI
 import config
 import math
@@ -62,7 +62,7 @@ path_3 = FollowPathCustom(
         # start_pose=shoot_second_note[0],
         start_pose=PoseType.current,
         waypoints=[coord for coord in come_back_with_third[1]],
-        end_pose=come_back_with_third[2],
+        end_pose=come_back_with_third[2].withOffset(Translation3d(-0.2, 0, 0)),
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.25,
         start_velocity=0,
@@ -224,39 +224,19 @@ auto = ParallelCommandGroup(
         InstantCommand(lambda: Field.odometry.disable()),
 
         # get third note from midline
-        # PathUntilIntake(path_4, Robot.wrist, Robot.intake),
 
-        ParallelRaceGroup(
-            SequentialCommandGroup(
-                path_4,
-                # ConditionalCommand(
-                #     WaitCommand(0),
-                #     SequentialCommandGroup(
-                #         miss_path_2,
-                #     ),
-                #     lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
-                #     # lambda: True
-                # ),
-                path_8
-            ),
-            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
+        PathUntilIntake(path_4, Robot.wrist, Robot.intake).raceWith(WaitUntilCommand(lambda: Sensors.limelight_intake.ta > 0.4 and Sensors.limelight_intake.ta < 1.75)),
+        ConditionalCommand(
+            AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
+            WaitCommand(0),
+            lambda: Sensors.limelight_intake.ta > 0.4 and not Robot.wrist.note_in_feeder()
         ),
 
-        # drive to shot zone
-        # path_8.raceWith(AimWrist(Robot.wrist, Field.calculations)),
+        path_8.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
         # shoot third note
         InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        # InstantCommand(lambda: Field.odometry.disable()),
-
-        # # get fourth note from midline
-        # PathUntilIntake(path_6, Robot.wrist, Robot.intake),
-        
-        # path_7.raceWith(AimWrist(Robot.wrist, Field.calculations)),
-        
-        # InstantCommand(lambda: Field.odometry.enable()),
-        # ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations)
     )
     # SequentialCommandGroup(
     #     # path_1,
