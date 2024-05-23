@@ -26,7 +26,7 @@ comp_bot: DigitalInput = DigitalInput(
     2
 )  # if false, we are using the practice bot (we will put a jumper on the DIO port)
 
-DEBUG_MODE: bool = True
+DEBUG_MODE: bool = False
 # MAKE SURE TO MAKE THIS FALSE FOR COMPETITION
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 LOGGING: bool = True
@@ -51,8 +51,8 @@ period: float = 0.04  # seconds
 
 NT_ELEVATOR: bool = False
 NT_WRIST: bool = True
-NT_FLYWHEEL: bool = True
-NT_INTAKE: bool = False
+NT_FLYWHEEL: bool = False
+NT_INTAKE: bool = True
 
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
@@ -70,13 +70,13 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 
 #AUTO
 
-class NoteSelect(Enum):
-    FAR = 0
-    MID = 1
-    CENTER = 2
+# class NoteSelect(Enum):
+#     FAR = 0
+#     MID = 1
+#     CENTER = 2
 
-first_note: NoteSelect = NoteSelect.FAR
-second_note: NoteSelect = NoteSelect.MID
+# first_note: NoteSelect = NoteSelect.FAR
+# second_note: NoteSelect = NoteSelect.MID
 
 # Leds
 leds_id = 0
@@ -197,7 +197,7 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_climb_current_limit: float = 45
+elevator_climb_current_limit: float = 55
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
 
 # Wrist
@@ -213,7 +213,7 @@ wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = 0.2
 feeder_voltage_feed = 8
 feeder_voltage_trap = 14
-feeder_voltage_crawl = 4.2 if comp_bot.get() else 4
+feeder_voltage_crawl = 4 if comp_bot.get() else 4
 feeder_pass_velocity = 0.5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = 0.65
@@ -259,8 +259,8 @@ drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 drivetrain_aiming_tilt_threshold: radians = 3 * degrees_to_radians
 shot_height_offset: inches = 0 # inches
-shot_angle_offset: degrees = 0.7
-wrist_shot_tolerance: degrees = 3#1.75 if comp_bot.get() else 2 
+shot_angle_offset: degrees = 0.65 if active_team == Team.RED else 0.75
+wrist_shot_tolerance: degrees = 2#1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
 shot_height_offset_scalar: float = 0.014
 speaker_length: meters = 41.83 * inches_to_meters
@@ -287,7 +287,7 @@ v0_flywheel_maximum: meters_per_second = 28
 idle_flywheel: meters_per_second = v0_flywheel_minimum / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
-auto_shoot_deadline = .5
+auto_shoot_deadline = 1.5
 auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 

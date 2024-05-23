@@ -16,9 +16,10 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.AMP_SKIP_2.coords import (
+from autonomous.routines.AMP_SKIP_2_2.coords import (
     shoot_first_note,
-    get_second_note,
+    get_second_note_1,
+    get_second_note_2,
     shoot_second_note,
     get_third_note,
     shoot_third_note,
@@ -30,36 +31,36 @@ from autonomous.routines.AMP_SKIP_2.coords import (
 
 from wpimath.geometry import Pose2d, Translation2d
 
-# path_1 = FollowPathCustom(
-#     subsystem=Robot.drivetrain,
-#     trajectory=CustomTrajectory(
-#         start_pose=shoot_first_note[0],
-#         waypoints=[coord for coord in shoot_first_note[1]],
-#         end_pose=shoot_first_note[2],
-#         max_velocity=config.drivetrain_max_vel_auto,
-#         max_accel=config.drivetrain_max_accel_auto - 1,
-#         start_velocity=0,
-#         end_velocity=0,
-#         rev=True
-#     ),
-#     theta_f=math.radians(-120)
-# )
+path_1 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        start_pose=POIPose(Pose2d(*get_second_note_1[0])),
+        waypoints=[coord for coord in get_second_note_1[1]],
+        end_pose=get_second_note_1[2],
+        max_velocity=config.drivetrain_max_vel_auto,
+        max_accel=config.drivetrain_max_accel_auto - 1,
+        start_velocity=0,
+        end_velocity=3,
+        rev=True
+    ),
+    theta_f=math.radians(-180)
+)
 
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        start_pose=POIPose(Pose2d(*get_second_note[0])),
-        # start_pose=PoseType.current,
-        waypoints=[coord for coord in get_second_note[1]],
-        end_pose=get_second_note[2],
+        # start_pose=get_second_note_2[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in get_second_note_2[1]],
+        end_pose=get_second_note_2[2],
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1,
-        start_velocity=0,
-        end_velocity=1,
+        start_velocity=3,
+        end_velocity=0,
         rev=True,
-        start_rotation=get_second_note[0][2]
+        start_rotation=get_second_note_2[0].get().rotation().radians()
     ),
-    theta_f=math.radians(-180)
+    theta_f=math.radians(-145)
 )
 
 path_3 = FollowPathCustom(
@@ -74,7 +75,7 @@ path_3 = FollowPathCustom(
         start_velocity=0,
         end_velocity=0,
         rev=False,
-        start_rotation=shoot_second_note[0].get().rotation().radians()
+        start_rotation=shoot_third_note[0].get().rotation().radians()
     ),
     theta_f=AngleType.calculate
 )
@@ -89,11 +90,11 @@ path_4 = FollowPathCustom(
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
-        end_velocity=0,
+        end_velocity=1,
         rev=True,
-        start_rotation=get_third_note[0].get().rotation().radians()
+        start_rotation=math.radians(-180)
     ),
-    theta_f=math.radians(-145)
+    theta_f=math.radians(-180)
 )
 
 path_5 = FollowPathCustom(
@@ -108,7 +109,7 @@ path_5 = FollowPathCustom(
         start_velocity=0,
         end_velocity=0,
         rev=False,
-        start_rotation=shoot_third_note[0].get().rotation().radians()
+        start_rotation=math.radians(-180)
     ),
     theta_f=AngleType.calculate
 )
@@ -128,6 +129,23 @@ path_6 = FollowPathCustom(
         start_rotation=get_fourth_note[0].get().rotation().radians()
     ),
     theta_f=(math.radians(-180))
+)
+
+path_7 = FollowPathCustom(
+    subsystem=Robot.drivetrain,
+    trajectory=CustomTrajectory(
+        # start_pose=get_third_note[0],
+        start_pose=PoseType.current,
+        waypoints=[coord for coord in get_third_note[1]],
+        end_pose=get_third_note[2],
+        max_velocity=config.drivetrain_max_vel_auto,
+        max_accel=config.drivetrain_max_accel_auto - 1,
+        start_velocity=0,
+        end_velocity=1,
+        rev=True,
+        start_rotation=math.radians(-180)
+    ),
+    theta_f=math.radians(-180)
 )
 
 # path_far_to_mid = FollowPathCustom(
@@ -174,6 +192,7 @@ auto = ParallelCommandGroup(
         # Get second note
         ParallelRaceGroup(
             SequentialCommandGroup(
+                path_1,
                 path_2,
                 path_3
             ),
@@ -199,7 +218,9 @@ auto = ParallelCommandGroup(
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
         InstantCommand(lambda: Field.odometry.disable()),
 
-        PathUntilIntake(path_6, Robot.wrist, Robot.intake, 1)
+        # PathUntilIntake(path_6, Robot.wrist, Robot.intake, 1)
+
+        path_7.alongWith(SetWristIdle(Robot.wrist))
     
     ),
 

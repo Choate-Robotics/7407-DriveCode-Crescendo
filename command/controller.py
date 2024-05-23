@@ -247,6 +247,14 @@ class IntakeStageNoteAuto(ParallelRaceGroup):
             WaitUntilCommand(lambda: wrist.note_in_feeder()),
         )
 
+class IntakeThenAim(SequentialCommandGroup):
+    def __init__(self, intake: Intake, wrist: Wrist, calculations: TrajectoryCalculator):
+        super().__init__(
+            IntakeStageNote(wrist, intake),
+            IntakeIdle(intake),
+            AimWrist(wrist, calculations)
+        )
+
 
 class PathUntilIntake(ParallelRaceGroup):
     def __init__(self, path: Command, wrist: Wrist, intake: Intake,
@@ -260,6 +268,15 @@ class PathUntilIntake(ParallelRaceGroup):
             IntakeStageNote(wrist, intake)
         )
 
+class PathIntakeAim(ParallelRaceGroup):
+    def __init__(self, path: Command, wrist: Wrist, intake: Intake, calculations: TrajectoryCalculator):
+        super().__init__(
+            path,
+            SequentialCommandGroup(
+                IntakeStageNote(wrist, intake),
+                AimWrist(wrist, calculations)
+            ),
+        )
 
 class IntakeStageIdle(SequentialCommandGroup):
     def __init__(self, wrist: Wrist, intake: Intake):
@@ -326,6 +343,7 @@ class ShootAuto(SequentialCommandGroup):
             wrist: Wrist,
             flywheel: Flywheel,
             traj_cal: TrajectoryCalculator,
+            deadline = config.auto_shoot_deadline
     ):
         super().__init__(
             ParallelCommandGroup(  # Aim
@@ -337,7 +355,7 @@ class ShootAuto(SequentialCommandGroup):
                         and wrist.ready_to_shoot
                         and flywheel.ready_to_shoot
             )
-            .withTimeout(config.auto_shoot_deadline),
+            .withTimeout(deadline),
             PassNote(wrist),  # noqa
         )
 

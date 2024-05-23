@@ -61,24 +61,27 @@ class _Robot(wpilib.TimedRobot):
         self.scheduler.setPeriod(config.period)
 
         self.auto_selection = wpilib.SendableChooser()
-        self.auto_selection.addOption("Test", autonomous.drive_straight)
+        # self.auto_selection.addOption("Test", autonomous.drive_straight)
         self.auto_selection.setDefaultOption("Five Note", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
-        self.auto_selection.addOption("Source Midline Auto", autonomous.mid_notes)
-        self.auto_selection.addOption("Alt Source Midline Auto", autonomous.mid_notes_2)
+        self.auto_selection.addOption("Source Side", autonomous.mid_notes)
+        self.auto_selection.addOption("Source Side Inverted", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Amp Side", autonomous.left_four_note)
         self.auto_selection.addOption("Speaker and Leave", autonomous.speaker_shoot_leave)
         # self.auto_selection.addOption("Do Nothing")
         self.auto_selection.addOption('Alt Amp Side', autonomous.left_four_note_reverse)
-        self.auto_selection.addOption('Amp Skip', autonomous.amp_skip)
-        self.auto_selection.addOption('Amp Skip 2', autonomous.amp_skip_2)
+        # self.auto_selection.addOption('Amp Skip', autonomous.amp_skip)
+        self.auto_selection.addOption('Amp Skip', autonomous.amp_skip_2)
+        self.auto_selection.addOption("Amp Skip Inverted 4-5", autonomous.amp_skip_2_2)
+        self.auto_selection.addOption("Amp Skip Inverted 4-3", autonomous.amp_skip_2_2_2)
+        self.auto_selection.addOption("Amp Skip New", autonomous.amp_skip_new)
         # self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
         # self.auto_selection.addOption("Five Notes", autonomous.five_note)
         # self.auto_selection.addOption("Amp Three Piece", autonomous.amp_auto)
         # self.auto_selection.addOption("Shoot Note", autonomous.aim_shoot_auto)
-        self.auto_selection.addOption("SQUARE of death", autonomous.square)
+        # self.auto_selection.addOption("SQUARE of death", autonomous.square)
 
         wpilib.SmartDashboard.putData("Auto", self.auto_selection)
 
@@ -90,19 +93,19 @@ class _Robot(wpilib.TimedRobot):
 
         self.log.info(f"Scheduler period set to {config.period} seconds")
 
-        self.note_1_selection = wpilib.SendableChooser()
-        self.note_1_selection.setDefaultOption("Far", config.NoteSelect.FAR)
-        self.note_1_selection.addOption("Mid", config.NoteSelect.MID)
-        self.note_1_selection.addOption("Center", config.NoteSelect.CENTER)
+        # self.note_1_selection = wpilib.SendableChooser()
+        # self.note_1_selection.setDefaultOption("Far", config.NoteSelect.FAR)
+        # self.note_1_selection.addOption("Mid", config.NoteSelect.MID)
+        # self.note_1_selection.addOption("Center", config.NoteSelect.CENTER)
 
-        wpilib.SmartDashboard.putData("First note", self.note_1_selection)
+        # wpilib.SmartDashboard.putData("First note", self.note_1_selection)
 
-        self.note_2_selection = wpilib.SendableChooser()
-        self.note_2_selection.addOption("Far", config.NoteSelect.FAR)
-        self.note_2_selection.setDefaultOption("Mid", config.NoteSelect.MID)
-        self.note_2_selection.addOption("Center", config.NoteSelect.CENTER)
+        # self.note_2_selection = wpilib.SendableChooser()
+        # self.note_2_selection.addOption("Far", config.NoteSelect.FAR)
+        # self.note_2_selection.setDefaultOption("Mid", config.NoteSelect.MID)
+        # self.note_2_selection.addOption("Center", config.NoteSelect.CENTER)
 
-        wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
+        # wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
 
         # Initialize subsystems and sensors
         def init_subsystems():
@@ -271,8 +274,8 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        config.first_note = self.note_1_selection.getSelected()
-        config.second_note = self.note_2_selection.getSelected()
+        # config.first_note = self.note_1_selection.getSelected()
+        # config.second_note = self.note_2_selection.getSelected()
 
         self.auto_selection.getSelected().run()
 

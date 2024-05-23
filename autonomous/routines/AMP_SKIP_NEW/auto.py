@@ -16,15 +16,11 @@ from commands2 import (
 )
 
 from autonomous.auto_routine import AutoRoutine
-from autonomous.routines.AMP_SKIP_2.coords import (
+from autonomous.routines.AMP_SKIP_NEW.coords import (
     shoot_first_note,
     get_second_note,
     shoot_second_note,
     get_third_note,
-    shoot_third_note,
-    get_fourth_note,
-    far_to_mid,
-    mid_to_far,
     initial
 )
 
@@ -90,45 +86,12 @@ path_4 = FollowPathCustom(
         max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
         end_velocity=0,
-        rev=True,
+        rev=False,
         start_rotation=get_third_note[0].get().rotation().radians()
     ),
-    theta_f=math.radians(-145)
+    theta_f=math.radians(-180)
 )
 
-path_5 = FollowPathCustom(
-    subsystem=Robot.drivetrain,
-    trajectory=CustomTrajectory(
-        # start_pose=shoot_third_note[0],
-        start_pose=PoseType.current,
-        waypoints=[coord for coord in shoot_third_note[1]],
-        end_pose=shoot_third_note[2],
-        max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1,
-        start_velocity=0,
-        end_velocity=0,
-        rev=False,
-        start_rotation=shoot_third_note[0].get().rotation().radians()
-    ),
-    theta_f=AngleType.calculate
-)
-
-path_6 = FollowPathCustom(
-    subsystem=Robot.drivetrain,
-    trajectory=CustomTrajectory(
-        # start_pose=get_fourth_note[0],
-        start_pose=PoseType.current,
-        waypoints=[coord for coord in get_fourth_note[1]],
-        end_pose=get_fourth_note[2],
-        max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1,
-        start_velocity=0,
-        end_velocity=0,
-        rev=True,
-        start_rotation=get_fourth_note[0].get().rotation().radians()
-    ),
-    theta_f=(math.radians(-180))
-)
 
 # path_far_to_mid = FollowPathCustom(
 #     subsystem=Robot.drivetrain,
@@ -186,21 +149,14 @@ auto = ParallelCommandGroup(
         InstantCommand(lambda: Field.odometry.disable()),
     
         # Get third note
-        ParallelRaceGroup(
-            SequentialCommandGroup(
-                path_4,
-                path_5
-            ),
-            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
+        ParallelCommandGroup(
+            path_4,
+            IntakeStageNote(Robot.wrist, Robot.intake)
         ),
     
         # Shoot third note
         InstantCommand(lambda: Field.odometry.enable()),
         ShootAuto(Robot.drivetrain, Robot.wrist, Robot.flywheel, Field.calculations),
-        InstantCommand(lambda: Field.odometry.disable()),
-
-        PathUntilIntake(path_6, Robot.wrist, Robot.intake, 1)
-    
     ),
 
     # SequentialCommandGroup(

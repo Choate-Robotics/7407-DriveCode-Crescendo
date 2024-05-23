@@ -41,35 +41,41 @@ shoot_second_note = (
 
 get_third_note = (
     shoot_second_note[2],
-    [
-        shoot_second_note[2].withOffset(Translation2d(1, 0))
-        ],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0)).withRotation(-135)
-)
-
-shoot_third_note = (
-    get_third_note[2].withRotation(-135),
-    [
-        # Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
-        # Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.7))
-        ],
-    shot_location
-)
-
-get_fourth_note = (
-    shoot_third_note[2].withRotation(-100),
-    [Field.POI.Coordinates.Structures.Obstacles.kStage.withOffset(Translation2d(0.15, -0.45))],
-    Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(0.1, -0.5))
-)
-
-far_to_mid = (
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(-120),
     [],
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(0, -0.25)).withRotation(130)
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-0.75, 0)).withRotation(-180)
 )
 
-mid_to_far = (
-    Field.POI.Coordinates.Notes.MidLine.kMidLeft.withRotation(0),
-    [],
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(0)
-)
+# get_third_note = (
+#     shoot_second_note[2],
+#     [
+#         shoot_second_note[2].withOffset(Translation2d(1, 0))
+#         ],
+#     Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d((-2 * constants.drivetrain_length / 3) + 0.5, 0)).withRotation(-135)
+# )
+
+# shoot_third_note = (
+#     get_third_note[2].withRotation(-135),
+#     [
+#         # Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
+#         # Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.7))
+#         ],
+#     shot_location
+# )
+
+# get_fourth_note = (
+#     shoot_third_note[2].withRotation(-100),
+#     [Field.POI.Coordinates.Structures.Obstacles.kStage.withOffset(Translation2d(0.15, -0.45))],
+#     Field.POI.Coordinates.Notes.MidLine.kCenter.withOffset(Translation2d(0.1, -0.5))
+# )
+
+# far_to_mid = (
+#     Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(-120),
+#     [],
+#     Field.POI.Coordinates.Notes.MidLine.kMidLeft.withOffset(Translation2d(0, -0.25)).withRotation(130)
+# )
+
+# mid_to_far = (
+#     Field.POI.Coordinates.Notes.MidLine.kMidLeft.withRotation(0),
+#     [],
+#     Field.POI.Coordinates.Notes.MidLine.kFarLeft.withRotation(0)
+# )
