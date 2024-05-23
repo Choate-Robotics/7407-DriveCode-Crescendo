@@ -1,7 +1,7 @@
 from command.autonomous.custom_pathing import FollowPathCustom, AngleType
 from command.autonomous.trajectory import CustomTrajectory, PoseType
 import command
-from robot_systems import Robot, Field
+from robot_systems import Robot, Field, Sensors
 from utils import POIPose, POI
 import config
 import math
@@ -202,21 +202,26 @@ auto = ParallelCommandGroup(
         PassNote(Robot.wrist),
 
         # get second note from midline
-        ParallelRaceGroup(
+        # ParallelRaceGroup(
+        #     SequentialCommandGroup(
+        #         path_2,
+        #         path_3
+        #     ),
+        #     IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
+        # ),
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake).raceWith(
             SequentialCommandGroup(
-                path_2,
-                # ConditionalCommand(
-                #     WaitCommand(0),
-                #     SequentialCommandGroup(
-                #         miss_path_1,
-                #     ),
-                #     lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
-                #     # lambda: True
-                # ),
-                path_3
-            ),
-            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
+                WaitCommand(1.5),
+                WaitUntilCommand(lambda: Sensors.limelight_intake.ta > 0.4 and Sensors.limelight_intake.ta < 1.75)
+            )
         ),
+        ConditionalCommand(
+            AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
+            WaitCommand(0),
+            lambda: Sensors.limelight_intake.ta > 0.4 and not Robot.wrist.note_in_feeder()
+        ),
+
+        path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 
         # shoot second note
         InstantCommand(lambda: Field.odometry.enable()),
@@ -229,14 +234,6 @@ auto = ParallelCommandGroup(
         ParallelRaceGroup(
             SequentialCommandGroup(
                 path_4,
-                # ConditionalCommand(
-                #     WaitCommand(0),
-                #     SequentialCommandGroup(
-                #         miss_path_2,
-                #     ),
-                #     lambda: Robot.intake.detect_note() | Robot.wrist.note_detected()
-                #     # lambda: True
-                # ),
                 path_8
             ),
             IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)

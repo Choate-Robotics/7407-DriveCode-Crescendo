@@ -27,3 +27,4 @@ from autonomous.routines.AMP_SKIP.auto import routine as amp_skip
 from autonomous.routines.AMP_SKIP_2.auto import routine as amp_skip_2
 from autonomous.routines.AMP_SKIP_2_2.auto import routine as amp_skip_2_2
 from autonomous.routines.AMP_SKIP_2_2.auto_2 import routine as amp_skip_2_2_2
+from autonomous.routines.AMP_SKIP_NEW.auto import routine as amp_skip_new
