@@ -24,16 +24,14 @@ from wpimath.geometry import Rotation2d
 from wpilib import RobotState
 from utils import POI
 
-def curve_abs(x):
-    curve = wpilib.SmartDashboard.getNumber('curve', 2)
-    return x ** curve
 
 
 def curve(x):
+    if abs(x) < 0.11:
+        return 0
     if x < 0:
-        return -curve_abs(-x)
-    return curve_abs(x)
-
+        return 1.12*(x + .11)
+    return 1.12*(x - .11)
 
 def bound_angle(degrees: float):
     degrees = degrees % 360
@@ -58,9 +56,6 @@ class DriveSwerveCustom(SubsystemCommand[Drivetrain]):
             self.subsystem.axis_dy.value * (1 if config.drivetrain_reversed else -1),
             self.subsystem.axis_rotation.value,
         )
-
-        if abs(d_theta) < 0.11:
-            d_theta = 0
 
         dx = curve(dx)
         dy = curve(dy)
@@ -359,7 +354,6 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
         self.drivetrain = subsystem
         self.limelight = LimeLight
         self.target_exists = False
-        self.target_constrained = False
         # self.v_pid = PIDController(.09, 0, 0.1)
         self.h_pid = PIDController(.04, 0, 00)
         self.o_pid = PIDController(
@@ -438,4 +432,42 @@ class DriveSwerveNoteLineup(SubsystemCommand[Drivetrain]):
     
     def end(self, interrupted: bool = False):
         # self.limelight.set_pipeline_mode(config.LimelightPipeline.feducial)
+        self.drivetrain.set_robot_centric((0, 0), 0)
+
+
+class DriveSwerveNoteRotate(SubsystemCommand[Drivetrain]):
+    def __init__(self, subsystem: Drivetrain, limelight: Limelight):
+        super().__init__(subsystem)
+        self.drivetrain = subsystem
+        self.limelight = limelight
+
+        self.theta_pid = PIDController(0.3, 0, 0)
+        self.nt = ntcore.NetworkTableInstance.getDefault()
+        self.table = self.nt.getTable("drivetrain")
+
+    def initialize(self):
+        self.theta_pid.enableContinuousInput(radians(-180), radians(180))
+        self.theta_pid.reset()
+        self.theta_pid.setSetpoint(0)
+
+    def execute(self):
+        self.limelight.update()
+
+        if not self.limelight.target_exists() or not self.limelight.get_target():
+            self.drivetrain.set_robot_centric((0, 0), 0)
+            return
+        
+        tx, ty, ta = self.limelight.get_target()
+
+        omega = self.theta_pid.calculate(-tx)
+
+        self.drivetrain.set_robot_centric((0, 0), omega)
+        self.table.putNumber(-tx, "error")
+        self.table.putNumber(0, "setpoint")
+        self.table.putNumber(omega, "output")
+
+    def isFinished(self) -> bool:
+        return False
+    
+    def end(self, interrupted):
         self.drivetrain.set_robot_centric((0, 0), 0)

@@ -50,8 +50,8 @@ drivetrain_max_vel:meters = (
     )
 # drivetrain_max_vel = 17.7
 drivetrain_max_accel: meters_per_second_squared = 0 # setting to 0 will set to default motor accel
-drivetrain_max_angular_vel = 1280 * degrees_per_second__to__radians_per_second
-drivetrain_max_angular_accel = 1280 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_vel = 720 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_accel = 720 * degrees_per_second__to__radians_per_second
 
 
 # the below variable is the rotation the motor rotates per meter of wheel movement
