@@ -68,9 +68,9 @@ class OI:
                 )
             )
 
-        Keymap.Drivetrain.X_MODE.onTrue(
-            commands2.InstantCommand(lambda: Robot.drivetrain.x_mode())
-        )
+        Keymap.Drivetrain.X_MODE.whileTrue(
+            command.DriveSwerveXMode(Robot.drivetrain)
+        ).onFalse(command.DriveSwerveCustom(Robot.drivetrain))
 
         Keymap.Intake.INTAKE_IN.whileTrue(
             command.SetElevator(Robot.elevator, config.Giraffe.kIdle.height).alongWith(
@@ -115,20 +115,22 @@ class OI:
             )
         
         
-        Keymap.Shooter.FEED_SHOT.and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
-            command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)
-        ).onFalse(
-            command.DriveSwerveCustom(Robot.drivetrain)
-        )
+        # Keymap.Shooter.FEED_SHOT.and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
+        #     command.DriveSwerveAim(Robot.drivetrain, Field.calculations, command.DriveSwerveAim.Target.feed, False)
+        # ).onFalse(
+        #     command.DriveSwerveCustom(Robot.drivetrain)
+        # )
         
-        Keymap.Shooter.FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second())\
-            .and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
-            command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed)
-        ).onFalse(
-                commands2.WaitCommand(0.5).andThen(
-                command.SetWristIdle(Robot.wrist)
-                )
-            )
+        # Keymap.Shooter.FEED_SHOT.and_(lambda: Robot.wrist.detect_note_second())\
+        #     .and_(Keymap.Shooter.FEED_MIDLINE.getAsBoolean).onTrue(
+        #     command.AimWrist(Robot.wrist, Field.calculations, command.AimWrist.Target.feed)
+        # ).onFalse(
+        #         commands2.WaitCommand(0.5).andThen(
+        #         command.SetWristIdle(Robot.wrist)
+        #         )
+        #     )
+
+        Keymap.Feeder.SOURCE_FEED.whileTrue(command.SourceFeed(Robot.wrist)).onFalse(command.SetWristIdle(Robot.wrist))
         
         
         

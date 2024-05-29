@@ -251,3 +251,37 @@ class PassNote(SubsystemCommand[Wrist]):
         # else:
         #     # utils.LocalLogger.debug("Note transferred")
         # self.subsystem.note_staged = False
+
+class SourceFeed(SubsystemCommand[Wrist]):
+    def __init__(self, subsystem: Wrist):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+        self.first_note_detected: bool = False
+
+    def initialize(self):
+        if not self.subsystem.detect_note_second():
+            self.subsystem.feed_in()
+
+    def execute(self):
+        self.subsystem.set_wrist_angle(math.radians(-12))
+
+        if self.subsystem.detect_note_first():
+            self.first_note_detected = True
+
+        voltage = (
+            config.feeder_voltage_crawl
+            if self.first_note_detected
+            else config.feeder_voltage_feed
+        )
+
+        if not self.subsystem.detect_note_second():
+            self.subsystem.set_feed_voltage(voltage)
+
+    def isFinished(self):
+        return False
+
+    def end(self, interrupted: bool):
+        self.subsystem.stop_feed()
+        if not interrupted:
+            self.subsystem.note_staged = True
+            # utils.LocalLogger.debug("Fed-in")

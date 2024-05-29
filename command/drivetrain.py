@@ -471,3 +471,16 @@ class DriveSwerveNoteRotate(SubsystemCommand[Drivetrain]):
     
     def end(self, interrupted):
         self.drivetrain.set_robot_centric((0, 0), 0)
+
+class DriveSwerveXMode(SubsystemCommand[Drivetrain]):
+    def initialize(self):
+        pass
+
+    def execute(self):
+        self.subsystem.x_mode()
+
+    def isFinished(self):
+        return False
+    
+    def end(self, interrupted):
+        pass

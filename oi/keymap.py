@@ -103,9 +103,9 @@ class Keymap:
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
         )
         
-        FEED_MIDLINE = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
-        )
+        # FEED_MIDLINE = commands2.button.JoystickButton(
+        #     Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        # )
         
         
         
@@ -127,6 +127,9 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.4
         )
         
+        SOURCE_FEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
         # UNJAM =
          
     class Climb:
