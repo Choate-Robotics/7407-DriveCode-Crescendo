@@ -44,7 +44,7 @@ class _Robot(wpilib.TimedRobot):
 
     def handle(self, func, *args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except Exception as e:
             self.log.error(str(e))
             self.nt.getTable("errors").putString(func.__name__, str(e))
@@ -64,13 +64,18 @@ class _Robot(wpilib.TimedRobot):
         # self.auto_selection.addOption("Test", autonomous.drive_straight)
         self.auto_selection.setDefaultOption("Five Note", autonomous.four_note_middle)
         # self.auto_selection.addOption("Two Notes", autonomous.two_note)
-        self.auto_selection.addOption("Source Midline Auto", autonomous.mid_notes)
-        self.auto_selection.addOption("Alt Source Midline Auto", autonomous.mid_notes_2)
+        self.auto_selection.addOption("Source Side", autonomous.mid_notes)
+        self.auto_selection.addOption("Source Side Inverted", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Four Notes", autonomous.four_note)
         self.auto_selection.addOption("Amp Side", autonomous.left_four_note)
         self.auto_selection.addOption("Speaker and Leave", autonomous.speaker_shoot_leave)
         # self.auto_selection.addOption("Do Nothing")
         self.auto_selection.addOption('Alt Amp Side', autonomous.left_four_note_reverse)
+        # self.auto_selection.addOption('Amp Skip', autonomous.amp_skip)
+        self.auto_selection.addOption('Amp Skip', autonomous.amp_skip_2)
+        self.auto_selection.addOption("Amp Skip Inverted 4-5", autonomous.amp_skip_2_2)
+        self.auto_selection.addOption("Amp Skip Inverted 4-3", autonomous.amp_skip_2_2_2)
+        self.auto_selection.addOption("Amp Skip New", autonomous.amp_skip_new)
         # self.auto_selection.addOption("Bobcats counter auto", autonomous.mid_notes_2)
         # self.auto_selection.addOption("Right Three Notes", autonomous.right_three_note)
         # self.auto_selection.addOption("Five Notes", autonomous.five_note)
@@ -88,19 +93,19 @@ class _Robot(wpilib.TimedRobot):
 
         self.log.info(f"Scheduler period set to {config.period} seconds")
 
-        self.note_1_selection = wpilib.SendableChooser()
-        self.note_1_selection.setDefaultOption("Far", config.NoteSelect.FAR)
-        self.note_1_selection.addOption("Mid", config.NoteSelect.MID)
-        self.note_1_selection.addOption("Center", config.NoteSelect.CENTER)
+        # self.note_1_selection = wpilib.SendableChooser()
+        # self.note_1_selection.setDefaultOption("Far", config.NoteSelect.FAR)
+        # self.note_1_selection.addOption("Mid", config.NoteSelect.MID)
+        # self.note_1_selection.addOption("Center", config.NoteSelect.CENTER)
 
-        wpilib.SmartDashboard.putData("First note", self.note_1_selection)
+        # wpilib.SmartDashboard.putData("First note", self.note_1_selection)
 
-        self.note_2_selection = wpilib.SendableChooser()
-        self.note_2_selection.addOption("Far", config.NoteSelect.FAR)
-        self.note_2_selection.setDefaultOption("Mid", config.NoteSelect.MID)
-        self.note_2_selection.addOption("Center", config.NoteSelect.CENTER)
+        # self.note_2_selection = wpilib.SendableChooser()
+        # self.note_2_selection.addOption("Far", config.NoteSelect.FAR)
+        # self.note_2_selection.setDefaultOption("Mid", config.NoteSelect.MID)
+        # self.note_2_selection.addOption("Center", config.NoteSelect.CENTER)
 
-        wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
+        # wpilib.SmartDashboard.putData("Second note", self.note_2_selection)
 
         # Initialize subsystems and sensors
         def init_subsystems():
@@ -137,7 +142,9 @@ class _Robot(wpilib.TimedRobot):
         # Field.odometry.disable()
 
     def robotPeriodic(self):
-        # Leds
+        
+        self.handle(Field.odometry.vision_estimator.set_orientations)
+        
         if Robot.wrist.detect_note_second():
             config.active_leds = (config.LEDType.KStatic(255, 0, 0), 1, 5)
         elif Robot.intake.detect_note() or Robot.wrist.detect_note_first():
@@ -160,20 +167,22 @@ class _Robot(wpilib.TimedRobot):
                     return 'Amping'
                 case states.FlywheelState.released:
                     return 'Released'
+                case states.FlywheelState.feeding:
+                    return 'Feeding'
+                case states.FlywheelState.static_feeding:
+                    return 'Static Feed'
+                case _:
+                    return 'Unknown'
 
         states_nt = self.nt.getTable('states')
-        states_nt.putString('flywheel', get_flywheel_state())
+        states_nt.putString('flywheel', self.handle(get_flywheel_state))
+        
+
 
         if self.team_selection.getSelected() == config.Team.BLUE:
             config.active_team = config.Team.BLUE
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
         else:
             config.active_team = config.Team.RED
-            # AT HARTFORD
-            # constants.FieldPos.Scoring.speaker_y = (
-            #     218.42 * inches_to_meters + 0.2
-            # ) - 4 * inches_to_meters
-            constants.FieldPos.Scoring.speaker_y = 218.42 * inches_to_meters
 
         Field.POI.setNTValues()
 
@@ -182,15 +191,17 @@ class _Robot(wpilib.TimedRobot):
 
         self.handle(self.scheduler.run)
 
-        self.handle(Sensors.limelight_back.update)
-        self.handle(Sensors.limelight_front.update)
-        self.handle(Sensors.limelight_intake.update)
+        # self.handle(Sensors.limelight_back.update_bot_pose)
+        # self.handle(Sensors.limelight_front.update_bot_pose)
+        # These already get called in the odometry update
+        
+        self.handle(Sensors.limelight_intake.update_generic)
 
         self.handle(Field.odometry.update)
 
         self.handle(Field.odometry.update_tables)
 
-        self.handle(Field.calculations.update)
+        # self.handle(Field.calculations.update)
 
         self.nt.getTable("swerve").putNumberArray(
             "abs encoders", Robot.drivetrain.get_abs()
@@ -222,7 +233,17 @@ class _Robot(wpilib.TimedRobot):
                 command.DriveSwerveCustom(Robot.drivetrain),
             )
         )
-        self.scheduler.schedule(
+        
+        if not self.isSimulation():
+            self.scheduler.schedule(
+                commands2.ConditionalCommand(
+                    command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake)),
+                    command.IntakeIdle(Robot.intake),
+                    lambda: config.comp_bot.get()
+                )
+            )
+        else:
+            self.scheduler.schedule(
             command.DeployIntake(Robot.intake).andThen(command.IntakeIdle(Robot.intake))
         )
 
@@ -253,8 +274,8 @@ class _Robot(wpilib.TimedRobot):
         Robot.drivetrain.n_back_left.zero()
         Robot.drivetrain.n_back_right.zero()
 
-        config.first_note = self.note_1_selection.getSelected()
-        config.second_note = self.note_2_selection.getSelected()
+        # config.first_note = self.note_1_selection.getSelected()
+        # config.second_note = self.note_2_selection.getSelected()
 
         self.auto_selection.getSelected().run()
 
@@ -262,7 +283,7 @@ class _Robot(wpilib.TimedRobot):
         pass
 
     def autonomousExit(self):
-        # Robot.drivetrain.gyro.reset_angle(radians(180))
+        # Robot.drivetrain.gyro.reset_angle(self.auto_selection.getSelected().initial_robot_pose.rotation().radians())
         # Robot.drivetrain.n_front_left.zero()
         # Robot.drivetrain.n_front_right.zero()
         # Robot.drivetrain.n_back_left.zero()

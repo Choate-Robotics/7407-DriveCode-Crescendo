@@ -11,6 +11,7 @@ from sensors import TrajectoryCalculator
 from subsystem import Wrist
 from toolkit.command import SubsystemCommand
 from units.SI import radians
+from enum import Enum
 
 
 class ZeroWrist(SubsystemCommand[Wrist]):
@@ -107,22 +108,38 @@ class AimWrist(SubsystemCommand[Wrist]):
     """
     Aims wrist to angle according to shooter calculations
     """
+    
+    class Target(Enum):
+        
+        speaker = 0
+        feed = 1
+        feed_static = 2
+        feed_amp = 3
 
-    def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator):
+    def __init__(self, subsystem: Wrist, traj_calc: TrajectoryCalculator, target: Target = Target.speaker):
         super().__init__(subsystem)
         self.subsystem = subsystem
         self.traj_calc = traj_calc
+        self.target = target
 
     def initialize(self):
         self.subsystem.wrist_moving = True
 
     def execute(self):
-        # angle = self.traj_calc.get_theta()
+        angle = (
+            self.traj_calc.get_theta()
+            if self.target == AimWrist.Target.speaker
+            else self.traj_calc.get_feed_theta()
+            if self.target == AimWrist.Target.feed
+            else self.traj_calc.get_static_feed_theta()
+            if self.target == AimWrist.Target.feed_static
+            else self.traj_calc.get_feed_theta(True)
+        )
 
-        self.subsystem.aim_wrist(self.traj_calc.get_theta())
+        self.subsystem.aim_wrist(angle)
 
         if (
-            self.subsystem.is_at_angle(self.traj_calc.get_theta(), math.radians(config.wrist_shot_tolerance))
+            self.subsystem.is_at_angle(angle, math.radians(config.wrist_shot_tolerance))
             and
             self.subsystem.get_wrist_velocity() < config.wrist_velocity_shot_tolerance
             ):
@@ -234,3 +251,37 @@ class PassNote(SubsystemCommand[Wrist]):
         # else:
         #     # utils.LocalLogger.debug("Note transferred")
         # self.subsystem.note_staged = False
+
+class SourceFeed(SubsystemCommand[Wrist]):
+    def __init__(self, subsystem: Wrist):
+        super().__init__(subsystem)
+        self.subsystem = subsystem
+        self.first_note_detected: bool = False
+
+    def initialize(self):
+        if not self.subsystem.detect_note_second():
+            self.subsystem.feed_in()
+
+    def execute(self):
+        self.subsystem.set_wrist_angle(math.radians(-12))
+
+        if self.subsystem.detect_note_first():
+            self.first_note_detected = True
+
+        voltage = (
+            config.feeder_voltage_crawl
+            if self.first_note_detected
+            else config.feeder_voltage_feed
+        )
+
+        if not self.subsystem.detect_note_second():
+            self.subsystem.set_feed_voltage(voltage)
+
+    def isFinished(self):
+        return False
+
+    def end(self, interrupted: bool):
+        self.subsystem.stop_feed()
+        if not interrupted:
+            self.subsystem.note_staged = True
+            # utils.LocalLogger.debug("Fed-in")

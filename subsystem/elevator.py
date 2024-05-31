@@ -159,19 +159,20 @@ class Elevator(Subsystem):
 
     def periodic(self) -> None:
 
-        table = ntcore.NetworkTableInstance.getDefault().getTable('elevator')
+        if config.NT_ELEVATOR:
+            table = ntcore.NetworkTableInstance.getDefault().getTable('elevator')
 
-        table.putNumber('elevator height', self.get_length())
-        table.putNumber('elevator abs height', self.get_elevator_abs())
-        table.putBoolean('elevator moving', self.elevator_moving)
-        table.putBoolean('elevator locked', self.locked)
-        table.putBoolean('elevator zeroed', self.zeroed)
-        table.putNumber('elevator height total', self.get_length_total_height())
-        table.putNumber('elevator target height', self.target_length)
-        table.putNumber('elevator motor lead applied output', self.motor_extend.motor.getAppliedOutput())
-        table.putNumber('elevator motor follow applied output', self.motor_extend_follower.motor.getAppliedOutput())
-        table.putNumber('elevator current', self.motor_extend.motor.getOutputCurrent())
-        
+            table.putNumber('elevator height', self.get_length())
+            table.putNumber('elevator abs height', self.get_elevator_abs())
+            table.putBoolean('elevator moving', self.elevator_moving)
+            table.putBoolean('elevator locked', self.locked)
+            table.putBoolean('elevator zeroed', self.zeroed)
+            table.putNumber('elevator height total', self.get_length_total_height())
+            table.putNumber('elevator target height', self.target_length)
+            table.putNumber('elevator motor lead applied output', self.motor_extend.motor.getAppliedOutput())
+            table.putNumber('elevator motor follow applied output', self.motor_extend_follower.motor.getAppliedOutput())
+            table.putNumber('elevator current', self.motor_extend.motor.getOutputCurrent())
+            
         # set drivetrain control speed
         states.drivetrain_controlled_vel = constants.drivetrain_max_vel * max((1 - (self.get_length() / constants.elevator_max_length)), .25)
         states.drivetrain_controlled_angular_vel = constants.drivetrain_max_angular_vel * max((1 - (self.get_length() / constants.elevator_max_length)), .5)

@@ -13,7 +13,8 @@ from commands2 import (
     WaitCommand,
     ParallelRaceGroup,
     ParallelDeadlineGroup,
-    WaitUntilCommand
+    WaitUntilCommand,
+    ConditionalCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -49,8 +50,8 @@ path_1 = FollowPathCustom(
 path_2 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=get_second_note[0],
-        start_pose=PoseType.current,
+        start_pose=get_second_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_second_note[1]],
         end_pose=get_second_note[2],
         max_velocity=config.drivetrain_max_vel_auto - 0.5,
@@ -66,8 +67,8 @@ path_2 = FollowPathCustom(
 path_3 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=get_third_note[0],
-        start_pose=PoseType.current,
+        start_pose=get_third_note[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in get_third_note[1]],
         end_pose=get_third_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
@@ -83,12 +84,12 @@ path_3 = FollowPathCustom(
 path_4 = FollowPathCustom(
     subsystem=Robot.drivetrain,
     trajectory=CustomTrajectory(
-        # start_pose=go_to_midline[0],
-        start_pose=PoseType.current,
+        start_pose=go_to_midline[0],
+        # start_pose=PoseType.current,
         waypoints=[coord for coord in go_to_midline[1]],
         end_pose=go_to_midline[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 1,
+        max_accel=config.drivetrain_max_accel_auto - 1.25,
         start_velocity=0,
         end_velocity=0,
         rev=True,
@@ -105,7 +106,7 @@ path_5 = FollowPathCustom(
         waypoints=[coord for coord in shoot_last_note[1]],
         end_pose=shoot_last_note[2],
         max_velocity=config.drivetrain_max_vel_auto,
-        max_accel=config.drivetrain_max_accel_auto - 0.75,
+        max_accel=config.drivetrain_max_accel_auto - 1.25,
         start_velocity=0,
         end_velocity=0,
         rev=False,
@@ -150,22 +151,12 @@ auto = ParallelCommandGroup(
 
         # Get fifth note, go to midline
         InstantCommand(lambda: Field.odometry.disable()),
-        PathUntilIntake(path_4, Robot.wrist, Robot.intake),
-        # path_4.alongWith(SetWristIdle(Robot.wrist)),
-
-        # ParallelCommandGroup(
-        #     ParallelDeadlineGroup(
-        #         WaitUntilCommand(lambda: Robot.intake.detect_note()),
-        #         DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake)
-        #     ),
-        #     IntakeStageNote(Robot.wrist, Robot.intake)
-        # ),
-
-        # ParallelRaceGroup(
-            # DriveSwerveNoteLineup(Robot.drivetrain, Sensors.limelight_intake),
-            # AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
-            # IntakeStageNote(Robot.wrist, Robot.intake),
-        # ),
+        PathUntilIntake(path_4, Robot.wrist, Robot.intake).raceWith(WaitUntilCommand(lambda: Sensors.limelight_intake.ta > 0.4 and Sensors.limelight_intake.ta < 1.75)),
+        ConditionalCommand(
+            AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
+            WaitCommand(0),
+            lambda: Sensors.limelight_intake.ta > 0.4 and not Robot.wrist.note_in_feeder()
+        ),
 
         path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
 

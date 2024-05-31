@@ -11,7 +11,7 @@ from commands2 import button, ParallelDeadlineGroup, WaitCommand, ParallelRaceGr
 import command
 import config
 import robot_states
-from oi.keymap import Controllers
+from oi.keymap import Controllers, Keymap
 from robot_systems import Field, Robot, Sensors
 
 # ADD ROBOT IN TO THE IMPORT FROM ROBOT_SYSTEMS LATER
@@ -73,14 +73,18 @@ class IT:
     
         button.Trigger(
             lambda: Robot.wrist.note_in_feeder()\
-                and not robot_states.flywheel_state == robot_states.FlywheelState.amping
+                and not robot_states.flywheel_state == robot_states.FlywheelState.amping\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.static_feeding
         ).onTrue(
             InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.shooting))
         )
         
         button.Trigger(
             lambda: not Robot.wrist.note_in_feeder()\
-                and not robot_states.flywheel_state == robot_states.FlywheelState.amping
+                and not robot_states.flywheel_state == robot_states.FlywheelState.amping\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and not robot_states.flywheel_state == robot_states.FlywheelState.static_feeding
         ).onTrue(
             InstantCommand(lambda: set_flywheel_state(robot_states.FlywheelState.idle))
         )
@@ -98,12 +102,43 @@ class IT:
             .onTrue(
                 command.SetFlywheelVelocityIndependent(Robot.flywheel, (config.flywheel_amp_speed, 5))
             )
+            
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and not Keymap.Shooter.FEED_MIDLINE.getAsBoolean()
+            )\
+            .onTrue(
+                command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations, command.SetFlywheelShootFeeder.Style.dynamic_amp)
+            )
+            
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.feeding\
+                and Keymap.Shooter.FEED_MIDLINE.getAsBoolean()
+            )\
+            .onTrue(
+                command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations)
+            )
+            
+        button.Trigger(
+            lambda: robot_states.flywheel_state == robot_states.FlywheelState.static_feeding
+            )\
+            .onTrue(
+                command.SetFlywheelShootFeeder(Robot.flywheel, Field.calculations, command.SetFlywheelShootFeeder.Style.static)
+            )
+            
+        def set_idle():
+            robot_states.flywheel_state = robot_states.FlywheelState.idle
 
         button.Trigger(
             lambda: robot_states.flywheel_state == robot_states.FlywheelState.idle
+                # or robot_states.flywheel_state == robot_states.FlywheelState.released
             ).debounce(1).onTrue(
-                command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+                ParallelCommandGroup(
+                    InstantCommand(set_idle),
+                    command.SetFlywheelLinearVelocity(Robot.flywheel, config.idle_flywheel)
+                )
             )
+            
             
     #     #FLYWHEEL TRIGGERS ----------------
         
@@ -120,7 +155,7 @@ class IT:
             and Robot.drivetrain.ready_to_shoot
             and Robot.flywheel.ready_to_shoot
             and not Robot.elevator.elevator_moving
-        ).onTrue(command.Shoot(Robot.wrist))
+        ).debounce(0.0).onTrue(command.Shoot(Robot.wrist))
         # SHOOTER TRIGGERS ----------------
 
 

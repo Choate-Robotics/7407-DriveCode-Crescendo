@@ -13,6 +13,8 @@ from wpimath.geometry import (
     Translation3d,
 )
 
+from units.SI import inches_to_meters
+
 import constants
 import config
 # from typing import Callable, TypeVar
@@ -326,6 +328,32 @@ class POI:
                         constants.FieldPos.Scoring.amp_rotation,
                     )
                 )
+                
+                kFeed = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            constants.FieldPos.Scoring.amp_x,
+                            constants.FieldPos.Scoring.amp_y,
+                        ),
+                        constants.FieldPos.Scoring.amp_rotation,
+                    )
+                )
+                
+                kFeedStatic = POIPose(
+                    Pose2d(
+                        constants.FieldPos.op_wing_boundary,
+                        constants.drivetrain_length_with_bumpers/2,
+                        0
+                    )
+                )
+                
+                kFeedMidline = POIPose(
+                    Pose2d(
+                        6.460,
+                        constants.field_width - 1,
+                        3.109,
+                    )
+                )
 
                 kAmpActual = POIPose(
                     Pose2d(
@@ -511,6 +539,24 @@ class POI:
                             2.92
                         ),
                         Rotation2d(constants.FieldPos.pose_reverse.radians())
+                    )
+                )
+                kSubwooferRight = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            0.67,
+                            constants.field_width/2 + 0.3
+                        ),
+                        Rotation2d(math.radians(120))
+                    )
+                )
+                kSubwooferLeft = POIPose(
+                    Pose2d(
+                        Translation2d(
+                            0.67,
+                            constants.field_width / 2 + 2.7
+                        ),
+                        Rotation2d(math.radians(-60))
                     )
                 )
             

@@ -49,6 +49,11 @@ LOG_FILE_LEVEL: int = 1
 
 period: float = 0.04  # seconds
 
+NT_ELEVATOR: bool = False
+NT_WRIST: bool = True
+NT_FLYWHEEL: bool = False
+NT_INTAKE: bool = True
+
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
 elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
@@ -65,13 +70,13 @@ stage_distance_threshold: float = constants.FieldPos.Stage.stage_length * math.s
 
 #AUTO
 
-class NoteSelect(Enum):
-    FAR = 0
-    MID = 1
-    CENTER = 2
+# class NoteSelect(Enum):
+#     FAR = 0
+#     MID = 1
+#     CENTER = 2
 
-first_note: NoteSelect = NoteSelect.FAR
-second_note: NoteSelect = NoteSelect.MID
+# first_note: NoteSelect = NoteSelect.FAR
+# second_note: NoteSelect = NoteSelect.MID
 
 # Leds
 leds_id = 0
@@ -192,7 +197,7 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_climb_current_limit: float = 45
+elevator_climb_current_limit: float = 55
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
 
 # Wrist
@@ -208,7 +213,7 @@ wrist_tent_limit = 15 * degrees_to_radians
 feeder_velocity = 0.2
 feeder_voltage_feed = 8
 feeder_voltage_trap = 14
-feeder_voltage_crawl = 4.2 if comp_bot.get() else 4
+feeder_voltage_crawl = 4 if comp_bot.get() else 4
 feeder_pass_velocity = 0.5
 feeder_pass_voltage = 2
 feeder_sensor_threshold = 0.65
@@ -229,7 +234,7 @@ front_right_encoder_zeroed_pos = 0.793 if comp_bot.get() else 0.536
 back_left_move_id = 11
 back_left_turn_id = 14
 back_left_encoder_port = AnalogEncoder(1 if comp_bot.get() else 0)
-back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.458
+back_left_encoder_zeroed_pos = 0.221 if comp_bot.get() else 0.181
 
 back_right_move_id = 18
 back_right_turn_id = 16
@@ -238,9 +243,9 @@ back_right_encoder_zeroed_pos = 0.151 if comp_bot.get() else 0.984
 driver_centric: bool = True
 drivetrain_reversed: bool = False
 
-drivetrain_rotation_P: float = 4
+drivetrain_rotation_P: float = 5.4
 drivetrain_rotation_I: float = 0.0
-drivetrain_rotation_D: float = 0.1
+drivetrain_rotation_D: float = 0.06
 drivetrain_aiming_max_angular_speed: radians = 50#constants.drivetrain_max_angular_vel
 drivetrain_aiming_max_angular_accel: radians = 35 #constants.drivetrain_max_angular_accel
 
@@ -252,11 +257,19 @@ drivetrain_max_accel_auto: float = 4
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
+drivetrain_aiming_tilt_threshold: radians = 3 * degrees_to_radians
 shot_height_offset: inches = 0 # inches
-shot_angle_offset: degrees = 0.7
-wrist_shot_tolerance: degrees = 1.75 if comp_bot.get() else 2 
+shot_angle_offset: degrees = 0.4 if active_team == Team.RED else 0.4
+wrist_shot_tolerance: degrees = 2#1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
 shot_height_offset_scalar: float = 0.014
+speaker_length: meters = 41.83 * inches_to_meters
+note_length: meters = 14 * inches_to_meters
+min_drivetrain_tolerance: degrees = 1
+max_drivetrain_tolerance: degrees = 13
+drivetrain_static_tolerance_offset: degrees = 1
+drivetrain_feed_tolerance: degrees = 5
+
 
 
 # Flywheel
@@ -264,19 +277,27 @@ flywheel_id_1 = 19
 flywheel_id_2 = 1
 flywheel_motor_count = 1
 flywheel_amp_speed: meters = 19.5
+flywheel_feed_speed_max: meters_per_second = 16
+flywheel_feed_speed_min: meters_per_second = 13
 flywheel_distance_scalar: float = 1.8
+feed_shot_target_height: meters = 4
 v0_flywheel_minimum: meters_per_second = 14
 v0_flywheel_maximum: meters_per_second = 28
 # v0_effective_flywheel: meters_per_second = 12
 idle_flywheel: meters_per_second = v0_flywheel_minimum / 2
 shooter_tol = 0.001  # For aim of shooter
 max_sim_times = 100  # To make sure that we don't have infinite while loop
-auto_shoot_deadline = 1.2
+auto_shoot_deadline = 1.5
 auto_intake_note_deadline = 3
 auto_path_intake_note_deadline = 1
 
 flywheel_feed_forward = 1 / constants.NEO_MAX_RPM  # TODO: placeholder
-flywheel_shot_tolerance: meters_per_second = 0.25
+flywheel_shot_tolerance: meters_per_second = 0.15
+flywheel_shot_tolerance_acceleration: meters_per_second = 50000
+flywheel_min_shot_tolerance: meters_per_second = 0.2
+flywheel_min_shot_tolerance_distance: meters = 7
+flywheel_max_shot_tolerance: meters_per_second = 0.375
+flywheel_max_shot_tolerance_distance: meters = 4
 flywheel_shot_current_threshold = 20
 
 
@@ -284,9 +305,10 @@ flywheel_shot_current_threshold = 20
 odometry_visible_tags_threshold = 2
 odometry_tag_area_threshold = 0
 odometry_vision_deviation_threshold = 0.5
-odometry_tag_distance_threshold: meters = 4
-odometry_two_tag_distance_threshold = 7
-odometry_distance_deviation_threshold: meters = 0.5
+odometry_tag_distance_threshold: meters = 3
+odometry_megatag2_max_angular_velocity:degrees = 12
+odometry_two_tag_distance_threshold = 8
+odometry_distance_deviation_threshold: meters = 0.3
 odometry_std_auto_formula = lambda x: abs(x**2) / 2.5  # noqa
 odometry_std_tele_formula = lambda x: abs(x**1.3) / 1.3  # noqa
 odometry_crash_detection_enabled:bool = False
@@ -298,7 +320,7 @@ object_detection_ty = -16
 object_detection_ty_threshold = 0
 object_detection_tx = 0
 object_detection_tx_threshold = 12
-object_detection_drivetrain_speed_dx = .5
+object_detection_drivetrain_speed_dx = .75
 object_detection_drivetrain_speed_dy = .5
 object_detection_intaking_drivetrain_speed = .3
 
@@ -351,7 +373,7 @@ DEPLOY_CONFIG = SparkMaxConfig(0.5, 0, 0, idle_mode=rev.CANSparkMax.IdleMode.kBr
 #     idle_mode=rev.CANSparkMax.IdleMode.kCoast,
 # )
 FLYWHEEL_CONFIG = TalonConfig(
-    0.3, 0, 0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
+    0.315, 0, 0.0, 0, 0, brake_mode=False, current_limit=60, kV=0.12
 )
 
 

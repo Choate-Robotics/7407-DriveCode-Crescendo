@@ -55,6 +55,10 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.RT) > 0.4
         )
         
+        # INTAKE_IN = commands2.button.Trigger(
+        #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
+        # )
+        
         
         INTAKE_OUT = commands2.button.Trigger(
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.LT) > 0.4
@@ -75,8 +79,8 @@ class Keymap:
         #     lambda: Controllers.DRIVER_CONTROLLER.getRawAxis(-controllerDRIVER.LT) > 0.4
         # )
         
-        ENABLE_AIM_WRIST = commands2.button.JoystickButton(
-            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
+        STATIC_FEED_SHOT = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.LB
         )
         
         SET_WRIST_SUBWOOFER = commands2.button.Trigger(
@@ -94,6 +98,15 @@ class Keymap:
         AMP = commands2.button.JoystickButton(
             Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.RB
         )
+        
+        FEED_SHOT = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.B
+        )
+        
+        # FEED_MIDLINE = commands2.button.JoystickButton(
+        #     Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        # )
+        
         
         
     class Feeder:
@@ -114,6 +127,9 @@ class Keymap:
             lambda: Controllers.OPERATOR_CONTROLLER.getRawAxis(-controllerOPERATOR.L_JOY[1]) > 0.4
         )
         
+        SOURCE_FEED = commands2.button.JoystickButton(
+            Joysticks.joysticks[Controllers.OPERATOR], controllerOPERATOR.START
+        )
         # UNJAM =
          
     class Climb:
@@ -133,4 +149,12 @@ class Keymap:
         UNDO_CLIMB_UP = commands2.button.Trigger(
             lambda: Controllers.OPERATOR_CONTROLLER.getPOV() == 180
         )
+        
+        # LOCK_STAGE_SOURCE = commands2.button.JoystickButton(
+        #     Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.X
+        # )
+        
+        # LOCK_STAGE_AMP = commands2.button.JoystickButton(
+        #     Joysticks.joysticks[Controllers.DRIVER], controllerDRIVER.Y
+        # )
         

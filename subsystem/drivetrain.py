@@ -115,7 +115,7 @@ class CustomSwerveNode(SwerveNode):
 
 class Drivetrain(SwerveDrivetrain):
     n_front_left = CustomSwerveNode(
-        TalonFX(config.front_left_move_id, foc=foc_active, config=config.MOVE_CONFIG),
+        TalonFX(config.front_left_move_id, foc=foc_active, config=config.MOVE_CONFIG, inverted=False),
         SparkMax(config.front_left_turn_id, config=config.TURN_CONFIG, inverted=True),
         config.front_left_encoder_port,
         absolute_encoder_zeroed_pos=config.front_left_encoder_zeroed_pos,
@@ -136,7 +136,7 @@ class Drivetrain(SwerveDrivetrain):
         name="n_back_left",
     )
     n_back_right = CustomSwerveNode(
-        TalonFX(config.back_right_move_id, foc=foc_active, config=config.MOVE_CONFIG),
+        TalonFX(config.back_right_move_id, foc=foc_active, config=config.MOVE_CONFIG, inverted=False),
         SparkMax(config.back_right_turn_id, config=config.TURN_CONFIG, inverted=True),
         config.back_right_encoder_port,
         absolute_encoder_zeroed_pos=config.back_right_encoder_zeroed_pos,
@@ -164,10 +164,10 @@ class Drivetrain(SwerveDrivetrain):
     ready_to_shoot: bool = False
 
     def x_mode(self):
-        self.n_front_left.set_motor_angle(math.radians(-45))
-        self.n_front_right.set_motor_angle(math.radians(45))
-        self.n_back_left.set_motor_angle(math.radians(45))
-        self.n_back_right.set_motor_angle(math.radians(-45))
+        self.n_front_left.set_motor_angle(math.radians(45))
+        self.n_front_right.set_motor_angle(math.radians(-45))
+        self.n_back_left.set_motor_angle(math.radians(-45))
+        self.n_back_right.set_motor_angle(math.radians(45))
 
     def get_abs(self):
         fl = self.n_front_left.get_abs() #0.467

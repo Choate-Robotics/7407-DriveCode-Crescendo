@@ -33,7 +33,7 @@ class PowerDistribution:
 class Field:
     odometry = sensors.FieldOdometry(
         Robot.drivetrain,
-        sensors.LimelightController([Sensors.limelight_front, Sensors.limelight_back]),
+        sensors.LimelightController([Sensors.limelight_front, Sensors.limelight_back], Robot.drivetrain.gyro),
         constants.field_width,
         constants.field_length
         )

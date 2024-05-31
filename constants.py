@@ -50,8 +50,8 @@ drivetrain_max_vel:meters = (
     )
 # drivetrain_max_vel = 17.7
 drivetrain_max_accel: meters_per_second_squared = 0 # setting to 0 will set to default motor accel
-drivetrain_max_angular_vel = 1280 * degrees_per_second__to__radians_per_second
-drivetrain_max_angular_accel = 1280 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_vel = 720 * degrees_per_second__to__radians_per_second
+drivetrain_max_angular_accel = 720 * degrees_per_second__to__radians_per_second
 
 
 # the below variable is the rotation the motor rotates per meter of wheel movement
@@ -68,6 +68,8 @@ class FieldPos:
     pose_reverse = Rotation2d(math.radians(180))
 
     wing_boundary = 231 * inches_to_meters
+    
+    op_wing_boundary = field_length - wing_boundary
 
     # all poses are relative to the blue field origin
     class Wing:
@@ -124,9 +126,9 @@ class FieldPos:
 
         x_deviation = stage_x - 182.73 * inches_to_meters + line_x_and_y
 
-        left_rotation = Rotation2d(math.radians(300))
+        left_rotation = Rotation2d(math.radians(180-300))
 
-        right_rotation = Rotation2d(math.radians(60))
+        right_rotation = Rotation2d(math.radians(180-60))
 
     class Source:
         source_x = field_length - 86.1 * inches_to_meters / 2
