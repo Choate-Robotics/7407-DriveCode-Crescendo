@@ -27,7 +27,7 @@ shoot_first_note = (
 get_second_note = (
     initial,
     [Field.POI.Coordinates.Structures.Scoring.kAmp.withOffset(Translation2d(0, 0.6))],
-    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(0.1, -0.2)).withRotation(-180)
+    Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(Translation2d(0, -0.2)).withRotation(-180)
 )
 
 shoot_second_note = (
@@ -36,7 +36,7 @@ shoot_second_note = (
         # Field.POI.Coordinates.Notes.MidLine.kFarLeft.withOffset(
         # Translation2d(-(constants.FieldPos.MidLine.mid_line - constants.FieldPos.wing_boundary) + 0.1, 0.3))
         ],
-    shot_location
+    shot_location.withOffset(Translation2d(0.5, 0.35))
 )
 
 get_third_note = (
@@ -59,11 +59,11 @@ shoot_third_note = (
 get_fourth_note = (
     shoot_second_note[2].withRotation(-180),
     [],
-    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-0.75, 0)).withRotation(0)
+    Field.POI.Coordinates.Notes.Wing.kLeft.withOffset(Translation2d(-0.4, 0)).withRotation(0)
 )
 
 get_fifth_note = (
-    get_fourth_note[2].withRotation(-90),
+    get_fourth_note[2].withRotation(-70),
     [Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(-constants.drivetrain_length, -1*constants.FieldPos.Wing.note_gap/6))],
     Field.POI.Coordinates.Notes.Wing.kCenter.withOffset(Translation2d(0, -0.125)).withRotation(0)
 )
