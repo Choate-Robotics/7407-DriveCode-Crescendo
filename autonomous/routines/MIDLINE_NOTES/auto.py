@@ -66,7 +66,7 @@ path_3 = FollowPathCustom(
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.25,
         start_velocity=0,
-        end_velocity=1.5,
+        end_velocity=0.5,
         rev=False,
         start_rotation=shoot_second_note[0].get().rotation().radians()
     ),
@@ -151,7 +151,7 @@ path_8 = FollowPathCustom(
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1.25,
         start_velocity=0,
-        end_velocity=1.5,
+        end_velocity=0.5,
         rev=False,
         start_rotation=come_back_with_third[0].get().rotation().radians()
     ),

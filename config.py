@@ -197,7 +197,7 @@ elevator_can_id_2: int = 15
 elevator_ramp_rate: float = 0.0
 elevator_feed_forward: float = 0.0
 elevator_climb_ff: float = -1
-elevator_climb_current_limit: float = 55
+elevator_climb_current_limit: float = 65
 elevator_zeroed_pos = 0.036 if comp_bot.get() else 0.023
 
 # Wrist
@@ -259,7 +259,7 @@ drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
 drivetrain_aiming_tilt_threshold: radians = 3 * degrees_to_radians
 shot_height_offset: inches = 0 # inches
-shot_angle_offset: degrees = 0.4 if active_team == Team.RED else 0.4
+shot_angle_offset: degrees = 0.55 if active_team == Team.RED else 0.55
 wrist_shot_tolerance: degrees = 2#1.75 if comp_bot.get() else 2 
 wrist_velocity_shot_tolerance: degrees = 1
 shot_height_offset_scalar: float = 0.014

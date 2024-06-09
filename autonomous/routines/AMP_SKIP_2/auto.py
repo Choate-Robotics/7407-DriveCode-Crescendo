@@ -1,6 +1,6 @@
 from command.autonomous.custom_pathing import FollowPathCustom, AngleType
 from command.autonomous.trajectory import CustomTrajectory, PoseType
-from robot_systems import Robot, Field
+from robot_systems import Robot, Field, Sensors
 from utils import POIPose
 from command import *
 import config
@@ -12,7 +12,9 @@ from commands2 import (
     ParallelCommandGroup,
     ParallelDeadlineGroup,
     WaitCommand,
-    ParallelRaceGroup
+    ParallelRaceGroup,
+    ConditionalCommand,
+    WaitUntilCommand
 )
 
 from autonomous.auto_routine import AutoRoutine
@@ -55,7 +57,7 @@ path_2 = FollowPathCustom(
         max_velocity=config.drivetrain_max_vel_auto,
         max_accel=config.drivetrain_max_accel_auto - 1,
         start_velocity=0,
-        end_velocity=1,
+        end_velocity=0,
         rev=True,
         start_rotation=get_second_note[0][2]
     ),
@@ -172,13 +174,19 @@ auto = ParallelCommandGroup(
         PassNote(Robot.wrist),
         
         # Get second note
-        ParallelRaceGroup(
+        PathUntilIntake(path_2, Robot.wrist, Robot.intake).raceWith(
             SequentialCommandGroup(
-                path_2,
-                path_3
-            ),
-            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
+                WaitCommand(1.75),
+                WaitUntilCommand(lambda: Sensors.limelight_intake.ta > 0.4 and Sensors.limelight_intake.ta < 1.75)
+            )
         ),
+        ConditionalCommand(
+            AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
+            WaitCommand(0),
+            lambda: Sensors.limelight_intake.ta > 0.4 and not Robot.wrist.note_in_feeder()
+        ),
+
+        path_3.raceWith(AimWrist(Robot.wrist, Field.calculations)),
     
         # Shoot second note
         InstantCommand(lambda: Field.odometry.enable()),
@@ -186,13 +194,14 @@ auto = ParallelCommandGroup(
         InstantCommand(lambda: Field.odometry.disable()),
     
         # Get third note
-        ParallelRaceGroup(
-            SequentialCommandGroup(
-                path_4,
-                path_5
-            ),
-            IntakeThenAim(Robot.intake, Robot.wrist, Field.calculations)
+        PathUntilIntake(path_4, Robot.wrist, Robot.intake).raceWith(WaitUntilCommand(lambda: Sensors.limelight_intake.ta > 0.4 and Sensors.limelight_intake.ta < 1.75)),
+        ConditionalCommand(
+            AutoPickupNote(Robot.drivetrain, Robot.wrist, Robot.intake, Sensors.limelight_intake),
+            WaitCommand(0),
+            lambda: Sensors.limelight_intake.ta > 0.4 and not Robot.wrist.note_in_feeder()
         ),
+
+        path_5.raceWith(AimWrist(Robot.wrist, Field.calculations)),
     
         # Shoot third note
         InstantCommand(lambda: Field.odometry.enable()),
