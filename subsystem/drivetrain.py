@@ -3,146 +3,61 @@ from __future__ import annotations
 import math
 import config
 import constants
-import ntcore
 
 from dataclasses import dataclass
-from wpilib import AnalogEncoder
-from wpimath.geometry import Pose2d
-from units.SI import (
+from wpilib import AnalogEncoder, TimedRobot
+from wpimath.geometry import Rotation2d, Pose2d, Translation2d
+from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, SwerveModuleState, ChassisSpeeds, \
+    SwerveModulePosition
+from wpimath.estimator import SwerveDrive4PoseEstimator
 
-    meters,
-    meters_per_second,
-    radians,
-    radians_per_second,
-    meters_per_second_squared,
-    degrees
-)
+from units.SI import meters, meters_per_second, \
+    radians_per_second, radians, degrees_per_second__to__radians_per_second, degrees, meters_per_second_squared
 
 from oi.keymap import Keymap
+from toolkit.oi.joysticks import JoystickAxis
+from toolkit.subsystem import Subsystem
+from toolkit.utils import logger
 from toolkit.motors.rev_motors import SparkMax, SparkMaxConfig
 from toolkit.motors.ctre_motors import TalonFX
 from toolkit.sensors.gyro import Pigeon2
+from toolkit.subsystem import Subsystem
 from toolkit.subsystem_templates.drivetrain import (
-    SwerveDrivetrain,
-    SwerveNode,
+    SwerveNode
 )
-foc_active = False
 
-
-@dataclass
-class CustomSwerveNode(SwerveNode):
-    m_move: TalonFX
-    m_turn: SparkMax
-    encoder: AnalogEncoder
-    absolute_encoder_zeroed_pos: float = 0
-    name: str = "DefaultNode"
-    counter: int = 0
-
-    def init(self):
-        print(f"Initializing {self.name}", self.counter)
-        self.m_move.init()
-        self.m_turn.init()
-        self.m_turn.optimize_normal_sparkmax()
-        self.counter += 1
-
-    def zero(self):
-        """
-        Zeros the drivetrain
-
-        """
-
-        self.m_turn.set_sensor_position(0)
-        abs_encoder_position: float = self.encoder.getAbsolutePosition()
-
-        # Find the difference in current and zero absolute position
-        encoder_difference: float = abs_encoder_position - self.absolute_encoder_zeroed_pos
-
-        if encoder_difference > .5:
-            encoder_difference -= 1
-        elif encoder_difference < -.5:
-            encoder_difference += 1
-
-        motor_change = encoder_difference * constants.drivetrain_turn_gear_ratio
-        
-        ntcore.NetworkTableInstance.getDefault().getTable('swerve').putNumber('where the motor thinks it should be', motor_change)
-
-        self.m_turn.set_sensor_position(motor_change)
-
-        self.m_turn.set_target_position(0)
-
-    def get_abs(self):
-        return self.encoder.getAbsolutePosition()
-
-    def set_motor_angle(self, pos: radians):
-        self.m_turn.set_target_position(
-            (pos / (2 * math.pi)) * constants.drivetrain_turn_gear_ratio
-        )
-
-    def get_turn_motor_angle(self) -> radians:
-        return (
-                (self.m_turn.get_sensor_position() / constants.drivetrain_turn_gear_ratio)
-                * 2
-                * math.pi
-        )
-
-    def set_motor_velocity(self, vel: meters_per_second):
-        rotations_per_second = (
-                vel *
-                constants.drivetrain_move_gear_ratio_as_rotations_per_meter
-        )
-        
-        rotations_per_second_squared = (
-            constants.drivetrain_max_accel *
-            constants.drivetrain_move_gear_ratio_as_rotations_per_meter
-        ) if constants.drivetrain_max_accel > 0 else 0
-        
-
-        self.m_move.set_target_velocity(rotations_per_second, rotations_per_second_squared)
-
-    def get_motor_velocity(self) -> meters_per_second:
-        return (
-                self.m_move.get_sensor_velocity()
-                / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
-        )
-
-    def get_drive_motor_traveled_distance(self) -> meters:
-        sensor_position = self.m_move.get_sensor_position()
-        return (
-                sensor_position
-                / constants.drivetrain_move_gear_ratio_as_rotations_per_meter
-        )
-
-
-class Drivetrain(SwerveDrivetrain):
-    n_front_left = CustomSwerveNode(
-        TalonFX(config.front_left_move_id, foc=foc_active, config=config.MOVE_CONFIG, inverted=False),
+class Drivetrain(Subsystem):
+    """
+    Swerve Drivetrain Extendable class. Contains driving functions.
+    """
+    n_front_left = SwerveNode(
+        TalonFX(config.front_left_move_id, foc=config.foc_active, config=config.MOVE_CONFIG, inverted=False),
         SparkMax(config.front_left_turn_id, config=config.TURN_CONFIG, inverted=True),
         config.front_left_encoder_port,
         absolute_encoder_zeroed_pos=config.front_left_encoder_zeroed_pos,
         name="n_front_left",
     )
-    n_front_right = CustomSwerveNode(
-        TalonFX(config.front_right_move_id, foc=foc_active, config=config.MOVE_CONFIG, inverted=True),
+    n_front_right = SwerveNode(
+        TalonFX(config.front_right_move_id, foc=config.foc_active, config=config.MOVE_CONFIG, inverted=True),
         SparkMax(config.front_right_turn_id, config=config.TURN_CONFIG, inverted=False),
         config.front_right_encoder_port,
         absolute_encoder_zeroed_pos=config.front_right_encoder_zeroed_pos,
         name="n_front_right",
     )
-    n_back_left = CustomSwerveNode(
-        TalonFX(config.back_left_move_id, foc=foc_active, config=config.MOVE_CONFIG, inverted=True),
+    n_back_left = SwerveNode(
+        TalonFX(config.back_left_move_id, foc=config.foc_active, config=config.MOVE_CONFIG, inverted=True),
         SparkMax(config.back_left_turn_id, config=config.TURN_CONFIG, inverted=False),
         config.back_left_encoder_port,
         absolute_encoder_zeroed_pos=config.back_left_encoder_zeroed_pos,
         name="n_back_left",
     )
-    n_back_right = CustomSwerveNode(
-        TalonFX(config.back_right_move_id, foc=foc_active, config=config.MOVE_CONFIG, inverted=False),
+    n_back_right = SwerveNode(
+        TalonFX(config.back_right_move_id, foc=config.foc_active, config=config.MOVE_CONFIG, inverted=False),
         SparkMax(config.back_right_turn_id, config=config.TURN_CONFIG, inverted=True),
         config.back_right_encoder_port,
         absolute_encoder_zeroed_pos=config.back_right_encoder_zeroed_pos,
         name="n_back_right",
     )
-
     gyro: Pigeon2 = Pigeon2(config.gyro_id)
     axis_dx = Keymap.Drivetrain.DRIVE_X_AXIS
     axis_dy = Keymap.Drivetrain.DRIVE_Y_AXIS
@@ -151,18 +66,244 @@ class Drivetrain(SwerveDrivetrain):
     max_vel: meters_per_second = constants.drivetrain_max_vel
     max_accel: meters_per_second_squared = constants.drivetrain_max_accel
     max_angular_vel: radians_per_second = constants.drivetrain_max_angular_vel
-    deadzone_velocity: meters_per_second = 0.05
-    deadzone_angular_velocity: radians_per_second = math.radians(5)
+    deadzone_velocity: meters_per_second = 0.05  # Does not run within this speed
+    deadzone_angular_velocity: radians_per_second = 5 * degrees_per_second__to__radians_per_second  # Will not turn within this speed
+    start_pose: Pose2d = Pose2d(0, 0, 0)  # Starting pose of the robot from wpilib Pose (x, y, rotation)
     start_angle: degrees = 0
-    start_pose: Pose2d = Pose2d(
-        0,
-        0,
-        math.radians(start_angle),
-    )
-    gyro_start_angle: radians = math.radians(start_angle)
-    gyro_offset: radians = math.radians(0)
+    gyro_start_angle: radians = 0
+    gyro_offset: degrees = 0
     ready_to_shoot: bool = False
 
+    def __init__(self):
+        super().__init__()
+        self.kinematics: SwerveDrive4Kinematics | None = None
+        self.odometry: SwerveDrive4Odometry | None = None
+        self.odometry_estimator: SwerveDrive4PoseEstimator | None = None
+        self.chassis_speeds: ChassisSpeeds | None = ChassisSpeeds(0, 0, 0)
+        self._omega: radians_per_second = 0
+        self._sim_fl: meters_per_second = 0
+        self._sim_fr: meters_per_second = 0
+        self._sim_bl: meters_per_second = 0
+        self._sim_br: meters_per_second = 0
+        self._sim_omega: radians_per_second = 0
+        self.sim_node_positions: tuple[SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition] = None
+        self.sim_node_states: tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState] = None
+        self.node_translations: tuple[Translation2d] | None = None
+
+    def init(self):
+        """
+        Initialize the swerve drivetrain, kinematics, odometry, and gyro.
+        """
+        logger.info("initializing swerve drivetrain", "[swerve_drivetrain]")
+        self.n_front_left.init()
+        self.n_front_right.init()
+        self.n_back_left.init()
+        self.n_back_right.init()
+        self.gyro.init(self.gyro_start_angle)
+
+        logger.info("initializing odometry", "[swerve_drivetrain]")
+
+        self.node_translations = (
+            Translation2d(.5 * self.track_width, .5 * self.track_width),
+            Translation2d(.5 * self.track_width, -.5 * self.track_width),
+            Translation2d(-.5 * self.track_width, .5 * self.track_width),
+            Translation2d(-.5 * self.track_width, -.5 * self.track_width)
+        )
+
+        self.kinematics = SwerveDrive4Kinematics(
+            *self.node_translations
+        )
+
+        self.odometry = SwerveDrive4Odometry(
+            self.kinematics,
+            self.get_heading(),
+            self.node_positions,
+            self.start_pose
+        )
+        self.odometry_estimator = SwerveDrive4PoseEstimator(
+            self.kinematics,
+            self.get_heading(),
+            self.node_positions,
+            self.start_pose
+        )
+        
+
+        logger.info("initialization complete", "[swerve_drivetrain]")
+
+    @property
+    def node_positions(self) -> tuple[
+        SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition
+    ]:
+        """
+        Get the node positions.
+        """
+        return (
+            self.n_front_left.get_node_position(),
+            self.n_front_right.get_node_position(),
+            self.n_back_left.get_node_position(),
+            self.n_back_right.get_node_position()
+        )
+
+    @property
+    def node_states(self) -> tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]:
+        """
+        Get the node states.
+        """
+        return (
+            self.n_front_left.get_node_state(),
+            self.n_front_right.get_node_state(),
+            self.n_back_left.get_node_state(),
+            self.n_back_right.get_node_state()
+        )
+
+    def set_driver_centric(self, vel: tuple[meters_per_second, meters_per_second], angular_vel: radians_per_second):
+        """
+        Set the driver centric velocity and angular velocity. Driver centric runs with perspective of driver.
+
+        Args:
+            vel: velocity in x and y direction as (meters per second, meters per second)
+            angular_vel: angular velocity in radians per second
+        """
+        # vel = rotate_vector(vel[0], vel[1], -self.gyro.get_robot_heading())
+
+        robo_speed = ChassisSpeeds.fromFieldRelativeSpeeds(vel[0], vel[1], angular_vel, self.get_heading())
+
+        vel = robo_speed.vx, robo_speed.vy
+
+        self.set_robot_centric(vel, angular_vel)
+
+    def set_robot_centric(self, vel: tuple[meters_per_second, meters_per_second], angular_vel: radians_per_second):
+        """
+        Set the robot centric velocity and angular velocity. Robot centric runs with perspective of robot.
+        Args:
+            vel: velocity in x and y direction as (meters per second, meters per second)
+            angular_vel: angular velocity in radians per second
+        """
+
+        dx, dy = vel
+
+        dx = 0 if abs(dx) < self.deadzone_velocity else dx
+
+        dy = 0 if abs(dy) < self.deadzone_velocity else dy
+
+        angular_vel = 0 if abs(angular_vel) < self.deadzone_angular_velocity else angular_vel
+
+        self.chassis_speeds = ChassisSpeeds(dx, dy, angular_vel)
+
+        new_states = self.kinematics.toSwerveModuleStates(self.chassis_speeds)
+        normalized_states = self.kinematics.desaturateWheelSpeeds(new_states, self.max_vel)
+        # normalized_states = new_states
+        fl, fr, bl, br = normalized_states
+            
+        self._sim_omega += angular_vel * .03
+            
+        self.n_front_left.set(fl.speed, fl.angle.radians())
+        self.n_front_right.set(fr.speed, fr.angle.radians())
+        self.n_back_left.set(bl.speed, bl.angle.radians())
+        self.n_back_right.set(br.speed, br.angle.radians())
+        
+
+        self.odometry.update(
+            self.get_heading(),
+            self.node_positions
+        )
+
+        
+
+        # self.odometry_estimator.update(
+        #     self.get_heading(),
+        #     self.node_positions
+        # )
+
+        # self.chassis_speeds = self.kinematics.toChassisSpeeds(*self.node_states)
+
+    def periodic(self):
+        pass
+
+    def stop(self):
+        """
+        Stop the drivetrain and all pods.
+        """
+        self.n_front_left.set(0, 0)
+        self.n_front_right.set(0, 0)
+        self.n_back_left.set(0, 0)
+        self.n_back_right.set(0, 0)
+        
+    def reset_gyro(self, radians: float = 0):
+        """
+        Reset the gyro to a given angle.
+
+        Args:
+            radians (float): The angle to reset the gyro to in radians.
+        """
+        if TimedRobot.isSimulation():
+            self._sim_omega = radians
+        self.gyro.reset_angle(radians)
+
+    def get_heading(self) -> Rotation2d:
+        """
+        Get the robot heading.
+
+        Returns:
+            Heading (Rotation2d): the robot heading
+        """
+        if TimedRobot.isSimulation():
+            return Rotation2d(self._sim_omega + self.gyro_offset)
+        return Rotation2d(self.gyro.get_robot_heading() + self.gyro_offset)
+
+    def reset_odometry(self, pose: Pose2d):
+        """
+        Reset the odometry to a given pose.
+
+        Args:
+            pose (Pose2d): The pose to reset the odometry to.
+        """
+        self.odometry.resetPosition(
+            gyroAngle=self.get_heading(),
+            pose=pose,
+            modulePositions=self.node_positions,
+        )
+        self.odometry_estimator.resetPosition(
+            gyroAngle=self.get_heading(),
+            pose=pose,
+            modulePositions=self.node_positions
+        )
+        
+    def reset_odometry_auto(self, pose: Pose2d):
+        """
+        Reset the odometry to a given pose.
+
+        Args:
+            pose (Pose2d): The pose to reset the odometry to.
+        """
+        self.odometry.resetPosition(
+            gyroAngle=pose.rotation(),
+            pose=pose,
+            modulePositions=self.node_positions,
+        )
+        self.odometry_estimator.resetPosition(
+            gyroAngle=pose.rotation(),
+            pose=pose,
+            modulePositions=self.node_positions
+        )
+        
+
+    @staticmethod
+    def _calculate_swerve_node(node_x: meters, node_y: meters, dx: meters_per_second, dy: meters_per_second,
+                               d_theta: radians_per_second) -> tuple[meters_per_second, radians]:
+        tangent_x, tangent_y = -node_y, node_x
+        tangent_m = math.sqrt(tangent_x ** 2 + tangent_y ** 2)
+        tangent_x /= tangent_m
+        tangent_y /= tangent_m
+
+        r = math.sqrt(2) / 2
+        sx = dx + r * d_theta * tangent_x
+        sy = dy + r * d_theta * tangent_y
+
+        theta = math.atan2(sy, sx)
+        magnitude = math.sqrt(sx ** 2 + sy ** 2)
+        return magnitude, theta
+    
     def x_mode(self):
         self.n_front_left.set_motor_angle(math.radians(45))
         self.n_front_right.set_motor_angle(math.radians(-45))
@@ -175,4 +316,3 @@ class Drivetrain(SwerveDrivetrain):
         bl = self.n_back_left.get_abs() #0.727
         br = self.n_back_right.get_abs() #0.860
         return [fl, fr, bl, br]
-    

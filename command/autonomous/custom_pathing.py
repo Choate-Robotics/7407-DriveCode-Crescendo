@@ -4,7 +4,7 @@ import time
 import ntcore, config
 
 from toolkit.command import SubsystemCommand
-from toolkit.subsystem_templates.drivetrain.swerve_drivetrain import SwerveDrivetrain
+from subsystem.drivetrain import Drivetrain
 from toolkit.utils.units import radians
 from toolkit.utils.toolkit_math import bounded_angle_diff, rotate_vector
 
@@ -31,7 +31,7 @@ class AngleType(Enum):
     calculate = 1
 
 
-class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
+class FollowPathCustom(SubsystemCommand[Drivetrain]):
     """
     Follows a path using a holonomic drive controller.
 
@@ -47,7 +47,7 @@ class FollowPathCustom(SubsystemCommand[SwerveDrivetrain]):
 
     def __init__(
             self,
-            subsystem: SwerveDrivetrain,
+            subsystem: Drivetrain,
             trajectory: CustomTrajectory,
             period: float = config.period,
             theta_f = AngleType.path

@@ -54,6 +54,8 @@ NT_WRIST: bool = True
 NT_FLYWHEEL: bool = False
 NT_INTAKE: bool = True
 
+foc_active = False
+
 # Giraffe
 elevator_wrist_limit: float = 0.75  # TODO: PLACEHOLDER
 elevator_wrist_threshold: float = 0.75  # TODO: PLACEHOLDER
