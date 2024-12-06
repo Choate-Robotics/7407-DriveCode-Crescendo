@@ -180,8 +180,6 @@ class SwerveDrivetrain(Subsystem):
     track_width: meters = 1
     max_vel: meters_per_second = 20 * miles_per_hour_to_meters_per_second
     max_angular_vel: radians_per_second = 4 * rotations_per_second__to__radians_per_second
-    deadzone_velocity: meters_per_second = 0.05  # Does not run within this speed
-    deadzone_angular_velocity: radians_per_second = 5 * degrees_per_second__to__radians_per_second  # Will not turn within this speed
     start_pose: Pose2d = Pose2d(0, 0, 0)  # Starting pose of the robot from wpilib Pose (x, y, rotation)
     gyro_start_angle: radians = 0
     gyro_offset: degrees = 0
@@ -293,12 +291,6 @@ class SwerveDrivetrain(Subsystem):
         """
 
         dx, dy = vel
-
-        dx = 0 if abs(dx) < self.deadzone_velocity else dx
-
-        dy = 0 if abs(dy) < self.deadzone_velocity else dy
-
-        angular_vel = 0 if abs(angular_vel) < self.deadzone_angular_velocity else angular_vel
 
         self.chassis_speeds = ChassisSpeeds(dx, dy, angular_vel)
 

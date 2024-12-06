@@ -254,6 +254,9 @@ drivetrain_rotation_enable_tuner: bool = True
 drivetrain_max_vel_auto: float = 4.5
 drivetrain_max_accel_auto: float = 4
 
+drivetrain_deadzone: float = 0.1
+drivetrain_curve: float = 3
+
 #Shooting
 drivetrain_aiming_offset: degrees = 2.0 # degrees
 drivetrain_aiming_move_speed_threshold: meters_per_second = 0.4
